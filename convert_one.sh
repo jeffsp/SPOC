@@ -23,10 +23,17 @@ trap cleanup EXIT
 # the coordinate system
 las2las64 -set_ogc_wkt -i $1 -o ${TMPDIR}/tmp.las
 
-# Extract the coordinate system and save it to a file
-lasinfo64 -i ${TMPDIR}/tmp.las -stdout \
-    | grep PROJCS \
-    > $2/${sn}.txt
+# Save info to a text file
+lasinfo64 -i ${TMPDIR}/tmp.las -stdout > ${TMPDIR}/info.txt
+
+# Does it have a projection?
+if grep -q PROJCS ${TMPDIR}/info.txt; then
+    # Save the projection
+    grep PROJCS ${TMPDIR}/info.txt > $2/${sn}.txt
+else
+    # If there is no projection, print a blank line
+    echo "" > $2/${sn}.txt
+fi
 
 # Append the data to the file
 las2txt64 -i ${TMPDIR}/tmp.las -parse xyziRGBc -sep tab -stdout \
