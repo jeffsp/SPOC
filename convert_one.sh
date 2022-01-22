@@ -30,4 +30,4 @@ lasinfo64 -i ${TMPDIR}/tmp.las -stdout \
 
 # Append the data to the file
 las2txt64 -i ${TMPDIR}/tmp.las -parse xyziRGBc -sep tab -stdout \
-    &>> $2/${sn}.txt
+    >> $2/${sn}.txt
