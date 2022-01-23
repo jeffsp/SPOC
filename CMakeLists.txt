@@ -10,6 +10,4 @@ macro(add_app name)
     target_link_libraries(${name} fmt)
 endmacro()
 
-add_app(test1)
-add_app(overstrike_encoder)
-add_app(overstrike_decoder)
+add_app(text2gpc)

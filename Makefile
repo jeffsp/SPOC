@@ -19,16 +19,6 @@ compile:
 clean:
 	@rm -rf build
 
-.PHONY: test # Run tests
-test:
-	./build/debug/test1
-	display tmp.ppm
-	./build/release/test1
-	display tmp.ppm
-
 .PHONY: run # Run app
 run:
-	./build/debug/overstrike_encoder < hambone.ppm > hambone.hmy
-	./build/debug/overstrike_decoder < hambone.hmy > hambone_decoded.ppm
-	display hambone.ppm hambone_decoded.ppm
-
+	./build/debug/text2gpc < ./results/gpc_file_format/Juarez.txt > Juarez.gpc
