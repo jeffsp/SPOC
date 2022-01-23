@@ -36,5 +36,5 @@ else
 fi
 
 # Append the data to the file
-las2txt64 -i ${TMPDIR}/tmp.las -parse xyziRGBc -sep tab -stdout \
+las2txt64 -i ${TMPDIR}/tmp.las -parse xyzciRGB -sep tab -stdout \
     >> $2/${sn}.txt
