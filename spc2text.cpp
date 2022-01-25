@@ -1,28 +1,28 @@
 #include <iostream>
 #include <sstream>
-#include "gpc.h"
-#include "gpc2text_cmd.h"
+#include "spc.h"
+#include "spc2text_cmd.h"
 
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace gpc;
+    using namespace spc;
 
     try
     {
         // Parse command line
         cmd::args args = cmd::get_args (argc, argv,
-            string (argv[0]) + " [options] < gpcfile > textfile");
+            string (argv[0]) + " [options] < spcfile > textfile");
 
         // If you are getting help, exit without an error
         if (args.help)
             return 0;
 
-        // Read gpc file
+        // Read spc file
         vector<point_record> point_records;
         string wkt;
 
-        read_gpc_file (cin, point_records, wkt);
+        read_spc_file (cin, point_records, wkt);
 
         if (args.verbose)
             clog << point_records.size () << " point records read" << endl;

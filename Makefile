@@ -6,9 +6,9 @@ cmake:
 	@cd build/debug && cmake -DCMAKE_BUILD_TYPE=Debug ../..
 	@cd build/release && cmake -DCMAKE_BUILD_TYPE=Release ../..
 
-.PHONY: convert # Convert LAS files to GPC files
+.PHONY: convert # Convert LAS files to SPC files
 convert:
-	./convert_all.sh ./datasets/las_files ./results/gpc_file_format
+	./convert_all.sh ./datasets/las_files ./results/spc_file_format
 
 .PHONY: compile # Compile all applications
 compile:
@@ -21,5 +21,5 @@ clean:
 
 .PHONY: run # Run app
 run:
-	./build/release/text2gpc -v -s -g 100 < ./results/gpc_file_format/Raqqah.txt > Raqqah.gpc
-	./build/release/gpc2text -v < Raqqah.gpc > Raqqah.txt
+	./build/release/text2spc -v -s -g 1 < ./results/spc_file_format/Raqqah.txt > Raqqah.spc
+	./build/release/spc2text -v < Raqqah.spc > Raqqah.txt

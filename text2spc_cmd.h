@@ -5,7 +5,7 @@
 #include <string>
 #include "cmd.h"
 
-namespace gpc
+namespace spc
 {
 
 namespace cmd
@@ -64,4 +64,4 @@ args get_args (int argc, char **argv, const std::string &usage)
 
 } // namespace cmd
 
-} // namespace gpc
+} // namespace spc

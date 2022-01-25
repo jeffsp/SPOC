@@ -10,5 +10,5 @@ macro(add_app name)
     target_link_libraries(${name} fmt)
 endmacro()
 
-add_app(text2gpc)
-add_app(gpc2text)
+add_app(text2spc)
+add_app(spc2text)

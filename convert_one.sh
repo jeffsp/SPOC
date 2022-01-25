@@ -7,7 +7,7 @@ sn=$(basename ${dn})
 echo converting ${sn}...
 
 # Create a tmp directory for intermediate files
-TMPDIR=$(mktemp --tmpdir --directory gpc.XXXXXXXX)
+TMPDIR=$(mktemp --tmpdir --directory spc.XXXXXXXX)
 
 # Create a cleanup function
 function cleanup {
@@ -36,5 +36,5 @@ else
 fi
 
 # Append the data to the file
-las2txt64 -i ${TMPDIR}/tmp.las -parse xyztcpiRGB -sep tab -stdout \
+las2txt64 -i ${TMPDIR}/tmp.las -parse xyzcpiRGB -sep tab -stdout \
     >> $2/${sn}.txt

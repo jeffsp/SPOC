@@ -15,4 +15,4 @@ The aim of this file format is to be a subset of the LAS file format.
 
 # Description of new format
 
-The proposed extension is GPC, standing for Geospatial Point Cloud.
+The proposed extension is SPC, standing for Simple Point Cloud.

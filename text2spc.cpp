@@ -1,18 +1,18 @@
 #include <iostream>
 #include <sstream>
-#include "gpc.h"
-#include "text2gpc_cmd.h"
+#include "spc.h"
+#include "text2spc_cmd.h"
 
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace gpc;
+    using namespace spc;
 
     try
     {
         // Parse command line
         cmd::args args = cmd::get_args (argc, argv,
-            string (argv[0]) + " [options] < textfile > gpcfile");
+            string (argv[0]) + " [options] < textfile > spcfile");
 
         // If you are getting help, exit without an error
         if (args.help)
@@ -63,7 +63,7 @@ int main (int argc, char **argv)
         // Write them to stdout
         if (args.verbose)
             clog << "writing records to stdout" << endl;
-        write_gpc_file (cout, point_records, wkt);
+        write_spc_file (cout, point_records, wkt);
 
         return 0;
     }

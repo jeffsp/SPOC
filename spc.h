@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace gpc
+namespace spc
 {
 
 struct point_record
@@ -16,7 +16,6 @@ struct point_record
     double x;
     double y;
     double z;
-    double t; // GPS time
     uint8_t c; // classification
     uint16_t p; // point source ID
     uint16_t i; // intensity
@@ -25,7 +24,7 @@ struct point_record
     uint16_t b;
 };
 
-struct gpc_file
+struct spc_file
 {
     char signature[4];
     std::vector<double> x;
@@ -41,7 +40,7 @@ struct gpc_file
     std::vector<std::vector<uint64_t>> extra;
     std::string wkt;
 
-    gpc_file ()
+    spc_file ()
     {
         signature[0] = 'G'; // Geospatial
         signature[1] = 'P'; // Point
@@ -73,11 +72,11 @@ struct gpc_file
     }
 };
 
-void write_gpc_file (std::ostream &s, const gpc_file &f)
+void write_spc_file (std::ostream &s, const spc_file &f)
 {
     // Make sure 'f' is valid
     if (!f.check ())
-        throw std::runtime_error ("Invalid gpc file format");
+        throw std::runtime_error ("Invalid spc file format");
 
     // Signature
     s.write (&f.signature[0], 4);
@@ -110,12 +109,12 @@ void write_gpc_file (std::ostream &s, const gpc_file &f)
     s.write (reinterpret_cast<const char*>(&f.wkt[0]), f.wkt.size ());
 }
 
-void write_gpc_file (std::ostream &s,
+void write_spc_file (std::ostream &s,
     const std::vector<point_record> &point_records,
     const std::string &wkt)
 {
-    // Stuff the records into a gpc_file struct
-    gpc_file f;
+    // Stuff the records into a spc_file struct
+    spc_file f;
     const size_t sz = point_records.size ();
     f.x.resize (sz);
     f.y.resize (sz);
@@ -132,7 +131,6 @@ void write_gpc_file (std::ostream &s,
         f.x[i] = point_records[i].x;
         f.y[i] = point_records[i].y;
         f.z[i] = point_records[i].z;
-        f.t[i] = point_records[i].t;
         f.c[i] = point_records[i].c;
         f.p[i] = point_records[i].p;
         f.i[i] = point_records[i].i;
@@ -141,13 +139,13 @@ void write_gpc_file (std::ostream &s,
         f.b[i] = point_records[i].b;
     }
 
-    write_gpc_file (s, f);
+    write_spc_file (s, f);
 }
 
-void read_gpc_file (std::istream &s, gpc_file &f)
+void read_spc_file (std::istream &s, spc_file &f)
 {
     // Read into tmp
-    gpc_file tmp_f;
+    spc_file tmp_f;
 
     // Read signature
     s.read (&tmp_f.signature[0], 4);
@@ -172,7 +170,6 @@ void read_gpc_file (std::istream &s, gpc_file &f)
     s.read (reinterpret_cast<char*>(&tmp_f.x[0]), n * sizeof (double));
     s.read (reinterpret_cast<char*>(&tmp_f.y[0]), n * sizeof (double));
     s.read (reinterpret_cast<char*>(&tmp_f.z[0]), n * sizeof (double));
-    s.read (reinterpret_cast<char*>(&tmp_f.t[0]), n * sizeof (double));
     s.read (reinterpret_cast<char*>(&tmp_f.c[0]), n * sizeof (uint8_t));
     s.read (reinterpret_cast<char*>(&tmp_f.p[0]), n * sizeof (uint16_t));
     s.read (reinterpret_cast<char*>(&tmp_f.i[0]), n * sizeof (uint16_t));
@@ -193,19 +190,19 @@ void read_gpc_file (std::istream &s, gpc_file &f)
 
     // Make sure 'f' is valid
     if (!f.check ())
-        throw std::runtime_error ("Invalid gpc file format");
+        throw std::runtime_error ("Invalid spc file format");
 
     // Commit
     f = tmp_f;
 }
 
-void read_gpc_file (std::istream &s,
+void read_spc_file (std::istream &s,
     std::vector<point_record> &point_records,
     std::string &wkt)
 {
-    // Read into gpc_file struct
-    gpc_file f;
-    read_gpc_file (s, f);
+    // Read into spc_file struct
+    spc_file f;
+    read_spc_file (s, f);
 
     // Stuff data points into a vector
     std::vector<point_record> tmp_point_records (f.x.size ());
@@ -215,7 +212,6 @@ void read_gpc_file (std::istream &s,
         tmp_point_records[i].x = f.x[i];
         tmp_point_records[i].y = f.y[i];
         tmp_point_records[i].z = f.z[i];
-        tmp_point_records[i].t = f.t[i];
         tmp_point_records[i].c = f.c[i];
         tmp_point_records[i].p = f.p[i];
         tmp_point_records[i].i = f.i[i];
@@ -235,20 +231,32 @@ void sort (T &point_records, const double grid_size)
     std::sort (std::begin (point_records), std::end (point_records),
         [&](const point_record &a, const point_record &b) -> bool
     {
-        if (std::round (a.x * grid_size) < std::round (b.x * grid_size))
+        if (std::round (a.x / grid_size) < std::round (b.x / grid_size))
             return true;
-        if (std::round (a.x * grid_size) > std::round (b.x * grid_size))
+        if (std::round (a.x / grid_size) > std::round (b.x / grid_size))
             return false;
-        if (std::round (a.y * grid_size) < std::round (b.y * grid_size))
+        if (std::round (a.y / grid_size) < std::round (b.y / grid_size))
             return true;
-        if (std::round (a.y * grid_size) > std::round (b.y * grid_size))
+        if (std::round (a.y / grid_size) > std::round (b.y / grid_size))
             return false;
-        if (std::round (a.z * grid_size) < std::round (b.z * grid_size))
+        if (std::round (a.z / grid_size) < std::round (b.z / grid_size))
             return true;
-        if (std::round (a.z * grid_size) > std::round (b.z * grid_size))
+        if (std::round (a.z / grid_size) > std::round (b.z / grid_size))
+            return false;
+        if (std::round (a.c / grid_size) < std::round (b.c / grid_size))
+            return true;
+        if (std::round (a.c / grid_size) > std::round (b.c / grid_size))
+            return false;
+        if (std::round (a.p / grid_size) < std::round (b.p / grid_size))
+            return true;
+        if (std::round (a.p / grid_size) > std::round (b.p / grid_size))
+            return false;
+        if (std::round (a.i / grid_size) < std::round (b.i / grid_size))
+            return true;
+        if (std::round (a.i / grid_size) > std::round (b.i / grid_size))
             return false;
         return false;
     });
 }
 
-} // namespace gpc
+} // namespace spc
