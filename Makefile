@@ -21,4 +21,4 @@ clean:
 
 .PHONY: run # Run app
 run:
-	./build/debug/text2gpc < ./results/gpc_file_format/Juarez.txt > Juarez.gpc
+	./build/debug/text2gpc -v -s -g 1000 < ./results/gpc_file_format/Juarez.txt > Juarez.gpc
