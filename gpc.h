@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdint>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -168,16 +169,16 @@ void read_gpc_file (std::istream &s, gpc_file &f)
     tmp_f.b.resize (n);
 
     // Read data
-    s.read (reinterpret_cast<char*>(&f.x[0]), n * sizeof (double));
-    s.read (reinterpret_cast<char*>(&f.y[0]), n * sizeof (double));
-    s.read (reinterpret_cast<char*>(&f.z[0]), n * sizeof (double));
-    s.read (reinterpret_cast<char*>(&f.t[0]), n * sizeof (double));
-    s.read (reinterpret_cast<char*>(&f.c[0]), n * sizeof (uint8_t));
-    s.read (reinterpret_cast<char*>(&f.p[0]), n * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&f.i[0]), n * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&f.r[0]), n * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&f.g[0]), n * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&f.b[0]), n * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.x[0]), n * sizeof (double));
+    s.read (reinterpret_cast<char*>(&tmp_f.y[0]), n * sizeof (double));
+    s.read (reinterpret_cast<char*>(&tmp_f.z[0]), n * sizeof (double));
+    s.read (reinterpret_cast<char*>(&tmp_f.t[0]), n * sizeof (double));
+    s.read (reinterpret_cast<char*>(&tmp_f.c[0]), n * sizeof (uint8_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.p[0]), n * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.i[0]), n * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.r[0]), n * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.g[0]), n * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.b[0]), n * sizeof (uint16_t));
 
     // Extra fields
     uint64_t sz = 0;

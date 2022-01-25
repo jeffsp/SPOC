@@ -11,3 +11,4 @@ macro(add_app name)
 endmacro()
 
 add_app(text2gpc)
+add_app(gpc2text)

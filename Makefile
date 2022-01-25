@@ -21,4 +21,5 @@ clean:
 
 .PHONY: run # Run app
 run:
-	./build/debug/text2gpc -v -s -g 1000 < ./results/gpc_file_format/Juarez.txt > Juarez.gpc
+	./build/release/text2gpc -v -s -g 100 < ./results/gpc_file_format/Raqqah.txt > Raqqah.gpc
+	./build/release/gpc2text -v < Raqqah.gpc > Raqqah.txt

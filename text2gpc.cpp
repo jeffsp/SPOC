@@ -31,6 +31,9 @@ int main (int argc, char **argv)
         string wkt;
         getline (cin, wkt);
 
+        if (args.verbose)
+            clog << "reading point records" << endl;
+
         // Read point records
         vector<point_record> point_records;
 
