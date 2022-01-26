@@ -134,6 +134,7 @@ void write_spc_file (std::ostream &s,
         f.g[i] = point_records[i].g;
         f.b[i] = point_records[i].b;
     }
+    f.wkt = wkt;
 
     write_spc_file (s, f);
 }
@@ -181,6 +182,7 @@ void read_spc_file (std::istream &s, spc_file &f)
     // WKT
     uint64_t len = 0;
     s.read (reinterpret_cast<char*>(&len), sizeof(uint64_t));
+    tmp_f.wkt.resize (len);
     s.read (reinterpret_cast<char*>(&tmp_f.wkt[0]), len);
 
     // Make sure 'f' is valid

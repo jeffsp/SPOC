@@ -32,6 +32,9 @@ int main (int argc, char **argv)
         getline (cin, wkt);
 
         if (args.verbose)
+            clog << "read " << wkt.size () << " byte WKT" << endl;
+
+        if (args.verbose)
             clog << "reading point records" << endl;
 
         // Read point records
@@ -63,6 +66,7 @@ int main (int argc, char **argv)
         // Write them to stdout
         if (args.verbose)
             clog << "writing records to stdout" << endl;
+
         write_spc_file (cout, point_records, wkt);
 
         return 0;

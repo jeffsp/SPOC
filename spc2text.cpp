@@ -24,10 +24,16 @@ int main (int argc, char **argv)
         vector<point_record> point_records;
         string wkt;
 
+        if (args.verbose)
+            clog << "reading spc file" << endl;
+
         read_spc_file (cin, point_records, wkt);
 
         if (args.verbose)
             clog << point_records.size () << " point records read" << endl;
+
+        if (args.verbose)
+            clog << "read " << wkt.size () << " byte WKT" << endl;
 
         if (args.verbose)
             clog << "writing point records to stdout" << endl;
