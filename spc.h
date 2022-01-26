@@ -16,12 +16,12 @@ struct point_record
     double x;
     double y;
     double z;
-    uint8_t c; // classification
-    uint16_t p; // point source ID
-    uint16_t i; // intensity
-    uint16_t r;
-    uint16_t g;
-    uint16_t b;
+    unsigned c; // classification
+    unsigned p; // point source ID
+    unsigned i; // intensity
+    unsigned r;
+    unsigned g;
+    unsigned b;
 };
 
 struct spc_file
@@ -30,7 +30,6 @@ struct spc_file
     std::vector<double> x;
     std::vector<double> y;
     std::vector<double> z;
-    std::vector<double> t;
     std::vector<uint8_t> c;
     std::vector<uint16_t> p;
     std::vector<uint16_t> i;
@@ -59,7 +58,6 @@ struct spc_file
         const size_t npoints = x.size ();
         if (y.size () != npoints) return false;
         if (z.size () != npoints) return false;
-        if (t.size () != npoints) return false;
         if (c.size () != npoints) return false;
         if (p.size () != npoints) return false;
         if (i.size () != npoints) return false;
@@ -89,7 +87,6 @@ void write_spc_file (std::ostream &s, const spc_file &f)
     s.write (reinterpret_cast<const char*>(&f.x[0]), n * sizeof (double));
     s.write (reinterpret_cast<const char*>(&f.y[0]), n * sizeof (double));
     s.write (reinterpret_cast<const char*>(&f.z[0]), n * sizeof (double));
-    s.write (reinterpret_cast<const char*>(&f.t[0]), n * sizeof (double));
     s.write (reinterpret_cast<const char*>(&f.c[0]), n * sizeof (uint8_t));
     s.write (reinterpret_cast<const char*>(&f.p[0]), n * sizeof (uint16_t));
     s.write (reinterpret_cast<const char*>(&f.i[0]), n * sizeof (uint16_t));
@@ -119,7 +116,6 @@ void write_spc_file (std::ostream &s,
     f.x.resize (sz);
     f.y.resize (sz);
     f.z.resize (sz);
-    f.t.resize (sz);
     f.c.resize (sz);
     f.p.resize (sz);
     f.i.resize (sz);
@@ -158,7 +154,6 @@ void read_spc_file (std::istream &s, spc_file &f)
     tmp_f.x.resize (n);
     tmp_f.y.resize (n);
     tmp_f.z.resize (n);
-    tmp_f.t.resize (n);
     tmp_f.c.resize (n);
     tmp_f.p.resize (n);
     tmp_f.i.resize (n);

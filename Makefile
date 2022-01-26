@@ -21,5 +21,5 @@ clean:
 
 .PHONY: run # Run app
 run:
-	./build/release/text2spc -v -s -g 1 < ./results/spc_file_format/Raqqah.txt > Raqqah.spc
-	./build/release/spc2text -v < Raqqah.spc > Raqqah.txt
+	./build/debug/text2spc -v < ./results/spc_file_format/Raqqah.txt > Raqqah.spc
+	./build/debug/spc2text -v < Raqqah.spc > Raqqah.txt
