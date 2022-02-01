@@ -10,5 +10,6 @@ macro(add_app name)
     target_link_libraries(${name} fmt)
 endmacro()
 
+add_app(test_octree)
 add_app(text2spc)
 add_app(spc2text)

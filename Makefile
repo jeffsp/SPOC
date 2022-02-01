@@ -1,4 +1,4 @@
-default: compile run
+default: compile test
 
 cmake:
 	@mkdir -p build/debug
@@ -23,3 +23,8 @@ clean:
 run:
 	./build/debug/text2spc -v < ./results/spc_file_format/Raqqah.txt > Raqqah.spc
 	./build/debug/spc2text -v < Raqqah.spc > Raqqah.txt
+
+.PHONY: test # Run tests
+test:
+	./build/debug/test_octree < ./results/spc_file_format/Juarez.txt
+	#echo -e "asdf\n1 2 3\n4 5 6\n 7 8 9" | ./build/debug/test_octree

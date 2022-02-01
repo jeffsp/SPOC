@@ -16,3 +16,9 @@ The aim of this file format is to be a subset of the LAS file format.
 # Description of new format
 
 The proposed extension is SPC, standing for Simple Point Cloud.
+
+* Points are stored as sets
+    * The order of the point records is not important and is not preserved
+    * It is uncommon for two points to have the same exact location in
+    3D space
+* Point locations have 12 digits of precision preserved
