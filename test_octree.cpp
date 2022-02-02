@@ -3,34 +3,47 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <string>
 #include <sstream>
 #include "spc.h"
 
-struct pointf { double x, y, z; };
+template<typename T>
+struct point { T x, y, z; };
 
-struct pointi { int64_t x, y, z; };
-
-pointi ftoi (const pointf &p, const pointf &s)
+struct spc_text_header
 {
-    const uint64_t c = (1UL << 51);
-    pointi q;
-    q.x = std::round (p.x / s.x * c);
-    q.y = std::round (p.y / s.y * c);
-    q.z = std::round (p.z / s.z * c);
-    return q;
+    std::string wkt;
+    point<double> xyz_scale_factor;
+    point<double> xyz_offset;
+};
+
+struct spc_text_header read_spc_text_header (std::istream &is)
+{
+    spc_text_header h;
+    std::getline (is, h.wkt);
+
+    std::string line;
+    // Read the xyz scale
+    {
+        std::getline (is, line);
+        std::stringstream ss (line);
+        ss >> h.xyz_scale_factor.x;
+        ss >> h.xyz_scale_factor.y;
+        ss >> h.xyz_scale_factor.z;
+    }
+    // Read the xyz offset
+    {
+        std::getline (is, line);
+        std::stringstream ss (line);
+        ss >> h.xyz_offset.x;
+        ss >> h.xyz_offset.y;
+        ss >> h.xyz_offset.z;
+    }
+
+    return h;
 }
 
-pointf itof (const pointi &p, const pointf &s)
-{
-    const uint64_t c = (1UL << 51);
-    pointf q;
-    q.x = static_cast<double> (p.x) / c * s.x;
-    q.y = static_cast<double> (p.y) / c * s.y;
-    q.z = static_cast<double> (p.z) / c * s.z;
-    return q;
-}
-
-bool operator== (const pointi &a, const pointi &b)
+bool operator== (const point<int64_t> &a, const point<int64_t> &b)
 {
     if (a.x != b.x) return false;
     if (a.y != b.y) return false;
@@ -38,12 +51,12 @@ bool operator== (const pointi &a, const pointi &b)
     return true;
 }
 
-bool operator!= (const pointi &a, const pointi &b)
+bool operator!= (const point<int64_t> &a, const point<int64_t> &b)
 {
     return !(a == b);
 }
 
-bool operator<= (const pointi &a, const pointi &b)
+bool operator<= (const point<int64_t> &a, const point<int64_t> &b)
 {
     if (a.x > b.x) return false;
     if (a.y > b.y) return false;
@@ -51,7 +64,7 @@ bool operator<= (const pointi &a, const pointi &b)
     return true;
 }
 
-bool operator>= (const pointi &a, const pointi &b)
+bool operator>= (const point<int64_t> &a, const point<int64_t> &b)
 {
     if (a.x < b.x) return false;
     if (a.y < b.y) return false;
@@ -66,14 +79,14 @@ struct node
 };
 
 template<typename T>
-std::pair<pointi, pointi> get_extent (const T &points)
+std::pair<point<T>, point<T>> get_extent (const std::vector<point<T>> &points)
 {
-    pointi minp { std::numeric_limits<int64_t>::max (),
-        std::numeric_limits<int64_t>::max (),
-        std::numeric_limits<int64_t>::max ()};
-    pointi maxp { std::numeric_limits<int64_t>::lowest (),
-        std::numeric_limits<int64_t>::lowest (),
-        std::numeric_limits<int64_t>::lowest ()};
+    point<T> minp { std::numeric_limits<T>::max (),
+        std::numeric_limits<T>::max (),
+        std::numeric_limits<T>::max ()};
+    point<T> maxp { std::numeric_limits<T>::lowest (),
+        std::numeric_limits<T>::lowest (),
+        std::numeric_limits<T>::lowest ()};
     for (const auto &p : points)
     {
         minp.x = std::min (p.x, minp.x);
@@ -86,25 +99,10 @@ std::pair<pointi, pointi> get_extent (const T &points)
     return {minp, maxp};
 }
 
-template<typename T>
-pointf get_scale (const T &points)
-{
-    pointf scalep { std::numeric_limits<double>::lowest (),
-        std::numeric_limits<double>::lowest (),
-        std::numeric_limits<double>::lowest ()};
-    for (const auto &p : points)
-    {
-        scalep.x = std::max (std::fabs(p.x), scalep.x);
-        scalep.y = std::max (std::fabs(p.y), scalep.y);
-        scalep.z = std::max (std::fabs(p.z), scalep.z);
-    }
-    return scalep;
-}
-
-unsigned get_node_index (const pointi &p,
-    const pointi &minp,
-    const pointf &midp,
-    const pointi &maxp)
+unsigned get_node_index (const point<int64_t> &p,
+    const point<int64_t> &minp,
+    const point<double> &midp,
+    const point<int64_t> &maxp)
 {
     // Get node index = 0, 1, ... 7
     const unsigned index =
@@ -115,10 +113,10 @@ unsigned get_node_index (const pointi &p,
     return index;
 }
 
-void change_extent (const pointi &p,
-    pointi &minp,
-    const pointf &midp,
-    pointi &maxp)
+void change_extent (const point<int64_t> &p,
+    point<int64_t> &minp,
+    const point<double> &midp,
+    point<int64_t> &maxp)
 {
     if (p.x < midp.x)
         maxp.x = std::floor (midp.x);
@@ -137,15 +135,14 @@ void change_extent (const pointi &p,
 class octree
 {
     private:
-    pointf scale;
     node root;
     size_t nodes;
     size_t leafs;
 
     void add (node *root,
-        const pointi &p,
-        const pointi &minp,
-        const pointi &maxp,
+        const point<int64_t> &p,
+        const point<int64_t> &minp,
+        const point<int64_t> &maxp,
         const int depth)
     {
         // Check logic
@@ -166,7 +163,7 @@ class octree
         }
 
         // Get midpoint between min and max
-        const pointf midp {
+        const point<double> midp {
             (minp.x + maxp.x) / 2.0,
             (minp.y + maxp.y) / 2.0,
             (minp.z + maxp.z) / 2.0};
@@ -189,31 +186,20 @@ class octree
 
     public:
     // CTOR
-    octree (const std::vector<pointf> &pfs)
+    octree (const std::vector<point<int64_t>> &points)
         : nodes (0)
         , leafs (0)
     {
         // Make sure we have data
-        if (pfs.empty ())
+        if (points.empty ())
             return;
 
-        // Determine the dynamic range in each dimension
-        scale = get_scale (pfs);
-
-        // Convert points to integers
-        std::vector<pointi> pis (pfs.size ());
-
-        for (size_t i = 0; i < pis.size (); ++i)
-            pis[i] = ftoi (pfs[i], scale);
-
         // Get extent min/max points
-        auto m = get_extent (pis);
-        auto minp = m.first;
-        auto maxp = m.second;
+        auto m = get_extent (points);
 
         // Create the tree
-        for (const auto &p : pis)
-            add (&root, p, minp, maxp, 0);
+        for (const auto &p : points)
+            add (&root, p, m.first, m.second, 0);
     }
     // DTOR
     ~octree ()
@@ -242,9 +228,9 @@ std::vector<uint8_t> encode (const octree &t)
     return x;
 }
 
-std::vector<pointf> decode (const std::vector<uint8_t> &t)
+std::vector<int64_t> decode (const std::vector<uint8_t> &t)
 {
-    std::vector<pointf> p;
+    std::vector<int64_t> p;
     return p;
 }
 
@@ -257,27 +243,49 @@ int main (int argc, char **argv)
     {
         clog << "Reading point records" << endl;
 
-        // Read SRS
-        string wkt;
-        getline (cin, wkt);
+        // Read header
+        const spc_text_header h = read_spc_text_header (cin);
+
+        clog << fixed;
+        clog << setprecision(std::numeric_limits<double>::digits10);
+        clog << h.wkt << endl;
+        clog << h.xyz_scale_factor.x
+            << "\t" << h.xyz_scale_factor.y
+            << "\t" << h.xyz_scale_factor.z << endl;
+        clog << h.xyz_offset.x
+            << "\t" << h.xyz_offset.y
+            << "\t" << h.xyz_offset.z << endl;
 
         // Read points
-        vector<pointf> points;
+        vector<point<int64_t>> points;
 
-        for (string line; getline (cin, line ); )
+        for (string line; getline (cin, line); )
         {
             // Parse the line
             stringstream ss (line);
-            pointf p;
-            ss >> p.x; ss >> p.y; ss >> p.z;
+            point<int64_t> p;
+            ss >> p.x;
+            ss >> p.y;
+            ss >> p.z;
             points.push_back (p);
         }
 
         clog << points.size () << " points read" << endl;
 
+        // Subtract off minimum
+        auto m = get_extent (points);
+        for (auto &p : points)
+        {
+            p.x -= m.first.x;
+            p.y -= m.first.y;
+            p.z -= m.first.z;
+        }
+        m = get_extent (points);
 
         clog << "Creating octree" << endl;
         octree t (points);
+
+        clog << points.size () << " points processed" << endl;
 
         return 0;
     }

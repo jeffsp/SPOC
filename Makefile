@@ -27,4 +27,4 @@ run:
 .PHONY: test # Run tests
 test:
 	./build/debug/test_octree < ./results/spc_file_format/Juarez.txt
-	#echo -e "asdf\n1 2 3\n4 5 6\n 7 8 9" | ./build/debug/test_octree
+	#echo -e "SRS\n0 0 0\n0 0 0\n1 2 3\n4 5 6\n 7 8 9" | ./build/debug/test_octree

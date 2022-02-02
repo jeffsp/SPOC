@@ -29,7 +29,9 @@ lasinfo64 -i ${TMPDIR}/tmp.las -stdout > ${TMPDIR}/info.txt
 # Does it have a projection?
 if grep -q PROJCS ${TMPDIR}/info.txt; then
     # Save the projection
-    grep PROJCS ${TMPDIR}/info.txt > $2/${sn}.txt
+    grep PROJCS ${TMPDIR}/info.txt \
+        | awk '{$1=$1};1' \
+        > $2/${sn}.txt
 else
     # If there is no projection, print a blank line
     echo "" > $2/${sn}.txt
@@ -40,7 +42,7 @@ if grep -q "scale factor x y z" ${TMPDIR}/info.txt; then
     # Save the scale factor
     grep "scale factor x y z" ${TMPDIR}/info.txt \
         | cut -f 2 -d ":" \
-        | tr -s ' ' \
+        | awk '{$1=$1};1' \
         >> $2/${sn}.txt
 else
     # Error
@@ -53,7 +55,7 @@ if grep -q "offset x y z" ${TMPDIR}/info.txt; then
     # Save the scale factor
     grep "offset x y z" ${TMPDIR}/info.txt \
         | cut -f 2 -d ":" \
-        | tr -s ' ' \
+        | awk '{$1=$1};1' \
         >> $2/${sn}.txt
 else
     # Error
