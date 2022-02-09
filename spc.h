@@ -41,7 +41,7 @@ struct spc_file
 
     spc_file ()
     {
-        signature[0] = 'G'; // Geospatial
+        signature[0] = 'S'; // Simple
         signature[1] = 'P'; // Point
         signature[2] = 'C'; // Cloud
         signature[3] = '\0';
@@ -49,7 +49,7 @@ struct spc_file
     bool check () const
     {
         // Check signature
-        if (signature[0] != 'G') return false;
+        if (signature[0] != 'S') return false;
         if (signature[1] != 'P') return false;
         if (signature[2] != 'C') return false;
         if (signature[3] != '\0') return false;

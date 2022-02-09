@@ -135,7 +135,7 @@ void change_extent (const point<int64_t> &p,
 class octree
 {
     private:
-    node root;
+    node *root;
     size_t nodes;
     size_t leafs;
 
@@ -155,10 +155,6 @@ class octree
         if (minp == maxp)
         {
             ++leafs;
-            std::clog << "depth = " << depth
-                << " leafs = " << leafs
-                << " nodes = " << nodes
-                << std::endl;
             return;
         }
 
@@ -183,6 +179,38 @@ class octree
         change_extent (p, current_minp, midp, current_maxp);
         add (root->nodes[n], p, current_minp, current_maxp, depth + 1);
     }
+    void free_node (node *t)
+    {
+        assert (t != nullptr);
+
+        // Free children first
+        for (auto n : t->nodes)
+            if (n != nullptr)
+                free_node (n);
+
+        // Free the node
+        delete t;
+    }
+    uint8_t encode (const std::array<node *, 8> &nodes)
+    {
+        uint8_t b = 0;
+        for (auto i : nodes)
+        {
+            if (i != nullptr)
+                b |= 1;
+            b <<= 1;
+        }
+        return b;
+    }
+    void encode (const node *root, std::vector<uint8_t> &x)
+    {
+        // Terminating case
+        if (root == nullptr)
+            return;
+        x.push_back (encode (root->nodes));
+        for (auto n : root->nodes)
+            encode (n, x);
+    }
 
     public:
     // CTOR
@@ -198,35 +226,32 @@ class octree
         auto m = get_extent (points);
 
         // Create the tree
+        root = new node;
+        ++nodes;
+
+        // Add the points
         for (const auto &p : points)
-            add (&root, p, m.first, m.second, 0);
+            add (root, p, m.first, m.second, 0);
     }
     // DTOR
     ~octree ()
     {
-        for (auto n : root.nodes)
-            free_node (n);
+        free_node (root);
     }
-    void free_node (node *t)
+    void info (std::ostream &os) const
     {
-        // Terminating condition
-        if (t == nullptr)
-            return;
-
-        // Free children first
-        for (auto n : t->nodes)
-            free_node (n);
-
-        // Free the node
-        delete t;
+        os << " leafs = " << leafs
+            << " nodes = " << nodes
+            << std::endl;
+    }
+    std::vector<uint8_t> encode ()
+    {
+        std::vector<uint8_t> x;
+        encode (root, x);
+        return x;
     }
 };
 
-std::vector<uint8_t> encode (const octree &t)
-{
-    std::vector<uint8_t> x;
-    return x;
-}
 
 std::vector<int64_t> decode (const std::vector<uint8_t> &t)
 {
@@ -286,6 +311,16 @@ int main (int argc, char **argv)
         octree t (points);
 
         clog << points.size () << " points processed" << endl;
+
+        t.info (clog);
+
+        clog << "Encoding octree" << endl;
+        const auto x = t.encode ();
+        clog << x.size () << " bytes" << endl;
+
+        // Send to stdout
+        for (auto i : x)
+            cout << i;
 
         return 0;
     }
