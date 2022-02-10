@@ -26,5 +26,5 @@ run:
 
 .PHONY: test # Run tests
 test:
-	./build/debug/test_octree < ./results/spc_file_format/Juarez.txt > Juarez.bytes
-	#echo -e "SRS\n0 0 0\n0 0 0\n1 2 3\n4 5 6\n 7 8 9" | ./build/debug/test_octree
+	./build/debug/test_octree
+	./build/debug/test_zlib

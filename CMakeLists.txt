@@ -7,9 +7,10 @@ set(CMAKE_CXX_STANDARD 20)
 
 macro(add_app name)
     add_executable(${name} ${name}.cpp)
-    target_link_libraries(${name} fmt)
+    target_link_libraries(${name} fmt z)
 endmacro()
 
 add_app(test_octree)
+add_app(test_zlib)
 add_app(text2spc)
 add_app(spc2text)

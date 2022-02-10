@@ -1,49 +1,17 @@
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <string>
-#include <sstream>
-#include "spc.h"
+#include <vector>
 
 template<typename T>
 struct point { T x, y, z; };
 
-struct spc_text_header
-{
-    std::string wkt;
-    point<double> xyz_scale_factor;
-    point<double> xyz_offset;
-};
-
-struct spc_text_header read_spc_text_header (std::istream &is)
-{
-    spc_text_header h;
-    std::getline (is, h.wkt);
-
-    std::string line;
-    // Read the xyz scale
-    {
-        std::getline (is, line);
-        std::stringstream ss (line);
-        ss >> h.xyz_scale_factor.x;
-        ss >> h.xyz_scale_factor.y;
-        ss >> h.xyz_scale_factor.z;
-    }
-    // Read the xyz offset
-    {
-        std::getline (is, line);
-        std::stringstream ss (line);
-        ss >> h.xyz_offset.x;
-        ss >> h.xyz_offset.y;
-        ss >> h.xyz_offset.z;
-    }
-
-    return h;
-}
-
-bool operator== (const point<int64_t> &a, const point<int64_t> &b)
+bool operator== (const point<double> &a, const point<double> &b)
 {
     if (a.x != b.x) return false;
     if (a.y != b.y) return false;
@@ -51,12 +19,13 @@ bool operator== (const point<int64_t> &a, const point<int64_t> &b)
     return true;
 }
 
-bool operator!= (const point<int64_t> &a, const point<int64_t> &b)
+bool operator!= (const point<double> &a, const point<double> &b)
 {
     return !(a == b);
 }
 
-bool operator<= (const point<int64_t> &a, const point<int64_t> &b)
+// This is NOT a sorting operator
+bool operator<= (const point<double> &a, const point<double> &b)
 {
     if (a.x > b.x) return false;
     if (a.y > b.y) return false;
@@ -64,12 +33,21 @@ bool operator<= (const point<int64_t> &a, const point<int64_t> &b)
     return true;
 }
 
-bool operator>= (const point<int64_t> &a, const point<int64_t> &b)
+// This is NOT a sorting operator
+bool operator>= (const point<double> &a, const point<double> &b)
 {
     if (a.x < b.x) return false;
     if (a.y < b.y) return false;
     if (a.z < b.z) return false;
     return true;
+}
+
+std::ostream &operator<< (std::ostream &s, const point<double> &p)
+{
+    s << ' ' << p.x;
+    s << ' ' << p.y;
+    s << ' ' << p.z;
+    return s;
 }
 
 struct node
@@ -99,10 +77,10 @@ std::pair<point<T>, point<T>> get_extent (const std::vector<point<T>> &points)
     return {minp, maxp};
 }
 
-unsigned get_node_index (const point<int64_t> &p,
-    const point<int64_t> &minp,
+unsigned get_node_index (const point<double> &p,
+    const point<double> &minp,
     const point<double> &midp,
-    const point<int64_t> &maxp)
+    const point<double> &maxp)
 {
     // Get node index = 0, 1, ... 7
     const unsigned index =
@@ -113,36 +91,28 @@ unsigned get_node_index (const point<int64_t> &p,
     return index;
 }
 
-void change_extent (const point<int64_t> &p,
-    point<int64_t> &minp,
+void change_extent (const point<double> &p,
+    point<double> &minp,
     const point<double> &midp,
-    point<int64_t> &maxp)
+    point<double> &maxp)
 {
-    if (p.x < midp.x)
-        maxp.x = std::floor (midp.x);
-    else
-        minp.x = std::ceil (midp.x);
-    if (p.y < midp.y)
-        maxp.y = std::floor (midp.y);
-    else
-        minp.y = std::ceil (midp.y);
-    if (p.z < midp.z)
-        maxp.z = std::floor (midp.z);
-    else
-        minp.z = std::ceil (midp.z);
+    if (p.x < midp.x) maxp.x = midp.x; else minp.x = midp.x;
+    if (p.y < midp.y) maxp.y = midp.y; else minp.y = midp.y;
+    if (p.z < midp.z) maxp.z = midp.z; else minp.z = midp.z;
 }
 
 class octree
 {
     private:
     node *root;
+    size_t max_depth;
     size_t nodes;
     size_t leafs;
 
     void add (node *root,
-        const point<int64_t> &p,
-        const point<int64_t> &minp,
-        const point<int64_t> &maxp,
+        const point<double> &p,
+        const point<double> &minp,
+        const point<double> &maxp,
         const int depth)
     {
         // Check logic
@@ -152,7 +122,7 @@ class octree
         assert (p <= maxp);
 
         // Terminal case
-        if (minp == maxp)
+        if (depth == max_depth)
         {
             ++leafs;
             return;
@@ -214,8 +184,9 @@ class octree
 
     public:
     // CTOR
-    octree (const std::vector<point<int64_t>> &points)
-        : nodes (0)
+    octree (const size_t max_depth, const std::vector<point<double>> &points)
+        : max_depth (max_depth)
+        , nodes (0)
         , leafs (0)
     {
         // Make sure we have data
@@ -238,11 +209,12 @@ class octree
     {
         free_node (root);
     }
-    void info (std::ostream &os) const
+    std::ostream &info (std::ostream &os) const
     {
         os << " leafs = " << leafs
             << " nodes = " << nodes
             << std::endl;
+        return os;
     }
     std::vector<uint8_t> encode ()
     {
@@ -253,74 +225,45 @@ class octree
 };
 
 
-std::vector<int64_t> decode (const std::vector<uint8_t> &t)
-{
-    std::vector<int64_t> p;
-    return p;
-}
-
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spc;
 
     try
     {
-        clog << "Reading point records" << endl;
+        const size_t N = 10'000;
 
-        // Read header
-        const spc_text_header h = read_spc_text_header (cin);
+        clog << "Generating " << N << " random points" << endl;
 
-        clog << fixed;
-        clog << setprecision(std::numeric_limits<double>::digits10);
-        clog << h.wkt << endl;
-        clog << h.xyz_scale_factor.x
-            << "\t" << h.xyz_scale_factor.y
-            << "\t" << h.xyz_scale_factor.z << endl;
-        clog << h.xyz_offset.x
-            << "\t" << h.xyz_offset.y
-            << "\t" << h.xyz_offset.z << endl;
+        vector<point<double>> points (N);
 
-        // Read points
-        vector<point<int64_t>> points;
+        // Generate random doubles at varying scales.
+        //
+        // We don't want a uniform distribution.
+        std::default_random_engine g;
+        std::uniform_real_distribution<double> d (0.0, 1.0);
+        std::uniform_int_distribution<int> e (
+            std::numeric_limits<double>::min_exponent,
+            std::numeric_limits<double>::max_exponent);
 
-        for (string line; getline (cin, line); )
-        {
-            // Parse the line
-            stringstream ss (line);
-            point<int64_t> p;
-            ss >> p.x;
-            ss >> p.y;
-            ss >> p.z;
-            points.push_back (p);
-        }
-
-        clog << points.size () << " points read" << endl;
-
-        // Subtract off minimum
-        auto m = get_extent (points);
         for (auto &p : points)
         {
-            p.x -= m.first.x;
-            p.y -= m.first.y;
-            p.z -= m.first.z;
+            const double x = std::ldexp (d (g), e (g));
+            const double y = std::ldexp (d (g), e (g));
+            const double z = std::ldexp (d (g), e (g));
+            p = point<double> {x, y, z};
         }
-        m = get_extent (points);
 
-        clog << "Creating octree" << endl;
-        octree t (points);
+        clog << "Encoding " << N << " random points" << endl;
 
-        clog << points.size () << " points processed" << endl;
+        const size_t max_depth = 32;
+        octree o (max_depth, points);
 
-        t.info (clog);
+        o.info (clog);
+        clog << endl;
 
-        clog << "Encoding octree" << endl;
-        const auto x = t.encode ();
-        clog << x.size () << " bytes" << endl;
-
-        // Send to stdout
-        for (auto i : x)
-            cout << i;
+        const auto x = o.encode ();
+        clog << "size " << x.size () << endl;
 
         return 0;
     }
