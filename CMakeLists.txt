@@ -11,6 +11,6 @@ macro(add_app name)
 endmacro()
 
 add_app(test_octree)
-add_app(test_zlib)
+add_app(test_compress)
 add_app(text2spc)
 add_app(spc2text)

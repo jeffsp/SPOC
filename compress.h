@@ -69,7 +69,7 @@ struct Inflator
 
 inline void compress (std::istream &is, std::ostream &os, const int level)
 {
-    constexpr size_t BUFFER_SIZE = 16384;
+    constexpr size_t BUFFER_SIZE = (1 << 20);
     std::vector<uint8_t> input_buffer (BUFFER_SIZE);
     std::vector<uint8_t> output_buffer (BUFFER_SIZE);
 
@@ -98,7 +98,7 @@ inline void compress (std::istream &is, std::ostream &os, const int level)
 
 inline void decompress (std::istream &is, std::ostream &os)
 {
-    constexpr size_t BUFFER_SIZE = 16384;
+    constexpr size_t BUFFER_SIZE = (1 << 20);
     std::vector<uint8_t> input_buffer (BUFFER_SIZE);
     std::vector<uint8_t> output_buffer (BUFFER_SIZE);
 
