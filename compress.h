@@ -9,7 +9,7 @@
 namespace spc
 {
 
-std::string zlib_error_string (int ret)
+inline std::string zlib_error_string (int ret)
 {
     switch (ret)
     {
@@ -67,7 +67,7 @@ struct Inflator
     }
 };
 
-void compress (std::istream &is, std::ostream &os, const int level)
+inline void compress (std::istream &is, std::ostream &os, const int level)
 {
     constexpr size_t BUFFER_SIZE = 16384;
     std::vector<uint8_t> input_buffer (BUFFER_SIZE);
@@ -96,7 +96,7 @@ void compress (std::istream &is, std::ostream &os, const int level)
     } while (!is.eof ());
 }
 
-void decompress (std::istream &is, std::ostream &os)
+inline void decompress (std::istream &is, std::ostream &os)
 {
     constexpr size_t BUFFER_SIZE = 16384;
     std::vector<uint8_t> input_buffer (BUFFER_SIZE);
@@ -139,4 +139,4 @@ void decompress (std::istream &is, std::ostream &os)
     } while (!done);
 }
 
-} // nameapsce spc
+} // namespace spc
