@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -67,6 +68,43 @@ struct Inflator
     }
 };
 
+inline std::vector<uint8_t> compress (const std::vector<uint8_t> &input, const int level)
+{
+    size_t input_index = 0;
+    constexpr size_t BUFFER_SIZE = (1 << 20);
+    std::vector<uint8_t> output_buffer (BUFFER_SIZE);
+    std::vector<uint8_t> output;
+
+    Deflator deflator (level);
+
+    do {
+        // Get bytes directly from the input vector
+        size_t bytes_left = input.size () - input_index;
+        const bool last_buffer = bytes_left <= BUFFER_SIZE;
+        deflator.s.avail_in = last_buffer ? bytes_left : BUFFER_SIZE;
+        deflator.s.next_in = const_cast<unsigned char *> (&input[input_index]);
+
+        do {
+            // Compress from input to output buffer
+            deflator.s.avail_out = BUFFER_SIZE;
+            deflator.s.next_out = &output_buffer[0];
+            deflate (&deflator.s, last_buffer ? Z_FINISH : Z_NO_FLUSH);
+            const auto compressed_bytes = BUFFER_SIZE - deflator.s.avail_out;
+
+            // Save compressed bytes
+            assert (compressed_bytes <= output_buffer.size ());
+            output.insert (output.end (),
+                output_buffer.begin (),
+                output_buffer.begin () + compressed_bytes);
+        } while (deflator.s.avail_out == 0);
+
+        // Go to next index in input
+        input_index += BUFFER_SIZE;
+    } while (input_index < input.size ());
+
+    return output;
+}
+
 inline void compress (std::istream &is, std::ostream &os, const int level)
 {
     constexpr size_t BUFFER_SIZE = (1 << 20);
@@ -94,6 +132,41 @@ inline void compress (std::istream &is, std::ostream &os, const int level)
                 throw std::runtime_error (zlib_error_string (Z_ERRNO));
         } while (deflator.s.avail_out == 0);
     } while (!is.eof ());
+}
+
+inline std::vector<uint8_t> decompress (const std::vector<uint8_t> &input)
+{
+    constexpr size_t BUFFER_SIZE = (1 << 20);
+    std::vector<uint8_t> output_buffer (BUFFER_SIZE);
+    std::vector<uint8_t> output;
+
+    Inflator inflator;
+
+    // Get bytes directory from input vector
+    inflator.s.avail_in = input.size ();
+    inflator.s.next_in = const_cast<unsigned char *> (&input[0]);
+
+    do {
+        inflator.s.avail_out = BUFFER_SIZE;
+        inflator.s.next_out = &output_buffer[0];
+        const auto ret = inflate (&inflator.s, Z_NO_FLUSH);
+        switch (ret)
+        {
+            case Z_NEED_DICT:
+            case Z_DATA_ERROR:
+            case Z_MEM_ERROR:
+                throw std::runtime_error (zlib_error_string (ret));
+        }
+        const auto decompressed_bytes = BUFFER_SIZE - inflator.s.avail_out;
+
+        // Save decompressed bytes
+        assert (decompressed_bytes <= output_buffer.size ());
+        output.insert (output.end (),
+            output_buffer.begin (),
+            output_buffer.begin () + decompressed_bytes);
+    } while (inflator.s.avail_out == 0);
+
+    return output;
 }
 
 inline void decompress (std::istream &is, std::ostream &os)

@@ -27,4 +27,4 @@ run:
 .PHONY: test # Run tests
 test:
 	./build/debug/test_octree
-	./build/debug/test_zlib
+	./build/debug/test_compress

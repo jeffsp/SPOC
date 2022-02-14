@@ -29,7 +29,7 @@ int main (int argc, char **argv)
         datasets.push_back ({1, 2, 3, 4, 5, 6, 7, 8, 9, 0});
 
         // Random bytes
-        const size_t N = 10000;
+        const size_t N = 10'000'000;
         clog << "Generating " << N << " random bytes " << endl;
         vector<uint8_t> x (N);
         default_random_engine g;
@@ -54,6 +54,22 @@ int main (int argc, char **argv)
         {
             for (const auto &x : datasets)
             {
+                // Vector interface
+                {
+                const auto y = spc::compress (x, l);
+                const auto z = spc::decompress (y);
+                verify (x == z);
+                clog << "Compression level " << l;
+                clog << '\t'
+                    << y.size () * 100.0 / x.size () << "%"
+                    << '\t' << x.size ()
+                    << " -> "
+                    << y.size ()
+                    << endl;
+                }
+
+                // Stream interface
+                {
                 stringstream is1 (string (x.begin (), x.end ()));
                 stringstream os1;
                 spc::compress (is1, os1, l);
@@ -61,8 +77,8 @@ int main (int argc, char **argv)
                 stringstream os2;
                 spc::decompress (is2, os2);
                 const auto s = os2.str ();
-                vector<uint8_t> y (s.begin (), s.end ());
-                verify (x == y);
+                vector<uint8_t> z (s.begin (), s.end ());
+                verify (x == z);
                 clog << "Compression level " << l;
                 clog << '\t'
                     << os1.str ().size () * 100.0 / is1.str ().size () << "%"
@@ -70,6 +86,7 @@ int main (int argc, char **argv)
                     << " -> "
                     << os1.str ().size ()
                     << endl;
+                }
             }
         }
 
