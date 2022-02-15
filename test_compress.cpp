@@ -30,7 +30,6 @@ int main (int argc, char **argv)
 
         // Random bytes
         const size_t N = 10'000'000;
-        clog << "Generating " << N << " random bytes " << endl;
         vector<uint8_t> x (N);
         default_random_engine g;
         uniform_int_distribution<int> b (0, 255);
@@ -41,7 +40,6 @@ int main (int argc, char **argv)
         datasets.push_back (x);
 
         // This executable
-        clog << "Reading " << argv[0] << endl;
         ifstream ifs (argv[0]);
         if (!ifs)
             throw runtime_error ("Could not open file for reading");
@@ -59,13 +57,6 @@ int main (int argc, char **argv)
                 const auto y = spc::compress (x, l);
                 const auto z = spc::decompress (y);
                 verify (x == z);
-                clog << "Compression level " << l;
-                clog << '\t'
-                    << y.size () * 100.0 / x.size () << "%"
-                    << '\t' << x.size ()
-                    << " -> "
-                    << y.size ()
-                    << endl;
                 }
 
                 // Stream interface
@@ -79,13 +70,6 @@ int main (int argc, char **argv)
                 const auto s = os2.str ();
                 vector<uint8_t> z (s.begin (), s.end ());
                 verify (x == z);
-                clog << "Compression level " << l;
-                clog << '\t'
-                    << os1.str ().size () * 100.0 / is1.str ().size () << "%"
-                    << '\t' << is1.str ().size ()
-                    << " -> "
-                    << os1.str ().size ()
-                    << endl;
                 }
             }
         }
