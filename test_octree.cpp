@@ -7,75 +7,13 @@
 #include <random>
 #include <string>
 #include <vector>
+#include "compress.h"
+#include "extent.h"
+#include "test_utils.h"
 
-template<typename T>
-struct point { T x, y, z; };
 
-bool operator== (const point<double> &a, const point<double> &b)
+namespace spc
 {
-    if (a.x != b.x) return false;
-    if (a.y != b.y) return false;
-    if (a.z != b.z) return false;
-    return true;
-}
-
-bool operator!= (const point<double> &a, const point<double> &b)
-{
-    return !(a == b);
-}
-
-// This is NOT a sorting operator
-bool operator<= (const point<double> &a, const point<double> &b)
-{
-    if (a.x > b.x) return false;
-    if (a.y > b.y) return false;
-    if (a.z > b.z) return false;
-    return true;
-}
-
-// This is NOT a sorting operator
-bool operator>= (const point<double> &a, const point<double> &b)
-{
-    if (a.x < b.x) return false;
-    if (a.y < b.y) return false;
-    if (a.z < b.z) return false;
-    return true;
-}
-
-std::ostream &operator<< (std::ostream &s, const point<double> &p)
-{
-    s << ' ' << p.x;
-    s << ' ' << p.y;
-    s << ' ' << p.z;
-    return s;
-}
-
-struct node
-{
-    // Arrays are not default initialized for standard types
-    std::array<node *, 8> nodes = { nullptr };
-};
-
-template<typename T>
-std::pair<point<T>, point<T>> get_extent (const std::vector<point<T>> &points)
-{
-    point<T> minp { std::numeric_limits<T>::max (),
-        std::numeric_limits<T>::max (),
-        std::numeric_limits<T>::max ()};
-    point<T> maxp { std::numeric_limits<T>::lowest (),
-        std::numeric_limits<T>::lowest (),
-        std::numeric_limits<T>::lowest ()};
-    for (const auto &p : points)
-    {
-        minp.x = std::min (p.x, minp.x);
-        minp.y = std::min (p.y, minp.y);
-        minp.z = std::min (p.z, minp.z);
-        maxp.x = std::max (p.x, maxp.x);
-        maxp.y = std::max (p.y, maxp.y);
-        maxp.z = std::max (p.z, maxp.z);
-    }
-    return {minp, maxp};
-}
 
 unsigned get_node_index (const point<double> &p,
     const point<double> &minp,
@@ -91,21 +29,19 @@ unsigned get_node_index (const point<double> &p,
     return index;
 }
 
-void change_extent (const point<double> &p,
-    point<double> &minp,
-    const point<double> &midp,
-    point<double> &maxp)
+struct node
 {
-    if (p.x < midp.x) maxp.x = midp.x; else minp.x = midp.x;
-    if (p.y < midp.y) maxp.y = midp.y; else minp.y = midp.y;
-    if (p.z < midp.z) maxp.z = midp.z; else minp.z = midp.z;
-}
+    // Arrays are not default initialized for standard types
+    std::array<node *, 8> nodes = { nullptr };
+};
 
 class octree
 {
     private:
     node *root;
     size_t max_depth;
+    point<double> min_extent;
+    point<double> max_extent;
     size_t nodes;
     size_t leafs;
 
@@ -113,13 +49,13 @@ class octree
         const point<double> &p,
         const point<double> &minp,
         const point<double> &maxp,
-        const int depth)
+        const unsigned depth)
     {
         // Check logic
         assert (root != nullptr);
-        assert (minp <= maxp);
-        assert (p >= minp);
-        assert (p <= maxp);
+        assert (all_le (minp, maxp));
+        assert (all_le (minp, p));
+        assert (all_le (p, maxp));
 
         // Terminal case
         if (depth == max_depth)
@@ -196,13 +132,16 @@ class octree
         // Get extent min/max points
         auto m = get_extent (points);
 
+        min_extent = m.first;
+        max_extent = m.second;
+
         // Create the tree
         root = new node;
         ++nodes;
 
         // Add the points
         for (const auto &p : points)
-            add (root, p, m.first, m.second, 0);
+            add (root, p, min_extent, max_extent, 0);
     }
     // DTOR
     ~octree ()
@@ -211,7 +150,9 @@ class octree
     }
     std::ostream &info (std::ostream &os) const
     {
-        os << " leafs = " << leafs
+        os << "min = " << min_extent
+            << " max = " << max_extent
+            << " leafs = " << leafs
             << " nodes = " << nodes
             << std::endl;
         return os;
@@ -224,46 +165,63 @@ class octree
     }
 };
 
+} // namespace spc
+
+void test (const size_t N,
+    const int min_exponent = std::numeric_limits<double>::min_exponent,
+    const int max_exponent = std::numeric_limits<double>::max_exponent)
+{
+    using namespace std;
+    using namespace spc;
+
+    clog << "Generating " << N << " random points" << endl;
+
+    vector<point<double>> points (N);
+
+    // Generate random doubles at varying scales.
+    //
+    // We don't want a uniform distribution.
+    std::default_random_engine g;
+    std::uniform_real_distribution<double> d (-1.0, 1.0);
+    std::uniform_int_distribution<int> e (min_exponent, max_exponent);
+
+    for (auto &p : points)
+    {
+        const double x = std::ldexp (d (g), e (g));
+        const double y = std::ldexp (d (g), e (g));
+        const double z = std::ldexp (d (g), e (g));
+        p = point<double> {x, y, z};
+    }
+
+    clog << "Encoding " << N << " random points" << endl;
+
+    const size_t max_depth = 8;
+    octree o (max_depth, points);
+
+    o.info (clog);
+
+    const auto x = o.encode ();
+    clog << "size " << x.size () << endl;
+    const auto y = spc::compress (x);
+    clog << "compressed size " << y.size () << endl;
+    clog << "ratio = " << y.size () * 100.0 / x.size () << endl;
+    const auto z = spc::decompress (y);
+    verify (x == z);
+    clog << endl;
+}
 
 int main (int argc, char **argv)
 {
     using namespace std;
+    using namespace spc;
 
     try
     {
-        const size_t N = 10'000;
-
-        clog << "Generating " << N << " random points" << endl;
-
-        vector<point<double>> points (N);
-
-        // Generate random doubles at varying scales.
-        //
-        // We don't want a uniform distribution.
-        std::default_random_engine g;
-        std::uniform_real_distribution<double> d (0.0, 1.0);
-        std::uniform_int_distribution<int> e (
-            std::numeric_limits<double>::min_exponent,
-            std::numeric_limits<double>::max_exponent);
-
-        for (auto &p : points)
-        {
-            const double x = std::ldexp (d (g), e (g));
-            const double y = std::ldexp (d (g), e (g));
-            const double z = std::ldexp (d (g), e (g));
-            p = point<double> {x, y, z};
-        }
-
-        clog << "Encoding " << N << " random points" << endl;
-
-        const size_t max_depth = 32;
-        octree o (max_depth, points);
-
-        o.info (clog);
-        clog << endl;
-
-        const auto x = o.encode ();
-        clog << "size " << x.size () << endl;
+        test (10, 0, 0);
+        test (10, 1, 10);
+        test (10, -10, 10);
+        test (10'000);
+        test (10'000'000);
 
         return 0;
     }

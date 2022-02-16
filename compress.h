@@ -68,7 +68,7 @@ struct Inflator
     }
 };
 
-inline std::vector<uint8_t> compress (const std::vector<uint8_t> &input, const int level)
+inline std::vector<uint8_t> compress (const std::vector<uint8_t> &input, const int level = -1)
 {
     constexpr size_t BUFFER_SIZE = (1 << 20);
     std::vector<uint8_t> output_buffer (BUFFER_SIZE);
