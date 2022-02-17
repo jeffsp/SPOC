@@ -15,7 +15,7 @@
 namespace spc
 {
 
-unsigned get_node_index (const point<double> &p,
+unsigned get_octant_index (const point<double> &p,
     const point<double> &minp,
     const point<double> &midp,
     const point<double> &maxp)
@@ -32,8 +32,36 @@ unsigned get_node_index (const point<double> &p,
 struct node
 {
     // Arrays are not default initialized for standard types
-    std::array<node *, 8> nodes = { nullptr };
+    std::array<node *, 8> octants = { nullptr };
 };
+
+uint8_t octants_to_byte (const std::array<node *, 8> &octants)
+{
+    uint8_t b = 0;
+    for (auto i : octants)
+    {
+        if (i != nullptr)
+            b |= 1;
+        b <<= 1;
+    }
+    return b;
+}
+
+template<typename NODE_FUNCTION, typename LEAF_FUNCTION>
+void dfs (const node *root,
+    NODE_FUNCTION node_function,
+    LEAF_FUNCTION leaf_function)
+{
+    // Terminating case
+    if (root == nullptr)
+    {
+        leaf_function ();
+        return;
+    }
+    node_function (root);
+    for (auto n : root->octants)
+        dfs (n, node_function, leaf_function);
+}
 
 class octree
 {
@@ -53,9 +81,9 @@ class octree
     {
         // Check logic
         assert (root != nullptr);
-        assert (all_le (minp, maxp));
-        assert (all_le (minp, p));
-        assert (all_le (p, maxp));
+        assert (octant_less (minp, maxp));
+        assert (octant_less (minp, p));
+        assert (octant_less (p, maxp));
 
         // Terminal case
         if (depth == max_depth)
@@ -70,52 +98,32 @@ class octree
             (minp.y + maxp.y) / 2.0,
             (minp.z + maxp.z) / 2.0};
 
-        const unsigned n = get_node_index (p, minp, midp, maxp);
-        assert (n < root->nodes.size ());
+        const unsigned n = get_octant_index (p, minp, midp, maxp);
+        assert (n < root->octants.size ());
 
         // Allocate new node if needed
-        if (root->nodes[n] == nullptr)
+        if (root->octants[n] == nullptr)
         {
-            root->nodes[n] = new node;
+            root->octants[n] = new node;
             ++nodes;
         }
 
         auto current_minp = minp;
         auto current_maxp = maxp;
         change_extent (p, current_minp, midp, current_maxp);
-        add (root->nodes[n], p, current_minp, current_maxp, depth + 1);
+        add (root->octants[n], p, current_minp, current_maxp, depth + 1);
     }
     void free_node (node *t)
     {
         assert (t != nullptr);
 
         // Free children first
-        for (auto n : t->nodes)
+        for (auto n : t->octants)
             if (n != nullptr)
                 free_node (n);
 
         // Free the node
         delete t;
-    }
-    uint8_t encode (const std::array<node *, 8> &nodes)
-    {
-        uint8_t b = 0;
-        for (auto i : nodes)
-        {
-            if (i != nullptr)
-                b |= 1;
-            b <<= 1;
-        }
-        return b;
-    }
-    void encode (const node *root, std::vector<uint8_t> &x)
-    {
-        // Terminating case
-        if (root == nullptr)
-            return;
-        x.push_back (encode (root->nodes));
-        for (auto n : root->nodes)
-            encode (n, x);
     }
 
     public:
@@ -160,7 +168,14 @@ class octree
     std::vector<uint8_t> encode ()
     {
         std::vector<uint8_t> x;
-        encode (root, x);
+        const auto node_function = [&] (const node *root)
+        {
+            x.push_back (octants_to_byte (root->octants));
+        };
+        const auto leaf_function = [&] ()
+        {
+        };
+        spc::dfs (root, node_function, leaf_function);
         return x;
     }
 };

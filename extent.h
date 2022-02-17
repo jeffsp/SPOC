@@ -36,4 +36,14 @@ void change_extent (const point<double> &p,
     if (p.z < midp.z) maxp.z = midp.z; else minp.z = midp.z;
 }
 
+// All dimensions <=
+inline bool octant_less (const point<double> &a, const point<double> &b)
+{
+    if (a.x > b.x) return false;
+    if (a.y > b.y) return false;
+    if (a.z > b.z) return false;
+    return true;
+}
+
+
 }
