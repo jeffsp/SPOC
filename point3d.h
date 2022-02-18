@@ -7,7 +7,12 @@ namespace spc
 
 // A point in 3D space
 template<typename T>
-struct point { T x, y, z; };
+struct point
+{
+    T x = 0;
+    T y = 0;
+    T z = 0;
+};
 
 // Point operators
 

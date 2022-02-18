@@ -34,6 +34,7 @@ struct node
     // Arrays are not default initialized for standard types
     octant_ptrs octants = { nullptr };
     extent<double> e;
+    size_t points = 0;
 };
 
 uint8_t octants_to_byte (const octant_ptrs &octants)
@@ -100,6 +101,9 @@ void add_octree_point (node * const root,
     assert (all_less_equal (root->e.minp, root->e.maxp));
     assert (all_less_equal (root->e.minp, p));
     assert (all_less_equal (p, root->e.maxp));
+
+    // Count the point
+    ++root->points;
 
     // Terminal case
     if (current_depth == max_depth)
@@ -205,10 +209,20 @@ void test (const size_t N,
 
     unsigned nodes = 0;
     unsigned leafs = 0;
-    const auto node_function = [&] (const node *root) { ++nodes; };
-    const auto leaf_function = [&] (const node *root) { ++leafs; };
+    unsigned leaf_points = 0;
+    const auto node_function = [&] (const node *root)
+    {
+        ++nodes;
+    };
+    const auto leaf_function = [&] (const node *root)
+    {
+        ++leafs;
+        leaf_points += root->points;
+    };
     spc::dfs (o.get_root (), node_function, leaf_function);
-    clog << "nodes " << nodes << " leafs " << leafs << endl;
+    clog << "nodes " << nodes
+        << " leafs " << leafs
+        << " leaf_points " << leaf_points << endl;
 
     const auto x = encode (o.get_root ());
     clog << "size " << x.size () << endl;
