@@ -1,12 +1,21 @@
 #pragma once
 
+#include <limits>
+#include <vector>
 #include "point3d.h"
 
 namespace spc
 {
 
 template<typename T>
-std::pair<point<T>, point<T>> get_extent (const std::vector<point<T>> &points)
+struct extent
+{
+    point<T> minp;
+    point<T> maxp;
+};
+
+template<typename T>
+extent<T> get_extent (const std::vector<point<T>> &points)
 {
     point<T> minp { std::numeric_limits<T>::max (),
         std::numeric_limits<T>::max (),
@@ -23,27 +32,28 @@ std::pair<point<T>, point<T>> get_extent (const std::vector<point<T>> &points)
         maxp.y = std::max (p.y, maxp.y);
         maxp.z = std::max (p.z, maxp.z);
     }
-    return {minp, maxp};
+    return extent<T> {minp, maxp};
 }
 
-void change_extent (const point<double> &p,
-    point<double> &minp,
-    const point<double> &midp,
-    point<double> &maxp)
+template<typename T>
+extent<T> get_new_extent (const extent<T> &e,
+    const point<double> &p,
+    const point<double> &midp)
 {
-    if (p.x < midp.x) maxp.x = midp.x; else minp.x = midp.x;
-    if (p.y < midp.y) maxp.y = midp.y; else minp.y = midp.y;
-    if (p.z < midp.z) maxp.z = midp.z; else minp.z = midp.z;
+    auto f (e);
+    if (p.x < midp.x) f.maxp.x = midp.x; else f.minp.x = midp.x;
+    if (p.y < midp.y) f.maxp.y = midp.y; else f.minp.y = midp.y;
+    if (p.z < midp.z) f.maxp.z = midp.z; else f.minp.z = midp.z;
+    return f;
 }
 
 // All dimensions <=
-inline bool octant_less (const point<double> &a, const point<double> &b)
+inline bool all_less_equal (const point<double> &a, const point<double> &b)
 {
     if (a.x > b.x) return false;
     if (a.y > b.y) return false;
     if (a.z > b.z) return false;
     return true;
 }
-
 
 }
