@@ -51,4 +51,15 @@ inline std::ostream &operator<< (std::ostream &s, const point<double> &p)
     return s;
 }
 
+inline bool operator< (const point<double> &a, const point<double> &b)
+{
+    if (a.x < b.x) return true;
+    if (a.x > b.x) return false;
+    if (a.y < b.y) return true;
+    if (a.y > b.y) return false;
+    if (a.z < b.z) return true;
+    if (a.z > b.z) return false;
+    return false;
+}
+
 }

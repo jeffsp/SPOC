@@ -2,7 +2,7 @@
 
 #include <limits>
 #include <vector>
-#include "point3d.h"
+#include "point.h"
 
 namespace spc
 {

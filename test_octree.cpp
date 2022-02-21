@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cmath>
@@ -78,20 +79,44 @@ uint8_t to_byte (const octant_ptrs &octants)
     return b;
 }
 
-std::vector<uint8_t> encode (const octree_node *root)
+std::vector<uint8_t> encode_tree (const octree_node *root)
 {
-    std::vector<uint8_t> octant_bytes;
-    std::vector<uint64_t> point_counts;
-    std::vector<point<double>> point_deltas;
+    std::vector<uint8_t> x;
     const auto node_function = [&] (const octree_node *root)
     {
-        // Encode the tree
-        octant_bytes.push_back (to_byte (root->octants));
+        x.push_back (to_byte (root->octants));
     };
+    const auto leaf_function = [&] (const octree_node *root)
+    {
+    };
+    spc::dfs (root, node_function, leaf_function);
+    return x;
+}
+
+std::vector<uint8_t> encode_point_counts (const octree_node *root)
+{
+    std::vector<uint64_t> point_counts;
+    const auto node_function = [&] (const octree_node *root) { };
     const auto leaf_function = [&] (const octree_node *root)
     {
         // Encode the point locations
         point_counts.push_back (root->points.size ());
+    };
+    spc::dfs (root, node_function, leaf_function);
+    // Output bytes
+    std::vector<uint8_t> x;
+    // Save the point counts (NOT PORTABLE)
+    const uint8_t *pc = reinterpret_cast<const uint8_t *> (&point_counts[0]);
+    x.insert (x.end (), pc, pc + point_counts.size () * sizeof(double));
+    return x;
+}
+
+std::vector<uint8_t> encode_point_deltas (const octree_node *root)
+{
+    std::vector<point<double>> point_deltas;
+    const auto node_function = [&] (const octree_node *root) { };
+    const auto leaf_function = [&] (const octree_node *root)
+    {
         // Get min point in octant
         const auto q = root->e.minp;
         for (size_t i = 0; i < root->points.size (); ++i)
@@ -105,15 +130,9 @@ std::vector<uint8_t> encode (const octree_node *root)
             point_deltas.push_back (d);
         }
     };
-    // Search the tree, savings values as we go...
     spc::dfs (root, node_function, leaf_function);
     // Output bytes
     std::vector<uint8_t> x;
-    // Save the tree
-    x.insert (x.end (), octant_bytes.begin (), octant_bytes.end ());
-    // Save the point counts (NOT PORTABLE)
-    const uint8_t *pc = reinterpret_cast<const uint8_t *> (&point_counts[0]);
-    x.insert (x.end (), pc, pc + point_counts.size () * sizeof(double));
     // Save the point deltas (NOT PORTABLE)
     const uint8_t *pd = reinterpret_cast<const uint8_t *> (&point_deltas[0]);
     x.insert (x.end (), pd, pd + point_deltas.size () * 3 * sizeof(double));
@@ -206,11 +225,56 @@ class octree
     const octree_node *get_root () const { return root; }
 };
 
+std::vector<uint8_t> encode (std::vector<point<double>> &points,
+        const size_t max_depth = 10)
+{
+    octree o (max_depth, points);
+    const auto x1 = encode_tree (o.get_root ());
+    const auto x2 = encode_point_counts (o.get_root ());
+    const auto x3 = encode_point_deltas (o.get_root ());
+
+    // Output
+    std::vector<uint8_t> x;
+    x.insert (x.end (), x1.begin (), x1.end ());
+    x.insert (x.end (), x2.begin (), x2.end ());
+    x.insert (x.end (), x3.begin (), x3.end ());
+    return x;
+}
+
+std::vector<point<double>> decode (const std::vector<uint8_t> &x)
+{
+    std::vector<point<double>> y;
+    return y;
+}
+
+
 } // namespace spc
 
+void print_info (std::ostream &os, const spc::octree &o)
+{
+    unsigned nodes = 0;
+    unsigned leafs = 0;
+    unsigned leaf_points = 0;
+    const auto node_function = [&] (const spc::octree_node *root)
+    {
+        ++nodes;
+    };
+    const auto leaf_function = [&] (const spc::octree_node *root)
+    {
+        ++leafs;
+        leaf_points += root->total_points;
+    };
+    spc::dfs (o.get_root (), node_function, leaf_function);
+    os << "extent " << o.get_root ()->e.maxp - o.get_root ()->e.minp
+        << " nodes " << nodes
+        << " leafs " << leafs
+        << " leaf_points " << leaf_points
+        << " points/leaf " << leaf_points * 1.0 / leafs << std::endl;
+}
+
 void test (const size_t N,
-    const int min_exponent = std::numeric_limits<double>::min_exponent,
-    const int max_exponent = std::numeric_limits<double>::max_exponent)
+    const int min_exponent = std::numeric_limits<double>::min_exponent / 2,
+    const int max_exponent = std::numeric_limits<double>::max_exponent / 2)
 {
     using namespace std;
     using namespace spc;
@@ -236,39 +300,54 @@ void test (const size_t N,
 
     clog << "Encoding " << N << " random points" << endl;
 
-    const size_t max_depth = 20;
+    const size_t max_depth = 10;
     octree o (max_depth, points);
 
-    unsigned nodes = 0;
-    unsigned leafs = 0;
-    unsigned leaf_points = 0;
-    const auto node_function = [&] (const octree_node *root)
-    {
-        ++nodes;
-    };
-    const auto leaf_function = [&] (const octree_node *root)
-    {
-        ++leafs;
-        leaf_points += root->total_points;
-        //clog << setprecision(std::numeric_limits<double>::digits10);
-        //clog << "delta " << root->e.maxp - root->e.minp << endl;
-    };
-    spc::dfs (o.get_root (), node_function, leaf_function);
-    clog << "minp " << o.get_root ()->e.minp
-        << " maxp " << o.get_root ()->e.maxp
-        << " nodes " << nodes
-        << " leafs " << leafs
-        << " leaf_points " << leaf_points << endl;
+    print_info (clog, o);
 
-    const auto x = encode (o.get_root ());
-    clog << "size " << x.size () << endl;
+    {
+    const auto x = encode_tree (o.get_root ());
+    clog << "size " << x.size ();
     const auto y = spc::compress (x);
-    clog << "compressed size " << y.size () << endl;
-    clog << "ratio = " << y.size () * 100.0 / x.size () << endl;
-    clog << "bytes/pt = " << y.size () * 1.0 / points.size () << endl;
+    clog << " compressed size " << y.size ();
+    clog << " ratio = " << y.size () * 100.0 / x.size () << endl;
     const auto z = spc::decompress (y);
     verify (x == z);
-    clog << endl;
+    }
+
+    {
+    const auto x = encode_point_counts (o.get_root ());
+    clog << "size " << x.size ();
+    const auto y = spc::compress (x);
+    clog << " compressed size " << y.size ();
+    clog << " ratio = " << y.size () * 100.0 / x.size () << endl;
+    const auto z = spc::decompress (y);
+    verify (x == z);
+    }
+
+    {
+    const auto x = encode_point_deltas (o.get_root ());
+    clog << "size " << x.size ();
+    const auto y = spc::compress (x);
+    clog << " compressed size " << y.size ();
+    clog << " ratio = " << y.size () * 100.0 / x.size () << endl;
+    const auto z = spc::decompress (y);
+    verify (x == z);
+    }
+
+    {
+        // Copy the points
+        auto x (points);
+        // Encode them
+        auto y = encode (x);
+        // Get decoded points
+        auto z = decode (y);
+        // Sort them because order is not preserved in encoded bytes
+        sort (begin (x), end (x));
+        sort (begin (z), end (z));
+        // Check results
+        verify (x == z);
+    }
 }
 
 int main (int argc, char **argv)
@@ -278,16 +357,20 @@ int main (int argc, char **argv)
 
     try
     {
-        test (10, 0, 0);
-        test (10, 1, 10);
-        test (10, -10, 10);
+        //test (10, 0, 0);
+        //test (10, 1, 10);
+        //test (10, -10, 10);
+        test (10'000, 0, 0);
+        test (10'000, 0, 10);
+        test (10'000, -10, 10);
+        //test (10'000, 0, 20);
+        //test (10'000, -20, 20);
         test (10'000);
-        test (10'000, 0, 20);
-        test (1'000'000);
-        test (1'000'000, 0, 0);
-        test (1'000'000, -10, 10);
-        test (10'000'000);
-        test (10'000'000, 0, 20);
+        //test (1'000'000);
+        //test (1'000'000, 0, 0);
+        //test (1'000'000, -10, 10);
+        //test (10'000'000);
+        //test (11'000'000, 0, 20);
 
         return 0;
     }
