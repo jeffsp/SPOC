@@ -47,6 +47,18 @@ extent<T> get_new_extent (const extent<T> &e,
     return f;
 }
 
+template<typename T>
+extent<T> get_new_extent (const extent<T> &e,
+    const unsigned octant_index,
+    const point<double> &midp)
+{
+    auto f (e);
+    if (octant_index & 0x01) f.maxp.x = midp.x; else f.minp.x = midp.x;
+    if (octant_index & 0x02) f.maxp.y = midp.y; else f.minp.y = midp.y;
+    if (octant_index & 0x04) f.maxp.z = midp.z; else f.minp.z = midp.z;
+    return f;
+}
+
 // All dimensions <=
 inline bool all_less_equal (const point<double> &a, const point<double> &b)
 {
@@ -54,6 +66,11 @@ inline bool all_less_equal (const point<double> &a, const point<double> &b)
     if (a.y > b.y) return false;
     if (a.z > b.z) return false;
     return true;
+}
+
+inline bool operator== (const extent<double> &a, const extent<double> &b)
+{
+    return (a.minp == b.minp) && (a.maxp == b.maxp);
 }
 
 }

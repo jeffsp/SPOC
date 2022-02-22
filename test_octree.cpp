@@ -70,16 +70,52 @@ void dfs (const octree_node *root,
 uint8_t to_byte (const octant_ptrs &octants)
 {
     uint8_t b = 0;
-    for (auto i : octants)
+    for (size_t i = 0; i < octants.size (); ++i)
     {
-        if (i != nullptr)
-            b |= 1;
-        b <<= 1;
+        if (octants[i] == nullptr)
+            continue;
+        b |= (1 << i);
     }
     return b;
 }
 
-std::vector<uint8_t> encode_tree (const octree_node *root)
+void append_double (const double d, std::vector<uint8_t> &x)
+{
+    const uint8_t *p = reinterpret_cast<const uint8_t *> (&d);
+    x.insert (x.end (), p, p + sizeof(double));
+}
+
+double bytes_to_double (const uint8_t *p)
+{
+    const double d = *(reinterpret_cast<const double *> (p));
+    return d;
+}
+
+std::vector<uint8_t> encode_extent (const spc::extent<double> &e)
+{
+    std::vector<uint8_t> bytes;
+    append_double (e.minp.x, bytes);
+    append_double (e.minp.y, bytes);
+    append_double (e.minp.z, bytes);
+    append_double (e.maxp.x, bytes);
+    append_double (e.maxp.y, bytes);
+    append_double (e.maxp.z, bytes);
+    return bytes;
+}
+
+spc::extent<double> decode_extent (const std::vector<uint8_t> &bytes)
+{
+    spc::extent<double> e;
+    e.minp.x = bytes_to_double (&bytes[0] + 0 * sizeof(double));
+    e.minp.y = bytes_to_double (&bytes[0] + 1 * sizeof(double));
+    e.minp.z = bytes_to_double (&bytes[0] + 2 * sizeof(double));
+    e.maxp.x = bytes_to_double (&bytes[0] + 3 * sizeof(double));
+    e.maxp.y = bytes_to_double (&bytes[0] + 4 * sizeof(double));
+    e.maxp.z = bytes_to_double (&bytes[0] + 5 * sizeof(double));
+    return e;
+}
+
+std::vector<uint8_t> encode_octree (const octree_node *root)
 {
     std::vector<uint8_t> x;
     const auto node_function = [&] (const octree_node *root)
@@ -160,24 +196,68 @@ void add_octree_point (octree_node * const root,
         return;
     }
 
-    // Get midpoint between min and max extents
+    // Get midpoint between min and max extent
     const point<double> midp {
         (root->e.minp.x + root->e.maxp.x) / 2.0,
         (root->e.minp.y + root->e.maxp.y) / 2.0,
         (root->e.minp.z + root->e.maxp.z) / 2.0};
 
     // Which octant does 'p' belong to?
-    const unsigned n = get_octant_index (p, midp);
+    const unsigned octant_index = get_octant_index (p, midp);
 
     // Allocate new node if needed
-    if (root->octants[n] == nullptr)
+    if (root->octants[octant_index] == nullptr)
     {
-        root->octants[n] = new octree_node;
-        // Set the extents on the new node
-        root->octants[n]->e = get_new_extent (root->e, p, midp);
+        root->octants[octant_index] = new octree_node;
+        // Set the extent on the new node
+        root->octants[octant_index]->e = get_new_extent (root->e, p, midp);
     }
 
-    add_octree_point (root->octants[n], p, max_depth, current_depth + 1);
+    add_octree_point (root->octants[octant_index], p, max_depth, current_depth + 1);
+}
+
+void add_octree_octant (octree_node * const root,
+    const std::vector<uint8_t> &bytes,
+    size_t &byte_index)
+{
+    // Check logic
+    assert (root != nullptr);
+    assert (byte_index <= bytes.size ());
+    assert (all_less_equal (root->e.minp, root->e.maxp));
+
+    // Terminating case
+    if (byte_index == bytes.size ())
+        return;
+
+    // Get the octant flags
+    const uint8_t b = bytes[byte_index];
+
+    // Is it a leaf?
+    if (b == 0)
+        return;
+
+    // Get midpoint between min and max extent
+    const point<double> midp {
+        (root->e.minp.x + root->e.maxp.x) / 2.0,
+        (root->e.minp.y + root->e.maxp.y) / 2.0,
+        (root->e.minp.z + root->e.maxp.z) / 2.0};
+
+    // How many octants are occupied in this extent?
+    for (size_t octant_index = 0; octant_index < 8; ++octant_index)
+    {
+        // Skip zero flags
+        if (((b >> octant_index) & 1) == 0)
+            continue;
+
+        // Allocate new node
+        root->octants[octant_index] = new octree_node;
+
+        // Set the extent on the new node
+        root->octants[octant_index]->e = get_new_extent (root->e, octant_index, midp);
+
+        // Recurse into the new octant
+        add_octree_octant (root->octants[octant_index], bytes, ++byte_index);
+    }
 }
 
 class octree
@@ -200,7 +280,8 @@ class octree
 
     public:
     // CTOR
-    octree (const size_t max_depth, const std::vector<point<double>> &points)
+    octree (const size_t max_depth,
+        const std::vector<point<double>> &points)
         : root (nullptr)
     {
         // Make sure we have data
@@ -217,6 +298,21 @@ class octree
         for (const auto &p : points)
             add_octree_point (root, p, max_depth, 0);
     }
+    // CTOR
+    octree (const std::vector<uint8_t> &bytes,
+        const spc::extent<double> &e)
+        : root (nullptr)
+    {
+        // Create the tree
+        root = new octree_node;
+
+        // Set the extent
+        root->e = e;
+
+        // Create the nodes from the encoded bytes
+        size_t byte_index = 0;
+        add_octree_octant (root, bytes, byte_index);
+    }
     // DTOR
     ~octree ()
     {
@@ -229,7 +325,7 @@ std::vector<uint8_t> encode (std::vector<point<double>> &points,
         const size_t max_depth = 10)
 {
     octree o (max_depth, points);
-    const auto x1 = encode_tree (o.get_root ());
+    const auto x1 = encode_octree (o.get_root ());
     const auto x2 = encode_point_counts (o.get_root ());
     const auto x3 = encode_point_deltas (o.get_root ());
 
@@ -306,14 +402,20 @@ void test (const size_t N,
     print_info (clog, o);
 
     {
-    const auto x = encode_tree (o.get_root ());
-    clog << "size " << x.size ();
-    const auto y = spc::compress (x);
-    clog << " compressed size " << y.size ();
-    clog << " ratio = " << y.size () * 100.0 / x.size () << endl;
-    const auto z = spc::decompress (y);
-    verify (x == z);
+    const auto x = encode_extent (o.get_root ()->e);
+    const auto e = decode_extent (x);
+    verify (o.get_root ()->e == e);
     }
+
+    {
+    const auto x = encode_octree (o.get_root ());
+    octree o2 (x, o.get_root ()->e);
+    print_info (clog, o2);
+    const auto y = encode_octree (o2.get_root ());
+    verify (x == y);
+    }
+
+    return;
 
     {
     const auto x = encode_point_counts (o.get_root ());
@@ -357,7 +459,7 @@ int main (int argc, char **argv)
 
     try
     {
-        //test (10, 0, 0);
+        test (10, 0, 0);
         //test (10, 1, 10);
         //test (10, -10, 10);
         test (10'000, 0, 0);
