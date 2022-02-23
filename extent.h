@@ -73,4 +73,40 @@ inline bool operator== (const extent<double> &a, const extent<double> &b)
     return (a.minp == b.minp) && (a.maxp == b.maxp);
 }
 
+void append_double (const double d, std::vector<uint8_t> &x)
+{
+    const uint8_t *p = reinterpret_cast<const uint8_t *> (&d);
+    x.insert (x.end (), p, p + sizeof(double));
+}
+
+double bytes_to_double (const uint8_t *p)
+{
+    const double d = *(reinterpret_cast<const double *> (p));
+    return d;
+}
+
+std::vector<uint8_t> encode_extent (const spc::extent<double> &e)
+{
+    std::vector<uint8_t> bytes;
+    append_double (e.minp.x, bytes);
+    append_double (e.minp.y, bytes);
+    append_double (e.minp.z, bytes);
+    append_double (e.maxp.x, bytes);
+    append_double (e.maxp.y, bytes);
+    append_double (e.maxp.z, bytes);
+    return bytes;
+}
+
+spc::extent<double> decode_extent (const std::vector<uint8_t> &bytes)
+{
+    spc::extent<double> e;
+    e.minp.x = bytes_to_double (&bytes[0] + 0 * sizeof(double));
+    e.minp.y = bytes_to_double (&bytes[0] + 1 * sizeof(double));
+    e.minp.z = bytes_to_double (&bytes[0] + 2 * sizeof(double));
+    e.maxp.x = bytes_to_double (&bytes[0] + 3 * sizeof(double));
+    e.maxp.y = bytes_to_double (&bytes[0] + 4 * sizeof(double));
+    e.maxp.z = bytes_to_double (&bytes[0] + 5 * sizeof(double));
+    return e;
+}
+
 }
