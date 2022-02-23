@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <random>
 #include <string>
 #include <vector>
@@ -31,14 +32,12 @@ unsigned get_octant_index (const point<double> &p, const point<double> &midp)
 struct octree_node
 {
     extent<double> e;
-    std::array<octree_node *, 8> octants =
-    { nullptr, nullptr, nullptr, nullptr,
-      nullptr, nullptr, nullptr, nullptr };
-    std::vector<point<double>> *deltas = { nullptr };
+    std::array<std::unique_ptr<octree_node>, 8> octants;
+    std::unique_ptr<std::vector<point<double>>> deltas;
 };
 
 template<typename NF, typename LF>
-void dfs (const octree_node *node,
+void dfs (const std::unique_ptr<octree_node> &node,
     NF node_function,
     LF leaf_function)
 {
@@ -47,7 +46,7 @@ void dfs (const octree_node *node,
 
     // It's a leaf if it has no children
     bool is_leaf = true;
-    for (auto n : node->octants)
+    for (const auto &n : node->octants)
     {
         // Skip nulls
         if (n == nullptr)
@@ -114,24 +113,24 @@ spc::extent<double> decode_extent (const std::vector<uint8_t> &bytes)
     return e;
 }
 
-std::vector<uint8_t> encode_octree (const octree_node *root)
+std::vector<uint8_t> encode_octree (const std::unique_ptr<octree_node> &root)
 {
     std::vector<uint8_t> x;
-    const auto node_function = [&] (const octree_node *node)
+    const auto node_function = [&] (const std::unique_ptr<octree_node> &node)
     {
         // Encode the octant pointers
         x.push_back (to_byte (node->octants));
     };
-    const auto leaf_function = [&] (const octree_node *node) { };
+    const auto leaf_function = [&] (const std::unique_ptr<octree_node> &node) { };
     spc::dfs (root, node_function, leaf_function);
     return x;
 }
 
-std::vector<uint8_t> encode_point_counts (const octree_node *root)
+std::vector<uint8_t> encode_point_counts (const std::unique_ptr<octree_node> &root)
 {
     std::vector<uint64_t> point_counts;
-    const auto node_function = [&] (const octree_node *node) { };
-    const auto leaf_function = [&] (const octree_node *node)
+    const auto node_function = [&] (const std::unique_ptr<octree_node> &node) { };
+    const auto leaf_function = [&] (const std::unique_ptr<octree_node> &node)
     {
         // Save the point location
         point_counts.push_back (node->deltas->size ());
@@ -145,11 +144,11 @@ std::vector<uint8_t> encode_point_counts (const octree_node *root)
     return x;
 }
 
-std::vector<uint8_t> encode_point_deltas (const octree_node *root)
+std::vector<uint8_t> encode_point_deltas (const std::unique_ptr<octree_node> &root)
 {
     std::vector<point<double>> deltas;
-    const auto node_function = [&] (const octree_node *node) { };
-    const auto leaf_function = [&] (const octree_node *node)
+    const auto node_function = [&] (const std::unique_ptr<octree_node> &node) { };
+    const auto leaf_function = [&] (const std::unique_ptr<octree_node> &node)
     {
         // Save the deltas
         deltas.insert (deltas.end (),
@@ -165,7 +164,7 @@ std::vector<uint8_t> encode_point_deltas (const octree_node *root)
     return x;
 }
 
-void add_octree_point (octree_node *node,
+void add_octree_point (const std::unique_ptr<octree_node> &node,
     const point<double> &p,
     const unsigned max_depth,
     const unsigned current_depth)
@@ -181,7 +180,7 @@ void add_octree_point (octree_node *node,
     {
         // Allocate delta container if needed
         if (node->deltas == nullptr)
-            node->deltas = new std::vector<point<double>>;
+            node->deltas.reset (new std::vector<point<double>>);
 
         // Get the octant corner point
         const auto q = node->e.minp;
@@ -209,7 +208,7 @@ void add_octree_point (octree_node *node,
     // Allocate new node if needed
     if (node->octants[octant_index] == nullptr)
     {
-        node->octants[octant_index] = new octree_node;
+        node->octants[octant_index].reset (new octree_node);
         // Set the extent on the new node
         node->octants[octant_index]->e = get_new_extent (node->e, p, midp);
     }
@@ -217,7 +216,7 @@ void add_octree_point (octree_node *node,
     add_octree_point (node->octants[octant_index], p, max_depth, current_depth + 1);
 }
 
-void add_octree_octant (octree_node *node,
+void add_octree_octant (const std::unique_ptr<octree_node> &node,
     const std::vector<uint8_t> &bytes,
     size_t &byte_index)
 {
@@ -251,7 +250,7 @@ void add_octree_octant (octree_node *node,
             continue;
 
         // Allocate new node
-        node->octants[octant_index] = new octree_node;
+        node->octants[octant_index].reset (new octree_node);
 
         // Set the extent on the new node
         node->octants[octant_index]->e = get_new_extent (node->e, octant_index, midp);
@@ -264,24 +263,7 @@ void add_octree_octant (octree_node *node,
 class octree
 {
     private:
-    octree_node *root;
-
-    void free_node (octree_node *t)
-    {
-        assert (t != nullptr);
-
-        // Free the points
-        if (t->deltas != nullptr)
-            delete t->deltas;
-
-        // Free children first
-        for (auto n : t->octants)
-            if (n != nullptr)
-                free_node (n);
-
-        // Free the node
-        delete t;
-    }
+    std::unique_ptr<octree_node> root;
 
     public:
     // CTOR
@@ -294,7 +276,7 @@ class octree
             return;
 
         // Create the tree
-        root = new octree_node;
+        root.reset (new octree_node);
 
         // Get the extent min/max points
         root->e = get_extent (points);
@@ -309,7 +291,7 @@ class octree
         : root (nullptr)
     {
         // Create the tree
-        root = new octree_node;
+        root.reset (new octree_node);
 
         // Set the extent
         root->e = e;
@@ -318,12 +300,7 @@ class octree
         size_t byte_index = 0;
         add_octree_octant (root, bytes, byte_index);
     }
-    // DTOR
-    ~octree ()
-    {
-        free_node (root);
-    }
-    const octree_node *get_root () const { return root; }
+    const std::unique_ptr<octree_node> &get_root () const { return root; }
 };
 
 std::vector<uint8_t> encode (std::vector<point<double>> &points,
@@ -356,11 +333,11 @@ void print_info (std::ostream &os, const spc::octree &o)
     unsigned nodes = 0;
     unsigned leafs = 0;
     unsigned total_points = 0;
-    const auto node_function = [&] (const spc::octree_node *node)
+    const auto node_function = [&] (const std::unique_ptr<spc::octree_node> &node)
     {
         ++nodes;
     };
-    const auto leaf_function = [&] (const spc::octree_node *node)
+    const auto leaf_function = [&] (const std::unique_ptr<spc::octree_node> &node)
     {
         ++leafs;
         total_points += node->deltas->size ();
