@@ -17,21 +17,32 @@
 namespace spc
 {
 
-unsigned get_octant_index (const point<double> &p, const point<double> &midp)
+// Given a reference point in 3D space, in which octant does a point
+// lie relative to that reference?
+//
+// There are 2^3=8 possibilities. If the reference is at location
+//
+//    0.0, 0.0, 0.0
+//
+// A second point at x,y,z may be located in one of 8 octants:
+//
+//    bit value
+//    0   x>0
+//    1   y>0
+//    2   z>0
+unsigned get_octant_index (const point<double> &p, const point<double> &ref)
 {
     // Get octree node index = 0..7
     const unsigned index =
-        ((p.x < midp.x) << 0) |
-        ((p.y < midp.y) << 1) |
-        ((p.z < midp.z) << 2);
+        ((p.x < ref.x) << 0) |
+        ((p.y < ref.y) << 1) |
+        ((p.z < ref.z) << 2);
     assert (index < 8);
     return index;
 }
 
-
 struct octree_node
 {
-    extent<double> e;
     std::array<std::unique_ptr<octree_node>, 8> octants;
     std::unique_ptr<std::vector<point<double>>> deltas;
 };
@@ -166,14 +177,15 @@ std::vector<uint8_t> encode_point_deltas (const std::unique_ptr<octree_node> &ro
 
 void add_octree_point (const std::unique_ptr<octree_node> &node,
     const point<double> &p,
+    const extent<double> &e,
     const unsigned max_depth,
     const unsigned current_depth)
 {
     // Check logic
     assert (node != nullptr);
-    assert (all_less_equal (node->e.minp, node->e.maxp));
-    assert (all_less_equal (node->e.minp, p));
-    assert (all_less_equal (p, node->e.maxp));
+    assert (all_less_equal (e.minp, e.maxp));
+    assert (all_less_equal (e.minp, p));
+    assert (all_less_equal (p, e.maxp));
 
     // Terminal case
     if (current_depth == max_depth)
@@ -183,7 +195,7 @@ void add_octree_point (const std::unique_ptr<octree_node> &node,
             node->deltas.reset (new std::vector<point<double>>);
 
         // Get the octant corner point
-        const auto q = node->e.minp;
+        const auto q = e.minp;
 
         // Check logic
         assert (all_less_equal (q, p));
@@ -198,32 +210,32 @@ void add_octree_point (const std::unique_ptr<octree_node> &node,
 
     // Get midpoint between min and max extent
     const point<double> midp {
-        (node->e.minp.x + node->e.maxp.x) / 2.0,
-        (node->e.minp.y + node->e.maxp.y) / 2.0,
-        (node->e.minp.z + node->e.maxp.z) / 2.0};
+        (e.minp.x + e.maxp.x) / 2.0,
+        (e.minp.y + e.maxp.y) / 2.0,
+        (e.minp.z + e.maxp.z) / 2.0};
 
     // Which octant does 'p' belong to?
     const unsigned octant_index = get_octant_index (p, midp);
 
     // Allocate new node if needed
     if (node->octants[octant_index] == nullptr)
-    {
         node->octants[octant_index].reset (new octree_node);
-        // Set the extent on the new node
-        node->octants[octant_index]->e = get_new_extent (node->e, p, midp);
-    }
 
-    add_octree_point (node->octants[octant_index], p, max_depth, current_depth + 1);
+    // Get the extent on the new node
+    const auto new_e = get_new_extent (e, p, midp);
+
+    add_octree_point (node->octants[octant_index], p, new_e, max_depth, current_depth + 1);
 }
 
 void add_octree_octant (const std::unique_ptr<octree_node> &node,
+    const extent<double> &e,
     const std::vector<uint8_t> &bytes,
     size_t &byte_index)
 {
     // Check logic
     assert (node != nullptr);
     assert (byte_index <= bytes.size ());
-    assert (all_less_equal (node->e.minp, node->e.maxp));
+    assert (all_less_equal (e.minp, e.maxp));
 
     // Terminating case
     if (byte_index == bytes.size ())
@@ -238,9 +250,9 @@ void add_octree_octant (const std::unique_ptr<octree_node> &node,
 
     // Get midpoint between min and max extent
     const point<double> midp {
-        (node->e.minp.x + node->e.maxp.x) / 2.0,
-        (node->e.minp.y + node->e.maxp.y) / 2.0,
-        (node->e.minp.z + node->e.maxp.z) / 2.0};
+        (e.minp.x + e.maxp.x) / 2.0,
+        (e.minp.y + e.maxp.y) / 2.0,
+        (e.minp.z + e.maxp.z) / 2.0};
 
     // How many octants are occupied in this extent?
     for (size_t octant_index = 0; octant_index < 8; ++octant_index)
@@ -252,11 +264,11 @@ void add_octree_octant (const std::unique_ptr<octree_node> &node,
         // Allocate new node
         node->octants[octant_index].reset (new octree_node);
 
-        // Set the extent on the new node
-        node->octants[octant_index]->e = get_new_extent (node->e, octant_index, midp);
+        // Get the extent of the new node
+        const auto new_e = get_new_extent (e, octant_index, midp);
 
         // Recurse into the new octant
-        add_octree_octant (node->octants[octant_index], bytes, ++byte_index);
+        add_octree_octant (node->octants[octant_index], new_e, bytes, ++byte_index);
     }
 }
 
@@ -275,15 +287,15 @@ class octree
         if (points.empty ())
             return;
 
-        // Create the tree
+        // Allocate the root node
         root.reset (new octree_node);
 
         // Get the extent min/max points
-        root->e = get_extent (points);
+        const auto e = get_extent (points);
 
         // Add the points
         for (const auto &p : points)
-            add_octree_point (root, p, max_depth, 0);
+            add_octree_point (root, p, e, max_depth, 0);
     }
     // CTOR
     octree (const std::vector<uint8_t> &bytes,
@@ -293,12 +305,9 @@ class octree
         // Create the tree
         root.reset (new octree_node);
 
-        // Set the extent
-        root->e = e;
-
         // Create the nodes from the encoded bytes
         size_t byte_index = 0;
-        add_octree_octant (root, bytes, byte_index);
+        add_octree_octant (root, e, bytes, byte_index);
     }
     const std::unique_ptr<octree_node> &get_root () const { return root; }
 };
@@ -325,7 +334,6 @@ std::vector<point<double>> decode (const std::vector<uint8_t> &x)
     return y;
 }
 
-
 } // namespace spc
 
 void print_info (std::ostream &os, const spc::octree &o)
@@ -343,8 +351,7 @@ void print_info (std::ostream &os, const spc::octree &o)
         total_points += node->deltas->size ();
     };
     spc::dfs (o.get_root (), node_function, leaf_function);
-    os << "extent " << o.get_root ()->e.maxp - o.get_root ()->e.minp
-        << " nodes " << nodes
+    os << " nodes " << nodes
         << " leafs " << leafs
         << " total_points " << total_points
         << " points/leaf " << total_points * 1.0 / leafs << std::endl;
@@ -366,13 +373,13 @@ void test (const size_t N,
     // We don't want a uniform distribution.
     std::default_random_engine g;
     std::uniform_real_distribution<double> d (-1.0, 1.0);
-    std::uniform_int_distribution<int> e (min_exponent, max_exponent);
+    std::uniform_int_distribution<int> exp (min_exponent, max_exponent);
 
     for (auto &p : points)
     {
-        const double x = std::ldexp (d (g), e (g));
-        const double y = std::ldexp (d (g), e (g));
-        const double z = std::ldexp (d (g), e (g));
+        const double x = std::ldexp (d (g), exp (g));
+        const double y = std::ldexp (d (g), exp (g));
+        const double z = std::ldexp (d (g), exp (g));
         p = point<double> {x, y, z};
     }
 
@@ -383,15 +390,18 @@ void test (const size_t N,
 
     print_info (clog, o);
 
+    // Get the extent min/max points
+    const auto e = get_extent (points);
+
     {
-    const auto x = encode_extent (o.get_root ()->e);
-    const auto e = decode_extent (x);
-    verify (o.get_root ()->e == e);
+    const auto x = encode_extent (e);
+    const auto y = decode_extent (x);
+    verify (y == e);
     }
 
     {
     const auto x = encode_octree (o.get_root ());
-    octree o2 (x, o.get_root ()->e);
+    octree o2 (x, e);
     const auto y = encode_octree (o2.get_root ());
     verify (x == y);
     }
