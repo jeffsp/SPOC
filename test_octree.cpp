@@ -27,29 +27,27 @@ unsigned get_octant_index (const point<double> &p, const point<double> &midp)
     return index;
 }
 
-struct octree_node;
-using octant_ptrs = std::array<octree_node *, 8>;
 
 struct octree_node
 {
-    // Arrays are not default initialized for standard types
-    octant_ptrs octants = { nullptr };
     extent<double> e;
-    size_t total_points = 0;
-    std::vector<point<double>> points;
+    std::array<octree_node *, 8> octants =
+    { nullptr, nullptr, nullptr, nullptr,
+      nullptr, nullptr, nullptr, nullptr };
+    std::vector<point<double>> *deltas = { nullptr };
 };
 
-template<typename NODE_FUNCTION, typename LEAF_FUNCTION>
-void dfs (const octree_node *root,
-    NODE_FUNCTION node_function,
-    LEAF_FUNCTION leaf_function)
+template<typename NF, typename LF>
+void dfs (const octree_node *node,
+    NF node_function,
+    LF leaf_function)
 {
     // Call node function on all nodes
-    node_function (root);
+    node_function (node);
 
     // It's a leaf if it has no children
     bool is_leaf = true;
-    for (auto n : root->octants)
+    for (auto n : node->octants)
     {
         // Skip nulls
         if (n == nullptr)
@@ -64,10 +62,11 @@ void dfs (const octree_node *root,
 
     // Call leaf if needed
     if (is_leaf)
-        leaf_function (root);
+        leaf_function (node);
 }
 
-uint8_t to_byte (const octant_ptrs &octants)
+template<typename T>
+uint8_t to_byte (const T &octants)
 {
     uint8_t b = 0;
     for (size_t i = 0; i < octants.size (); ++i)
@@ -118,13 +117,12 @@ spc::extent<double> decode_extent (const std::vector<uint8_t> &bytes)
 std::vector<uint8_t> encode_octree (const octree_node *root)
 {
     std::vector<uint8_t> x;
-    const auto node_function = [&] (const octree_node *root)
+    const auto node_function = [&] (const octree_node *node)
     {
-        x.push_back (to_byte (root->octants));
+        // Encode the octant pointers
+        x.push_back (to_byte (node->octants));
     };
-    const auto leaf_function = [&] (const octree_node *root)
-    {
-    };
+    const auto leaf_function = [&] (const octree_node *node) { };
     spc::dfs (root, node_function, leaf_function);
     return x;
 }
@@ -132,16 +130,16 @@ std::vector<uint8_t> encode_octree (const octree_node *root)
 std::vector<uint8_t> encode_point_counts (const octree_node *root)
 {
     std::vector<uint64_t> point_counts;
-    const auto node_function = [&] (const octree_node *root) { };
-    const auto leaf_function = [&] (const octree_node *root)
+    const auto node_function = [&] (const octree_node *node) { };
+    const auto leaf_function = [&] (const octree_node *node)
     {
-        // Encode the point locations
-        point_counts.push_back (root->points.size ());
+        // Save the point location
+        point_counts.push_back (node->deltas->size ());
     };
     spc::dfs (root, node_function, leaf_function);
     // Output bytes
     std::vector<uint8_t> x;
-    // Save the point counts (NOT PORTABLE)
+    // Encode the point counts (NOT PORTABLE)
     const uint8_t *pc = reinterpret_cast<const uint8_t *> (&point_counts[0]);
     x.insert (x.end (), pc, pc + point_counts.size () * sizeof(double));
     return x;
@@ -149,81 +147,84 @@ std::vector<uint8_t> encode_point_counts (const octree_node *root)
 
 std::vector<uint8_t> encode_point_deltas (const octree_node *root)
 {
-    std::vector<point<double>> point_deltas;
-    const auto node_function = [&] (const octree_node *root) { };
-    const auto leaf_function = [&] (const octree_node *root)
+    std::vector<point<double>> deltas;
+    const auto node_function = [&] (const octree_node *node) { };
+    const auto leaf_function = [&] (const octree_node *node)
     {
-        // Get min point in octant
-        const auto q = root->e.minp;
-        for (size_t i = 0; i < root->points.size (); ++i)
-        {
-            // Get the point
-            const auto p = root->points[i];
-            assert (all_less_equal (q, p));
-            // Subtract octant min from this point
-            const auto d = p - q;
-            // Save the delta
-            point_deltas.push_back (d);
-        }
+        // Save the deltas
+        deltas.insert (deltas.end (),
+            node->deltas->begin (),
+            node->deltas->end ());
     };
     spc::dfs (root, node_function, leaf_function);
     // Output bytes
     std::vector<uint8_t> x;
     // Save the point deltas (NOT PORTABLE)
-    const uint8_t *pd = reinterpret_cast<const uint8_t *> (&point_deltas[0]);
-    x.insert (x.end (), pd, pd + point_deltas.size () * 3 * sizeof(double));
+    const uint8_t *pd = reinterpret_cast<const uint8_t *> (&deltas[0]);
+    x.insert (x.end (), pd, pd + deltas.size () * 3 * sizeof(double));
     return x;
 }
 
-void add_octree_point (octree_node * const root,
+void add_octree_point (octree_node *node,
     const point<double> &p,
     const unsigned max_depth,
     const unsigned current_depth)
 {
     // Check logic
-    assert (root != nullptr);
-    assert (all_less_equal (root->e.minp, root->e.maxp));
-    assert (all_less_equal (root->e.minp, p));
-    assert (all_less_equal (p, root->e.maxp));
-
-    // Count the point
-    ++root->total_points;
+    assert (node != nullptr);
+    assert (all_less_equal (node->e.minp, node->e.maxp));
+    assert (all_less_equal (node->e.minp, p));
+    assert (all_less_equal (p, node->e.maxp));
 
     // Terminal case
     if (current_depth == max_depth)
     {
-        root->points.push_back (p);
+        // Allocate delta container if needed
+        if (node->deltas == nullptr)
+            node->deltas = new std::vector<point<double>>;
+
+        // Get the octant corner point
+        const auto q = node->e.minp;
+
+        // Check logic
+        assert (all_less_equal (q, p));
+
+        // Subtract octant corner from this point
+        const auto d = p - q;
+
+        // Save the delta
+        node->deltas->push_back (d);
         return;
     }
 
     // Get midpoint between min and max extent
     const point<double> midp {
-        (root->e.minp.x + root->e.maxp.x) / 2.0,
-        (root->e.minp.y + root->e.maxp.y) / 2.0,
-        (root->e.minp.z + root->e.maxp.z) / 2.0};
+        (node->e.minp.x + node->e.maxp.x) / 2.0,
+        (node->e.minp.y + node->e.maxp.y) / 2.0,
+        (node->e.minp.z + node->e.maxp.z) / 2.0};
 
     // Which octant does 'p' belong to?
     const unsigned octant_index = get_octant_index (p, midp);
 
     // Allocate new node if needed
-    if (root->octants[octant_index] == nullptr)
+    if (node->octants[octant_index] == nullptr)
     {
-        root->octants[octant_index] = new octree_node;
+        node->octants[octant_index] = new octree_node;
         // Set the extent on the new node
-        root->octants[octant_index]->e = get_new_extent (root->e, p, midp);
+        node->octants[octant_index]->e = get_new_extent (node->e, p, midp);
     }
 
-    add_octree_point (root->octants[octant_index], p, max_depth, current_depth + 1);
+    add_octree_point (node->octants[octant_index], p, max_depth, current_depth + 1);
 }
 
-void add_octree_octant (octree_node * const root,
+void add_octree_octant (octree_node *node,
     const std::vector<uint8_t> &bytes,
     size_t &byte_index)
 {
     // Check logic
-    assert (root != nullptr);
+    assert (node != nullptr);
     assert (byte_index <= bytes.size ());
-    assert (all_less_equal (root->e.minp, root->e.maxp));
+    assert (all_less_equal (node->e.minp, node->e.maxp));
 
     // Terminating case
     if (byte_index == bytes.size ())
@@ -238,9 +239,9 @@ void add_octree_octant (octree_node * const root,
 
     // Get midpoint between min and max extent
     const point<double> midp {
-        (root->e.minp.x + root->e.maxp.x) / 2.0,
-        (root->e.minp.y + root->e.maxp.y) / 2.0,
-        (root->e.minp.z + root->e.maxp.z) / 2.0};
+        (node->e.minp.x + node->e.maxp.x) / 2.0,
+        (node->e.minp.y + node->e.maxp.y) / 2.0,
+        (node->e.minp.z + node->e.maxp.z) / 2.0};
 
     // How many octants are occupied in this extent?
     for (size_t octant_index = 0; octant_index < 8; ++octant_index)
@@ -250,13 +251,13 @@ void add_octree_octant (octree_node * const root,
             continue;
 
         // Allocate new node
-        root->octants[octant_index] = new octree_node;
+        node->octants[octant_index] = new octree_node;
 
         // Set the extent on the new node
-        root->octants[octant_index]->e = get_new_extent (root->e, octant_index, midp);
+        node->octants[octant_index]->e = get_new_extent (node->e, octant_index, midp);
 
         // Recurse into the new octant
-        add_octree_octant (root->octants[octant_index], bytes, ++byte_index);
+        add_octree_octant (node->octants[octant_index], bytes, ++byte_index);
     }
 }
 
@@ -265,9 +266,13 @@ class octree
     private:
     octree_node *root;
 
-    void free_node (octree_node * const t)
+    void free_node (octree_node *t)
     {
         assert (t != nullptr);
+
+        // Free the points
+        if (t->deltas != nullptr)
+            delete t->deltas;
 
         // Free children first
         for (auto n : t->octants)
@@ -350,22 +355,22 @@ void print_info (std::ostream &os, const spc::octree &o)
 {
     unsigned nodes = 0;
     unsigned leafs = 0;
-    unsigned leaf_points = 0;
-    const auto node_function = [&] (const spc::octree_node *root)
+    unsigned total_points = 0;
+    const auto node_function = [&] (const spc::octree_node *node)
     {
         ++nodes;
     };
-    const auto leaf_function = [&] (const spc::octree_node *root)
+    const auto leaf_function = [&] (const spc::octree_node *node)
     {
         ++leafs;
-        leaf_points += root->total_points;
+        total_points += node->deltas->size ();
     };
     spc::dfs (o.get_root (), node_function, leaf_function);
     os << "extent " << o.get_root ()->e.maxp - o.get_root ()->e.minp
         << " nodes " << nodes
         << " leafs " << leafs
-        << " leaf_points " << leaf_points
-        << " points/leaf " << leaf_points * 1.0 / leafs << std::endl;
+        << " total_points " << total_points
+        << " points/leaf " << total_points * 1.0 / leafs << std::endl;
 }
 
 void test (const size_t N,
@@ -410,29 +415,21 @@ void test (const size_t N,
     {
     const auto x = encode_octree (o.get_root ());
     octree o2 (x, o.get_root ()->e);
-    print_info (clog, o2);
     const auto y = encode_octree (o2.get_root ());
     verify (x == y);
     }
 
-    return;
-
     {
     const auto x = encode_point_counts (o.get_root ());
-    clog << "size " << x.size ();
     const auto y = spc::compress (x);
-    clog << " compressed size " << y.size ();
-    clog << " ratio = " << y.size () * 100.0 / x.size () << endl;
     const auto z = spc::decompress (y);
     verify (x == z);
     }
+    return;
 
     {
     const auto x = encode_point_deltas (o.get_root ());
-    clog << "size " << x.size ();
     const auto y = spc::compress (x);
-    clog << " compressed size " << y.size ();
-    clog << " ratio = " << y.size () * 100.0 / x.size () << endl;
     const auto z = spc::decompress (y);
     verify (x == z);
     }
@@ -460,19 +457,19 @@ int main (int argc, char **argv)
     try
     {
         test (10, 0, 0);
-        //test (10, 1, 10);
-        //test (10, -10, 10);
+        test (10, 1, 10);
+        test (10, -10, 10);
         test (10'000, 0, 0);
         test (10'000, 0, 10);
         test (10'000, -10, 10);
-        //test (10'000, 0, 20);
-        //test (10'000, -20, 20);
+        test (10'000, 0, 20);
+        test (10'000, -20, 20);
         test (10'000);
-        //test (1'000'000);
-        //test (1'000'000, 0, 0);
-        //test (1'000'000, -10, 10);
-        //test (10'000'000);
-        //test (11'000'000, 0, 20);
+        test (1'000'000);
+        test (1'000'000, 0, 0);
+        test (1'000'000, -10, 10);
+        test (10'000'000);
+        test (11'000'000, 0, 20);
 
         return 0;
     }
