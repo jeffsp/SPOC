@@ -7,6 +7,9 @@
 namespace spc
 {
 
+// A node in an octree represents a cube in 3D space. The cube is
+// divided into 8 octants. An array of 8 pointers recursively divides
+// the node into subspaces.
 struct octree_node
 {
     std::array<std::unique_ptr<octree_node>, 8> octants;
@@ -91,20 +94,20 @@ void add_octree_point (const std::unique_ptr<octree_node> &node,
 
 void add_octree_octant (const std::unique_ptr<octree_node> &node,
     const extent<double> &e,
-    const std::vector<uint8_t> &bytes,
+    const std::vector<uint8_t> &octant_bytes,
     size_t &byte_index)
 {
     // Check logic
     assert (node != nullptr);
-    assert (byte_index <= bytes.size ());
+    assert (byte_index <= octant_bytes.size ());
     assert (all_less_equal (e.minp, e.maxp));
 
     // Terminating case
-    if (byte_index == bytes.size ())
+    if (byte_index == octant_bytes.size ())
         return;
 
     // Get the octant flags
-    const uint8_t b = bytes[byte_index];
+    const uint8_t b = octant_bytes[byte_index];
 
     // Is it a leaf?
     if (b == 0)
@@ -130,7 +133,7 @@ void add_octree_octant (const std::unique_ptr<octree_node> &node,
         const auto new_e = get_new_extent (e, octant_index, midp);
 
         // Recurse into the new octant
-        add_octree_octant (node->octants[octant_index], new_e, bytes, ++byte_index);
+        add_octree_octant (node->octants[octant_index], new_e, octant_bytes, ++byte_index);
     }
 }
 
@@ -140,7 +143,7 @@ class octree
     std::unique_ptr<octree_node> root;
 
     public:
-    // CTOR
+    // Contruct an octree from a container of 3D points
     octree (const size_t max_depth, const std::vector<point<double>> &points)
     {
         // Make sure we have data
@@ -157,15 +160,29 @@ class octree
         for (const auto &p : points)
             add_octree_point (root, p, e, max_depth, 0);
     }
-    // CTOR
-    octree (const std::vector<uint8_t> &bytes, const spc::extent<double> &e)
+    // Construct an octree over a given extent from encoded bytes
+    octree (const spc::extent<double> &e,
+        const std::vector<uint8_t> &octant_bytes)
     {
         // Create the tree
         root.reset (new octree_node);
 
         // Create the nodes from the encoded bytes
         size_t byte_index = 0;
-        add_octree_octant (root, e, bytes, byte_index);
+        add_octree_octant (root, e, octant_bytes, byte_index);
+    }
+    // Construct an octree over a given extent from encoded bytes
+    octree (const spc::extent<double> &e,
+        const std::vector<uint8_t> &octant_bytes,
+        const std::vector<uint8_t> &point_count_bytes,
+        const std::vector<uint8_t> &point_delta_bytes)
+    {
+        // Create the tree
+        root.reset (new octree_node);
+
+        // Create the nodes from the encoded bytes
+        size_t byte_index = 0;
+        add_octree_octant (root, e, octant_bytes, byte_index);
     }
     const std::unique_ptr<octree_node> &get_root () const { return root; }
 };
@@ -243,6 +260,86 @@ std::vector<uint8_t> encode_octree (const std::unique_ptr<octree_node> &root)
     const auto leaf_function = [&] (const std::unique_ptr<octree_node> &node) { };
     spc::dfs (root, node_function, leaf_function);
     return x;
+}
+
+std::vector<uint64_t> get_point_counts (const std::unique_ptr<octree_node> &root)
+{
+    std::vector<uint64_t> point_counts;
+    const auto node_function = [&] (const std::unique_ptr<octree_node> &node) { };
+    const auto leaf_function = [&] (const std::unique_ptr<octree_node> &node)
+    {
+        // Check logic
+        assert (node != nullptr);
+        // Save the point count
+        point_counts.push_back (node->deltas->size ());
+    };
+    spc::dfs (root, node_function, leaf_function);
+    return point_counts;
+}
+
+std::vector<uint8_t> encode_point_counts (const std::vector<uint64_t> &point_counts)
+{
+    // Output bytes
+    std::vector<uint8_t> x;
+    // Encode the point counts (NOT PORTABLE)
+    const uint8_t *pc = reinterpret_cast<const uint8_t *> (&point_counts[0]);
+    x.insert (x.end (), pc, pc + point_counts.size () * sizeof(uint64_t));
+    return x;
+}
+
+std::vector<uint64_t> decode_point_counts (const std::vector<uint8_t> &x)
+{
+    // Check logic
+    assert (x.size () % sizeof(uint64_t) == 0);
+
+    // Decoded counts
+    std::vector<uint64_t> point_counts;
+    // Decode the point counts (NOT PORTABLE)
+    const uint64_t *pc = reinterpret_cast<const uint64_t *> (&x[0]);
+    const size_t total_points = x.size () / sizeof(uint64_t);
+    point_counts.insert (point_counts.end (), pc, pc + total_points);
+    return point_counts;
+}
+
+std::vector<point<double>> get_point_deltas (const std::unique_ptr<octree_node> &root)
+{
+    std::vector<point<double>> point_deltas;
+    const auto node_function = [&] (const std::unique_ptr<octree_node> &node) { };
+    const auto leaf_function = [&] (const std::unique_ptr<octree_node> &node)
+    {
+        // Check logic
+        assert (node != nullptr);
+        // Save the point location
+        point_deltas.insert (point_deltas.end (),
+            node->deltas->begin (),
+            node->deltas->end ());
+    };
+    spc::dfs (root, node_function, leaf_function);
+    return point_deltas;
+}
+
+std::vector<uint8_t> encode_point_deltas (const std::vector<point<double>> &point_deltas)
+{
+    // Output bytes
+    std::vector<uint8_t> x;
+    // Encode the point deltas (NOT PORTABLE)
+    const uint8_t *pd = reinterpret_cast<const uint8_t *> (&point_deltas[0]);
+    x.insert (x.end (), pd, pd + point_deltas.size () * sizeof(point<double>));
+    return x;
+}
+
+std::vector<point<double>> decode_point_deltas (const std::vector<uint8_t> &x)
+{
+    // Check logic
+    assert (x.size () % sizeof(point<double>) == 0);
+
+    // Decoded deltas
+    std::vector<point<double>> point_deltas;
+    // Decode the point deltas (NOT PORTABLE)
+    const point<double> *pc = reinterpret_cast<const point<double> *> (&x[0]);
+    const size_t total_points = x.size () / sizeof(point<double>);
+    point_deltas.insert (point_deltas.end (), pc, pc + total_points);
+    return point_deltas;
 }
 
 } // namespace spc

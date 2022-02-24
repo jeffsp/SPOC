@@ -19,44 +19,6 @@ namespace spc
 {
 
 /*
-std::vector<uint8_t> encode_point_counts (const std::unique_ptr<octree_node> &root)
-{
-    std::vector<uint64_t> point_counts;
-    const auto node_function = [&] (const std::unique_ptr<octree_node> &node) { };
-    const auto leaf_function = [&] (const std::unique_ptr<octree_node> &node)
-    {
-        // Save the point location
-        point_counts.push_back (node->deltas->size ());
-    };
-    spc::dfs (root, node_function, leaf_function);
-    // Output bytes
-    std::vector<uint8_t> x;
-    // Encode the point counts (NOT PORTABLE)
-    const uint8_t *pc = reinterpret_cast<const uint8_t *> (&point_counts[0]);
-    x.insert (x.end (), pc, pc + point_counts.size () * sizeof(double));
-    return x;
-}
-
-std::vector<uint8_t> encode_point_deltas (const std::unique_ptr<octree_node> &root)
-{
-    std::vector<point<double>> deltas;
-    const auto node_function = [&] (const std::unique_ptr<octree_node> &node) { };
-    const auto leaf_function = [&] (const std::unique_ptr<octree_node> &node)
-    {
-        // Save the deltas
-        deltas.insert (deltas.end (),
-            node->deltas->begin (),
-            node->deltas->end ());
-    };
-    spc::dfs (root, node_function, leaf_function);
-    // Output bytes
-    std::vector<uint8_t> x;
-    // Save the point deltas (NOT PORTABLE)
-    const uint8_t *pd = reinterpret_cast<const uint8_t *> (&deltas[0]);
-    x.insert (x.end (), pd, pd + deltas.size () * 3 * sizeof(double));
-    return x;
-}
-
 std::vector<uint8_t> encode (std::vector<point<double>> &points,
         const size_t max_depth = 10)
 {
@@ -98,22 +60,49 @@ void test_extent (const T &points)
 }
 
 template<typename T>
-void test_octree (const T &points)
+void test_octree (const T &points, const size_t max_depth)
 {
     using namespace std;
     using namespace spc;
 
     const auto e = get_extent (points);
 
-    const size_t max_depth = 10;
     octree o (max_depth, points);
 
     print_octree_info (clog, o);
 
     const auto x = encode_octree (o.get_root ());
-    octree o2 (x, e);
+    octree o2 (e, x);
     const auto y = encode_octree (o2.get_root ());
     verify (x == y);
+}
+
+template<typename T>
+void test_point_counts (const T &points, const size_t max_depth)
+{
+    using namespace std;
+    using namespace spc;
+
+    octree o (max_depth, points);
+
+    const auto pcs = get_point_counts (o.get_root ());
+    const auto x = encode_point_counts (pcs);
+    const auto y = decode_point_counts (x);
+    verify (pcs == y);
+}
+
+template<typename T>
+void test_point_deltas (const T &points, const size_t max_depth)
+{
+    using namespace std;
+    using namespace spc;
+
+    octree o (max_depth, points);
+
+    const auto pds = get_point_deltas (o.get_root ());
+    const auto x = encode_point_deltas (pds);
+    const auto y = decode_point_deltas (x);
+    verify (pds == y);
 }
 
 void test (const size_t N,
@@ -143,24 +132,15 @@ void test (const size_t N,
     }
 
     test_extent (points);
-    test_octree (points);
+
+    for (auto max_depth : {1, 8, 16})
+    {
+        test_octree (points, max_depth);
+        test_point_counts (points, max_depth);
+        test_point_deltas (points, max_depth);
+    }
 
     /*
-    {
-    const auto x = encode_point_counts (o.get_root ());
-    const auto y = spc::compress (x);
-    const auto z = spc::decompress (y);
-    verify (x == z);
-    }
-    return;
-
-    {
-    const auto x = encode_point_deltas (o.get_root ());
-    const auto y = spc::compress (x);
-    const auto z = spc::decompress (y);
-    verify (x == z);
-    }
-
     {
         // Copy the points
         auto x (points);
@@ -194,10 +174,8 @@ int main (int argc, char **argv)
         test (10'000, -20, 20);
         test (10'000);
         test (1'000'000);
-        test (1'000'000, 0, 0);
         test (1'000'000, -10, 10);
-        test (10'000'000);
-        test (11'000'000, 0, 20);
+        test (1'000'000, 0, 30);
 
         return 0;
     }
