@@ -43,9 +43,10 @@ int main (int argc, char **argv)
         ifstream ifs (argv[0]);
         if (!ifs)
             throw runtime_error ("Could not open file for reading");
-        auto ss = ostringstream {};
-        ss << ifs.rdbuf();
-        datasets.push_back (vector<uint8_t> (ss.str ().begin (), ss.str ().end ()));
+        string s ((std::istreambuf_iterator<char>(ifs)),
+                  std::istreambuf_iterator<char>());
+
+        datasets.push_back (vector<uint8_t> (s.begin (), s.end ()));
 
         // Compress them all at all compression levels
         for (auto l : levels)
