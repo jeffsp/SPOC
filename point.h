@@ -43,6 +43,20 @@ inline point<double> operator- (const point<double> &a, const point<double> &b)
     return c -= b;
 }
 
+inline point<double> operator+= (point<double> &a, const point<double> &b)
+{
+    a.x += b.x;
+    a.y += b.y;
+    a.z += b.z;
+    return a;
+}
+
+inline point<double> operator+ (const point<double> &a, const point<double> &b)
+{
+    auto c (a);
+    return c += b;
+}
+
 inline std::ostream &operator<< (std::ostream &s, const point<double> &p)
 {
     s << ' ' << p.x;

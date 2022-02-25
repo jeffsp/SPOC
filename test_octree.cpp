@@ -113,6 +113,11 @@ void test_octree (const T &points, const size_t max_depth)
     std::sort (std::begin (p2), std::end (p2));
     std::sort (std::begin (p3), std::end (p3));
     verify (p1 == p2);
+    clog << "p1 size " << p1.size () << endl;
+    clog << "p3 size " << p3.size () << endl;
+    clog << setprecision(std::numeric_limits<double>::digits10);
+    for (size_t i = 0; i < p1.size () && i < p3.size (); ++i)
+        clog << p1[i] << '\t' << p3[i] << endl;
     verify (p1 == p3);
 }
 
