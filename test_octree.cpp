@@ -124,7 +124,11 @@ void test_octree (const T &points, const size_t max_depth)
         }
     }
 
-    verify (spc::about_equal (p1, p2, precision));
+    // The same points stored in two different trees will be equal
+    verify (p1 == p2);
+
+    // The original points will be slightly different than the ones
+    // retrieved from the tree because of rounding error
     verify (spc::about_equal (p1, p3, precision));
 }
 

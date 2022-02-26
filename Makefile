@@ -30,3 +30,14 @@ test:
 	./build/release/test_octree
 	./build/debug/test_compress
 	./build/release/test_compress
+
+.PHONY: memcheck # Run memcheck
+memcheck:
+	valgrind --leak-check=full --error-exitcode=1 ./build/debug/test_octree
+	valgrind --leak-check=full --error-exitcode=1 ./build/release/test_octree
+	valgrind --leak-check=full --error-exitcode=1 ./build/debug/test_compress
+	valgrind --leak-check=full --error-exitcode=1 ./build/release/test_compress
+
+.PHONY: help # Generate list of targets with descriptions
+help:
+	@grep '^.PHONY: .* #' Makefile | sed 's/\.PHONY: \(.*\) # \(.*\)/\1	\2/' | expand -t20
