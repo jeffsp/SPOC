@@ -91,8 +91,7 @@ void test_octree (const T &points, const size_t max_depth)
 
     // Encode the octree
     {
-        const auto e = get_extent (points);
-        x.extent_bytes = encode_extent (e);
+        x.extent_bytes = encode_extent (o1.get_root ()->e);
         x.octant_bytes = encode_octants (o1.get_root ());
         x.point_count_bytes = encode_point_counts (get_point_counts (o1.get_root ()));
         x.point_delta_bytes = encode_point_deltas (get_point_deltas (o1.get_root ()));
@@ -105,20 +104,28 @@ void test_octree (const T &points, const size_t max_depth)
         x.point_delta_bytes);
 
     auto p1 = o1.get_points ();
-    auto p2 = o1.get_points ();
+    auto p2 = o2.get_points ();
     auto p3 = points;
+
+    verify (p1.size () == p2.size ());
+    verify (p1.size () == p3.size ());
 
     // Point order is not preserved
     std::sort (std::begin (p1), std::end (p1));
     std::sort (std::begin (p2), std::end (p2));
     std::sort (std::begin (p3), std::end (p3));
-    verify (p1 == p2);
-    clog << "p1 size " << p1.size () << endl;
-    clog << "p3 size " << p3.size () << endl;
     clog << setprecision(std::numeric_limits<double>::digits10);
-    for (size_t i = 0; i < p1.size () && i < p3.size (); ++i)
-        clog << p1[i] << '\t' << p3[i] << endl;
-    verify (p1 == p3);
+    const unsigned precision = 9;
+    for (size_t i = 0; i < p1.size () && i < p2.size (); ++i)
+    {
+        if (!about_equal (p1[i], p2[i], precision))
+        {
+            clog << p1[i] << '\t' << p2[i] << endl;
+        }
+    }
+
+    verify (spc::about_equal (p1, p2, precision));
+    verify (spc::about_equal (p1, p3, precision));
 }
 
 void test (const size_t N,
@@ -149,29 +156,13 @@ void test (const size_t N,
 
     test_extent (points);
 
-    for (auto max_depth : {1, 8, 16})
+    for (auto max_depth : {1, 2, 4, 8})
     {
         test_octants (points, max_depth);
         test_point_counts (points, max_depth);
         test_point_deltas (points, max_depth);
         test_octree (points, max_depth);
     }
-
-    /*
-    {
-        // Copy the points
-        auto x (points);
-        // Encode them
-        auto y = encode (x);
-        // Get decoded points
-        auto z = decode (y);
-        // Sort them because order is not preserved in encoded bytes
-        sort (begin (x), end (x));
-        sort (begin (z), end (z));
-        // Check results
-        verify (x == z);
-    }
-    */
 }
 
 int main (int argc, char **argv)
@@ -181,6 +172,7 @@ int main (int argc, char **argv)
 
     try
     {
+        test (3, 0, 0);
         test (10, 0, 0);
         test (10, 1, 10);
         test (10, -10, 10);
@@ -189,10 +181,12 @@ int main (int argc, char **argv)
         test (10'000, -10, 10);
         test (10'000, 0, 20);
         test (10'000, -20, 20);
-        test (10'000);
-        test (1'000'000);
-        test (1'000'000, -10, 10);
-        test (1'000'000, 0, 30);
+        test (10'000, -40, 0);
+        test (100'000, 0, 0);
+        test (100'000, 0, 10);
+        test (100'000, 0, 20);
+        test (100'000, -20, 20);
+        test (100'000, -40, 0);
 
         return 0;
     }

@@ -26,7 +26,7 @@ run:
 
 .PHONY: test # Run tests
 test:
-	./build/debug/test_compress
-	./build/release/test_compress
 	./build/debug/test_octree
 	./build/release/test_octree
+	./build/debug/test_compress
+	./build/release/test_compress
