@@ -161,7 +161,7 @@ inline void add_octree_octant (const std::unique_ptr<octree_node> &node,
         node->octants[octant_index].reset (new octree_node);
 
         // Get the extent of the new node
-        node->e = get_new_extent (node->e, octant_index, midp);
+        node->octants[octant_index]->e = get_new_extent (node->e, octant_index, midp);
 
         // Recurse into the new octant
         add_octree_octant (node->octants[octant_index], octant_bytes, ++byte_index);
@@ -407,6 +407,23 @@ inline void print_octree_info (std::ostream &os, const spc::octree &o)
         << " leafs " << leafs
         << " total_points " << total_points
         << " points/leaf " << total_points * 1.0 / leafs << std::endl;
+}
+
+inline void print_octree (std::ostream &os, const spc::octree &o)
+{
+    size_t node_number = 0;
+    const auto node_function = [&] (const std::unique_ptr<spc::octree_node> &node)
+    {
+
+        os << node_number++
+            << "\tmin " << node->e.minp
+            << "\tmax " << node->e.maxp
+            << std::endl;
+    };
+    const auto leaf_function = [&] (const std::unique_ptr<spc::octree_node> &node)
+    {
+    };
+    dfs (o.get_root (), node_function, leaf_function);
 }
 
 } // namespace spc
