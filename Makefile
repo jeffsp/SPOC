@@ -1,10 +1,10 @@
 default: compile test
 
 cmake:
-	@mkdir -p build/debug
-	@mkdir -p build/release
-	@cd build/debug && cmake -DCMAKE_BUILD_TYPE=Debug ../..
-	@cd build/release && cmake -DCMAKE_BUILD_TYPE=Release ../..
+	mkdir -p build/debug
+	mkdir -p build/release
+	cd build/debug && cmake -DCMAKE_BUILD_TYPE=Debug ../..
+	cd build/release && cmake -DCMAKE_BUILD_TYPE=Release ../..
 
 .PHONY: convert # Convert LAS files to SPC files
 convert:
@@ -12,12 +12,12 @@ convert:
 
 .PHONY: compile # Compile all applications
 compile:
-	@cd build/debug && make -j 24
-	@cd build/release && make -j 24
+	cd build/debug && make -j 24
+	cd build/release && make -j 24
 
 .PHONY: clean # Clean build objects
 clean:
-	@rm -rf build
+	rm -rf build
 
 .PHONY: run # Run app
 run:
@@ -33,10 +33,10 @@ test:
 
 .PHONY: memcheck # Run memcheck
 memcheck:
-	valgrind --leak-check=full --error-exitcode=1 ./build/debug/test_octree
-	valgrind --leak-check=full --error-exitcode=1 ./build/release/test_octree
-	valgrind --leak-check=full --error-exitcode=1 ./build/debug/test_compress
-	valgrind --leak-check=full --error-exitcode=1 ./build/release/test_compress
+	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_octree
+	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_octree
+	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_compress
+	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_compress
 
 .PHONY: help # Generate list of targets with descriptions
 help:

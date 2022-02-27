@@ -72,14 +72,6 @@ void test_point_deltas (const T &points, const size_t max_depth)
     verify (pds == y);
 }
 
-struct encoded_octree
-{
-    std::vector<uint8_t> extent_bytes;
-    std::vector<uint8_t> octant_bytes;
-    std::vector<uint8_t> point_count_bytes;
-    std::vector<uint8_t> point_delta_bytes;
-};
-
 template<typename T>
 void test_octree (const T &points, const size_t max_depth)
 {
@@ -87,21 +79,11 @@ void test_octree (const T &points, const size_t max_depth)
     using namespace spc;
 
     octree o1 (max_depth, points);
-    encoded_octree x;
 
-    // Encode the octree
-    {
-        x.extent_bytes = encode_extent (o1.get_root ()->e);
-        x.octant_bytes = encode_octants (o1.get_root ());
-        x.point_count_bytes = encode_point_counts (get_point_counts (o1.get_root ()));
-        x.point_delta_bytes = encode_point_deltas (get_point_deltas (o1.get_root ()));
-    }
+    const auto x = encode (o1);
 
     // Decode the octree
-    octree o2 (x.extent_bytes,
-        x.octant_bytes,
-        x.point_count_bytes,
-        x.point_delta_bytes);
+    octree o2 (x);
 
     auto p1 = o1.get_points ();
     auto p2 = o2.get_points ();
@@ -130,6 +112,35 @@ void test_octree (const T &points, const size_t max_depth)
     // The original points will be slightly different than the ones
     // retrieved from the tree because of rounding error
     verify (spc::about_equal (p1, p3, precision));
+}
+
+template<typename T>
+void test_compress_octree (const T &points)
+{
+    using namespace std;
+    using namespace spc;
+
+    vector<uint8_t> b;
+    for (size_t max_depth = 1; max_depth < 16; ++max_depth)
+    {
+        octree o (max_depth, points);
+        const auto x = encode (o);
+        auto y = compress (x.extent_bytes);
+        clog << "extent size " << y.size ();
+        b.insert (b.end (), y.begin (), y.end ());
+        y = compress (x.octant_bytes);
+        clog << "\toctants size " << y.size ();
+        b.insert (b.end (), y.begin (), y.end ());
+        y = compress (x.point_count_bytes);
+        clog << "\tpoint counts size " << y.size ();
+        b.insert (b.end (), y.begin (), y.end ());
+        y = compress (x.point_delta_bytes);
+        clog << "\tpoint deltas size " << y.size () << endl;
+        b.insert (b.end (), y.begin (), y.end ());
+        clog << "max_depth " << max_depth
+            << "\tbytes/point " << b.size () * 1.0 / points.size ()
+            << endl;
+    }
 }
 
 void test (const size_t N,
@@ -167,6 +178,8 @@ void test (const size_t N,
         test_point_deltas (points, max_depth);
         test_octree (points, max_depth);
     }
+
+    test_compress_octree (points);
 }
 
 int main (int argc, char **argv)

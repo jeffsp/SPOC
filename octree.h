@@ -274,6 +274,14 @@ inline std::vector<point<double>> decode_point_deltas (const std::vector<uint8_t
     return point_deltas;
 }
 
+struct encoded_octree
+{
+    std::vector<uint8_t> extent_bytes;
+    std::vector<uint8_t> octant_bytes;
+    std::vector<uint8_t> point_count_bytes;
+    std::vector<uint8_t> point_delta_bytes;
+};
+
 class octree
 {
     private:
@@ -312,26 +320,23 @@ class octree
         add_octree_octant (root, octant_bytes, byte_index);
     }
     // Construct an octree over a given extent from encoded bytes
-    octree (const std::vector<uint8_t> &extent_bytes,
-        const std::vector<uint8_t> &octant_bytes,
-        const std::vector<uint8_t> &point_count_bytes,
-        const std::vector<uint8_t> &point_delta_bytes)
+    octree (const encoded_octree &x)
     {
         // Create the tree
         root.reset (new octree_node);
 
         // Get the extent
-        root->e = decode_extent (extent_bytes);
+        root->e = decode_extent (x.extent_bytes);
 
         // Create the nodes from the encoded bytes
         size_t byte_index = 0;
-        add_octree_octant (root, octant_bytes, byte_index);
+        add_octree_octant (root, x.octant_bytes, byte_index);
 
         // Get the point counts
-        const auto pcs = decode_point_counts (point_count_bytes);
+        const auto pcs = decode_point_counts (x.point_count_bytes);
 
         // Get the point deltas
-        const auto pds = decode_point_deltas (point_delta_bytes);
+        const auto pds = decode_point_deltas (x.point_delta_bytes);
 
         // Set the points
         size_t pcs_index = 0;
@@ -387,6 +392,18 @@ class octree
         return p;
     }
 };
+
+inline encoded_octree encode (const octree &o)
+{
+    encoded_octree x;
+
+    x.extent_bytes = encode_extent (o.get_root ()->e);
+    x.octant_bytes = encode_octants (o.get_root ());
+    x.point_count_bytes = encode_point_counts (get_point_counts (o.get_root ()));
+    x.point_delta_bytes = encode_point_deltas (get_point_deltas (o.get_root ()));
+    return x;
+}
+
 
 inline void print_octree_info (std::ostream &os, const spc::octree &o)
 {
