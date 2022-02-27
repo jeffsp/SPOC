@@ -29,7 +29,7 @@ int main (int argc, char **argv)
         datasets.push_back ({1, 2, 3, 4, 5, 6, 7, 8, 9, 0});
 
         // Random bytes
-        const size_t N = 10'000'000;
+        const size_t N = 1'000'000;
         vector<uint8_t> x (N);
         default_random_engine g;
         uniform_int_distribution<int> b (0, 255);
