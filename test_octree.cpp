@@ -12,18 +12,8 @@
 #include "compress.h"
 #include "extent.h"
 #include "octree.h"
+#include "point.h"
 #include "test_utils.h"
-
-template<typename T>
-void test_extent (const T &points)
-{
-    using namespace std;
-    using namespace spc;
-    const auto e = get_extent (points);
-    const auto x = encode_extent (e);
-    const auto y = decode_extent (x);
-    verify (y == e);
-}
 
 template<typename T>
 void test_octants (const T &points, const size_t max_depth)
@@ -44,6 +34,7 @@ void test_octants (const T &points, const size_t max_depth)
     verify (x == y);
 }
 
+/*
 template<typename T>
 void test_point_counts (const T &points, const size_t max_depth)
 {
@@ -67,7 +58,7 @@ void test_point_deltas (const T &points, const size_t max_depth)
     octree o (max_depth, points);
 
     const auto pds = get_point_deltas (o.get_root ());
-    const auto x = encode_point_deltas (pds);
+    const auto x = encode_points (pds);
     const auto y = decode_point_deltas (x);
     verify (pds == y);
 }
@@ -142,6 +133,7 @@ void test_compress_octree (const T &points)
             << endl;
     }
 }
+*/
 
 void test (const size_t N,
     const int min_exponent = std::numeric_limits<double>::min_exponent / 2,
@@ -152,25 +144,9 @@ void test (const size_t N,
 
     clog << "Generating " << N << " random points" << endl;
 
-    vector<point<double>> points (N);
+    const auto points = generate_points (N, min_exponent, max_exponent);
 
-    // Generate random doubles at varying scales.
-    //
-    // We don't want a uniform distribution.
-    std::default_random_engine g;
-    std::uniform_real_distribution<double> d (-1.0, 1.0);
-    std::uniform_int_distribution<int> exp (min_exponent, max_exponent);
-
-    for (auto &p : points)
-    {
-        const double x = std::ldexp (d (g), exp (g));
-        const double y = std::ldexp (d (g), exp (g));
-        const double z = std::ldexp (d (g), exp (g));
-        p = point<double> {x, y, z};
-    }
-
-    test_extent (points);
-
+    /*
     for (auto max_depth : {1, 2, 4, 8})
     {
         test_octants (points, max_depth);
@@ -180,6 +156,7 @@ void test (const size_t N,
     }
 
     test_compress_octree (points);
+    */
 }
 
 int main (int argc, char **argv)
@@ -200,10 +177,17 @@ int main (int argc, char **argv)
         test (10'000, -20, 20);
         test (10'000, -40, 0);
         test (100'000, 0, 0);
+        test (100'000, 0, 5);
+        test (100'000, -10, 0);
         test (100'000, 0, 10);
+        test (100'000, 0, 15);
         test (100'000, 0, 20);
         test (100'000, -20, 20);
-        test (100'000, -40, 0);
+        test (100'000, 0, 30);
+        test (100'000, 0, 40);
+        test (100'000, 0, 50);
+        test (100'000, -50, 0);
+        test (1'000'000, 0, 12);
 
         return 0;
     }

@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cassert>
 #include <limits>
+#include <utility>
 #include <vector>
 #include "point.h"
 
@@ -73,40 +75,70 @@ inline bool operator== (const extent<double> &a, const extent<double> &b)
     return (a.minp == b.minp) && (a.maxp == b.maxp);
 }
 
-void append_double (const double d, std::vector<uint8_t> &x)
-{
-    const uint8_t *p = reinterpret_cast<const uint8_t *> (&d);
-    x.insert (x.end (), p, p + sizeof(double));
-}
+using extent_pair = std::pair<std::vector<uint8_t>,std::vector<uint8_t>>;
 
-double bytes_to_double (const uint8_t *p)
+inline extent_pair encode_extent (const spc::extent<double> &e)
 {
-    const double d = *(reinterpret_cast<const double *> (p));
-    return d;
-}
-
-std::vector<uint8_t> encode_extent (const spc::extent<double> &e)
-{
-    std::vector<uint8_t> bytes;
-    append_double (e.minp.x, bytes);
-    append_double (e.minp.y, bytes);
-    append_double (e.minp.z, bytes);
-    append_double (e.maxp.x, bytes);
-    append_double (e.maxp.y, bytes);
-    append_double (e.maxp.z, bytes);
+    extent_pair bytes;
+    bytes.first = encode_point (e.minp);
+    bytes.second = encode_point (e.maxp);
     return bytes;
 }
 
-spc::extent<double> decode_extent (const std::vector<uint8_t> &bytes)
+inline spc::extent<double> decode_extent (const extent_pair &bytes)
 {
     spc::extent<double> e;
-    e.minp.x = bytes_to_double (&bytes[0] + 0 * sizeof(double));
-    e.minp.y = bytes_to_double (&bytes[0] + 1 * sizeof(double));
-    e.minp.z = bytes_to_double (&bytes[0] + 2 * sizeof(double));
-    e.maxp.x = bytes_to_double (&bytes[0] + 3 * sizeof(double));
-    e.maxp.y = bytes_to_double (&bytes[0] + 4 * sizeof(double));
-    e.maxp.z = bytes_to_double (&bytes[0] + 5 * sizeof(double));
+    e.minp = decode_point (bytes.first);
+    e.maxp = decode_point (bytes.second);
     return e;
+}
+
+constexpr double max_value = (1ul << 62);
+
+inline point<uint64_t> rescale (const point<double> &p,
+    const point<double> &s,
+    const point<double> &minp)
+{
+    point<uint64_t> q;
+    q.x = (p.x - minp.x) * max_value / s.x;
+    q.y = (p.y - minp.y) * max_value / s.y;
+    q.z = (p.z - minp.z) * max_value / s.z;
+    return q;
+}
+
+inline point<double> restore (const point<uint64_t> &p,
+    const point<double> &s,
+    const point<double> &minp)
+{
+    point<double> q;
+    q.x = p.x * s.x / max_value + minp.x;
+    q.y = p.y * s.y / max_value + minp.y;
+    q.z = p.z * s.z / max_value + minp.z;
+    return q;
+}
+
+inline std::vector<point<uint64_t>> rescale (
+    const std::vector<point<double>> p,
+    const extent<double> &e)
+{
+    assert (all_less_equal (e.minp, e.maxp));
+    const point<double> s = e.maxp - e.minp;
+    std::vector<point<uint64_t>> q (p.size ());
+    for (size_t i = 0; i < p.size (); ++i)
+        q[i] = rescale (p[i], s, e.minp);
+    return q;
+}
+
+inline std::vector<point<double>> restore (
+    const std::vector<point<uint64_t>> p,
+    const spc::extent<double> &e)
+{
+    assert (all_less_equal (e.minp, e.maxp));
+    const point<double> s = e.maxp - e.minp;
+    std::vector<point<double>> q (p.size ());
+    for (size_t i = 0; i < p.size (); ++i)
+        q[i] = restore (p[i], s, e.minp);
+    return q;
 }
 
 }

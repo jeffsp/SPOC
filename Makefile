@@ -26,6 +26,8 @@ run:
 
 .PHONY: test # Run tests
 test:
+	./build/debug/test_extent
+	./build/release/test_extent
 	./build/debug/test_octree
 	./build/release/test_octree
 	./build/debug/test_compress

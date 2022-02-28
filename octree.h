@@ -250,33 +250,9 @@ inline std::vector<point<double>> get_point_deltas (const std::unique_ptr<octree
     return point_deltas;
 }
 
-inline std::vector<uint8_t> encode_point_deltas (const std::vector<point<double>> &point_deltas)
-{
-    // Output bytes
-    std::vector<uint8_t> x;
-    // Encode the point deltas (NOT PORTABLE)
-    const uint8_t *pd = reinterpret_cast<const uint8_t *> (&point_deltas[0]);
-    x.insert (x.end (), pd, pd + point_deltas.size () * sizeof(point<double>));
-    return x;
-}
-
-inline std::vector<point<double>> decode_point_deltas (const std::vector<uint8_t> &x)
-{
-    // Check logic
-    assert (x.size () % sizeof(point<double>) == 0);
-
-    // Decoded deltas
-    std::vector<point<double>> point_deltas;
-    // Decode the point deltas (NOT PORTABLE)
-    const point<double> *pc = reinterpret_cast<const point<double> *> (&x[0]);
-    const size_t total_points = x.size () / sizeof(point<double>);
-    point_deltas.insert (point_deltas.end (), pc, pc + total_points);
-    return point_deltas;
-}
-
 struct encoded_octree
 {
-    std::vector<uint8_t> extent_bytes;
+    extent_pair extent_bytes;
     std::vector<uint8_t> octant_bytes;
     std::vector<uint8_t> point_count_bytes;
     std::vector<uint8_t> point_delta_bytes;
@@ -306,7 +282,7 @@ class octree
             add_octree_point (root, p, max_depth, 0);
     }
     // Construct an octree over a given extent from encoded bytes
-    octree (const std::vector<uint8_t> &extent_bytes,
+    octree (const extent_pair &extent_bytes,
         const std::vector<uint8_t> &octant_bytes)
     {
         // Create the tree
@@ -336,7 +312,7 @@ class octree
         const auto pcs = decode_point_counts (x.point_count_bytes);
 
         // Get the point deltas
-        const auto pds = decode_point_deltas (x.point_delta_bytes);
+        const auto pds = decode_points (x.point_delta_bytes);
 
         // Set the points
         size_t pcs_index = 0;
@@ -400,7 +376,7 @@ inline encoded_octree encode (const octree &o)
     x.extent_bytes = encode_extent (o.get_root ()->e);
     x.octant_bytes = encode_octants (o.get_root ());
     x.point_count_bytes = encode_point_counts (get_point_counts (o.get_root ()));
-    x.point_delta_bytes = encode_point_deltas (get_point_deltas (o.get_root ()));
+    x.point_delta_bytes = encode_points (get_point_deltas (o.get_root ()));
     return x;
 }
 
