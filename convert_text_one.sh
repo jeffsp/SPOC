@@ -37,32 +37,6 @@ else
     echo "" > $2/${sn}.txt
 fi
 
-# Does it have a scale factor?
-#if grep -q "scale factor x y z" ${TMPDIR}/info.txt; then
-#    # Save the scale factor
-#    grep "scale factor x y z" ${TMPDIR}/info.txt \
-#        | cut -f 2 -d ":" \
-#        | awk '{$1=$1};1' \
-#        >> $2/${sn}.txt
-#else
-#    # Error
-#    echo "No scale factor found"
-#    exit -1
-#fi
-
-# Does it have an offset?
-#if grep -q "offset x y z" ${TMPDIR}/info.txt; then
-#    # Save the scale factor
-#    grep "offset x y z" ${TMPDIR}/info.txt \
-#        | cut -f 2 -d ":" \
-#        | awk '{$1=$1};1' \
-#        >> $2/${sn}.txt
-#else
-#    # Error
-#    echo "No offset found"
-#    exit -1
-#fi
-
 # Append the data to the file
 las2txt64 -i ${TMPDIR}/tmp.las -parse xyzcpiRGB -sep tab -stdout \
     >> $2/${sn}.txt

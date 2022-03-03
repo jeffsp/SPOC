@@ -1,8 +1,14 @@
 default: compile run
 
 .PHONY: convert # Convert LAS files to SPC files
-convert:
-	./convert_all.sh ./datasets/las_files ./results/spc_file_format
+convert_text:
+	./convert_text_all.sh ./datasets/las_files ./results/spc_file_format
+
+convert_laz:
+	./convert_laz_all.sh ./datasets/las_files ./results/spc_file_format
+
+convert_spc:
+	./convert_spc_all.sh ./datasets/las_files ./results/spc_file_format
 
 cmake:
 	mkdir -p build/debug
@@ -41,7 +47,9 @@ memcheck:
 run:
 	./build/debug/text2spc -v < ./results/spc_file_format/Juarez.txt > Juarez.spc
 	./build/debug/spc2text -v < Juarez.spc > Juarez.txt
-	#diff -q ./results/spc_file_format/Juarez.txt Juarez.txt
+	./build/debug/text2spc -v < Juarez.txt > Juarez2.spc
+	./build/debug/spc2text -v < Juarez2.spc > Juarez2.txt
+	diff -q Juarez.txt Juarez2.txt
 
 .PHONY: help # Generate list of targets with descriptions
 help:
