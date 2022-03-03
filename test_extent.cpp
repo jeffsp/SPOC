@@ -20,37 +20,30 @@ void test_extent (const T &points)
     using namespace spc;
     const auto e = get_extent (points);
 
-    const auto minp_e = encode_point (e.minp);
-    const auto minp_d = decode_point (minp_e);
-    verify (e.minp == minp_d);
-    const auto d = e.maxp - e.minp;
-    const auto scale_e = encode_point (d);
-    const auto scale_d = decode_point (scale_e);
-    verify (d == scale_d);
     const auto e_e = encode_extent (e);
     const auto e_d = decode_extent (e_e);
     verify (e_d == e);
 
     const auto x = rescale (points, e);
     const auto y = restore (x, e);
-    verify (points.size () == y.size ());
-
-    std::vector<point<double>> diff (points.size ());
+    std::vector<point<double>> d (points.size ());
+    std::vector<point<double>> z (points.size ());
 
     for (size_t i = 0; i < points.size (); ++i)
-    {
-        diff[i] = points[i] - y[i];
-        const auto c = diff[i] + y[i];
-        verify (points[i] == c);
-    }
+        d[i] = points[i] - y[i];
 
-    const auto de = encode_points (diff);
-    const auto z1 = compress (de);
-    clog << "ratios1/2\t"
-        << z1.size () * 1.0 / points.size ();
-    const auto z2 = compress (encode_points (points));
-    clog << '\t'
-        << z2.size () * 1.0 / points.size ()
+    for (size_t i = 0; i < points.size (); ++i)
+        z[i] = y[i] + d[i];
+
+    verify (points == z);
+
+    const auto z1 = compress (encode_points (x));
+    const auto z2 = compress (encode_points (d));
+    const auto z3 = compress (encode_points (points));
+    clog << "ratios x/d/original"
+        << '\t' << z1.size () * 1.0 / points.size ()
+        << '\t' << z2.size () * 1.0 / points.size ()
+        << '\t' << z3.size () * 1.0 / points.size ()
         << " bytes/pt" << endl;
 }
 

@@ -18,15 +18,6 @@ int main (int argc, char **argv)
         if (args.help)
             return 0;
 
-        // Show the args
-        if (args.verbose)
-        {
-            clog << boolalpha;
-            clog << "sort = " << args.sort << endl;
-            if (args.sort)
-                clog << "sort_grid_resolution = " << args.sort_grid_resolution << "m" << endl;
-        }
-
         // Read SRS
         string wkt;
         getline (cin, wkt);
@@ -53,15 +44,6 @@ int main (int argc, char **argv)
 
         if (args.verbose)
             clog << point_records.size () << " point records read" << endl;
-
-        // Sort, if specified
-        if (args.sort)
-        {
-            if (args.verbose)
-                clog << "sorting records..." << endl;
-
-            sort (point_records, args.sort_grid_resolution);
-        }
 
         // Write them to stdout
         if (args.verbose)

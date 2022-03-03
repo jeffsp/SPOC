@@ -108,26 +108,28 @@ inline point<double> decode_point (const std::vector<uint8_t> &bytes)
     return p;
 }
 
-inline std::vector<uint8_t> encode_points (const std::vector<point<double>> &points)
+template<typename T>
+inline std::vector<uint8_t> encode_points (const std::vector<point<T>> &points)
 {
     // Output bytes
     std::vector<uint8_t> bytes;
     // Encode the points (NOT PORTABLE)
     const uint8_t *pd = reinterpret_cast<const uint8_t *> (&points[0]);
-    bytes.insert (bytes.end (), pd, pd + points.size () * sizeof(point<double>));
+    bytes.insert (bytes.end (), pd, pd + points.size () * sizeof(point<T>));
     return bytes;
 }
 
-inline std::vector<point<double>> decode_points (const std::vector<uint8_t> &bytes)
+template<typename T>
+inline std::vector<point<T>> decode_points (const std::vector<uint8_t> &bytes)
 {
     // Check logic
-    assert (bytes.size () % sizeof(point<double>) == 0);
+    assert (bytes.size () % sizeof(point<T>) == 0);
 
     // Decoded points
-    std::vector<point<double>> points;
+    std::vector<point<T>> points;
     // Decode the points (NOT PORTABLE)
-    const point<double> *pc = reinterpret_cast<const point<double> *> (&bytes[0]);
-    const size_t total_points = bytes.size () / sizeof(point<double>);
+    const point<T> *pc = reinterpret_cast<const point<T> *> (&bytes[0]);
+    const size_t total_points = bytes.size () / sizeof(point<T>);
     points.insert (points.end (), pc, pc + total_points);
     return points;
 }

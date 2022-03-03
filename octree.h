@@ -312,7 +312,7 @@ class octree
         const auto pcs = decode_point_counts (x.point_count_bytes);
 
         // Get the point deltas
-        const auto pds = decode_points (x.point_delta_bytes);
+        const auto pds = decode_points<double> (x.point_delta_bytes);
 
         // Set the points
         size_t pcs_index = 0;

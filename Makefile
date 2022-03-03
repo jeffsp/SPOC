@@ -1,4 +1,4 @@
-default: compile test
+default: compile run
 
 .PHONY: convert # Convert LAS files to SPC files
 convert:
@@ -39,8 +39,9 @@ memcheck:
 
 .PHONY: run # Run app
 run:
-	./build/debug/text2spc -v < ./results/spc_file_format/Raqqah.txt > Raqqah.spc
-	./build/debug/spc2text -v < Raqqah.spc > Raqqah.txt
+	./build/debug/text2spc -v < ./results/spc_file_format/Juarez.txt > Juarez.spc
+	./build/debug/spc2text -v < Juarez.spc > Juarez.txt
+	#diff -q ./results/spc_file_format/Juarez.txt Juarez.txt
 
 .PHONY: help # Generate list of targets with descriptions
 help:

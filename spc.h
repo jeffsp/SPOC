@@ -70,7 +70,7 @@ struct spc_file
     }
 };
 
-void write_spc_file (std::ostream &s, const spc_file &f)
+inline void write_spc_file (std::ostream &s, const spc_file &f)
 {
     // Make sure 'f' is valid
     if (!f.check ())
@@ -106,7 +106,7 @@ void write_spc_file (std::ostream &s, const spc_file &f)
     s.write (reinterpret_cast<const char*>(&f.wkt[0]), f.wkt.size ());
 }
 
-void write_spc_file (std::ostream &s,
+inline void write_spc_file (std::ostream &s,
     const std::vector<point_record> &point_records,
     const std::string &wkt)
 {
@@ -139,7 +139,7 @@ void write_spc_file (std::ostream &s,
     write_spc_file (s, f);
 }
 
-void read_spc_file (std::istream &s, spc_file &f)
+inline void read_spc_file (std::istream &s, spc_file &f)
 {
     // Read into tmp
     spc_file tmp_f;
@@ -193,7 +193,7 @@ void read_spc_file (std::istream &s, spc_file &f)
     f = tmp_f;
 }
 
-void read_spc_file (std::istream &s,
+inline void read_spc_file (std::istream &s,
     std::vector<point_record> &point_records,
     std::string &wkt)
 {
@@ -220,40 +220,6 @@ void read_spc_file (std::istream &s,
     // Commit
     point_records = tmp_point_records;
     wkt = f.wkt;
-}
-
-template<typename T>
-void sort (T &point_records, const double grid_size)
-{
-    std::sort (std::begin (point_records), std::end (point_records),
-        [&](const point_record &a, const point_record &b) -> bool
-    {
-        if (std::round (a.x / grid_size) < std::round (b.x / grid_size))
-            return true;
-        if (std::round (a.x / grid_size) > std::round (b.x / grid_size))
-            return false;
-        if (std::round (a.y / grid_size) < std::round (b.y / grid_size))
-            return true;
-        if (std::round (a.y / grid_size) > std::round (b.y / grid_size))
-            return false;
-        if (std::round (a.z / grid_size) < std::round (b.z / grid_size))
-            return true;
-        if (std::round (a.z / grid_size) > std::round (b.z / grid_size))
-            return false;
-        if (std::round (a.c / grid_size) < std::round (b.c / grid_size))
-            return true;
-        if (std::round (a.c / grid_size) > std::round (b.c / grid_size))
-            return false;
-        if (std::round (a.p / grid_size) < std::round (b.p / grid_size))
-            return true;
-        if (std::round (a.p / grid_size) > std::round (b.p / grid_size))
-            return false;
-        if (std::round (a.i / grid_size) < std::round (b.i / grid_size))
-            return true;
-        if (std::round (a.i / grid_size) > std::round (b.i / grid_size))
-            return false;
-        return false;
-    });
 }
 
 } // namespace spc

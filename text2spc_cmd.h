@@ -15,8 +15,6 @@ struct args
 {
     bool help = false;
     bool verbose = false;
-    bool sort = false;
-    double sort_grid_resolution = 10.0;
 };
 
 args get_args (int argc, char **argv, const std::string &usage)
@@ -28,12 +26,10 @@ args get_args (int argc, char **argv, const std::string &usage)
         static struct option long_options[] = {
             {"help", no_argument, 0,  'h' },
             {"verbose", no_argument, 0,  'v' },
-            {"sort", required_argument, 0,  's' },
-            {"sort_grid_resolution", required_argument, 0,  'g' },
             {0,      0,           0,  0 }
         };
 
-        int c = getopt_long(argc, argv, "hvsg:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hv", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -50,8 +46,6 @@ args get_args (int argc, char **argv, const std::string &usage)
                 return args;
             }
             case 'v': args.verbose = true; break;
-            case 's': args.sort = true; break;
-            case 'g': args.sort_grid_resolution = atof (optarg); break;
         }
     }
 
