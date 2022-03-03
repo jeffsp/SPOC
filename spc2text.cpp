@@ -43,7 +43,6 @@ int main (int argc, char **argv)
         for (size_t i = 0; i < point_records.size (); ++i)
         {
             const point_record &p = point_records[i];
-            cout << fixed;
             cout << setprecision(std::numeric_limits<double>::digits10);
             cout << p.x;
             cout << '\t' << p.y;
