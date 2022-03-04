@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <fstream>
@@ -30,7 +29,7 @@ struct spc_file
     std::vector<double> x;
     std::vector<double> y;
     std::vector<double> z;
-    std::vector<uint8_t> c;
+    std::vector<uint16_t> c;
     std::vector<uint16_t> p;
     std::vector<uint16_t> i;
     std::vector<uint16_t> r;
@@ -87,7 +86,7 @@ inline void write_spc_file (std::ostream &s, const spc_file &f)
     s.write (reinterpret_cast<const char*>(&f.x[0]), n * sizeof (double));
     s.write (reinterpret_cast<const char*>(&f.y[0]), n * sizeof (double));
     s.write (reinterpret_cast<const char*>(&f.z[0]), n * sizeof (double));
-    s.write (reinterpret_cast<const char*>(&f.c[0]), n * sizeof (uint8_t));
+    s.write (reinterpret_cast<const char*>(&f.c[0]), n * sizeof (uint16_t));
     s.write (reinterpret_cast<const char*>(&f.p[0]), n * sizeof (uint16_t));
     s.write (reinterpret_cast<const char*>(&f.i[0]), n * sizeof (uint16_t));
     s.write (reinterpret_cast<const char*>(&f.r[0]), n * sizeof (uint16_t));
@@ -166,7 +165,7 @@ inline void read_spc_file (std::istream &s, spc_file &f)
     s.read (reinterpret_cast<char*>(&tmp_f.x[0]), n * sizeof (double));
     s.read (reinterpret_cast<char*>(&tmp_f.y[0]), n * sizeof (double));
     s.read (reinterpret_cast<char*>(&tmp_f.z[0]), n * sizeof (double));
-    s.read (reinterpret_cast<char*>(&tmp_f.c[0]), n * sizeof (uint8_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.c[0]), n * sizeof (uint16_t));
     s.read (reinterpret_cast<char*>(&tmp_f.p[0]), n * sizeof (uint16_t));
     s.read (reinterpret_cast<char*>(&tmp_f.i[0]), n * sizeof (uint16_t));
     s.read (reinterpret_cast<char*>(&tmp_f.r[0]), n * sizeof (uint16_t));
