@@ -1,9 +1,12 @@
 #pragma once
 
+#include "point.h"
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -219,6 +222,15 @@ inline void read_spc_file (std::istream &s,
     // Commit
     point_records = tmp_point_records;
     wkt = f.wkt;
+}
+
+template<typename T>
+inline void sort (T &p)
+{
+    const auto fn =
+        [&] (const point_record &a, const point_record &b)
+        { return a.x < b.x; };
+    std::stable_sort (std::begin (p), std::end (p), fn);
 }
 
 } // namespace spc

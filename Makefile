@@ -1,4 +1,4 @@
-default: compile run
+default: compile test
 
 .PHONY: convert # Convert LAS files to SPC files
 convert_text:
@@ -27,6 +27,8 @@ clean:
 
 .PHONY: test # Run tests
 test:
+	head -1000001 ./results/spc_file_format/Wellington.txt \
+	| ./build/debug/test_double
 	./build/debug/test_compress
 	./build/release/test_compress
 	./build/debug/test_extent
