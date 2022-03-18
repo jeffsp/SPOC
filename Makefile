@@ -1,14 +1,20 @@
 default: compile test
 
-.PHONY: convert # Convert LAS files to SPC files
+.PHONY: convert_text # Convert LAS files to TXT files
 convert_text:
-	./convert_text_all.sh ./datasets/las_files ./results/spc_file_format
+	./convert_text_all.sh ./datasets/las_files ./results/spoc_file_format
 
+.PHONY: convert_laz # Convert LAS files to LAZ files
 convert_laz:
-	./convert_laz_all.sh ./datasets/las_files ./results/spc_file_format
+	./convert_laz_all.sh ./datasets/las_files ./results/spoc_file_format
 
-convert_spc:
-	./convert_spc_all.sh ./datasets/las_files ./results/spc_file_format
+.PHONY: convert_spoc # Convert TXT files to SPOC files
+convert_spoc:
+	./convert_spoc_all.sh ./datasets/las_files ./results/spoc_file_format
+
+.PHONY: compare # Compare LAZ and SPOC file sizes
+compare:
+	./compare_all.sh ./datasets/las_files ./results/spoc_file_format
 
 cmake:
 	mkdir -p build/debug
@@ -27,14 +33,12 @@ clean:
 
 .PHONY: test # Run tests
 test:
-	head -1000001 ./results/spc_file_format/Wellington.txt \
-	| ./build/debug/test_double
 	./build/debug/test_compress
 	./build/release/test_compress
 	./build/debug/test_extent
 	./build/release/test_extent
-	./build/debug/test_octree
-	./build/release/test_octree
+	./build/debug/test_spoc
+	./build/release/test_spoc
 
 .PHONY: memcheck # Run memcheck
 memcheck:
@@ -42,16 +46,8 @@ memcheck:
 	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_compress
 	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_extent
 	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_extent
-	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_octree
-	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_octree
-
-.PHONY: run # Run app
-run:
-	./build/debug/text2spc -v < ./results/spc_file_format/Juarez.txt > Juarez.spc
-	./build/debug/spc2text -v < Juarez.spc > Juarez.txt
-	./build/debug/text2spc -v < Juarez.txt > Juarez2.spc
-	./build/debug/spc2text -v < Juarez2.spc > Juarez2.txt
-	diff -q Juarez.txt Juarez2.txt
+	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_spoc
+	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_spoc
 
 .PHONY: help # Generate list of targets with descriptions
 help:

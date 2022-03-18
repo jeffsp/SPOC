@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace spc
+namespace spoc
 {
 
 namespace cmd
@@ -34,4 +34,4 @@ void print_help (std::ostream &os, const std::string &usage, const size_t noptio
 
 } // namespace cmd
 
-} // namespace spc
+} // namespace spoc

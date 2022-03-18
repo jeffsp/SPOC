@@ -1,18 +1,18 @@
 #include <iostream>
 #include <sstream>
-#include "spc.h"
-#include "text2spc_cmd.h"
+#include "spoc.h"
+#include "text2spoc_cmd.h"
 
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spc;
+    using namespace spoc;
 
     try
     {
         // Parse command line
         cmd::args args = cmd::get_args (argc, argv,
-            string (argv[0]) + " [options] < textfile > spcfile");
+            string (argv[0]) + " [options] < textfile > spocfile");
 
         // If you are getting help, exit without an error
         if (args.help)
@@ -56,7 +56,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "writing records to stdout" << endl;
 
-        write_spc_file (cout, point_records, wkt);
+        write_spoc_file (cout, point_records, wkt);
 
         return 0;
     }

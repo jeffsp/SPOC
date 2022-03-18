@@ -1,5 +1,5 @@
 #include "compress.h"
-#include "spc.h"
+#include "spoc.h"
 #include "test_utils.h"
 #include <cmath>
 #include <iomanip>
@@ -11,10 +11,11 @@
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spc;
+    using namespace spoc;
 
     try
     {
+        /*
         if (argc != 1)
             throw runtime_error ("Usage: pgm < filename");
 
@@ -56,12 +57,13 @@ int main (int argc, char **argv)
         vector<uint8_t> xb (x.size () * 8);
         const uint8_t *p = reinterpret_cast<const uint8_t *> (&x[0]);
         std::copy (p, p + xb.size (), xb.begin ());
-        const auto y = spc::compress (xb);
-        const auto z = spc::decompress (y);
+        const auto y = spoc::compress (xb);
+        const auto z = spoc::decompress (y);
         verify (xb == z);
 
         clog << y.size () << " compressed double bytes" << endl;
         }
+        */
 
         return 0;
     }

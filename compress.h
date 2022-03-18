@@ -7,7 +7,7 @@
 #include <vector>
 #include <zlib.h>
 
-namespace spc
+namespace spoc
 {
 
 inline std::string zlib_error_string (int ret)
@@ -204,4 +204,4 @@ inline void decompress (std::istream &is, std::ostream &os)
     } while (!done);
 }
 
-} // namespace spc
+} // namespace spoc

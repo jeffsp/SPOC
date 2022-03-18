@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace spc
+namespace spoc
 {
 
 struct point_record
@@ -26,7 +26,7 @@ struct point_record
     unsigned b;
 };
 
-struct spc_file
+struct spoc_file
 {
     char signature[4];
     std::vector<double> x;
@@ -41,20 +41,20 @@ struct spc_file
     std::vector<std::vector<uint64_t>> extra;
     std::string wkt;
 
-    spc_file ()
+    spoc_file ()
     {
         signature[0] = 'S'; // Simple
         signature[1] = 'P'; // Point
-        signature[2] = 'C'; // Cloud
-        signature[3] = '\0';
+        signature[2] = 'O'; // Cloud
+        signature[3] = 'C';
     }
     bool check () const
     {
         // Check signature
         if (signature[0] != 'S') return false;
         if (signature[1] != 'P') return false;
-        if (signature[2] != 'C') return false;
-        if (signature[3] != '\0') return false;
+        if (signature[2] != 'O') return false;
+        if (signature[3] != 'C') return false;
 
         // Check data
         const size_t npoints = x.size ();
@@ -72,11 +72,11 @@ struct spc_file
     }
 };
 
-inline void write_spc_file (std::ostream &s, const spc_file &f)
+inline void write_spoc_file (std::ostream &s, const spoc_file &f)
 {
     // Make sure 'f' is valid
     if (!f.check ())
-        throw std::runtime_error ("Invalid spc file format");
+        throw std::runtime_error ("Invalid spoc file format");
 
     // Signature
     s.write (&f.signature[0], 4);
@@ -108,12 +108,12 @@ inline void write_spc_file (std::ostream &s, const spc_file &f)
     s.write (reinterpret_cast<const char*>(&f.wkt[0]), f.wkt.size ());
 }
 
-inline void write_spc_file (std::ostream &s,
+inline void write_spoc_file (std::ostream &s,
     const std::vector<point_record> &point_records,
     const std::string &wkt)
 {
-    // Stuff the records into a spc_file struct
-    spc_file f;
+    // Stuff the records into a spoc_file struct
+    spoc_file f;
     const size_t sz = point_records.size ();
     f.x.resize (sz);
     f.y.resize (sz);
@@ -138,13 +138,13 @@ inline void write_spc_file (std::ostream &s,
     }
     f.wkt = wkt;
 
-    write_spc_file (s, f);
+    write_spoc_file (s, f);
 }
 
-inline void read_spc_file (std::istream &s, spc_file &f)
+inline void read_spoc_file (std::istream &s, spoc_file &f)
 {
     // Read into tmp
-    spc_file tmp_f;
+    spoc_file tmp_f;
 
     // Read signature
     s.read (&tmp_f.signature[0], 4);
@@ -189,19 +189,19 @@ inline void read_spc_file (std::istream &s, spc_file &f)
 
     // Make sure 'f' is valid
     if (!f.check ())
-        throw std::runtime_error ("Invalid spc file format");
+        throw std::runtime_error ("Invalid spoc file format");
 
     // Commit
     f = tmp_f;
 }
 
-inline void read_spc_file (std::istream &s,
+inline void read_spoc_file (std::istream &s,
     std::vector<point_record> &point_records,
     std::string &wkt)
 {
-    // Read into spc_file struct
-    spc_file f;
-    read_spc_file (s, f);
+    // Read into spoc_file struct
+    spoc_file f;
+    read_spoc_file (s, f);
 
     // Stuff data points into a vector
     std::vector<point_record> tmp_point_records (f.x.size ());
@@ -233,4 +233,4 @@ inline void sort (T &p)
     std::stable_sort (std::begin (p), std::end (p), fn);
 }
 
-} // namespace spc
+} // namespace spoc

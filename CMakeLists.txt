@@ -1,4 +1,4 @@
-project(spc)
+project(spoc)
 
 cmake_minimum_required(VERSION 3.0.0)
 
@@ -11,8 +11,7 @@ macro(add_app name)
 endmacro()
 
 add_app(test_compress)
-add_app(test_double)
 add_app(test_extent)
-add_app(test_octree)
-add_app(text2spc)
-add_app(spc2text)
+add_app(test_spoc)
+add_app(text2spoc)
+add_app(spoc2text)

@@ -6,7 +6,7 @@
 #include <random>
 #include <vector>
 
-namespace spc
+namespace spoc
 {
 
 // A point in 3D space
@@ -170,13 +170,13 @@ inline bool about_equal (const std::vector<point<double>> &a,
     return true;
 }
 
-inline std::vector<spc::point<double>> generate_points (
+inline std::vector<spoc::point<double>> generate_points (
     const size_t N,
     const int min_exponent = std::numeric_limits<double>::min_exponent / 2,
     const int max_exponent = std::numeric_limits<double>::max_exponent / 2)
 {
     using namespace std;
-    using namespace spc;
+    using namespace spoc;
 
     vector<point<double>> points (N);
 

@@ -2,32 +2,32 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
-#include "spc.h"
-#include "spc2text_cmd.h"
+#include "spoc.h"
+#include "spoc2text_cmd.h"
 
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spc;
+    using namespace spoc;
 
     try
     {
         // Parse command line
         cmd::args args = cmd::get_args (argc, argv,
-            string (argv[0]) + " [options] < spcfile > textfile");
+            string (argv[0]) + " [options] < spocfile > textfile");
 
         // If you are getting help, exit without an error
         if (args.help)
             return 0;
 
-        // Read spc file
+        // Read spoc file
         vector<point_record> point_records;
         string wkt;
 
         if (args.verbose)
-            clog << "reading spc file" << endl;
+            clog << "reading spoc file" << endl;
 
-        read_spc_file (cin, point_records, wkt);
+        read_spoc_file (cin, point_records, wkt);
 
         if (args.verbose)
             clog << point_records.size () << " point records read" << endl;

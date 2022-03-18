@@ -6,7 +6,7 @@
 #include <vector>
 #include "point.h"
 
-namespace spc
+namespace spoc
 {
 
 template<typename T>
@@ -77,7 +77,7 @@ inline bool operator== (const extent<double> &a, const extent<double> &b)
 
 using extent_pair = std::pair<std::vector<uint8_t>,std::vector<uint8_t>>;
 
-inline extent_pair encode_extent (const spc::extent<double> &e)
+inline extent_pair encode_extent (const spoc::extent<double> &e)
 {
     extent_pair bytes;
     bytes.first = encode_point (e.minp);
@@ -85,9 +85,9 @@ inline extent_pair encode_extent (const spc::extent<double> &e)
     return bytes;
 }
 
-inline spc::extent<double> decode_extent (const extent_pair &bytes)
+inline spoc::extent<double> decode_extent (const extent_pair &bytes)
 {
-    spc::extent<double> e;
+    spoc::extent<double> e;
     e.minp = decode_point (bytes.first);
     e.maxp = decode_point (bytes.second);
     return e;
@@ -131,7 +131,7 @@ inline std::vector<point<uint64_t>> rescale (
 
 inline std::vector<point<double>> restore (
     const std::vector<point<uint64_t>> p,
-    const spc::extent<double> &e)
+    const spoc::extent<double> &e)
 {
     assert (all_less_equal (e.minp, e.maxp));
     const point<double> s = e.maxp - e.minp;

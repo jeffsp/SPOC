@@ -55,8 +55,8 @@ int main (int argc, char **argv)
             {
                 // Vector interface
                 {
-                const auto y = spc::compress (x, l);
-                const auto z = spc::decompress (y);
+                const auto y = spoc::compress (x, l);
+                const auto z = spoc::decompress (y);
                 verify (x == z);
                 }
 
@@ -64,10 +64,10 @@ int main (int argc, char **argv)
                 {
                 stringstream is1 (string (x.begin (), x.end ()));
                 stringstream os1;
-                spc::compress (is1, os1, l);
+                spoc::compress (is1, os1, l);
                 stringstream is2 (os1.str ());
                 stringstream os2;
-                spc::decompress (is2, os2);
+                spoc::decompress (is2, os2);
                 const auto s = os2.str ();
                 vector<uint8_t> z (s.begin (), s.end ());
                 verify (x == z);
