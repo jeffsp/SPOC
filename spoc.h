@@ -2,6 +2,7 @@
 
 #include "point.h"
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <fstream>
@@ -21,10 +22,49 @@ struct point_record
     unsigned c; // classification
     unsigned p; // point source ID
     unsigned i; // intensity
-    unsigned r;
-    unsigned g;
-    unsigned b;
+    unsigned r; // red
+    unsigned g; // green
+    unsigned b; // blue
+    std::array<unsigned,8> extra;
+
+    point_record ()
+        : x (0.0) , y (0.0) , z (0.0)
+        , c (0) , p (0) , i (0)
+        , r (0) , g (0) , b (0)
+        , extra ({0})
+    {
+    }
 };
+
+inline std::ostream &operator<< (std::ostream &s, const point_record &p)
+{
+    s << '\t' << p.x << '\t' << p.y << '\t' << p.z;
+    s << '\t' << p.c << '\t' << p.p << '\t' << p.i;
+    s << '\t' << p.r << '\t' << p.g << '\t' << p.b;
+    for (auto i : p.extra)
+        s << '\t' << i;
+    return s;
+}
+
+inline bool operator== (const point_record &a, const point_record &b)
+{
+    if (a.x != b.x) return false;
+    if (a.y != b.y) return false;
+    if (a.z != b.z) return false;
+    if (a.c != b.c) return false;
+    if (a.p != b.p) return false;
+    if (a.i != b.i) return false;
+    if (a.r != b.r) return false;
+    if (a.g != b.g) return false;
+    if (a.b != b.b) return false;
+    if (a.extra != b.extra) return false;
+    return true;
+}
+
+inline bool operator!= (const point_record &a, const point_record &b)
+{
+    return !(a == b);
+}
 
 struct spoc_file
 {
@@ -38,7 +78,7 @@ struct spoc_file
     std::vector<uint16_t> r;
     std::vector<uint16_t> g;
     std::vector<uint16_t> b;
-    std::vector<std::vector<uint64_t>> extra;
+    std::array<std::vector<uint64_t>,8> extra;
     std::string wkt;
 
     spoc_file ()
@@ -66,8 +106,8 @@ struct spoc_file
         if (r.size () != npoints) return false;
         if (g.size () != npoints) return false;
         if (b.size () != npoints) return false;
-        for (auto &e : extra)
-            if (e.size () != npoints) return false;
+        for (size_t j = 0; j < extra.size (); ++j)
+            if (extra[j].size () != npoints) return false;
         return true;
     }
 };
@@ -82,25 +122,23 @@ inline void write_spoc_file (std::ostream &s, const spoc_file &f)
     s.write (&f.signature[0], 4);
 
     // Number of points
-    const uint64_t n = f.x.size ();
-    s.write (reinterpret_cast<const char*>(&n), sizeof(uint64_t));
+    const uint64_t npoints = f.x.size ();
+    s.write (reinterpret_cast<const char*>(&npoints), sizeof(uint64_t));
 
     // Data
-    s.write (reinterpret_cast<const char*>(&f.x[0]), n * sizeof (double));
-    s.write (reinterpret_cast<const char*>(&f.y[0]), n * sizeof (double));
-    s.write (reinterpret_cast<const char*>(&f.z[0]), n * sizeof (double));
-    s.write (reinterpret_cast<const char*>(&f.c[0]), n * sizeof (uint16_t));
-    s.write (reinterpret_cast<const char*>(&f.p[0]), n * sizeof (uint16_t));
-    s.write (reinterpret_cast<const char*>(&f.i[0]), n * sizeof (uint16_t));
-    s.write (reinterpret_cast<const char*>(&f.r[0]), n * sizeof (uint16_t));
-    s.write (reinterpret_cast<const char*>(&f.g[0]), n * sizeof (uint16_t));
-    s.write (reinterpret_cast<const char*>(&f.b[0]), n * sizeof (uint16_t));
+    s.write (reinterpret_cast<const char*>(&f.x[0]), npoints * sizeof (double));
+    s.write (reinterpret_cast<const char*>(&f.y[0]), npoints * sizeof (double));
+    s.write (reinterpret_cast<const char*>(&f.z[0]), npoints * sizeof (double));
+    s.write (reinterpret_cast<const char*>(&f.c[0]), npoints * sizeof (uint16_t));
+    s.write (reinterpret_cast<const char*>(&f.p[0]), npoints * sizeof (uint16_t));
+    s.write (reinterpret_cast<const char*>(&f.i[0]), npoints * sizeof (uint16_t));
+    s.write (reinterpret_cast<const char*>(&f.r[0]), npoints * sizeof (uint16_t));
+    s.write (reinterpret_cast<const char*>(&f.g[0]), npoints * sizeof (uint16_t));
+    s.write (reinterpret_cast<const char*>(&f.b[0]), npoints * sizeof (uint16_t));
 
     // Extra fields
-    const uint64_t sz = f.extra.size ();
-    s.write (reinterpret_cast<const char*>(&sz), sizeof(uint64_t));
-    for (size_t i = 0; i < sz; ++i)
-        s.write (reinterpret_cast<const char*>(&f.extra[i]), n * sizeof(uint64_t));
+    for (size_t j = 0; j < f.extra.size (); ++j)
+        s.write (reinterpret_cast<const char*>(&f.extra[j][0]), npoints * sizeof(uint64_t));
 
     // WKT
     const uint64_t len = f.wkt.size ();
@@ -114,17 +152,19 @@ inline void write_spoc_file (std::ostream &s,
 {
     // Stuff the records into a spoc_file struct
     spoc_file f;
-    const size_t sz = point_records.size ();
-    f.x.resize (sz);
-    f.y.resize (sz);
-    f.z.resize (sz);
-    f.c.resize (sz);
-    f.p.resize (sz);
-    f.i.resize (sz);
-    f.r.resize (sz);
-    f.g.resize (sz);
-    f.b.resize (sz);
-    for (size_t i = 0; i < sz; ++i)
+    const size_t npoints = point_records.size ();
+    f.x.resize (npoints);
+    f.y.resize (npoints);
+    f.z.resize (npoints);
+    f.c.resize (npoints);
+    f.p.resize (npoints);
+    f.i.resize (npoints);
+    f.r.resize (npoints);
+    f.g.resize (npoints);
+    f.b.resize (npoints);
+    for (size_t j = 0; j < f.extra.size (); ++j)
+        f.extra[j].resize (npoints);
+    for (size_t i = 0; i < npoints; ++i)
     {
         f.x[i] = point_records[i].x;
         f.y[i] = point_records[i].y;
@@ -135,6 +175,8 @@ inline void write_spoc_file (std::ostream &s,
         f.r[i] = point_records[i].r;
         f.g[i] = point_records[i].g;
         f.b[i] = point_records[i].b;
+        for (size_t j = 0; j < f.extra.size (); ++j)
+            f.extra[j][i] = point_records[i].extra[j];
     }
     f.wkt = wkt;
 
@@ -150,36 +192,36 @@ inline void read_spoc_file (std::istream &s, spoc_file &f)
     s.read (&tmp_f.signature[0], 4);
 
     // Read number of points
-    uint64_t n = 0;
-    s.read (reinterpret_cast<char*>(&n), sizeof(uint64_t));
+    uint64_t npoints = 0;
+    s.read (reinterpret_cast<char*>(&npoints), sizeof(uint64_t));
 
     // Resize vectors
-    tmp_f.x.resize (n);
-    tmp_f.y.resize (n);
-    tmp_f.z.resize (n);
-    tmp_f.c.resize (n);
-    tmp_f.p.resize (n);
-    tmp_f.i.resize (n);
-    tmp_f.r.resize (n);
-    tmp_f.g.resize (n);
-    tmp_f.b.resize (n);
+    tmp_f.x.resize (npoints);
+    tmp_f.y.resize (npoints);
+    tmp_f.z.resize (npoints);
+    tmp_f.c.resize (npoints);
+    tmp_f.p.resize (npoints);
+    tmp_f.i.resize (npoints);
+    tmp_f.r.resize (npoints);
+    tmp_f.g.resize (npoints);
+    tmp_f.b.resize (npoints);
+    for (size_t j = 0; j < tmp_f.extra.size (); ++j)
+        tmp_f.extra[j].resize (npoints);
 
     // Read data
-    s.read (reinterpret_cast<char*>(&tmp_f.x[0]), n * sizeof (double));
-    s.read (reinterpret_cast<char*>(&tmp_f.y[0]), n * sizeof (double));
-    s.read (reinterpret_cast<char*>(&tmp_f.z[0]), n * sizeof (double));
-    s.read (reinterpret_cast<char*>(&tmp_f.c[0]), n * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&tmp_f.p[0]), n * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&tmp_f.i[0]), n * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&tmp_f.r[0]), n * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&tmp_f.g[0]), n * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&tmp_f.b[0]), n * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.x[0]), npoints * sizeof (double));
+    s.read (reinterpret_cast<char*>(&tmp_f.y[0]), npoints * sizeof (double));
+    s.read (reinterpret_cast<char*>(&tmp_f.z[0]), npoints * sizeof (double));
+    s.read (reinterpret_cast<char*>(&tmp_f.c[0]), npoints * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.p[0]), npoints * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.i[0]), npoints * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.r[0]), npoints * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.g[0]), npoints * sizeof (uint16_t));
+    s.read (reinterpret_cast<char*>(&tmp_f.b[0]), npoints * sizeof (uint16_t));
 
     // Extra fields
-    uint64_t sz = 0;
-    s.read (reinterpret_cast<char*>(&sz), sizeof(uint64_t));
-    for (size_t i = 0; i < sz; ++i)
-        s.read (reinterpret_cast<char*>(&tmp_f.extra[i]), n * sizeof(uint64_t));
+    for (size_t j = 0; j < tmp_f.extra.size (); ++j)
+        s.read (reinterpret_cast<char*>(&tmp_f.extra[j][0]), npoints * sizeof(uint64_t));
 
     // WKT
     uint64_t len = 0;
@@ -217,20 +259,13 @@ inline void read_spoc_file (std::istream &s,
         tmp_point_records[i].r = f.r[i];
         tmp_point_records[i].g = f.g[i];
         tmp_point_records[i].b = f.b[i];
+        for (size_t j = 0; j < f.extra.size (); ++j)
+            tmp_point_records[i].extra[j] = f.extra[j][i];
     }
 
     // Commit
     point_records = tmp_point_records;
     wkt = f.wkt;
-}
-
-template<typename T>
-inline void sort (T &p)
-{
-    const auto fn =
-        [&] (const point_record &a, const point_record &b)
-        { return a.x < b.x; };
-    std::stable_sort (std::begin (p), std::end (p), fn);
 }
 
 } // namespace spoc

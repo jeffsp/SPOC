@@ -45,13 +45,6 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << point_records.size () << " point records read" << endl;
 
-        // Sort the records first
-        if (args.verbose)
-            clog << "Sorting records" << endl;
-
-        // Sort in-place
-        sort (point_records);
-
         // Write them to stdout
         if (args.verbose)
             clog << "writing records to stdout" << endl;
