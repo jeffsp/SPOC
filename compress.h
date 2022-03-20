@@ -68,7 +68,7 @@ struct Inflator
     }
 };
 
-inline std::vector<uint8_t> compress (const std::vector<uint8_t> &input, const int level = -1)
+inline std::vector<uint8_t> compress (const uint8_t *p, const size_t nbytes, const int level = -1)
 {
     constexpr size_t BUFFER_SIZE = (1 << 20);
     std::vector<uint8_t> output_buffer (BUFFER_SIZE);
@@ -76,9 +76,10 @@ inline std::vector<uint8_t> compress (const std::vector<uint8_t> &input, const i
 
     Deflator deflator (level);
 
-        // Get bytes directly from the input vector
-        deflator.s.avail_in = input.size ();
-        deflator.s.next_in = const_cast<unsigned char *> (&input[0]);
+    // Get bytes directly from the input vector
+    deflator.s.avail_in = nbytes;
+    deflator.s.next_in = const_cast<unsigned char *> (p);
+
 
     do {
         // Compress from input to output buffer
@@ -95,6 +96,11 @@ inline std::vector<uint8_t> compress (const std::vector<uint8_t> &input, const i
     } while (deflator.s.avail_out == 0);
 
     return output;
+}
+
+inline std::vector<uint8_t> compress (const std::vector<uint8_t> &input, const int level = -1)
+{
+    return compress (&input[0], input.size (), level);
 }
 
 inline void compress (std::istream &is, std::ostream &os, const int level)
@@ -159,6 +165,14 @@ inline std::vector<uint8_t> decompress (const std::vector<uint8_t> &input)
     } while (inflator.s.avail_out == 0);
 
     return output;
+}
+
+inline void decompress (const std::vector<uint8_t> &input, uint8_t *output, const size_t output_bytes)
+{
+    const auto d = decompress (input);
+    if (d.size () != output_bytes)
+        throw std::runtime_error ("Can't decompress: unexpected number of decompressed bytes");;
+    std::copy (&d[0], &d[0] + output_bytes, output);
 }
 
 inline void decompress (std::istream &is, std::ostream &os)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "compress.h"
 #include "point.h"
 #include <algorithm>
 #include <array>
@@ -146,6 +147,74 @@ inline void write_spoc_file (std::ostream &s, const spoc_file &f)
     s.write (reinterpret_cast<const char*>(&f.wkt[0]), f.wkt.size ());
 }
 
+template<typename T>
+inline bool all_zero (const std::vector<T> &x)
+{
+    for (const auto i : x)
+        if (i != 0)
+            return false;
+    return true;
+}
+
+template<typename T>
+inline void write_compressed (std::ostream &s, const std::vector<T> &x)
+{
+    // Check to see if they are all zero
+    if (all_zero (x))
+    {
+        // If they are all zero, write the length, as '0'
+        const uint64_t n = 0;
+        std::clog << "writing 0 bytes" << std::endl;
+        s.write (reinterpret_cast<const char*>(&n), sizeof(uint64_t));
+        return;
+    }
+
+    // Compress
+    const auto c = spoc::compress (reinterpret_cast<const uint8_t *> (&x[0]), x.size () * sizeof(T));
+
+    // Write compressed length
+    const uint64_t n = c.size ();
+    s.write (reinterpret_cast<const char*>(&n), sizeof(uint64_t));
+
+    // Write compressed bytes
+    std::clog << "writing " << c.size () << " bytes" << std::endl;
+    s.write (reinterpret_cast<const char*>(&c[0]), c.size ());
+}
+
+inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
+{
+    // Make sure 'f' is valid
+    if (!f.check ())
+        throw std::runtime_error ("Invalid spoc file format");
+
+    // Signature
+    s.write (&f.signature[0], 4);
+
+    // Number of points
+    const uint64_t npoints = f.x.size ();
+    s.write (reinterpret_cast<const char*>(&npoints), sizeof(uint64_t));
+
+    // Data
+    write_compressed (s, f.x);
+    write_compressed (s, f.y);
+    write_compressed (s, f.z);
+    write_compressed (s, f.c);
+    write_compressed (s, f.p);
+    write_compressed (s, f.i);
+    write_compressed (s, f.r);
+    write_compressed (s, f.g);
+    write_compressed (s, f.b);
+
+    // Extra fields
+    for (size_t j = 0; j < f.extra.size (); ++j)
+        write_compressed (s, f.extra[j]);
+
+    // WKT
+    const uint64_t len = f.wkt.size ();
+    s.write (reinterpret_cast<const char*>(&len), sizeof(uint64_t));
+    s.write (reinterpret_cast<const char*>(&f.wkt[0]), f.wkt.size ());
+}
+
 inline void write_spoc_file (std::ostream &s,
     const std::vector<point_record> &point_records,
     const std::string &wkt)
@@ -180,7 +249,7 @@ inline void write_spoc_file (std::ostream &s,
     }
     f.wkt = wkt;
 
-    write_spoc_file (s, f);
+    write_spoc_file_compressed (s, f);
 }
 
 inline void read_spoc_file (std::istream &s, spoc_file &f)
@@ -237,13 +306,93 @@ inline void read_spoc_file (std::istream &s, spoc_file &f)
     f = tmp_f;
 }
 
+template<typename T>
+inline void read_compressed (std::istream &s, std::vector<T> &x)
+{
+    // Get number of compressed bytes
+    uint64_t n = 0;
+    s.read (reinterpret_cast<char*>(&n), sizeof(uint64_t));
+
+    // If a '0' was written, the bytes are all zeros
+    if (n == 0)
+    {
+        std::fill (std::begin (x), std::end (x), 0);
+        return;
+    }
+
+    // Read compressed bytes
+    std::vector<uint8_t> c (n);
+    s.read (reinterpret_cast<char *> (&c[0]), n);
+
+    // Decompress
+    std::vector<T> d (x.size ());
+    spoc::decompress (c, reinterpret_cast<uint8_t *> (&d[0]), d.size () * sizeof(T));
+
+    // Commit
+    x = d;
+}
+
+inline void read_spoc_file_compressed (std::istream &s, spoc_file &f)
+{
+    // Read into tmp
+    spoc_file tmp_f;
+
+    // Read signature
+    s.read (&tmp_f.signature[0], 4);
+
+    // Read number of points
+    uint64_t npoints = 0;
+    s.read (reinterpret_cast<char*>(&npoints), sizeof(uint64_t));
+
+    // Resize vectors
+    tmp_f.x.resize (npoints);
+    tmp_f.y.resize (npoints);
+    tmp_f.z.resize (npoints);
+    tmp_f.c.resize (npoints);
+    tmp_f.p.resize (npoints);
+    tmp_f.i.resize (npoints);
+    tmp_f.r.resize (npoints);
+    tmp_f.g.resize (npoints);
+    tmp_f.b.resize (npoints);
+    for (size_t j = 0; j < tmp_f.extra.size (); ++j)
+        tmp_f.extra[j].resize (npoints);
+
+    // Read data
+    read_compressed (s, tmp_f.x);
+    read_compressed (s, tmp_f.y);
+    read_compressed (s, tmp_f.z);
+    read_compressed (s, tmp_f.c);
+    read_compressed (s, tmp_f.p);
+    read_compressed (s, tmp_f.i);
+    read_compressed (s, tmp_f.r);
+    read_compressed (s, tmp_f.g);
+    read_compressed (s, tmp_f.b);
+
+    // Extra fields
+    for (size_t j = 0; j < tmp_f.extra.size (); ++j)
+        read_compressed (s, tmp_f.extra[j]);
+
+    // WKT
+    uint64_t len = 0;
+    s.read (reinterpret_cast<char*>(&len), sizeof(uint64_t));
+    tmp_f.wkt.resize (len);
+    s.read (reinterpret_cast<char*>(&tmp_f.wkt[0]), len);
+
+    // Make sure 'f' is valid
+    if (!f.check ())
+        throw std::runtime_error ("Invalid spoc file format");
+
+    // Commit
+    f = tmp_f;
+}
+
 inline void read_spoc_file (std::istream &s,
     std::vector<point_record> &point_records,
     std::string &wkt)
 {
     // Read into spoc_file struct
     spoc_file f;
-    read_spoc_file (s, f);
+    read_spoc_file_compressed (s, f);
 
     // Stuff data points into a vector
     std::vector<point_record> tmp_point_records (f.x.size ());

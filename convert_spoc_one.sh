@@ -7,7 +7,7 @@ sn=$(basename ${dn})
 echo converting ${sn}...
 
 # Create a tmp directory for intermediate files
-TMPDIR=$(mktemp --tmpdir --directory spc.XXXXXXXX)
+TMPDIR=$(mktemp --tmpdir --directory spoc.XXXXXXXX)
 
 # Create a cleanup function
 function cleanup {
@@ -17,8 +17,5 @@ function cleanup {
 # Run cleanup on exit
 trap cleanup EXIT
 
-# Convert to spc
-./build/release/text2spc -v < $2/${sn}.txt > $2/${sn}.spc
-
-# Zip it up
-zip $2/${sn}.zip $2/${sn}.spc
+# Convert to spoc
+./build/release/text2spoc -v < $2/${sn}.txt > $2/${sn}.spoc

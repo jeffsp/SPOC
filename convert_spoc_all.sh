@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 
-# Convert to spc file
-parallel -k ./convert_spc_one.sh {} $2 ::: \
+# Convert to spoc file
+parallel -k ./convert_spoc_one.sh {} $2 ::: \
 $(find $1 -name "*.las" -or -name "*.laz")

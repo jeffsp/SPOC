@@ -7,7 +7,7 @@ sn=$(basename ${dn})
 echo converting ${sn}...
 
 # Create a tmp directory for intermediate files
-TMPDIR=$(mktemp --tmpdir --directory spc.XXXXXXXX)
+TMPDIR=$(mktemp --tmpdir --directory spoc.XXXXXXXX)
 
 # Create a cleanup function
 function cleanup {
