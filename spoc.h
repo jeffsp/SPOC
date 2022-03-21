@@ -164,7 +164,6 @@ inline void write_compressed (std::ostream &s, const std::vector<T> &x)
     {
         // If they are all zero, write the length, as '0'
         const uint64_t n = 0;
-        std::clog << "writing 0 bytes" << std::endl;
         s.write (reinterpret_cast<const char*>(&n), sizeof(uint64_t));
         return;
     }
@@ -177,7 +176,6 @@ inline void write_compressed (std::ostream &s, const std::vector<T> &x)
     s.write (reinterpret_cast<const char*>(&n), sizeof(uint64_t));
 
     // Write compressed bytes
-    std::clog << "writing " << c.size () << " bytes" << std::endl;
     s.write (reinterpret_cast<const char*>(&c[0]), c.size ());
 }
 
