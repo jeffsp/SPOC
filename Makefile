@@ -49,6 +49,10 @@ memcheck:
 	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_spoc
 	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_spoc
 
+.PHONY: laslib # Build LASlib library
+laslib:
+	$(MAKE) -C laslib/LASlib
+
 .PHONY: help # Generate list of targets with descriptions
 help:
 	@grep '^.PHONY: .* #' Makefile | sed 's/\.PHONY: \(.*\) # \(.*\)/\1	\2/' | expand -t20
