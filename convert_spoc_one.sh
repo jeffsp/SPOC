@@ -7,4 +7,5 @@ sn=$(basename ${dn})
 echo converting ${sn}...
 
 # Convert to spoc
-./build/release/text2spoc -v < $2/${sn}.txt > $2/${sn}.spoc
+#./build/release/text2spoc -v < $2/${sn}.txt > $2/${sn}.spoc
+./build/debug/las2spoc -v $2/${sn}.las $2/${sn}.spoc
