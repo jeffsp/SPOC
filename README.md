@@ -22,3 +22,12 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
     * It is uncommon for two points to have the same exact location in
     3D space
 * Point locations have 12 digits of precision preserved
+
+# Requirements
+
+* Don't pay for what you don't use
+* Linear complexity
+* 64-bit doubles
+* Don't rely on data being spatially arranged
+* Don't reinvent the wheel: rely on the system's optimization mechanisms
+  (disk/memory cache)
