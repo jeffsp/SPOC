@@ -86,8 +86,8 @@ struct spoc_file
     {
         signature[0] = 'S'; // Simple
         signature[1] = 'P'; // Point
-        signature[2] = 'O'; // Cloud
-        signature[3] = 'C';
+        signature[2] = 'O';
+        signature[3] = 'C'; // Cloud
     }
     bool check () const
     {
