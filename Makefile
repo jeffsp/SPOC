@@ -51,7 +51,7 @@ memcheck:
 
 .PHONY: laslib # Build LASlib library
 laslib:
-	$(MAKE) -C laslib/LASlib
+	$(MAKE) -j -C laslib/LASlib
 
 .PHONY: help # Generate list of targets with descriptions
 help:
