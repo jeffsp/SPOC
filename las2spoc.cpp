@@ -50,7 +50,7 @@ int main (int argc, char **argv)
         if (l.lasreader->header.vlr_geo_ogc_wkt == nullptr)
         {
             clog << "WARNING: No spatial coordinate system was found." << endl;
-            clog << "The coordinate system must be specified in a VLR as an OGC WKT" << endl;
+            clog << "The coordinate system should be specified in OGC WKT format" << endl;
         }
 
         // Read points and put them into point records
