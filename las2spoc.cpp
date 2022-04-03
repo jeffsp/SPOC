@@ -46,6 +46,10 @@ int main (int argc, char **argv)
 
         las l (args.input_fn);
 
+        // Check the coordinate system
+        if (l.lasreader->header.vlr_geo_ogc_wkt == nullptr)
+            throw runtime_error ("The coordinate system must be specified in a VLR as an OGC WKT");
+
         // Read points and put them into point records
         vector<point_record> point_records;
 
@@ -76,9 +80,9 @@ int main (int argc, char **argv)
         if (!ofs)
             throw runtime_error ("Could not open file for writing");
 
-        //clog << "VLR_geo_ogc_wkt: " << l.lasreader->header.vlr_geo_ogc_wkt << endl;
-        //const string wkt (l.lasreader->header.vlr_geo_ogc_wkt);
-        string wkt ("WKT");
+        assert (l.lasreader->header.vlr_geo_ogc_wkt != NULL);
+
+        const string wkt (l.lasreader->header.vlr_geo_ogc_wkt);
         write_spoc_file (ofs, point_records, wkt);
 
         return 0;
