@@ -1,14 +1,10 @@
 default: compile test
 
-.PHONY: convert_text # Convert LAS files to TXT files
-convert_text:
-	./convert_text_all.sh ./datasets/las_files ./results/spoc_file_format
-
 .PHONY: convert_laz # Convert LAS files to LAZ files
 convert_laz:
 	./convert_laz_all.sh ./datasets/las_files ./results/spoc_file_format
 
-.PHONY: convert_spoc # Convert TXT files to SPOC files
+.PHONY: convert_spoc # Convert LAS files to SPOC files
 convert_spoc:
 	./convert_spoc_all.sh ./datasets/las_files ./results/spoc_file_format
 
