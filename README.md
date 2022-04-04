@@ -31,3 +31,26 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * Don't rely on data being spatially arranged
 * Don't reinvent the wheel: rely on the system's optimization mechanisms
   (disk/memory cache)
+* Streaming is not supported. Point clouds are random-access. Point
+  clouds are assumed to fit into memory.
+* Linux pipes are supported (not for las files)
+
+# TODO
+
+* [ ] read/write spoc files
+* [ ] read/write las files
+* [ ] spoc\_connect: Connected components, saved in extra fields
+* [ ] spoc\_crop: 2D/3D meters/percentage/by classification/by component
+* [ ] spoc\_decimate
+* [ ] spoc\_field_filter: 2D/3D spatial filtering: does not changes xyz coords
+* [ ] spoc\_info
+* [ ] spoc\_interpolate
+* [ ] spoc\_las2spoc
+* [ ] spoc\_merge
+* [ ] spoc\_octree: break into files arranged as an octree
+* [ ] spoc\_quantize
+* [ ] spoc\_sort: by field/by voxel
+* [ ] spoc\_spatial_filter: 2D/3D spatial filtering: changes 3D structure
+* [ ] spoc\_spoc2las: warn when fields are lost, warn when precision is lost
+* [ ] spoc\_tile
+* [ ] spoc\_transform
