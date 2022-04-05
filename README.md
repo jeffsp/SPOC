@@ -37,6 +37,11 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 
 # TODO
 
+* [ ] Gitlab runner
+* [ ] CI/CD
+* [ ] Test suite
+* [ ] Coverage
+* [ ] Cppcheck
 * [ ] read/write spoc files
 * [ ] read/write las files
 * [ ] spoc\_connect: Connected components, saved in extra fields
