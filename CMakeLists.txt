@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 macro(add_app name)
     add_executable(${name} ${name}.cpp)
-    target_link_libraries(${name} fmt z)
+    target_link_libraries(${name} z)
 endmacro()
 
 add_app(test_compress)
