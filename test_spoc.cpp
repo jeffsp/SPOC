@@ -68,7 +68,7 @@ void test_point_record ()
     }
 }
 
-void test_io ()
+void test_spoc_file_io ()
 {
     const auto p = get_random_point_records (1000);
 
@@ -83,12 +83,24 @@ void test_io ()
     verify (p == q);
 }
 
+void test_spoc_file ()
+{
+    spoc_file f;
+    verify (f.get_signature ()[0] == 'S');
+    verify (f.get_signature ()[1] == 'P');
+    verify (f.get_signature ()[2] == 'O');
+    verify (f.get_signature ()[3] == 'C');
+    verify (f.get_npoints () == 0);
+    verify (f.get_x ().empty () == true);
+}
+
 int main (int argc, char **argv)
 {
     try
     {
         test_point_record ();
-        test_io ();
+        test_spoc_file_io ();
+        test_spoc_file ();
         return 0;
     }
     catch (const exception &e)

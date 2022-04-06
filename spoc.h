@@ -71,6 +71,7 @@ class spoc_file
 {
     public:
     spoc_file ()
+        : npoints (0)
     {
         signature[0] = 'S'; // Simple
         signature[1] = 'P'; // Point
@@ -149,6 +150,21 @@ class spoc_file
         for (size_t j = 0; j < extra.size (); ++j)
             if (!extra[j].empty ()) extra[j].resize (n);
     }
+
+    // Readonly accessors
+    const char *get_signature () const { return signature; }
+    const size_t get_npoints () const { return npoints; }
+    const std::vector<double> get_x () const { return x; }
+    const std::vector<double> get_y () const { return y; }
+    const std::vector<double> get_z () const { return z; }
+    const std::vector<uint16_t> get_c () const { return c; }
+    const std::vector<uint16_t> get_p () const { return p; }
+    const std::vector<uint16_t> get_i () const { return i; }
+    const std::vector<uint16_t> get_r () const { return r; }
+    const std::vector<uint16_t> get_g () const { return g; }
+    const std::vector<uint16_t> get_b () const { return b; }
+    const std::array<std::vector<uint64_t>,8> get_extra () const { return extra; }
+    const std::string get_wkt () { return wkt; }
 
     // I/O
     friend std::ostream &operator<< (std::ostream &s, const spoc_file &f);
@@ -314,7 +330,6 @@ inline void write_spoc_file (std::ostream &s,
     }
     f.wkt = wkt;
 
-    std::clog << f << std::endl;
     write_spoc_file_compressed (s, f);
 }
 
