@@ -113,40 +113,6 @@ struct spoc_file
     }
 };
 
-inline void write_spoc_file (std::ostream &s, const spoc_file &f)
-{
-    // Make sure 'f' is valid
-    if (!f.check ())
-        throw std::runtime_error ("Invalid spoc file format");
-
-    // Signature
-    s.write (&f.signature[0], 4);
-
-    // Number of points
-    const uint64_t npoints = f.x.size ();
-    s.write (reinterpret_cast<const char*>(&npoints), sizeof(uint64_t));
-
-    // Data
-    s.write (reinterpret_cast<const char*>(&f.x[0]), npoints * sizeof (double));
-    s.write (reinterpret_cast<const char*>(&f.y[0]), npoints * sizeof (double));
-    s.write (reinterpret_cast<const char*>(&f.z[0]), npoints * sizeof (double));
-    s.write (reinterpret_cast<const char*>(&f.c[0]), npoints * sizeof (uint16_t));
-    s.write (reinterpret_cast<const char*>(&f.p[0]), npoints * sizeof (uint16_t));
-    s.write (reinterpret_cast<const char*>(&f.i[0]), npoints * sizeof (uint16_t));
-    s.write (reinterpret_cast<const char*>(&f.r[0]), npoints * sizeof (uint16_t));
-    s.write (reinterpret_cast<const char*>(&f.g[0]), npoints * sizeof (uint16_t));
-    s.write (reinterpret_cast<const char*>(&f.b[0]), npoints * sizeof (uint16_t));
-
-    // Extra fields
-    for (size_t j = 0; j < f.extra.size (); ++j)
-        s.write (reinterpret_cast<const char*>(&f.extra[j][0]), npoints * sizeof(uint64_t));
-
-    // WKT
-    const uint64_t len = f.wkt.size ();
-    s.write (reinterpret_cast<const char*>(&len), sizeof(uint64_t));
-    s.write (reinterpret_cast<const char*>(&f.wkt[0]), f.wkt.size ());
-}
-
 template<typename T>
 inline bool all_zero (const std::vector<T> &x)
 {
@@ -162,7 +128,7 @@ inline void write_compressed (std::ostream &s, const std::vector<T> &x)
     // Check to see if they are all zero
     if (all_zero (x))
     {
-        // If they are all zero, write the length, as '0'
+        // If they are all zero, write the length as '0'
         const uint64_t n = 0;
         s.write (reinterpret_cast<const char*>(&n), sizeof(uint64_t));
         return;
@@ -248,60 +214,6 @@ inline void write_spoc_file (std::ostream &s,
     f.wkt = wkt;
 
     write_spoc_file_compressed (s, f);
-}
-
-inline void read_spoc_file (std::istream &s, spoc_file &f)
-{
-    // Read into tmp
-    spoc_file tmp_f;
-
-    // Read signature
-    s.read (&tmp_f.signature[0], 4);
-
-    // Read number of points
-    uint64_t npoints = 0;
-    s.read (reinterpret_cast<char*>(&npoints), sizeof(uint64_t));
-
-    // Resize vectors
-    tmp_f.x.resize (npoints);
-    tmp_f.y.resize (npoints);
-    tmp_f.z.resize (npoints);
-    tmp_f.c.resize (npoints);
-    tmp_f.p.resize (npoints);
-    tmp_f.i.resize (npoints);
-    tmp_f.r.resize (npoints);
-    tmp_f.g.resize (npoints);
-    tmp_f.b.resize (npoints);
-    for (size_t j = 0; j < tmp_f.extra.size (); ++j)
-        tmp_f.extra[j].resize (npoints);
-
-    // Read data
-    s.read (reinterpret_cast<char*>(&tmp_f.x[0]), npoints * sizeof (double));
-    s.read (reinterpret_cast<char*>(&tmp_f.y[0]), npoints * sizeof (double));
-    s.read (reinterpret_cast<char*>(&tmp_f.z[0]), npoints * sizeof (double));
-    s.read (reinterpret_cast<char*>(&tmp_f.c[0]), npoints * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&tmp_f.p[0]), npoints * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&tmp_f.i[0]), npoints * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&tmp_f.r[0]), npoints * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&tmp_f.g[0]), npoints * sizeof (uint16_t));
-    s.read (reinterpret_cast<char*>(&tmp_f.b[0]), npoints * sizeof (uint16_t));
-
-    // Extra fields
-    for (size_t j = 0; j < tmp_f.extra.size (); ++j)
-        s.read (reinterpret_cast<char*>(&tmp_f.extra[j][0]), npoints * sizeof(uint64_t));
-
-    // WKT
-    uint64_t len = 0;
-    s.read (reinterpret_cast<char*>(&len), sizeof(uint64_t));
-    tmp_f.wkt.resize (len);
-    s.read (reinterpret_cast<char*>(&tmp_f.wkt[0]), len);
-
-    // Make sure 'f' is valid
-    if (!f.check ())
-        throw std::runtime_error ("Invalid spoc file format");
-
-    // Commit
-    f = tmp_f;
 }
 
 template<typename T>
