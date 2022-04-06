@@ -99,38 +99,41 @@ class spoc_file
             if (extra[j].size () != npoints && !extra[j].empty ()) return false;
         return true;
     }
+    // Get record number 'n'
     point_record get (const size_t n)
     {
         assert (n < npoints);
-        point_record q;
-        q.x = x.empty () ? 0.0 : x[n];
-        q.y = y.empty () ? 0.0 : y[n];
-        q.z = z.empty () ? 0.0 : z[n];
-        q.c = c.empty () ? 0 : c[n];
-        q.p = p.empty () ? 0 : p[n];
-        q.i = i.empty () ? 0 : i[n];
-        q.r = r.empty () ? 0 : r[n];
-        q.g = g.empty () ? 0 : g[n];
-        q.b = b.empty () ? 0 : b[n];
+        point_record pr;
+        pr.x = x.empty () ? 0.0 : x[n];
+        pr.y = y.empty () ? 0.0 : y[n];
+        pr.z = z.empty () ? 0.0 : z[n];
+        pr.c = c.empty () ? 0 : c[n];
+        pr.p = p.empty () ? 0 : p[n];
+        pr.i = i.empty () ? 0 : i[n];
+        pr.r = r.empty () ? 0 : r[n];
+        pr.g = g.empty () ? 0 : g[n];
+        pr.b = b.empty () ? 0 : b[n];
         for (size_t j = 0; j < extra.size (); ++j)
-            q.extra[j] = q.extra.empty () ? 0 : extra[j][n];
-        return q;
+            pr.extra[j] = pr.extra.empty () ? 0 : extra[j][n];
+        return pr;
     }
-    void set (const size_t n, const point_record &p)
+    // Set record number 'n'
+    void set (const size_t n, const point_record &pr)
     {
         assert (n < npoints);
-        set (x, n, p.x);
-        set (y, n, p.y);
-        set (z, n, p.z);
-        set (c, n, p.c);
-        set (p, n, p.p);
-        set (i, n, p.i);
-        set (r, n, p.r);
-        set (g, n, p.g);
-        set (b, n, p.b);
+        set (x, n, pr.x);
+        set (y, n, pr.y);
+        set (z, n, pr.z);
+        set (c, n, pr.c);
+        set (p, n, pr.p);
+        set (i, n, pr.i);
+        set (r, n, pr.r);
+        set (g, n, pr.g);
+        set (b, n, pr.b);
         for (size_t j = 0; j < extra.size (); ++j)
-            set (extra[j], n, p.extra[j]);
+            set (extra[j], n, pr.extra[j]);
     }
+    // Resize the number of records in the spoc_file to 'n'
     void resize (const size_t n)
     {
         npoints = n;
@@ -147,7 +150,15 @@ class spoc_file
             if (!extra[j].empty ()) extra[j].resize (n);
     }
 
+    // I/O
+    friend std::ostream &operator<< (std::ostream &s, const spoc_file &f);
+    friend void write_spoc_file_compressed (std::ostream &s, const spoc_file &f);
+    friend void write_spoc_file (std::ostream &s, const std::vector<point_record> &point_records, const std::string &wkt);
+    friend void read_spoc_file_compressed (std::istream &s, spoc_file &f);
+    friend void read_spoc_file (std::istream &s, std::vector<point_record> &point_records, std::string &wkt);
+
     private:
+    // Data
     char signature[4];
     size_t npoints;
     std::vector<double> x;
@@ -161,6 +172,11 @@ class spoc_file
     std::vector<uint16_t> b;
     std::array<std::vector<uint64_t>,8> extra;
     std::string wkt;
+
+    // Set the field 'x' at location 'n' to value 'y'
+    //
+    // The container holding field 'x' may be empty, so this function will
+    // ensure that the container will get resized appropriately.
     template<typename T,typename U>
     void set (T &x, const size_t n, const U y)
     {
@@ -177,6 +193,27 @@ class spoc_file
         x[n] = y;
     }
 };
+
+inline std::ostream &operator<< (std::ostream &s, const spoc_file &f)
+{
+    s << f.signature[0];
+    s << f.signature[1];
+    s << f.signature[2];
+    s << f.signature[3] << std::endl;
+    s << "npoints " << f.npoints << std::endl;
+    s << "x " << f.x.size () << std::endl;
+    s << "y " << f.y.size () << std::endl;
+    s << "z " << f.z.size () << std::endl;
+    s << "c " << f.c.size () << std::endl;
+    s << "p " << f.p.size () << std::endl;
+    s << "i " << f.i.size () << std::endl;
+    s << "r " << f.r.size () << std::endl;
+    s << "g " << f.g.size () << std::endl;
+    s << "b " << f.b.size () << std::endl;
+    for (size_t j = 0; j < f.extra.size (); ++j)
+        s << "extra[" << j << "]" << f.extra[j].size () << std::endl;
+    return s;
+}
 
 template<typename T>
 inline bool all_zero (const std::vector<T> &x)
@@ -220,8 +257,7 @@ inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
     s.write (&f.signature[0], 4);
 
     // Number of points
-    const uint64_t npoints = f.x.size ();
-    s.write (reinterpret_cast<const char*>(&npoints), sizeof(uint64_t));
+    s.write (reinterpret_cast<const char*>(&f.npoints), sizeof(uint64_t));
 
     // Data
     write_compressed (s, f.x);
@@ -250,19 +286,19 @@ inline void write_spoc_file (std::ostream &s,
 {
     // Stuff the records into a spoc_file struct
     spoc_file f;
-    const size_t npoints = point_records.size ();
-    f.x.resize (npoints);
-    f.y.resize (npoints);
-    f.z.resize (npoints);
-    f.c.resize (npoints);
-    f.p.resize (npoints);
-    f.i.resize (npoints);
-    f.r.resize (npoints);
-    f.g.resize (npoints);
-    f.b.resize (npoints);
+    f.npoints = point_records.size ();
+    f.x.resize (f.npoints);
+    f.y.resize (f.npoints);
+    f.z.resize (f.npoints);
+    f.c.resize (f.npoints);
+    f.p.resize (f.npoints);
+    f.i.resize (f.npoints);
+    f.r.resize (f.npoints);
+    f.g.resize (f.npoints);
+    f.b.resize (f.npoints);
     for (size_t j = 0; j < f.extra.size (); ++j)
-        f.extra[j].resize (npoints);
-    for (size_t i = 0; i < npoints; ++i)
+        f.extra[j].resize (f.npoints);
+    for (size_t i = 0; i < f.npoints; ++i)
     {
         f.x[i] = point_records[i].x;
         f.y[i] = point_records[i].y;
@@ -278,6 +314,7 @@ inline void write_spoc_file (std::ostream &s,
     }
     f.wkt = wkt;
 
+    std::clog << f << std::endl;
     write_spoc_file_compressed (s, f);
 }
 
@@ -314,6 +351,13 @@ inline void read_spoc_file_compressed (std::istream &s, spoc_file &f)
 
     // Read signature
     s.read (&tmp_f.signature[0], 4);
+
+    // Check signature
+    if (tmp_f.signature[0] != 'S' ||
+        tmp_f.signature[1] != 'P' ||
+        tmp_f.signature[2] != 'O' ||
+        tmp_f.signature[3] != 'C')
+        throw std::runtime_error ("Invalid SPOC file signature");
 
     // Read number of points
     uint64_t npoints = 0;

@@ -40,11 +40,6 @@ void test_extent (const T &points)
     const auto z1 = compress (encode_points (x));
     const auto z2 = compress (encode_points (d));
     const auto z3 = compress (encode_points (points));
-    clog << "ratios x/d/original"
-        << '\t' << z1.size () * 1.0 / points.size ()
-        << '\t' << z2.size () * 1.0 / points.size ()
-        << '\t' << z3.size () * 1.0 / points.size ()
-        << " bytes/pt" << endl;
 }
 
 void test (const size_t N,
@@ -53,8 +48,6 @@ void test (const size_t N,
 {
     using namespace std;
     using namespace spoc;
-
-    clog << "Generating " << N << " random points" << endl;
 
     const auto points = generate_points (N, min_exponent, max_exponent);
 
@@ -74,21 +67,12 @@ int main (int argc, char **argv)
         test (10, -10, 10);
         test (10'000, 0, 0);
         test (10'000, 0, 10);
+        test (10'000, -10, 0);
         test (10'000, -10, 10);
         test (10'000, 0, 20);
         test (10'000, -20, 20);
         test (10'000, -40, 0);
-        test (100'000, 0, 0);
-        test (100'000, 0, 5);
-        test (100'000, -10, 0);
-        test (100'000, 0, 10);
-        test (100'000, 0, 15);
-        test (100'000, 0, 20);
-        test (100'000, -20, 20);
-        test (100'000, 0, 30);
-        test (100'000, 0, 40);
-        test (100'000, 0, 50);
-        test (100'000, -50, 0);
+        test (10'000, -50, 0);
         test (1'000'000, 0, 12);
 
         return 0;

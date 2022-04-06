@@ -29,12 +29,12 @@ clean:
 
 .PHONY: test # Run tests
 test:
+	./build/debug/test_spoc
+	./build/release/test_spoc
 	./build/debug/test_compress
 	./build/release/test_compress
 	./build/debug/test_extent
 	./build/release/test_extent
-	./build/debug/test_spoc
-	./build/release/test_spoc
 
 .PHONY: memcheck # Run memcheck
 memcheck:
