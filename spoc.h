@@ -67,21 +67,9 @@ inline bool operator!= (const point_record &a, const point_record &b)
     return !(a == b);
 }
 
-struct spoc_file
+class spoc_file
 {
-    char signature[4];
-    std::vector<double> x;
-    std::vector<double> y;
-    std::vector<double> z;
-    std::vector<uint16_t> c;
-    std::vector<uint16_t> p;
-    std::vector<uint16_t> i;
-    std::vector<uint16_t> r;
-    std::vector<uint16_t> g;
-    std::vector<uint16_t> b;
-    std::array<std::vector<uint64_t>,8> extra;
-    std::string wkt;
-
+    public:
     spoc_file ()
     {
         signature[0] = 'S'; // Simple
@@ -98,18 +86,95 @@ struct spoc_file
         if (signature[3] != 'C') return false;
 
         // Check data
-        const size_t npoints = x.size ();
-        if (y.size () != npoints) return false;
-        if (z.size () != npoints) return false;
-        if (c.size () != npoints) return false;
-        if (p.size () != npoints) return false;
-        if (i.size () != npoints) return false;
-        if (r.size () != npoints) return false;
-        if (g.size () != npoints) return false;
-        if (b.size () != npoints) return false;
+        if (x.size () != npoints && !x.empty ()) return false;
+        if (y.size () != npoints && !y.empty ()) return false;
+        if (z.size () != npoints && !z.empty ()) return false;
+        if (c.size () != npoints && !c.empty ()) return false;
+        if (p.size () != npoints && !p.empty ()) return false;
+        if (i.size () != npoints && !i.empty ()) return false;
+        if (r.size () != npoints && !r.empty ()) return false;
+        if (g.size () != npoints && !g.empty ()) return false;
+        if (b.size () != npoints && !b.empty ()) return false;
         for (size_t j = 0; j < extra.size (); ++j)
-            if (extra[j].size () != npoints) return false;
+            if (extra[j].size () != npoints && !extra[j].empty ()) return false;
         return true;
+    }
+    point_record get (const size_t n)
+    {
+        assert (n < npoints);
+        point_record q;
+        q.x = x.empty () ? 0.0 : x[n];
+        q.y = y.empty () ? 0.0 : y[n];
+        q.z = z.empty () ? 0.0 : z[n];
+        q.c = c.empty () ? 0 : c[n];
+        q.p = p.empty () ? 0 : p[n];
+        q.i = i.empty () ? 0 : i[n];
+        q.r = r.empty () ? 0 : r[n];
+        q.g = g.empty () ? 0 : g[n];
+        q.b = b.empty () ? 0 : b[n];
+        for (size_t j = 0; j < extra.size (); ++j)
+            q.extra[j] = q.extra.empty () ? 0 : extra[j][n];
+        return q;
+    }
+    void set (const size_t n, const point_record &p)
+    {
+        assert (n < npoints);
+        set (x, n, p.x);
+        set (y, n, p.y);
+        set (z, n, p.z);
+        set (c, n, p.c);
+        set (p, n, p.p);
+        set (i, n, p.i);
+        set (r, n, p.r);
+        set (g, n, p.g);
+        set (b, n, p.b);
+        for (size_t j = 0; j < extra.size (); ++j)
+            set (extra[j], n, p.extra[j]);
+    }
+    void resize (const size_t n)
+    {
+        npoints = n;
+        if (!x.empty ()) x.resize (n);
+        if (!y.empty ()) y.resize (n);
+        if (!z.empty ()) z.resize (n);
+        if (!c.empty ()) c.resize (n);
+        if (!p.empty ()) p.resize (n);
+        if (!i.empty ()) i.resize (n);
+        if (!r.empty ()) r.resize (n);
+        if (!g.empty ()) g.resize (n);
+        if (!b.empty ()) b.resize (n);
+        for (size_t j = 0; j < extra.size (); ++j)
+            if (!extra[j].empty ()) extra[j].resize (n);
+    }
+
+    private:
+    char signature[4];
+    size_t npoints;
+    std::vector<double> x;
+    std::vector<double> y;
+    std::vector<double> z;
+    std::vector<uint16_t> c;
+    std::vector<uint16_t> p;
+    std::vector<uint16_t> i;
+    std::vector<uint16_t> r;
+    std::vector<uint16_t> g;
+    std::vector<uint16_t> b;
+    std::array<std::vector<uint64_t>,8> extra;
+    std::string wkt;
+    template<typename T,typename U>
+    void set (T &x, const size_t n, const U y)
+    {
+        // Assigning 0 to empty is a no-op
+        if (x.empty () && y == 0)
+            return;
+        // Resize if needed
+        if (x.empty ())
+            x.resize (npoints);
+        // Check logic
+        assert (n < npoints);
+        assert (n < x.size ());
+        // Do the assignment
+        x[n] = y;
     }
 };
 
