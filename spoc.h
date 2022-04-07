@@ -67,6 +67,29 @@ inline bool operator!= (const point_record &a, const point_record &b)
     return !(a == b);
 }
 
+template<typename T>
+inline bool all_zero (const std::vector<T> &x)
+{
+    for (const auto i : x)
+        if (i != 0)
+            return false;
+    return true;
+}
+
+// Resize a vector, following DPFWYDU rules
+template<typename T>
+inline void resize (std::vector<T> &x, const size_t n)
+{
+    // Only resize if it's being used
+    if (!x.empty ())
+        x.resize (n);
+    // Resize can change the contents, so recheck for all zero
+    if (all_zero (x))
+        x.clear ();
+    // Free memory
+    x.shrink_to_fit ();
+}
+
 class spoc_file
 {
     public:
@@ -138,17 +161,22 @@ class spoc_file
     void resize (const size_t n)
     {
         npoints = n;
-        if (!x.empty ()) x.resize (n);
-        if (!y.empty ()) y.resize (n);
-        if (!z.empty ()) z.resize (n);
-        if (!c.empty ()) c.resize (n);
-        if (!p.empty ()) p.resize (n);
-        if (!i.empty ()) i.resize (n);
-        if (!r.empty ()) r.resize (n);
-        if (!g.empty ()) g.resize (n);
-        if (!b.empty ()) b.resize (n);
+        spoc::resize (x, n);
+        spoc::resize (y, n);
+        spoc::resize (z, n);
+        spoc::resize (c, n);
+        spoc::resize (p, n);
+        spoc::resize (i, n);
+        spoc::resize (r, n);
+        spoc::resize (g, n);
+        spoc::resize (b, n);
         for (size_t j = 0; j < extra.size (); ++j)
-            if (!extra[j].empty ()) extra[j].resize (n);
+            spoc::resize (extra[j], n);
+    }
+    // Reallocate memory on all containers
+    void reallocate ()
+    {
+        resize (npoints);
     }
 
     // Readonly accessors
@@ -232,15 +260,6 @@ inline std::ostream &operator<< (std::ostream &s, const spoc_file &f)
         for (auto i : f.extra[j]) s << " " << i; s << std::endl;
     }
     return s;
-}
-
-template<typename T>
-inline bool all_zero (const std::vector<T> &x)
-{
-    for (const auto i : x)
-        if (i != 0)
-            return false;
-    return true;
 }
 
 template<typename T>
