@@ -92,6 +92,39 @@ void test_spoc_file ()
     verify (f.get_signature ()[3] == 'C');
     verify (f.get_npoints () == 0);
     verify (f.get_x ().empty () == true);
+    verify (f.get_npoints () == 0);
+    verify (f.get_x ().size () == 0);
+    verify (f.get_y ().size () == 0);
+    verify (f.get_z ().size () == 0);
+    f.resize (1);
+    verify (f.get_npoints () == 1);
+    auto p = f.get (0);
+    verify (f.get_x ().size () == 0);
+    verify (f.get_y ().size () == 0);
+    verify (f.get_z ().size () == 0);
+    verify (p.x == 0);
+    verify (p.y == 0);
+    verify (p.z == 0);
+    clog << f;
+    p.z = 123;
+    f.set (0, p);
+    clog << f;
+    verify (f.get_x ().size () == 0);
+    verify (f.get_y ().size () == 0);
+    verify (f.get_z ().size () == 1);
+    verify (f.get_extra ()[7].empty () == true);
+    p.extra[7] = 456;
+    f.set (0, p);
+    clog << f;
+    verify (f.get_extra ()[7].empty () == false);
+    f.resize (10);
+    clog << f;
+    f.set (9, p);
+    clog << f;
+    verify (f.get_extra ()[7].at (0) == 456);
+    verify (f.get_extra ()[7].at (1) == 0);
+    verify (f.get_extra ()[7].at (8) == 0);
+    verify (f.get_extra ()[7].at (9) == 456);
 }
 
 int main (int argc, char **argv)

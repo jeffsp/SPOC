@@ -115,7 +115,7 @@ class spoc_file
         pr.g = g.empty () ? 0 : g[n];
         pr.b = b.empty () ? 0 : b[n];
         for (size_t j = 0; j < extra.size (); ++j)
-            pr.extra[j] = pr.extra.empty () ? 0 : extra[j][n];
+            pr.extra[j] = extra[j].empty () ? 0 : extra[j][n];
         return pr;
     }
     // Set record number 'n'
@@ -217,17 +217,20 @@ inline std::ostream &operator<< (std::ostream &s, const spoc_file &f)
     s << f.signature[2];
     s << f.signature[3] << std::endl;
     s << "npoints " << f.npoints << std::endl;
-    s << "x " << f.x.size () << std::endl;
-    s << "y " << f.y.size () << std::endl;
-    s << "z " << f.z.size () << std::endl;
-    s << "c " << f.c.size () << std::endl;
-    s << "p " << f.p.size () << std::endl;
-    s << "i " << f.i.size () << std::endl;
-    s << "r " << f.r.size () << std::endl;
-    s << "g " << f.g.size () << std::endl;
-    s << "b " << f.b.size () << std::endl;
+    s << "x"; for (auto i : f.x) s << " " << i; s << std::endl;
+    s << "y"; for (auto i : f.y) s << " " << i; s << std::endl;
+    s << "z"; for (auto i : f.z) s << " " << i; s << std::endl;
+    s << "c"; for (auto i : f.c) s << " " << i; s << std::endl;
+    s << "p"; for (auto i : f.p) s << " " << i; s << std::endl;
+    s << "i"; for (auto i : f.i) s << " " << i; s << std::endl;
+    s << "r"; for (auto i : f.r) s << " " << i; s << std::endl;
+    s << "g"; for (auto i : f.g) s << " " << i; s << std::endl;
+    s << "b"; for (auto i : f.b) s << " " << i; s << std::endl;
     for (size_t j = 0; j < f.extra.size (); ++j)
-        s << "extra[" << j << "]" << f.extra[j].size () << std::endl;
+    {
+        s << "extra[" << j << "]";
+        for (auto i : f.extra[j]) s << " " << i; s << std::endl;
+    }
     return s;
 }
 
