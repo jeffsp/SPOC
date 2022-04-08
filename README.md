@@ -9,7 +9,8 @@ systems but can be Electro-optical, SAR, ..., etc.
 
 A point cloud is a ...
 
-Many of the data fields contained in ASPRS LAS files are obsolete.
+Many of the data fields contained in ASPRS LAS files do not apply to
+data collected from EO, SAR, ...
 
 The aim of this file format is to be a subset of the LAS file format.
 
@@ -25,7 +26,7 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 
 # Requirements
 
-* Don't pay for what you don't use
+* Don't pay for what you don't use: FreeWYDU
 * Linear complexity
 * 64-bit doubles
 * Don't rely on data being spatially arranged
@@ -33,10 +34,11 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
   (disk/memory cache)
 * Streaming is not supported. Point clouds are random-access. Point
   clouds are assumed to fit into memory.
-* Linux pipes are supported (not for las files)
+* Linux pipes are supported (not for LASlib I/O files)
 
 # TODO
 
+* [ ] FreeWYDU support in memory and disk footprints
 * [ ] Gitlab runner
 * [ ] CI/CD
 * [ ] Test suite
@@ -47,7 +49,7 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [ ] spoc\_connect: Connected components, saved in extra fields
 * [ ] spoc\_crop: 2D/3D meters/percentage/by classification/by component
 * [ ] spoc\_decimate
-* [ ] spoc\_field_filter: 2D/3D spatial filtering: does not changes xyz coords
+* [ ] spoc\_field\_filter: 2D/3D spatial filtering: does not changes xyz coords
 * [ ] spoc\_info
 * [ ] spoc\_interpolate
 * [ ] spoc\_las2spoc
@@ -55,7 +57,8 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [ ] spoc\_octree: break into files arranged as an octree
 * [ ] spoc\_quantize
 * [ ] spoc\_sort: by field/by voxel
-* [ ] spoc\_spatial_filter: 2D/3D spatial filtering: changes 3D structure
+* [ ] spoc\_spatial\_filter: 2D/3D spatial filtering: changes 3D structure
 * [ ] spoc\_spoc2las: warn when fields are lost, warn when precision is lost
 * [ ] spoc\_tile
 * [ ] spoc\_transform
+* [ ] spoc\_transform\_lambda: Functional plugins with python/bash
