@@ -46,19 +46,19 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [ ] Cppcheck
 * [ ] read/write spoc files
 * [ ] read/write las files
-* [ ] spoc\_connect: Connected components, saved in extra fields
-* [ ] spoc\_crop: 2D/3D meters/percentage/by classification/by component
-* [ ] spoc\_decimate
-* [ ] spoc\_field\_filter: 2D/3D spatial filtering: does not changes xyz coords
-* [ ] spoc\_info
-* [ ] spoc\_interpolate
-* [ ] spoc\_las2spoc
-* [ ] spoc\_merge
-* [ ] spoc\_octree: break into files arranged as an octree
-* [ ] spoc\_quantize
-* [ ] spoc\_sort: by field/by voxel
-* [ ] spoc\_spatial\_filter: 2D/3D spatial filtering: changes 3D structure
-* [ ] spoc\_spoc2las: warn when fields are lost, warn when precision is lost
-* [ ] spoc\_tile
-* [ ] spoc\_transform
-* [ ] spoc\_transform\_lambda: Functional plugins with python/bash
+* [ ] spoc connect: Connected components, saved in extra fields
+* [ ] spoc crop: 2D/3D meters/percentage/by classification/by component
+* [ ] spoc decimate
+* [ ] spoc field\_filter: 2D/3D spatial filtering: does not changes xyz coords
+* [ ] spoc info
+* [ ] spoc interpolate
+* [ ] spoc las2spoc
+* [ ] spoc merge
+* [ ] spoc octree: break into files arranged as an octree
+* [ ] spoc quantize
+* [ ] spoc sort: by field/by voxel
+* [ ] spoc spatial\_filter: 2D/3D spatial filtering: changes 3D structure
+* [ ] spoc spoc2las: warn when fields are lost, warn when precision is lost
+* [ ] spoc tile
+* [ ] spoc transform
+* [ ] spoc transform\_lambda: Functional plugins with python/bash
