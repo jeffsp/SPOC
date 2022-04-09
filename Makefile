@@ -2,15 +2,21 @@ default: compile test
 
 .PHONY: convert_laz # Convert LAS files to LAZ files
 convert_laz:
-	./convert_laz_all.sh ./datasets/las_files ./results/spoc_file_format
+	@cd ./scripts && ./convert_laz_all.sh \
+		$$(realpath ../datasets/las_files) \
+		$$(realpath ../results/spoc_file_format)
 
 .PHONY: convert_spoc # Convert LAS files to SPOC files
 convert_spoc:
-	./convert_spoc_all.sh ./datasets/las_files ./results/spoc_file_format
+	@cd ./scripts && ./convert_spoc_all.sh \
+		$$(realpath ../datasets/las_files) \
+		$$(realpath ../results/spoc_file_format)
 
 .PHONY: compare # Compare LAZ and SPOC file sizes
 compare:
-	./compare_all.sh ./datasets/las_files ./results/spoc_file_format
+	@cd ./scripts && ./compare_all.sh \
+		$$(realpath ../datasets/las_files) \
+		$$(realpath ../results/spoc_file_format)
 
 cmake:
 	mkdir -p build/debug
