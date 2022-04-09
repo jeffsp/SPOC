@@ -24,4 +24,4 @@ trap cleanup EXIT
 las2las64 -set_ogc_wkt -i $1 -o ${TMPDIR}/tmp.las
 
 # Convert to spoc
-./build/debug/las2spoc -v ${TMPDIR}/tmp.las $2/${sn}.spoc
+las2spoc -v ${TMPDIR}/tmp.las $2/${sn}.spoc
