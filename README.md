@@ -46,9 +46,11 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [ ] Cppcheck
 * [ ] read/write spoc files
 * [ ] read/write las files
+* [ ] spoc compare: Compare two point clouds, specifying fields
 * [ ] spoc connect: Connected components, saved in extra fields
 * [ ] spoc crop: 2D/3D meters/percentage/by classification/by component
 * [ ] spoc decimate
+* [ ] spoc dump: Dump the contents of a spoc file as text
 * [ ] spoc field\_filter: 2D/3D spatial filtering: does not changes xyz coords
 * [ ] spoc info
 * [ ] spoc interpolate
