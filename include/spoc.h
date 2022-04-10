@@ -352,6 +352,10 @@ inline void write_spoc_file (std::ostream &s,
     }
     f.wkt = wkt;
 
+    // Release unused fields
+    f.reallocate ();
+
+    // Write it
     write_spoc_file_compressed (s, f);
 }
 

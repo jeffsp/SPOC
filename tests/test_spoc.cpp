@@ -161,6 +161,58 @@ void test_spoc_file ()
     clog << f;
 }
 
+void test_free_wydu ()
+{
+    const size_t N = 1000;
+    size_t s0, s1, s2, s3;
+    vector<point_record> pc (N);
+    {
+    stringstream s;
+    const string wkt = "WKT";
+    write_spoc_file (s, pc, wkt);
+    // Save the size on disk
+    s0 = s.str().size ();
+    }
+    pc = get_random_point_records (1000);
+    {
+    stringstream s;
+    const string wkt = "WKT";
+    write_spoc_file (s, pc, wkt);
+    // Save the size on disk
+    s1 = s.str().size ();
+    }
+    // Zero out Z coordinate
+    for (auto &p : pc)
+        p.z = 0.0;
+    {
+    stringstream s;
+    const string wkt = "WKT";
+    write_spoc_file (s, pc, wkt);
+    // Save the size on disk
+    s2 = s.str().size ();
+    }
+    // Zero out all fields
+    for (auto &p : pc)
+    {
+        p.x = p.y = p.c = p.p = p.i = p.r = p.g = p.b = 0;
+        for (size_t j = 0; j < p.extra.size (); ++j)
+            p.extra[j] = 0;
+    }
+    {
+    stringstream s;
+    const string wkt = "WKT";
+    write_spoc_file (s, pc, wkt);
+    // Save the size on disk
+    s3 = s.str().size ();
+    }
+    // All zeros is much smaller than random data
+    verify (s0 * 10 < s1);
+    // Zeroing out a field makes it smaller
+    verify (s2 < s1);
+    // All zeros is same size as all zeros
+    verify (s0 == s3);
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -168,6 +220,7 @@ int main (int argc, char **argv)
         test_point_record ();
         test_spoc_file_io ();
         test_spoc_file ();
+        test_free_wydu ();
         return 0;
     }
     catch (const exception &e)

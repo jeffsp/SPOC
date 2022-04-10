@@ -27,6 +27,9 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 # Requirements
 
 * Don't pay for what you don't use: FreeWYDU
+    The memory footprint is zero for fields that are all zero. When
+    point clouds are resized each field is checked, and fields that
+    contain all 0's are cleared and their memory is freed.
 * Linear complexity
 * 64-bit doubles
 * Don't rely on data being spatially arranged
