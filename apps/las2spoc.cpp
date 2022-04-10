@@ -23,7 +23,7 @@ struct las
         delete lasreader;
     }
     LASreadOpener lasreadopener;
-    LASreader *lasreader = lasreadopener.open();
+    LASreader *lasreader;
 };
 
 int main (int argc, char **argv)
@@ -35,7 +35,7 @@ int main (int argc, char **argv)
     {
         // Parse command line
         cmd::args args = cmd::get_args (argc, argv,
-                string (argv[0]) + " [options] < textfile > spocfile");
+                string (argv[0]) + " [options] lasfile spocfile");
 
         // If you are getting help, exit without an error
         if (args.help)

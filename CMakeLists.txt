@@ -32,3 +32,4 @@ macro(add_laslib_app name)
 endmacro()
 
 add_laslib_app(las2spoc)
+add_laslib_app(spoc2las)
