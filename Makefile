@@ -58,7 +58,12 @@ memcheck:
 
 .PHONY: cppcheck # Run cppcheck
 cppcheck:
-	cppcheck --enable=all -q -I include -I apps --suppress=missingIncludeSystem apps/*.cpp
+	@cppcheck --enable=all -q --error-exitcode=255 \
+		-I include -I apps -I laslib/LASlib/inc \
+		--inline-suppr \
+		--suppress=missingIncludeSystem \
+		--suppress=*:laslib/LASlib/inc/* \
+		apps/*.cpp
 
 .PHONY: laslib # Build LASlib library
 laslib:

@@ -88,6 +88,7 @@ inline void append_double (const double d, std::vector<uint8_t> &bytes)
 
 inline double bytes_to_double (const uint8_t *p)
 {
+    // cppcheck-suppress invalidPointerCast
     const double d = *(reinterpret_cast<const double *> (p));
     return d;
 }
