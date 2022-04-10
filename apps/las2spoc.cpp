@@ -5,9 +5,9 @@
 #include <stdexcept>
 #include <string>
 
-struct las
+struct las_reader
 {
-    explicit las (const std::string &fn)
+    explicit las_reader (const std::string &fn)
         : lasreader (nullptr)
     {
         lasreadopener.set_file_name (fn.c_str ());
@@ -15,7 +15,7 @@ struct las
         if (lasreader == nullptr)
             throw std::runtime_error ("Could not open LASlib lasreader");
     }
-    ~las ()
+    ~las_reader ()
     {
         if (lasreader == nullptr)
             return;
@@ -44,7 +44,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "reading " << args.input_fn << endl;
 
-        las l (args.input_fn);
+        las_reader l (args.input_fn);
 
         // Check the coordinate system
         if (l.lasreader->header.vlr_geo_ogc_wkt == nullptr)

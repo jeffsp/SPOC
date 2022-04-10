@@ -5,25 +5,28 @@
 #include <stdexcept>
 #include <string>
 
-struct las
+struct las_writer
 {
-    explicit las (const std::string &fn, const LASheader &lasheader)
+    explicit las_writer (const std::string &fn, const LASheader &lasheader)
         : laswriter (nullptr)
+        , lasheader (lasheader)
     {
         laswriteopener.set_file_name(fn.c_str ());
         laswriter = laswriteopener.open(&lasheader);
         if (laswriter == nullptr)
             throw std::runtime_error ("Could not open LASlib laswriter");
     }
-    ~las ()
+    ~las_writer ()
     {
         if (laswriter == nullptr)
             return;
+        laswriter->update_header (&lasheader, true);
         laswriter->close();
         delete laswriter;
     }
     LASwriteOpener laswriteopener;
     LASwriter *laswriter;
+    const LASheader &lasheader;
 };
 
 int main (int argc, char **argv)
@@ -78,8 +81,8 @@ int main (int argc, char **argv)
         lasheader.x_offset = min_x;
         lasheader.y_offset = min_y;
         lasheader.z_offset = min_z;
-        lasheader.point_data_format = xxx;
-        lasheader.point_data_record_length = xxx;
+        lasheader.point_data_format = 2;
+        lasheader.point_data_record_length = 26;
 
         // Initialize the point
         LASpoint laspoint;
@@ -89,7 +92,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "writing records to " << args.output_fn << endl;
 
-        las l (args.output_fn, lasheader);
+        las_writer l (args.output_fn, lasheader);
 
         for (size_t i = 0; i < point_records.size (); ++i)
         {
@@ -100,16 +103,13 @@ int main (int argc, char **argv)
             laspoint.set_classification (p.c);
             laspoint.set_point_source_ID (p.p);
             laspoint.set_intensity (p.i);
-            laspoint.set_red (p.r);
-            laspoint.set_green (p.g);
-            laspoint.set_blue (p.b);
+            laspoint.rgb[0] = p.r;
+            laspoint.rgb[1] = p.g;
+            laspoint.rgb[2] = p.b;
 
             l.laswriter->write_point (&laspoint);
             l.laswriter->update_inventory (&laspoint);
         }
-
-        // Done
-        laswriter->update_header(&lasheader, true);
 
         return 0;
     }
