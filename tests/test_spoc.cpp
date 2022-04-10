@@ -133,32 +133,46 @@ void test_spoc_file ()
     verify (f.get_z ().at (9) == 0);
     verify (f.get_z ().size () == 10);
     f.reallocate ();
-    clog << f;
     verify (f.get_z ().size () == 0);
     verify (f.get_npoints () == 10);
-    clog << f;
     p.extra[7] = 0;
     f.set (0, p);
     f.set (9, p);
-    clog << f;
     f.resize (11);
     verify (f.get_npoints () == 11);
-    clog << f;
     const auto q = get_random_point_records (3);
     f.set (0, q[0]);
     f.set (9, q[1]);
     f.set (10, q[2]);
-    clog << f;
     point_record p0;
     f.set (0, p0);
-    clog << f;
     f.set (9, p0);
     f.reallocate ();
     verify (f.get_npoints () == 11);
-    clog << f;
+    verify (f.get_x ().size () == 11);
+    verify (f.get_y ().size () == 11);
+    verify (f.get_z ().size () == 11);
+    verify (f.get_c ().size () == 11);
+    verify (f.get_p ().size () == 11);
+    verify (f.get_i ().size () == 11);
+    verify (f.get_r ().size () == 11);
+    verify (f.get_g ().size () == 11);
+    verify (f.get_b ().size () == 11);
+    for (size_t j = 0; j < f.get_extra ().size (); ++j)
+        verify (f.get_extra ()[j].size () == 11);
     f.set (10, p0);
     f.reallocate ();
-    clog << f;
+    verify (f.get_x ().size () == 0);
+    verify (f.get_y ().size () == 0);
+    verify (f.get_z ().size () == 0);
+    verify (f.get_c ().size () == 0);
+    verify (f.get_p ().size () == 0);
+    verify (f.get_i ().size () == 0);
+    verify (f.get_r ().size () == 0);
+    verify (f.get_g ().size () == 0);
+    verify (f.get_b ().size () == 0);
+    for (size_t j = 0; j < f.get_extra ().size (); ++j)
+        verify (f.get_extra ()[j].size () == 0);
 }
 
 void test_free_wydu ()
