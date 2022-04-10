@@ -47,14 +47,16 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "reading " << args.input_fn << endl;
 
+        ifstream ifs (args.input_fn);
+
+        if (!ifs)
+            throw runtime_error ("Can't open file for reading");
+
         // Read spoc file
         vector<point_record> point_records;
         string wkt;
 
-        if (args.verbose)
-            clog << "reading spoc file" << endl;
-
-        read_spoc_file (cin, point_records, wkt);
+        read_spoc_file (ifs, point_records, wkt);
 
         if (args.verbose)
             clog << point_records.size () << " point records read" << endl;
@@ -63,9 +65,9 @@ int main (int argc, char **argv)
             clog << "read " << wkt.size () << " byte WKT" << endl;
 
         // Get min x, y, z
-        double min_x = std::numeric_limits<double>::max ();
-        double min_y = std::numeric_limits<double>::max ();
-        double min_z = std::numeric_limits<double>::max ();
+        double min_x = numeric_limits<double>::max ();
+        double min_y = numeric_limits<double>::max ();
+        double min_z = numeric_limits<double>::max ();
         for (auto &p : point_records)
         {
             min_x = std::min (min_x, p.x);
@@ -97,9 +99,9 @@ int main (int argc, char **argv)
         for (size_t i = 0; i < point_records.size (); ++i)
         {
             const auto p = point_records[i];
-            laspoint.set_x (p.x - min_x);
-            laspoint.set_y (p.y - min_y);
-            laspoint.set_z (p.z - min_z);
+            laspoint.set_X (p.x - min_x);
+            laspoint.set_Y (p.y - min_y);
+            laspoint.set_Z (p.z - min_z);
             laspoint.set_classification (p.c);
             laspoint.set_point_source_ID (p.p);
             laspoint.set_intensity (p.i);
