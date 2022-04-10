@@ -56,6 +56,10 @@ memcheck:
 	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_spoc
 	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_spoc
 
+.PHONY: cppcheck # Run cppcheck
+cppcheck:
+	cppcheck --enable=all -q -I include -I apps --suppress=missingIncludeSystem apps/*.cpp
+
 .PHONY: laslib # Build LASlib library
 laslib:
 	$(MAKE) -j -C laslib/LASlib

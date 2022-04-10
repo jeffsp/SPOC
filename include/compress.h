@@ -31,7 +31,7 @@ inline std::string zlib_error_string (int ret)
 struct Deflator
 {
     z_stream s;
-    Deflator (const int level)
+    explicit Deflator (const int level)
     {
         s.zalloc = Z_NULL;
         s.zfree = Z_NULL;

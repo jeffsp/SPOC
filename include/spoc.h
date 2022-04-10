@@ -70,9 +70,9 @@ inline bool operator!= (const point_record &a, const point_record &b)
 template<typename T>
 inline bool all_zero (const std::vector<T> &x)
 {
-    for (const auto i : x)
-        if (i != 0)
-            return false;
+    if (std::any_of (x.begin (), x.end (),
+        [](const T &i) { return i != 0; }))
+        return false;
     return true;
 }
 

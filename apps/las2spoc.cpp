@@ -7,7 +7,7 @@
 
 struct las
 {
-    las (const std::string &fn)
+    explicit las (const std::string &fn)
         : lasreader (nullptr)
     {
         lasreadopener.set_file_name (fn.c_str ());

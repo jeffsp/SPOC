@@ -19,7 +19,7 @@ The aim of this file format is to be a subset of the LAS file format.
 The proposed extension is SPOC, standing for Simple POint Cloud.
 
 * Points are stored as sets
-    * The order of the point records is not important and is not preserved
+    * The order of the point records is preserved
     * It is uncommon for two points to have the same exact location in
     3D space
 * Point locations have 12 digits of precision preserved
@@ -60,10 +60,11 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [ ] spoc las2spoc
 * [ ] spoc merge
 * [ ] spoc octree: break into files arranged as an octree
-* [ ] spoc quantize
+* [ ] spoc quantize: on voxel boundaries
 * [ ] spoc sort: by field/by voxel
 * [ ] spoc spatial\_filter: 2D/3D spatial filtering: changes 3D structure
 * [ ] spoc spoc2las: warn when fields are lost, warn when precision is lost
+* [ ] spoc srs: Get/set SRS
 * [ ] spoc tile
 * [ ] spoc transform
 * [ ] spoc transform\_lambda: Functional plugins with python/bash
