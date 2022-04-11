@@ -41,14 +41,16 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 
 # TODO
 
-* [ ] FreeWYDU support in memory and disk footprints
-* [ ] Gitlab runner
-* [ ] CI/CD
-* [ ] Test suite
+* [X] FreeWYDU support in memory and disk footprints
+* [X] Gitlab runner
+* [X] CI/CD
+* [ ] Test data files
+* [ ] Unit test suite
+* [ ] Integration test suite
 * [ ] Coverage
-* [ ] Cppcheck
-* [ ] read/write spoc files
-* [ ] read/write las files
+* [X] Cppcheck
+* [X] read/write spoc files
+* [X] read/write las files
 * [ ] spoc compare: Compare two point clouds, specifying fields
 * [ ] spoc connect: Connected components, saved in extra fields
 * [ ] spoc crop: 2D/3D meters/percentage/by classification/by component
