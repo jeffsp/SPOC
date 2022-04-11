@@ -1,3 +1,8 @@
+lint:
+  stage: lint
+  script:
+    - make cppcheck
+
 build:
   stage: build
   script:
@@ -15,3 +20,8 @@ test:
   stage: test
   script:
     - make test
+
+memcheck:
+  stage: memcheck
+  script:
+    - make memcheck

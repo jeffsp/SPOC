@@ -22,6 +22,15 @@ compare:
 		$$(realpath ../datasets/las_files) \
 		$$(realpath ../results/spoc_file_format)
 
+.PHONY: cppcheck # Run cppcheck
+cppcheck:
+	@cppcheck --enable=all -q --error-exitcode=255 \
+		-I include -I apps -I laslib/LASlib/inc \
+		--inline-suppr \
+		--suppress=missingIncludeSystem \
+		--suppress=*:laslib/LASlib/inc/* \
+		apps/*.cpp
+
 .PHONY: cmake # Use cmake to generate Makefiles
 cmake:
 	mkdir -p build/debug
@@ -59,15 +68,6 @@ memcheck:
 	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_extent
 	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_spoc
 	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_spoc
-
-.PHONY: cppcheck # Run cppcheck
-cppcheck:
-	@cppcheck --enable=all -q --error-exitcode=255 \
-		-I include -I apps -I laslib/LASlib/inc \
-		--inline-suppr \
-		--suppress=missingIncludeSystem \
-		--suppress=*:laslib/LASlib/inc/* \
-		apps/*.cpp
 
 .PHONY: help # Generate list of targets with descriptions
 help:
