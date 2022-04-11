@@ -6,9 +6,9 @@ build:
     paths:
       - build/debug/*
       - build/release/*
-  #cache:
-  #  paths:
-  #    - build/*
+  cache:
+    paths:
+      - laslib/LASlib/src/*.o
 
 test:
   stage: test
