@@ -9,6 +9,7 @@ build:
   cache:
     paths:
       - laslib/LASlib/src/*.o
+      - laslib/LASzip/src/*.o
 
 test:
   stage: test
