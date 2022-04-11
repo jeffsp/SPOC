@@ -29,6 +29,10 @@ cmake:
 	cd build/debug && cmake -DCMAKE_BUILD_TYPE=Debug ../..
 	cd build/release && cmake -DCMAKE_BUILD_TYPE=Release ../..
 
+.PHONY: laslib # Build LASlib library
+laslib:
+	$(MAKE) -j -C laslib/LASlib
+
 .PHONY: compile # Compile all applications and tests
 compile: laslib
 	cd build/debug && make -j 24
@@ -64,10 +68,6 @@ cppcheck:
 		--suppress=missingIncludeSystem \
 		--suppress=*:laslib/LASlib/inc/* \
 		apps/*.cpp
-
-.PHONY: laslib # Build LASlib library
-laslib:
-	$(MAKE) -j -C laslib/LASlib
 
 .PHONY: help # Generate list of targets with descriptions
 help:
