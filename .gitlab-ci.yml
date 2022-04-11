@@ -1,11 +1,7 @@
-lint:
-  stage: lint
-  script:
-    - make cppcheck
-
 build:
   stage: build
   script:
+    - make cppcheck
     - make cmake compile
   artifacts:
     paths:
@@ -20,8 +16,4 @@ test:
   stage: test
   script:
     - make test
-
-memcheck:
-  stage: memcheck
-  script:
     - make memcheck
