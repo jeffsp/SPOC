@@ -2,9 +2,10 @@ build:
   stage: build
   script:
     - make cmake compile
-  #artifacts:
-  #  paths:
-  #    - mybinary
+  artifacts:
+    paths:
+      - build/debug/*
+      - build/release/*
   #cache:
   #  paths:
   #    - build/*
