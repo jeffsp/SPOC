@@ -55,10 +55,8 @@ int main (int argc, char **argv)
             throw runtime_error ("Can't open file for reading");
 
         // Read spoc file
-        vector<point_record> point_records;
         string wkt;
-
-        read_spoc_file (ifs, point_records, wkt);
+        auto point_records = read_spoc_file (ifs, wkt);
 
         if (args.verbose)
             clog << point_records.size () << " point records read" << endl;

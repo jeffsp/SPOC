@@ -23,6 +23,7 @@ endmacro()
 
 add_app(text2spoc)
 add_app(spoc2text)
+add_app(spoc_info)
 
 macro(add_laslib_app name)
     add_executable(${name} ./apps/${name}.cpp)

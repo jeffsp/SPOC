@@ -100,6 +100,7 @@ class spoc_file
         signature[1] = 'P'; // Point
         signature[2] = 'O';
         signature[3] = 'C'; // Cloud
+        signature[4] = '\0'; // Terminate
     }
     bool check () const
     {
@@ -196,14 +197,14 @@ class spoc_file
 
     // I/O
     friend std::ostream &operator<< (std::ostream &s, const spoc_file &f);
-    friend void write_spoc_file_compressed (std::ostream &s, const spoc_file &f);
+    friend void write_spoc_file (std::ostream &s, const spoc_file &f);
     friend void write_spoc_file (std::ostream &s, const std::vector<point_record> &point_records, const std::string &wkt);
-    friend void read_spoc_file_compressed (std::istream &s, spoc_file &f);
-    friend void read_spoc_file (std::istream &s, std::vector<point_record> &point_records, std::string &wkt);
+    friend spoc_file read_spoc_file (std::istream &s);
+    friend std::vector<point_record> read_spoc_file (std::istream &s, std::string &wkt);
 
     private:
     // Data
-    char signature[4];
+    char signature[5];
     size_t npoints;
     std::vector<double> x;
     std::vector<double> y;
@@ -285,7 +286,7 @@ inline void write_compressed (std::ostream &s, const std::vector<T> &x)
     s.write (reinterpret_cast<const char*>(&c[0]), c.size ());
 }
 
-inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
+inline void write_spoc_file (std::ostream &s, const spoc_file &f)
 {
     // Make sure 'f' is valid
     if (!f.check ())
@@ -356,7 +357,7 @@ inline void write_spoc_file (std::ostream &s,
     f.reallocate ();
 
     // Write it
-    write_spoc_file_compressed (s, f);
+    write_spoc_file (s, f);
 }
 
 template<typename T>
@@ -385,19 +386,19 @@ inline void read_compressed (std::istream &s, std::vector<T> &x)
     x = d;
 }
 
-inline void read_spoc_file_compressed (std::istream &s, spoc_file &f)
+inline spoc_file read_spoc_file (std::istream &s)
 {
-    // Read into tmp
-    spoc_file tmp_f;
+    // Read into f
+    spoc_file f;
 
     // Read signature
-    s.read (&tmp_f.signature[0], 4);
+    s.read (&f.signature[0], 4);
 
     // Check signature
-    if (tmp_f.signature[0] != 'S' ||
-        tmp_f.signature[1] != 'P' ||
-        tmp_f.signature[2] != 'O' ||
-        tmp_f.signature[3] != 'C')
+    if (f.signature[0] != 'S' ||
+        f.signature[1] != 'P' ||
+        f.signature[2] != 'O' ||
+        f.signature[3] != 'C')
         throw std::runtime_error ("Invalid SPOC file signature");
 
     // Read number of points
@@ -405,76 +406,73 @@ inline void read_spoc_file_compressed (std::istream &s, spoc_file &f)
     s.read (reinterpret_cast<char*>(&npoints), sizeof(uint64_t));
 
     // Resize vectors
-    tmp_f.x.resize (npoints);
-    tmp_f.y.resize (npoints);
-    tmp_f.z.resize (npoints);
-    tmp_f.c.resize (npoints);
-    tmp_f.p.resize (npoints);
-    tmp_f.i.resize (npoints);
-    tmp_f.r.resize (npoints);
-    tmp_f.g.resize (npoints);
-    tmp_f.b.resize (npoints);
-    for (size_t j = 0; j < tmp_f.extra.size (); ++j)
-        tmp_f.extra[j].resize (npoints);
+    f.x.resize (npoints);
+    f.y.resize (npoints);
+    f.z.resize (npoints);
+    f.c.resize (npoints);
+    f.p.resize (npoints);
+    f.i.resize (npoints);
+    f.r.resize (npoints);
+    f.g.resize (npoints);
+    f.b.resize (npoints);
+    for (size_t j = 0; j < f.extra.size (); ++j)
+        f.extra[j].resize (npoints);
 
     // Read data
-    read_compressed (s, tmp_f.x);
-    read_compressed (s, tmp_f.y);
-    read_compressed (s, tmp_f.z);
-    read_compressed (s, tmp_f.c);
-    read_compressed (s, tmp_f.p);
-    read_compressed (s, tmp_f.i);
-    read_compressed (s, tmp_f.r);
-    read_compressed (s, tmp_f.g);
-    read_compressed (s, tmp_f.b);
+    read_compressed (s, f.x);
+    read_compressed (s, f.y);
+    read_compressed (s, f.z);
+    read_compressed (s, f.c);
+    read_compressed (s, f.p);
+    read_compressed (s, f.i);
+    read_compressed (s, f.r);
+    read_compressed (s, f.g);
+    read_compressed (s, f.b);
 
     // Extra fields
-    for (size_t j = 0; j < tmp_f.extra.size (); ++j)
-        read_compressed (s, tmp_f.extra[j]);
+    for (size_t j = 0; j < f.extra.size (); ++j)
+        read_compressed (s, f.extra[j]);
 
     // WKT
     uint64_t len = 0;
     s.read (reinterpret_cast<char*>(&len), sizeof(uint64_t));
-    tmp_f.wkt.resize (len);
-    s.read (reinterpret_cast<char*>(&tmp_f.wkt[0]), len);
+    f.wkt.resize (len);
+    s.read (reinterpret_cast<char*>(&f.wkt[0]), len);
 
     // Make sure 'f' is valid
     if (!f.check ())
         throw std::runtime_error ("Invalid spoc file format");
 
-    // Commit
-    f = tmp_f;
+    return f;
 }
 
-inline void read_spoc_file (std::istream &s,
-    std::vector<point_record> &point_records,
-    std::string &wkt)
+inline std::vector<point_record> read_spoc_file (std::istream &s, std::string &wkt)
 {
     // Read into spoc_file struct
-    spoc_file f;
-    read_spoc_file_compressed (s, f);
+    spoc_file f = read_spoc_file (s);
 
     // Stuff data points into a vector
-    std::vector<point_record> tmp_point_records (f.x.size ());
+    std::vector<point_record> point_records (f.x.size ());
 
-    for (size_t i = 0; i < tmp_point_records.size (); ++i)
+    for (size_t i = 0; i < point_records.size (); ++i)
     {
-        tmp_point_records[i].x = f.x[i];
-        tmp_point_records[i].y = f.y[i];
-        tmp_point_records[i].z = f.z[i];
-        tmp_point_records[i].c = f.c[i];
-        tmp_point_records[i].p = f.p[i];
-        tmp_point_records[i].i = f.i[i];
-        tmp_point_records[i].r = f.r[i];
-        tmp_point_records[i].g = f.g[i];
-        tmp_point_records[i].b = f.b[i];
+        point_records[i].x = f.x[i];
+        point_records[i].y = f.y[i];
+        point_records[i].z = f.z[i];
+        point_records[i].c = f.c[i];
+        point_records[i].p = f.p[i];
+        point_records[i].i = f.i[i];
+        point_records[i].r = f.r[i];
+        point_records[i].g = f.g[i];
+        point_records[i].b = f.b[i];
         for (size_t j = 0; j < f.extra.size (); ++j)
-            tmp_point_records[i].extra[j] = f.extra[j][i];
+            point_records[i].extra[j] = f.extra[j][i];
     }
 
     // Commit
-    point_records = tmp_point_records;
     wkt = f.wkt;
+
+    return point_records;
 }
 
 } // namespace spoc

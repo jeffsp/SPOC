@@ -76,8 +76,7 @@ void test_spoc_file_io ()
     const string wkt1 = "Test wkt";
     write_spoc_file (s, p, wkt1);
     string wkt2;
-    remove_const<decltype(p)>::type q;
-    read_spoc_file (s, q, wkt2);
+    auto q = read_spoc_file (s, wkt2);
 
     verify (wkt1 == wkt2);
     verify (p == q);

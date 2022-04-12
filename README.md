@@ -68,5 +68,4 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [ ] spoc spoc2las: warn when fields are lost, warn when precision is lost
 * [ ] spoc srs: Get/set SRS
 * [ ] spoc tile
-* [ ] spoc transform
-* [ ] spoc transform\_lambda: Functional plugins with python/bash
+* [ ] spoc transform/transform\_lambda: Functional plugins with python/bash

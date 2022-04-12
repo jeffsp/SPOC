@@ -21,13 +21,11 @@ int main (int argc, char **argv)
             return 0;
 
         // Read spoc file
-        vector<point_record> point_records;
-        string wkt;
-
         if (args.verbose)
             clog << "reading spoc file" << endl;
 
-        read_spoc_file (cin, point_records, wkt);
+        string wkt;
+        auto point_records = read_spoc_file (cin, wkt);
 
         if (args.verbose)
             clog << point_records.size () << " point records read" << endl;
