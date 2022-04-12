@@ -22,8 +22,12 @@ compare:
 		$$(realpath ../datasets/las_files) \
 		$$(realpath ../results/spoc_file_format)
 
+.PHONY: prep_merge # Prepare for merging
+prep_merge: cppcheck clean cmake compile test memcheck
+
 .PHONY: cppcheck # Run cppcheck
 cppcheck:
+	@echo "Running cppcheck..."
 	@cppcheck --enable=all -q --error-exitcode=255 \
 		-I include -I apps -I laslib/LASlib/inc \
 		--inline-suppr \
@@ -33,10 +37,11 @@ cppcheck:
 
 .PHONY: cmake # Use cmake to generate Makefiles
 cmake:
-	mkdir -p build/debug
-	mkdir -p build/release
-	cd build/debug && cmake -DCMAKE_BUILD_TYPE=Debug ../..
-	cd build/release && cmake -DCMAKE_BUILD_TYPE=Release ../..
+	@echo "Running cmake..."
+	@mkdir -p build/debug
+	@mkdir -p build/release
+	@cd build/debug && cmake -DCMAKE_BUILD_TYPE=Debug ../..
+	@cd build/release && cmake -DCMAKE_BUILD_TYPE=Release ../..
 
 .PHONY: laslib # Build LASlib library
 laslib:
@@ -49,25 +54,28 @@ compile: laslib
 
 .PHONY: clean # Clean build objects
 clean:
-	rm -rf build
+	@echo "Cleaning..."
+	@rm -rf build
 
 .PHONY: test # Run tests
 test:
-	./build/debug/test_spoc
-	./build/release/test_spoc
-	./build/debug/test_compress
-	./build/release/test_compress
-	./build/debug/test_extent
-	./build/release/test_extent
+	@echo "Testing..."
+	@./build/debug/test_spoc
+	@./build/release/test_spoc
+	@./build/debug/test_compress
+	@./build/release/test_compress
+	@./build/debug/test_extent
+	@./build/release/test_extent
 
 .PHONY: memcheck # Run memcheck
 memcheck:
-	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_compress
-	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_compress
-	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_extent
-	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_extent
-	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_spoc
-	valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_spoc
+	@echo "Running memchecks..."
+	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_compress
+	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_compress
+	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_extent
+	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_extent
+	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_spoc
+	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_spoc
 
 .PHONY: help # Generate list of targets with descriptions
 help:
