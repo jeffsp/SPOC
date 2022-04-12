@@ -1,6 +1,7 @@
 #include "las2spoc_cmd.h"
 #include "laswriter.hpp"
 #include "spoc.h"
+#include <chrono>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -27,6 +28,7 @@ struct las_writer
     LASwriteOpener laswriteopener;
     LASwriter *laswriter;
     const LASheader &lasheader;
+
 };
 
 int main (int argc, char **argv)
@@ -77,6 +79,13 @@ int main (int argc, char **argv)
 
         // Create the header
         LASheader lasheader;
+        strcpy (lasheader.system_identifier, "SPOC by Zetamon XYZ");
+        strcpy (lasheader.generating_software, "spoc2las");
+        const auto now = std::chrono::system_clock::now ();
+        time_t tt = std::chrono::system_clock::to_time_t(now);
+        tm local_tm = *localtime(&tt);
+        lasheader.file_creation_day = local_tm.tm_yday;
+        lasheader.file_creation_year = local_tm.tm_year + 1900;
         lasheader.x_scale_factor = 1.0;
         lasheader.y_scale_factor = 1.0;
         lasheader.z_scale_factor = 1.0;
