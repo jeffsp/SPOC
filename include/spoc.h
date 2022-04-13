@@ -2,6 +2,7 @@
 
 #include "compress.h"
 #include "point.h"
+#include "version.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -158,6 +159,7 @@ class spoc_file
         for (size_t j = 0; j < extra.size (); ++j)
             set (extra[j], n, pr.extra[j]);
     }
+    // Set the wll-known-text SRS string
     void set_wkt (const std::string &s)
     {
         wkt = s;
@@ -186,6 +188,9 @@ class spoc_file
 
     // Readonly accessors
     const char *get_signature () const { return signature; }
+    const uint8_t get_major_version () const { return major_version; }
+    const uint8_t get_minor_version () const { return minor_version; }
+    const std::string get_wkt () { return wkt; }
     const size_t get_npoints () const { return npoints; }
     const std::vector<double> get_x () const { return x; }
     const std::vector<double> get_y () const { return y; }
@@ -197,7 +202,6 @@ class spoc_file
     const std::vector<uint16_t> get_g () const { return g; }
     const std::vector<uint16_t> get_b () const { return b; }
     const std::array<std::vector<uint64_t>,8> get_extra () const { return extra; }
-    const std::string get_wkt () { return wkt; }
 
     // I/O
     friend std::ostream &operator<< (std::ostream &s, const spoc_file &f);
@@ -207,6 +211,9 @@ class spoc_file
     private:
     // Data
     char signature[5];
+    uint8_t major_version = MAJOR_VERSION;
+    uint8_t minor_version = MINOR_VERSION;
+    std::string wkt;
     size_t npoints;
     std::vector<double> x;
     std::vector<double> y;
@@ -218,7 +225,6 @@ class spoc_file
     std::vector<uint16_t> g;
     std::vector<uint16_t> b;
     std::array<std::vector<uint64_t>,8> extra;
-    std::string wkt;
 
     // Set the field 'x' at location 'n' to value 'y'
     //
@@ -297,6 +303,15 @@ inline void write_spoc_file (std::ostream &s, const spoc_file &f)
     // Signature
     s.write (&f.signature[0], 4);
 
+    // Version
+    s.write (reinterpret_cast<const char*>(&f.major_version), sizeof(uint8_t));
+    s.write (reinterpret_cast<const char*>(&f.minor_version), sizeof(uint8_t));
+
+    // WKT
+    const uint64_t len = f.wkt.size ();
+    s.write (reinterpret_cast<const char*>(&len), sizeof(uint64_t));
+    s.write (reinterpret_cast<const char*>(&f.wkt[0]), f.wkt.size ());
+
     // Number of points
     s.write (reinterpret_cast<const char*>(&f.npoints), sizeof(uint64_t));
 
@@ -314,25 +329,21 @@ inline void write_spoc_file (std::ostream &s, const spoc_file &f)
     // Extra fields
     for (size_t j = 0; j < f.extra.size (); ++j)
         write_compressed (s, f.extra[j]);
-
-    // WKT
-    const uint64_t len = f.wkt.size ();
-    s.write (reinterpret_cast<const char*>(&len), sizeof(uint64_t));
-    s.write (reinterpret_cast<const char*>(&f.wkt[0]), f.wkt.size ());
 }
 
 inline void write_spoc_file (std::ostream &s,
-    const std::vector<point_record> &point_records,
-    const std::string &wkt)
+    const std::string &wkt,
+    const std::vector<point_record> &point_records)
 {
-    // Stuff the records into a spoc_file struct
     spoc_file f;
-    f.resize (point_records.size ());
-    for (size_t i = 0; i < f.get_npoints (); ++i)
-        f.set (i, point_records[i]);
 
     // Set WKT
     f.set_wkt (wkt);
+
+    // Stuff the records into a spoc_file struct
+    f.resize (point_records.size ());
+    for (size_t i = 0; i < f.get_npoints (); ++i)
+        f.set (i, point_records[i]);
 
     // Release unused fields
     f.reallocate ();
@@ -378,6 +389,16 @@ inline spoc_file read_spoc_file (std::istream &s)
         f.signature[3] != 'C')
         throw std::runtime_error ("Invalid SPOC file signature");
 
+    // Read version
+    s.read (reinterpret_cast<char*>(&f.major_version), sizeof(uint8_t));
+    s.read (reinterpret_cast<char*>(&f.minor_version), sizeof(uint8_t));
+
+    // WKT
+    uint64_t len = 0;
+    s.read (reinterpret_cast<char*>(&len), sizeof(uint64_t));
+    f.wkt.resize (len);
+    s.read (reinterpret_cast<char*>(&f.wkt[0]), len);
+
     // Read number of points
     s.read (reinterpret_cast<char*>(&f.npoints), sizeof(uint64_t));
 
@@ -395,12 +416,6 @@ inline spoc_file read_spoc_file (std::istream &s)
     // Extra fields
     for (size_t j = 0; j < f.extra.size (); ++j)
         f.extra[j] = read_compressed<uint64_t> (s, f.npoints);
-
-    // WKT
-    uint64_t len = 0;
-    s.read (reinterpret_cast<char*>(&len), sizeof(uint64_t));
-    f.wkt.resize (len);
-    s.read (reinterpret_cast<char*>(&f.wkt[0]), len);
 
     // Make sure 'f' is valid
     if (!f.check ())

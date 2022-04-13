@@ -74,7 +74,7 @@ void test_spoc_file_io ()
 
     stringstream s;
     const string wkt1 = "Test wkt";
-    write_spoc_file (s, p, wkt1);
+    write_spoc_file (s, wkt1, p);
     string wkt2;
     auto q = read_spoc_file (s, wkt2);
 
@@ -89,7 +89,6 @@ void test_spoc_file ()
     verify (f.get_signature ()[1] == 'P');
     verify (f.get_signature ()[2] == 'O');
     verify (f.get_signature ()[3] == 'C');
-    verify (f.get_npoints () == 0);
     verify (f.get_x ().empty () == true);
     verify (f.get_npoints () == 0);
     verify (f.get_x ().size () == 0);
@@ -182,7 +181,7 @@ void test_free_wydu ()
     {
     stringstream s;
     const string wkt = "WKT";
-    write_spoc_file (s, pc, wkt);
+    write_spoc_file (s, wkt, pc);
     // Save the size on disk
     s0 = s.str().size ();
     }
@@ -190,7 +189,7 @@ void test_free_wydu ()
     {
     stringstream s;
     const string wkt = "WKT";
-    write_spoc_file (s, pc, wkt);
+    write_spoc_file (s, wkt, pc);
     // Save the size on disk
     s1 = s.str().size ();
     }
@@ -200,7 +199,7 @@ void test_free_wydu ()
     {
     stringstream s;
     const string wkt = "WKT";
-    write_spoc_file (s, pc, wkt);
+    write_spoc_file (s, wkt, pc);
     // Save the size on disk
     s2 = s.str().size ();
     }
@@ -214,7 +213,7 @@ void test_free_wydu ()
     {
     stringstream s;
     const string wkt = "WKT";
-    write_spoc_file (s, pc, wkt);
+    write_spoc_file (s, wkt, pc);
     // Save the size on disk
     s3 = s.str().size ();
     }

@@ -35,26 +35,38 @@ int main (int argc, char **argv)
         // Read into spoc_file struct
         spoc_file f = read_spoc_file (cin);
 
+        nlohmann::json j;
+
         if (args.header_info)
         {
-            if (args.json)
-            {
-                nlohmann::json j;
-                j["npoints"] = f.get_npoints ();
-                j["wkt"] = f.get_wkt ();
-                cout << j.dump(4) << endl;
-            }
-            else
-            {
-                cout << "npoints\t" << f.get_npoints () << endl;
-                cout << "wkt\t" << f.get_wkt () << endl;
-            }
+            j["header"]["major_version"] = f.get_major_version ();
+            j["header"]["minor_version"] = f.get_minor_version ();
+            j["header"]["wkt"] = f.get_wkt ();
+            j["header"]["npoints"] = f.get_npoints ();
         }
 
         for (size_t i = 0; i < f.get_npoints(); ++i)
         {
             // Get the point record
             const auto p = f.get (i);
+        }
+
+        j["points"]["x"] = f.get_x ().size ();
+        j["points"]["y"] = f.get_y ().size ();
+        j["points"]["z"] = f.get_z ().size ();
+
+        if (args.json)
+            cout << j.dump(4) << endl;
+        else
+        {
+            for (auto i = j.begin(); i != j.end(); ++i)
+            {
+                cout << i.key() << endl;
+                for (auto k = i->begin(); k != i->end(); ++k)
+                {
+                    cout << "\t" << k.key() << "\t" << k.value() << endl;
+                }
+            }
         }
 
         return 0;

@@ -49,7 +49,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "writing records to stdout" << endl;
 
-        write_spoc_file (cout, point_records, wkt);
+        write_spoc_file (cout, wkt, point_records);
 
         return 0;
     }
