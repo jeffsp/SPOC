@@ -44,6 +44,7 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [X] FreeWYDU support in memory and disk footprints
 * [X] Gitlab runner
 * [X] CI/CD
+* [ ] Version number in header
 * [ ] Test data files
 * [ ] Unit test suite
 * [ ] Integration test suite

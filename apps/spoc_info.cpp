@@ -35,24 +35,19 @@ int main (int argc, char **argv)
         // Read into spoc_file struct
         spoc_file f = read_spoc_file (cin);
 
-        clog << f.get_signature () << endl;
-        clog << f.get_npoints () << endl;
-        clog << f.get_x ().size () << endl;
-        clog << f.get_wkt () << endl;
         if (args.header_info)
         {
             if (args.json)
             {
-                /*
                 nlohmann::json j;
-                j["wkt"] = f.get_wkt ();
                 j["npoints"] = f.get_npoints ();
+                j["wkt"] = f.get_wkt ();
                 cout << j.dump(4) << endl;
-                */
             }
             else
             {
                 cout << "npoints\t" << f.get_npoints () << endl;
+                cout << "wkt\t" << f.get_wkt () << endl;
             }
         }
 
