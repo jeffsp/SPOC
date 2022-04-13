@@ -158,6 +158,10 @@ class spoc_file
         for (size_t j = 0; j < extra.size (); ++j)
             set (extra[j], n, pr.extra[j]);
     }
+    void set_wkt (const std::string &s)
+    {
+        wkt = s;
+    }
     // Resize the number of records in the spoc_file to 'n'
     void resize (const size_t n)
     {
@@ -198,9 +202,7 @@ class spoc_file
     // I/O
     friend std::ostream &operator<< (std::ostream &s, const spoc_file &f);
     friend void write_spoc_file (std::ostream &s, const spoc_file &f);
-    friend void write_spoc_file (std::ostream &s, const std::vector<point_record> &point_records, const std::string &wkt);
     friend spoc_file read_spoc_file (std::istream &s);
-    friend std::vector<point_record> read_spoc_file (std::istream &s, std::string &wkt);
 
     private:
     // Data
@@ -325,33 +327,12 @@ inline void write_spoc_file (std::ostream &s,
 {
     // Stuff the records into a spoc_file struct
     spoc_file f;
-    f.npoints = point_records.size ();
-    f.x.resize (f.npoints);
-    f.y.resize (f.npoints);
-    f.z.resize (f.npoints);
-    f.c.resize (f.npoints);
-    f.p.resize (f.npoints);
-    f.i.resize (f.npoints);
-    f.r.resize (f.npoints);
-    f.g.resize (f.npoints);
-    f.b.resize (f.npoints);
-    for (size_t j = 0; j < f.extra.size (); ++j)
-        f.extra[j].resize (f.npoints);
-    for (size_t i = 0; i < f.npoints; ++i)
-    {
-        f.x[i] = point_records[i].x;
-        f.y[i] = point_records[i].y;
-        f.z[i] = point_records[i].z;
-        f.c[i] = point_records[i].c;
-        f.p[i] = point_records[i].p;
-        f.i[i] = point_records[i].i;
-        f.r[i] = point_records[i].r;
-        f.g[i] = point_records[i].g;
-        f.b[i] = point_records[i].b;
-        for (size_t j = 0; j < f.extra.size (); ++j)
-            f.extra[j][i] = point_records[i].extra[j];
-    }
-    f.wkt = wkt;
+    f.resize (point_records.size ());
+    for (size_t i = 0; i < f.get_npoints (); ++i)
+        f.set (i, point_records[i]);
+
+    // Set WKT
+    f.set_wkt (wkt);
 
     // Release unused fields
     f.reallocate ();
@@ -361,29 +342,25 @@ inline void write_spoc_file (std::ostream &s,
 }
 
 template<typename T>
-inline void read_compressed (std::istream &s, std::vector<T> &x)
+inline std::vector<T> read_compressed (std::istream &s, const size_t size)
 {
     // Get number of compressed bytes
     uint64_t n = 0;
     s.read (reinterpret_cast<char*>(&n), sizeof(uint64_t));
 
-    // If a '0' was written, the bytes are all zeros
+    // If a '0' was written, the vector is empty
     if (n == 0)
-    {
-        std::fill (std::begin (x), std::end (x), 0);
-        return;
-    }
+        return std::vector<T> ();
 
     // Read compressed bytes
     std::vector<uint8_t> c (n);
     s.read (reinterpret_cast<char *> (&c[0]), n);
 
     // Decompress
-    std::vector<T> d (x.size ());
-    spoc::decompress (c, reinterpret_cast<uint8_t *> (&d[0]), d.size () * sizeof(T));
+    std::vector<T> x (size);
+    spoc::decompress (c, reinterpret_cast<uint8_t *> (&x[0]), x.size () * sizeof(T));
 
-    // Commit
-    x = d;
+    return x;
 }
 
 inline spoc_file read_spoc_file (std::istream &s)
@@ -402,36 +379,22 @@ inline spoc_file read_spoc_file (std::istream &s)
         throw std::runtime_error ("Invalid SPOC file signature");
 
     // Read number of points
-    uint64_t npoints = 0;
-    s.read (reinterpret_cast<char*>(&npoints), sizeof(uint64_t));
-
-    // Resize vectors
-    f.x.resize (npoints);
-    f.y.resize (npoints);
-    f.z.resize (npoints);
-    f.c.resize (npoints);
-    f.p.resize (npoints);
-    f.i.resize (npoints);
-    f.r.resize (npoints);
-    f.g.resize (npoints);
-    f.b.resize (npoints);
-    for (size_t j = 0; j < f.extra.size (); ++j)
-        f.extra[j].resize (npoints);
+    s.read (reinterpret_cast<char*>(&f.npoints), sizeof(uint64_t));
 
     // Read data
-    read_compressed (s, f.x);
-    read_compressed (s, f.y);
-    read_compressed (s, f.z);
-    read_compressed (s, f.c);
-    read_compressed (s, f.p);
-    read_compressed (s, f.i);
-    read_compressed (s, f.r);
-    read_compressed (s, f.g);
-    read_compressed (s, f.b);
+    f.x = read_compressed<double> (s, f.npoints);
+    f.y = read_compressed<double> (s, f.npoints);
+    f.z = read_compressed<double> (s, f.npoints);
+    f.c = read_compressed<uint16_t> (s, f.npoints);
+    f.p = read_compressed<uint16_t> (s, f.npoints);
+    f.i = read_compressed<uint16_t> (s, f.npoints);
+    f.r = read_compressed<uint16_t> (s, f.npoints);
+    f.g = read_compressed<uint16_t> (s, f.npoints);
+    f.b = read_compressed<uint16_t> (s, f.npoints);
 
     // Extra fields
     for (size_t j = 0; j < f.extra.size (); ++j)
-        read_compressed (s, f.extra[j]);
+        f.extra[j] = read_compressed<uint64_t> (s, f.npoints);
 
     // WKT
     uint64_t len = 0;
@@ -452,25 +415,13 @@ inline std::vector<point_record> read_spoc_file (std::istream &s, std::string &w
     spoc_file f = read_spoc_file (s);
 
     // Stuff data points into a vector
-    std::vector<point_record> point_records (f.x.size ());
+    std::vector<point_record> point_records (f.get_npoints ());
 
     for (size_t i = 0; i < point_records.size (); ++i)
-    {
-        point_records[i].x = f.x[i];
-        point_records[i].y = f.y[i];
-        point_records[i].z = f.z[i];
-        point_records[i].c = f.c[i];
-        point_records[i].p = f.p[i];
-        point_records[i].i = f.i[i];
-        point_records[i].r = f.r[i];
-        point_records[i].g = f.g[i];
-        point_records[i].b = f.b[i];
-        for (size_t j = 0; j < f.extra.size (); ++j)
-            point_records[i].extra[j] = f.extra[j][i];
-    }
+        point_records[i] = f.get (i);
 
     // Commit
-    wkt = f.wkt;
+    wkt = f.get_wkt ();
 
     return point_records;
 }
