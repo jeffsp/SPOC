@@ -1,100 +1,113 @@
 #include "test_utils.h"
-#include <iostream>
 #include <any>
+#include <iostream>
 #include <memory>
 #include <vector>
 #include <stdexcept>
 
-using namespace std;
-
 // JSON Definition
-using jvalue = std::any; // string, int, double, bool, jobject, jarray
-using jobject = vector<pair<string,jvalue>>;
-using jarray = vector<jvalue>;
+namespace json
+{
 
-inline std::ostream &operator<< (std::ostream &s, const jvalue &v);
-inline std::ostream &operator<< (std::ostream &s, const jarray &ja)
+// json::value can be any of:
+//      string,
+//      const char *,
+//      int,
+//      float,
+//      double,
+//      bool,
+//      json::object,
+//      json::array
+using value = std::any;
+using object = std::vector<std::pair<std::string,value>>;
+using array = std::vector<value>;
+
+} // namespace json
+
+inline std::ostream &operator<< (std::ostream &s, const json::value &v);
+inline std::ostream &operator<< (std::ostream &s, const json::array &a)
 {
     s << "[ ";
-    auto i = ja.begin ();
-    while (i != ja.end ())
+    auto i = a.begin ();
+    while (i != a.end ())
     {
         s << *i++;
-        if (i != ja.end ())
+        if (i != a.end ())
             s << ", ";
     }
     s << " ]";
     return s;
 }
 
-inline std::ostream &operator<< (std::ostream &s, const jobject &jo)
+inline std::ostream &operator<< (std::ostream &s, const json::object &o)
 {
-    s << "{" << endl;
-    auto i = jo.begin ();
-    while (i != jo.end ())
+    s << "{" << std::endl;
+    auto i = o.begin ();
+    while (i != o.end ())
     {
         s << "'" << i->first << "'";
         s << " : ";
         s << i->second;
         ++i;
-        if (i != jo.end ())
+        if (i != o.end ())
             s << ", ";
-        s << endl;
+        s << std::endl;
     }
     s << "}";
     return s;
 }
 
-inline std::ostream &operator<< (std::ostream &s, const jvalue &v)
+inline std::ostream &operator<< (std::ostream &s, const json::value &v)
 {
     if (v.type () == typeid (int))
-        clog << any_cast<int> (v);
+        std::clog << std::any_cast<int> (v);
     else if (v.type () == typeid (float))
-        clog << any_cast<float> (v);
+        std::clog << std::any_cast<float> (v);
     else if (v.type () == typeid (bool))
-        clog << boolalpha << any_cast<bool> (v);
+        std::clog << std::boolalpha << any_cast<bool> (v);
     else if (v.type () == typeid (double))
-        clog << any_cast<double> (v);
-    else if (v.type () == typeid (string))
-        clog << "'" << any_cast<string> (v) << "'";
+        std::clog << std::any_cast<double> (v);
+    else if (v.type () == typeid (std::string))
+        std::clog << "'" << std::any_cast<std::string> (v) << "'";
     else if (v.type () == typeid (const char *))
-        clog << "'" << any_cast<const char *> (v) << "'";
-    else if (v.type () == typeid (jarray))
-        clog << any_cast<jarray> (v);
-    else if (v.type () == typeid (jobject))
-        clog << any_cast<jobject> (v);
+        std::clog << "'" << std::any_cast<const char *> (v) << "'";
+    else if (v.type () == typeid (json::array))
+        std::clog << std::any_cast<json::array> (v);
+    else if (v.type () == typeid (json::object))
+        std::clog << std::any_cast<json::object> (v);
     else
-        clog << "unknown type: " << v.type().name();
+        std::clog << "unknown type: " << v.type().name();
     return s;
 }
 
 void test_json ()
 {
-    jobject j;
-    j.push_back (make_pair (string ("xyz"), jvalue {12345}));
-    j.push_back (make_pair ("hammy", jvalue { "asdf" }));
-    j.push_back (make_pair ("blah", jvalue { 1.0f }));
-    j.push_back (make_pair ("foo", jvalue { string ("bar") }));
-    j.push_back (make_pair (string ("x"), jvalue { 2.3 }));
-    j.push_back (make_pair ("y", jvalue { false }));
+    json::object j;
+    j.push_back (make_pair (std::string ("xyz"), json::value {12345}));
+    j.push_back (make_pair ("hammy", json::value { "asdf" }));
+    j.push_back (make_pair ("blah", json::value { 1.0f }));
+    j.push_back (make_pair ("foo", json::value { std::string ("bar") }));
+    j.push_back (make_pair (std::string ("x"), json::value { 2.3 }));
+    j.push_back (make_pair ("y", json::value { false }));
 
-    jarray ja;
-    ja.push_back (jvalue { 333 });
-    ja.push_back (jvalue { "666" });
-    ja.push_back (jvalue { 9.99 });
-    j.push_back (make_pair ("369", jvalue { ja }));
+    json::array ja;
+    ja.push_back (json::value { 333 });
+    ja.push_back (json::value { "666" });
+    ja.push_back (json::value { 9.99 });
+    j.push_back (make_pair ("369", json::value { ja }));
 
-    jobject jo;
-    jo.push_back (make_pair ("superstring1", jvalue {-1}));
-    jo.push_back (make_pair ("superstring2", jvalue {-2}));
-    j.push_back (make_pair ("ss12", jvalue { jo }));
-    clog << j << endl;
+    json::object jo;
+    jo.push_back (make_pair ("superstring1", json::value {-1}));
+    jo.push_back (make_pair ("superstring2", json::value {-2}));
+    j.push_back (make_pair ("ss12", json::value { jo }));
+    std::clog << j << std::endl;
 
     verify (false);
 }
 
 int main (int argc, char **argv)
 {
+    using namespace std;
     try
     {
         test_json ();
