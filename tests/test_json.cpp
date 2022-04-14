@@ -11,15 +11,71 @@ using namespace std;
 using jvalue = std::any; // string, int, double, bool, jobject, jarray
 using jobject = vector<pair<string,jvalue>>;
 using jarray = vector<jvalue>;
-using json = jobject;
+
+inline std::ostream &operator<< (std::ostream &s, const jvalue &v);
+inline std::ostream &operator<< (std::ostream &s, const jarray &ja)
+{
+    s << "[ ";
+    auto i = ja.begin ();
+    while (i != ja.end ())
+    {
+        s << *i++;
+        if (i != ja.end ())
+            s << ", ";
+    }
+    s << " ]";
+    return s;
+}
+
+inline std::ostream &operator<< (std::ostream &s, const jobject &jo)
+{
+    s << "{" << endl;
+    auto i = jo.begin ();
+    while (i != jo.end ())
+    {
+        s << "'" << i->first << "'";
+        s << " : ";
+        s << i->second;
+        ++i;
+        if (i != jo.end ())
+            s << ", ";
+        s << endl;
+    }
+    s << "}";
+    return s;
+}
+
+inline std::ostream &operator<< (std::ostream &s, const jvalue &v)
+{
+    if (v.type () == typeid (int))
+        clog << any_cast<int> (v);
+    else if (v.type () == typeid (float))
+        clog << any_cast<float> (v);
+    else if (v.type () == typeid (bool))
+        clog << boolalpha << any_cast<bool> (v);
+    else if (v.type () == typeid (double))
+        clog << any_cast<double> (v);
+    else if (v.type () == typeid (string))
+        clog << "'" << any_cast<string> (v) << "'";
+    else if (v.type () == typeid (const char *))
+        clog << "'" << any_cast<const char *> (v) << "'";
+    else if (v.type () == typeid (jarray))
+        clog << any_cast<jarray> (v);
+    else if (v.type () == typeid (jobject))
+        clog << any_cast<jobject> (v);
+    else
+        clog << "unknown type: " << v.type().name();
+    return s;
+}
 
 void test_json ()
 {
-    json j;
-    j.push_back (make_pair ("xyz", jvalue {12345}));
+    jobject j;
+    j.push_back (make_pair (string ("xyz"), jvalue {12345}));
     j.push_back (make_pair ("hammy", jvalue { "asdf" }));
     j.push_back (make_pair ("blah", jvalue { 1.0f }));
-    j.push_back (make_pair ("x", jvalue { 2.3 }));
+    j.push_back (make_pair ("foo", jvalue { string ("bar") }));
+    j.push_back (make_pair (string ("x"), jvalue { 2.3 }));
     j.push_back (make_pair ("y", jvalue { false }));
 
     jarray ja;
@@ -32,31 +88,7 @@ void test_json ()
     jo.push_back (make_pair ("superstring1", jvalue {-1}));
     jo.push_back (make_pair ("superstring2", jvalue {-2}));
     j.push_back (make_pair ("ss12", jvalue { jo }));
-    clog << "{" << endl;
-    for (auto i : j)
-    {
-        clog << i.first << '\t';
-        if (i.second.type () == typeid (int))
-            clog << any_cast<int> (i.second );
-        else if (i.second.type () == typeid (float))
-            clog << any_cast<float> (i.second );
-        else if (i.second.type () == typeid (bool))
-            clog << boolalpha << any_cast<bool> (i.second );
-        else if (i.second.type () == typeid (double))
-            clog << any_cast<double> (i.second );
-        else if (i.second.type () == typeid (string))
-            clog << any_cast<string> (i.second );
-        else if (i.second.type () == typeid (const char *))
-            clog << any_cast<const char *> (i.second );
-        else if (i.second.type () == typeid (jarray))
-            clog << "jarray";
-        else if (i.second.type () == typeid (jobject))
-            clog << "jobject";
-        else
-            clog << "unknown type: " << i.second.type().name();
-        clog << endl;
-    }
-    clog << "}" << endl;
+    clog << j << endl;
 
     verify (false);
 }
