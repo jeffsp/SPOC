@@ -61,6 +61,8 @@ clean:
 .PHONY: test # Run tests
 test:
 	@echo "Testing..."
+	./build/debug/test_json
+	./build/release/test_json
 	./build/debug/test_spoc
 	./build/release/test_spoc
 	./build/debug/test_compress

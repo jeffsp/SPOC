@@ -14,6 +14,7 @@ endmacro()
 
 add_test(test_compress)
 add_test(test_extent)
+add_test(test_json)
 add_test(test_spoc)
 
 macro(add_app name)
