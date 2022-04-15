@@ -1,170 +1,15 @@
+#include "json.h"
 #include "test_utils.h"
 #include <any>
 #include <iostream>
 #include <map>
-#include <memory>
 #include <vector>
 #include <stdexcept>
 
-namespace json
-{
-
-// JSON Definition
-//
-// json::value can be any of:
-//      string,
-//      const char *,
-//      int,
-//      float,
-//      double,
-//      bool,
-//      json::object,
-//      json::array
-using value = std::any;
-
-// json::object maps strings to values
-using object = std::map<std::string,value>;
-
-// json::array is a vector of json::values
-using array = std::vector<value>;
-
-} // namespace json
-
-inline void print_indents (std::ostream &s, const int indents)
-{
-    for (auto i = 0; i < indents; ++i)
-        s << "    ";
-}
-
-inline void pretty_print (std::ostream &s, const json::value &v, const int indents);
-inline void pretty_print (std::ostream &s, const json::array &a, const int indents)
-{
-    s << "[ ";
-    auto i = a.begin ();
-    while (i != a.end ())
-    {
-        pretty_print (s, *i++, indents);
-        if (i != a.end ())
-            s << ", ";
-    }
-    s << " ]";
-}
-
-inline void pretty_print (std::ostream &s, const json::object &o, const int indents)
-{
-    s << "{" << std::endl;
-    auto i = o.begin ();
-    while (i != o.end ())
-    {
-        print_indents (s, indents + 1);
-        s << "'" << i->first << "'";
-        s << " : ";
-        pretty_print (s, i->second, indents + 1);
-        ++i;
-        if (i != o.end ())
-            s << ", ";
-        s << std::endl;
-    }
-    print_indents (s, indents);
-    s << "}";
-}
-
-inline void pretty_print (std::ostream &s, const json::value &v, const int indents)
-{
-    if (v.type () == typeid (int))
-    {
-        s << std::any_cast<int> (v);
-    }
-    else if (v.type () == typeid (float))
-    {
-        s << std::any_cast<float> (v);
-    }
-    else if (v.type () == typeid (bool))
-    {
-        s << std::boolalpha;
-        s << std::any_cast<bool> (v);
-    }
-    else if (v.type () == typeid (double))
-    {
-        s << std::any_cast<double> (v);
-    }
-    else if (v.type () == typeid (std::string))
-    {
-        s << "'";
-        s << std::any_cast<std::string> (v);
-        s << "'";
-    }
-    else if (v.type () == typeid (const char *))
-    {
-        s << "'";
-        s << std::any_cast<const char *> (v);
-        s << "'";
-    }
-    else if (v.type () == typeid (json::array))
-        pretty_print (s, std::any_cast<json::array> (v), indents);
-    else if (v.type () == typeid (json::object))
-        pretty_print (s, std::any_cast<json::object> (v), indents);
-    else
-        s << "unknown type: " << v.type().name();
-}
-
-inline std::ostream &operator<< (std::ostream &s, const json::value &v);
-inline std::ostream &operator<< (std::ostream &s, const json::array &a)
-{
-    s << "[ ";
-    auto i = a.begin ();
-    while (i != a.end ())
-    {
-        s << *i++;
-        if (i != a.end ())
-            s << ", ";
-    }
-    s << " ]";
-    return s;
-}
-
-inline std::ostream &operator<< (std::ostream &s, const json::object &o)
-{
-    s << "{ ";
-    auto i = o.begin ();
-    while (i != o.end ())
-    {
-        s << "'" << i->first << "'";
-        s << " : ";
-        s << i->second;
-        ++i;
-        if (i != o.end ())
-            s << ", ";
-    }
-    s << " }";
-    return s;
-}
-
-inline std::ostream &operator<< (std::ostream &s, const json::value &v)
-{
-    if (v.type () == typeid (int))
-        std::clog << std::any_cast<int> (v);
-    else if (v.type () == typeid (float))
-        std::clog << std::any_cast<float> (v);
-    else if (v.type () == typeid (bool))
-        std::clog << std::boolalpha << std::any_cast<bool> (v);
-    else if (v.type () == typeid (double))
-        std::clog << std::any_cast<double> (v);
-    else if (v.type () == typeid (std::string))
-        std::clog << "'" << std::any_cast<std::string> (v) << "'";
-    else if (v.type () == typeid (const char *))
-        std::clog << "'" << std::any_cast<const char *> (v) << "'";
-    else if (v.type () == typeid (json::array))
-        std::clog << std::any_cast<json::array> (v);
-    else if (v.type () == typeid (json::object))
-        std::clog << std::any_cast<json::object> (v);
-    else
-        std::clog << "unknown type: " << v.type().name();
-    return s;
-}
-
 void test_json ()
 {
+    using namespace spoc;
+    using namespace json;
     json::object j;
     j[std::string ("xyz")] = 12345;
     j["hammy"] = "asdf";
@@ -205,18 +50,18 @@ void test_json ()
     jj["header"] = header;
     jj["summary"] = summary;
 
-    std::clog << "j " << std::endl;
-    std::clog << j << std::endl;
-    std::clog << "jj " << std::endl;
-    std::clog << jj << std::endl;
+    std::stringstream ss;
+    ss << "j " << std::endl;
+    ss << j << std::endl;
+    ss << "jj " << std::endl;
+    ss << jj << std::endl;
 
-    std::clog << "j " << std::endl;
-    pretty_print (std::clog, j, 0);
-    std::clog << std::endl;
-    std::clog << "jj " << std::endl;
-    pretty_print (std::clog, jj, 0);
-    std::clog << std::endl;
-    verify (false);
+    ss << "j " << std::endl;
+    pretty_print (ss, j, 0);
+    ss << std::endl;
+    ss << "jj " << std::endl;
+    pretty_print (ss, jj, 0);
+    ss << std::endl;
 }
 
 int main (int argc, char **argv)

@@ -1,3 +1,4 @@
+#include "json.h"
 #include "spoc.h"
 #include "spoc_info_cmd.h"
 #include "json.h"
@@ -7,27 +8,33 @@
 #include <string>
 
 template<typename T,typename U>
-std::map<std::string,T> get_summary (const U &x)
+spoc::json::object get_summary (const U &x)
 {
-    std::map<std::string,T> m;
+    // Return value
+    spoc::json::object s;
+
+    // Handle the empty case
     if (x.empty ())
     {
-        m.insert ({"size", 0});
-        m.insert ({"min", 0});
-        m.insert ({"max", 0});
-        return m;
+        s["size"] = 0;
+        s["min"] = 0;
+        s["max"] = 0;
+        return s;
     }
+
     // Copy
     auto y (x);
+
+    // Get Quantiles
     const size_t n = y.size ();
     std::sort (begin (y), end (y));
-    m.insert ({"range", y.back() - y.front()});
-    m.insert ({"q0", y.front()});
-    m.insert ({"q1", y[n / 4]});
-    m.insert ({"q2", y[n / 2]});
-    m.insert ({"q3", y[3 * n / 4]});
-    m.insert ({"q4", y.back()});
-    return m;
+    s["range"] = y.back() - y.front();
+    s["q0"] = y.front();
+    s["q1"] = y[n / 4];
+    s["q2"] = y[n / 2];
+    s["q3"] = y[3 * n / 4];
+    s["q4"] = y.back();
+    return s;
 }
 
 int main (int argc, char **argv)
@@ -60,43 +67,53 @@ int main (int argc, char **argv)
         // Read into spoc_file struct
         spoc_file f = read_spoc_file (cin);
 
-        nlohmann::json j;
-
-        if (args.header_info)
-        {
-            j["header"]["major_version"] = f.get_major_version ();
-            j["header"]["minor_version"] = f.get_minor_version ();
-            j["header"]["wkt"] = f.get_wkt ();
-            j["header"]["npoints"] = f.get_npoints ();
-        }
-
-        if (args.summary_info)
-        {
-            for (size_t i = 0; i < f.get_npoints(); ++i)
-            {
-                // Get the point record
-                const auto p = f.get (i);
-            }
-
-            j["summary"]["x"] = get_summary<double> (f.get_x ());
-            j["summary"]["y"] = get_summary<double> (f.get_y ());
-            j["summary"]["z"] = get_summary<double> (f.get_z ());
-            j["summary"]["c"] = get_summary<uint16_t> (f.get_c ());
-            j["summary"]["p"] = get_summary<uint16_t> (f.get_p ());
-            j["summary"]["i"] = get_summary<uint16_t> (f.get_i ());
-            j["summary"]["r"] = get_summary<uint16_t> (f.get_r ());
-            j["summary"]["g"] = get_summary<uint16_t> (f.get_g ());
-            j["summary"]["b"] = get_summary<uint16_t> (f.get_b ());
-            for (size_t k = 0; k < f.get_extra ().size (); ++k)
-                j["summary"]["extra"][std::to_string(k)] = get_summary<uint64_t> (f.get_extra ()[k]);
-        }
+        cout.precision (15);
+        cout << fixed;
 
         if (args.json)
         {
-            cout << j.dump(4) << endl;
+            json::object j;
+
+            if (args.header_info)
+            {
+                json::object h;
+                h["major_version"] = f.get_major_version ();
+                h["minor_version"] = f.get_minor_version ();
+                h["wkt"] = f.get_wkt ();
+                h["npoints"] = f.get_npoints ();
+                j["header"] = h;
+            }
+
+            if (args.summary_info)
+            {
+                for (size_t i = 0; i < f.get_npoints(); ++i)
+                {
+                    // Get the point record
+                    const auto p = f.get (i);
+                }
+                json::object s;
+
+                s["x"] = get_summary<double> (f.get_x ());
+                s["y"] = get_summary<double> (f.get_y ());
+                s["z"] = get_summary<double> (f.get_z ());
+                s["c"] = get_summary<uint16_t> (f.get_c ());
+                s["p"] = get_summary<uint16_t> (f.get_p ());
+                s["i"] = get_summary<uint16_t> (f.get_i ());
+                s["r"] = get_summary<uint16_t> (f.get_r ());
+                s["g"] = get_summary<uint16_t> (f.get_g ());
+                s["b"] = get_summary<uint16_t> (f.get_b ());
+                json::array a;
+                for (size_t k = 0; k < f.get_extra ().size (); ++k)
+                    a.push_back (get_summary<uint64_t> (f.get_extra ()[k]));
+                s["extra"] = a;
+                j["summary"] = s;
+            }
+
+            json::pretty_print (cout, j, 0);
         }
         else
         {
+            /*
             for (auto i1 = j.begin(); i1 != j.end(); ++i1)
             {
                 cout << i1.key() << endl;
@@ -105,7 +122,10 @@ int main (int argc, char **argv)
                     cout << "\t" << i2.key() << "\t" << i2.value() << endl;
                 }
             }
+            */
         }
+
+        cout << endl;
 
         return 0;
     }

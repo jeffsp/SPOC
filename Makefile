@@ -29,11 +29,10 @@ prep_merge: cppcheck clean cmake compile test memcheck
 cppcheck:
 	@echo "Running cppcheck..."
 	@cppcheck --enable=all -q --error-exitcode=255 \
-		-I include -I apps -I laslib/LASlib/inc -I include/json \
+		-I include -I apps -I laslib/LASlib/inc \
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
 		--suppress='*:laslib/LASlib/inc/*' \
-		--suppress='*:include/json/*' \
 		apps/*.cpp
 
 .PHONY: cmake # Use cmake to generate Makefiles
