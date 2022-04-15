@@ -87,7 +87,7 @@ inline void pretty_print (std::ostream &s, const json::value &v, const int inden
     }
     else if (v.type () == typeid (uint8_t))
     {
-        s << std::any_cast<uint8_t> (v);
+        s << int (std::any_cast<uint8_t> (v));
     }
     else if (v.type () == typeid (uint16_t))
     {
@@ -173,7 +173,7 @@ inline std::ostream &operator<< (std::ostream &s, const json::value &v)
     else if (v.type () == typeid (char))
         s << int (std::any_cast<char> (v));
     else if (v.type () == typeid (uint8_t))
-        s << std::any_cast<uint8_t> (v);
+        s << int (std::any_cast<uint8_t> (v));
     else if (v.type () == typeid (uint16_t))
         s << std::any_cast<uint16_t> (v);
     else if (v.type () == typeid (uint32_t))
