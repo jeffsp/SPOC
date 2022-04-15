@@ -28,20 +28,85 @@ using object = std::map<std::string,value>;
 // json::array is a vector of json::values
 using array = std::vector<value>;
 
-struct json
-{
-    json ()
-    {
-    }
-    ::json::object root;
-    /*
-    ::json::object &operator[] (const std::string &key)
-    {
-    }
-    */
-};
-
 } // namespace json
+
+inline void print_indents (std::ostream &s, const int indents)
+{
+    for (auto i = 0; i < indents; ++i)
+        s << "    ";
+}
+
+inline void pretty_print (std::ostream &s, const json::value &v, const int indents);
+inline void pretty_print (std::ostream &s, const json::array &a, const int indents)
+{
+    s << "[ ";
+    auto i = a.begin ();
+    while (i != a.end ())
+    {
+        pretty_print (s, *i++, indents);
+        if (i != a.end ())
+            s << ", ";
+    }
+    s << " ]";
+}
+
+inline void pretty_print (std::ostream &s, const json::object &o, const int indents)
+{
+    s << "{" << std::endl;
+    auto i = o.begin ();
+    while (i != o.end ())
+    {
+        print_indents (s, indents + 1);
+        s << "'" << i->first << "'";
+        s << " : ";
+        pretty_print (s, i->second, indents + 1);
+        ++i;
+        if (i != o.end ())
+            s << ", ";
+        s << std::endl;
+    }
+    print_indents (s, indents);
+    s << "}";
+}
+
+inline void pretty_print (std::ostream &s, const json::value &v, const int indents)
+{
+    if (v.type () == typeid (int))
+    {
+        s << std::any_cast<int> (v);
+    }
+    else if (v.type () == typeid (float))
+    {
+        s << std::any_cast<float> (v);
+    }
+    else if (v.type () == typeid (bool))
+    {
+        s << std::boolalpha;
+        s << std::any_cast<bool> (v);
+    }
+    else if (v.type () == typeid (double))
+    {
+        s << std::any_cast<double> (v);
+    }
+    else if (v.type () == typeid (std::string))
+    {
+        s << "'";
+        s << std::any_cast<std::string> (v);
+        s << "'";
+    }
+    else if (v.type () == typeid (const char *))
+    {
+        s << "'";
+        s << std::any_cast<const char *> (v);
+        s << "'";
+    }
+    else if (v.type () == typeid (json::array))
+        pretty_print (s, std::any_cast<json::array> (v), indents);
+    else if (v.type () == typeid (json::object))
+        pretty_print (s, std::any_cast<json::object> (v), indents);
+    else
+        s << "unknown type: " << v.type().name();
+}
 
 inline std::ostream &operator<< (std::ostream &s, const json::value &v);
 inline std::ostream &operator<< (std::ostream &s, const json::array &a)
@@ -60,7 +125,7 @@ inline std::ostream &operator<< (std::ostream &s, const json::array &a)
 
 inline std::ostream &operator<< (std::ostream &s, const json::object &o)
 {
-    s << "{" << std::endl;
+    s << "{ ";
     auto i = o.begin ();
     while (i != o.end ())
     {
@@ -70,9 +135,8 @@ inline std::ostream &operator<< (std::ostream &s, const json::object &o)
         ++i;
         if (i != o.end ())
             s << ", ";
-        s << std::endl;
     }
-    s << "}";
+    s << " }";
     return s;
 }
 
@@ -83,7 +147,7 @@ inline std::ostream &operator<< (std::ostream &s, const json::value &v)
     else if (v.type () == typeid (float))
         std::clog << std::any_cast<float> (v);
     else if (v.type () == typeid (bool))
-        std::clog << std::boolalpha << any_cast<bool> (v);
+        std::clog << std::boolalpha << std::any_cast<bool> (v);
     else if (v.type () == typeid (double))
         std::clog << std::any_cast<double> (v);
     else if (v.type () == typeid (std::string))
@@ -117,7 +181,6 @@ void test_json ()
     ja[1] = 666.66;
     ja.push_back (9.99);
     ja.push_back (ja);
-    ja.push_back (ja);
     j["369"] = ja;
 
     json::object jo;
@@ -127,13 +190,32 @@ void test_json ()
     j["xxx"] = ja;
     j["ss12"] = jo;
 
-    std::clog << j << std::endl;
+    json::object header;
+    header["major_version"] = 1;
+    header["minor_version"] = 4;
+    json::object summary;
+    summary["x"] = 100.1;
+    summary["y"] = 100.1;
+    json::array a;
+    a.push_back (1);
+    a.push_back (2);
+    a.push_back (3);
+    summary["list"] = a;
+    json::object jj;
+    jj["header"] = header;
+    jj["summary"] = summary;
 
-    json::json jj;
-    //jj.add ("xyz", 12345);
-    //j["header"]["major_version"] = 4;
-    //j["summary"]["x"]["range"] = 100.1;
-    //j["summary"]["x"]["min"][0] = 100.1;
+    std::clog << "j " << std::endl;
+    std::clog << j << std::endl;
+    std::clog << "jj " << std::endl;
+    std::clog << jj << std::endl;
+
+    std::clog << "j " << std::endl;
+    pretty_print (std::clog, j, 0);
+    std::clog << std::endl;
+    std::clog << "jj " << std::endl;
+    pretty_print (std::clog, jj, 0);
+    std::clog << std::endl;
     verify (false);
 }
 
