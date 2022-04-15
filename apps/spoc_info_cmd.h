@@ -18,6 +18,7 @@ struct args
     bool json = true;
     bool header_info = true;
     bool summary_info = true;
+    bool compact = true;
 };
 
 inline args get_args (int argc, char **argv, const std::string &usage)
@@ -32,10 +33,11 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"json", no_argument, 0,  'j' },
             {"header-info", no_argument, 0,  'e' },
             {"summary-info", no_argument, 0,  's' },
+            {"compact", no_argument, 0,  'c' },
             {0,      0,           0,  0 }
         };
 
-        int c = getopt_long(argc, argv, "hvjes", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvjesc", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -55,6 +57,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 'j': args.json = !args.json; break;
             case 'e': args.header_info = !args.header_info; break;
             case 's': args.summary_info = !args.summary_info; break;
+            case 'c': args.compact = !args.compact; break;
         }
     }
 
