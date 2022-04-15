@@ -5,10 +5,11 @@
 #include <vector>
 #include <stdexcept>
 
-// JSON Definition
 namespace json
 {
 
+// JSON Definition
+//
 // json::value can be any of:
 //      string,
 //      const char *,
@@ -19,8 +20,29 @@ namespace json
 //      json::object,
 //      json::array
 using value = std::any;
+
+// json::object is a vector of string,json::value pairs
+//
+// vectors are used because we want to preserve the order
 using object = std::vector<std::pair<std::string,value>>;
+
+// json::array is a vector of json::values
+//
+// vectors are used because we want to preserve the order
 using array = std::vector<value>;
+
+struct json
+{
+    json ()
+    {
+    }
+    ::json::object root;
+    /*
+    ::json::object &operator[] (const std::string &key)
+    {
+    }
+    */
+};
 
 } // namespace json
 
@@ -93,15 +115,28 @@ void test_json ()
     json::array ja;
     ja.push_back (json::value { 333 });
     ja.push_back (json::value { "666" });
+    ja[1] = "66666";
+    ja[1] = 66666;
+    ja[1] = 666.66;
     ja.push_back (json::value { 9.99 });
+    ja.push_back (json::value { ja });
+    ja.push_back (json::value { ja });
     j.push_back (make_pair ("369", json::value { ja }));
 
     json::object jo;
     jo.push_back (make_pair ("superstring1", json::value {-1}));
     jo.push_back (make_pair ("superstring2", json::value {-2}));
+    jo[0].second = -3;
+    ja.push_back (json::value { jo });
+    j.push_back (make_pair ("xxx", json::value { ja }));
     j.push_back (make_pair ("ss12", json::value { jo }));
     std::clog << j << std::endl;
 
+    json::json jj;
+    //jj.add ("xyz", 12345);
+    //j["header"]["major_version"] = 4;
+    //j["summary"]["x"]["range"] = 100.1;
+    //j["summary"]["x"]["min"][0] = 100.1;
     verify (false);
 }
 
