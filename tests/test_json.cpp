@@ -1,6 +1,7 @@
 #include "test_utils.h"
 #include <any>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <vector>
 #include <stdexcept>
@@ -21,14 +22,10 @@ namespace json
 //      json::array
 using value = std::any;
 
-// json::object is a vector of string,json::value pairs
-//
-// vectors are used because we want to preserve the order
-using object = std::vector<std::pair<std::string,value>>;
+// json::object maps strings to values
+using object = std::map<std::string,value>;
 
 // json::array is a vector of json::values
-//
-// vectors are used because we want to preserve the order
 using array = std::vector<value>;
 
 struct json
@@ -105,31 +102,31 @@ inline std::ostream &operator<< (std::ostream &s, const json::value &v)
 void test_json ()
 {
     json::object j;
-    j.push_back (make_pair (std::string ("xyz"), json::value {12345}));
-    j.push_back (make_pair ("hammy", json::value { "asdf" }));
-    j.push_back (make_pair ("blah", json::value { 1.0f }));
-    j.push_back (make_pair ("foo", json::value { std::string ("bar") }));
-    j.push_back (make_pair (std::string ("x"), json::value { 2.3 }));
-    j.push_back (make_pair ("y", json::value { false }));
+    j[std::string ("xyz")] = 12345;
+    j["hammy"] = "asdf";
+    j["blah"] = 1.0f;
+    j["foo"] = std::string ("bar");
+    j[std::string ("x")] = 2.3;
+    j["y"] = false;
 
     json::array ja;
-    ja.push_back (json::value { 333 });
-    ja.push_back (json::value { "666" });
+    ja.push_back (333);
+    ja.push_back ("666");
     ja[1] = "66666";
     ja[1] = 66666;
     ja[1] = 666.66;
-    ja.push_back (json::value { 9.99 });
-    ja.push_back (json::value { ja });
-    ja.push_back (json::value { ja });
-    j.push_back (make_pair ("369", json::value { ja }));
+    ja.push_back (9.99);
+    ja.push_back (ja);
+    ja.push_back (ja);
+    j["369"] = ja;
 
     json::object jo;
-    jo.push_back (make_pair ("superstring1", json::value {-1}));
-    jo.push_back (make_pair ("superstring2", json::value {-2}));
-    jo[0].second = -3;
-    ja.push_back (json::value { jo });
-    j.push_back (make_pair ("xxx", json::value { ja }));
-    j.push_back (make_pair ("ss12", json::value { jo }));
+    jo["superstring1"] = -1;
+    jo["superstring2"] = -2;
+    ja.push_back (jo);
+    j["xxx"] = ja;
+    j["ss12"] = jo;
+
     std::clog << j << std::endl;
 
     json::json jj;
