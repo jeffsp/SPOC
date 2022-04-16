@@ -68,7 +68,7 @@ inline void pretty_print (std::ostream &s, const json::object &o, const int inde
         pretty_print (s, i->second, indents + 1);
         ++i;
         if (i != o.end ())
-            s << ", ";
+            s << ",";
         s << std::endl;
     }
     print_indents (s, indents);

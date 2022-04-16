@@ -18,11 +18,13 @@ The aim of this file format is to be a subset of the LAS file format.
 
 The proposed extension is SPOC, standing for Simple POint Cloud.
 
-* Points are stored as sets
+* Points are stored as vectors
     * The order of the point records is preserved
     * It is uncommon for two points to have the same exact location in
     3D space
-* Point locations have 12 digits of precision preserved
+* Point locations are stored as 64-bit double precision numbers, so
+  about 16 decimal digits of precision is preserved, assuming an IEEE
+  754 standard.
 
 # Requirements
 
@@ -30,6 +32,10 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
     The memory footprint is zero for fields that are all zero. When
     point clouds are resized each field is checked, and fields that
     contain all 0's are cleared and their memory is freed.
+    Setting individual point values does not trigger a resizing check --
+    only resizing operations, or a explicit call to `reallocate()` will
+    trigger checks. Also, writing a non-zero value to a field that
+    contains all zeros will trigger a resize operation for that field.
 * Linear complexity
 * 64-bit doubles
 * Don't rely on data being spatially arranged
@@ -58,7 +64,7 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [ ] spoc decimate
 * [ ] spoc dump: Dump the contents of a spoc file as text
 * [ ] spoc field\_filter: 2D/3D spatial filtering: does not changes xyz coords
-* [ ] spoc info
+* [X] spoc info
 * [ ] spoc interpolate
 * [ ] spoc las2spoc
 * [ ] spoc merge

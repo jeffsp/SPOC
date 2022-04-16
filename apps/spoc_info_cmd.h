@@ -15,7 +15,7 @@ struct args
 {
     bool help = false;
     bool verbose = false;
-    bool json = true;
+    bool json = false;
     bool header_info = true;
     bool summary_info = true;
     bool compact = true;
