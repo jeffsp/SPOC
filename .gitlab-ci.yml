@@ -3,12 +3,10 @@ build:
   script:
     - make cppcheck
     - make cmake compile
-  artifacts:
+  cache:
     paths:
       - build/debug/*
       - build/release/*
-  cache:
-    paths:
       - laslib/LASlib/src/*.o
       - laslib/LASzip/src/*.o
 
