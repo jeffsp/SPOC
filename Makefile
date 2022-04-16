@@ -40,8 +40,10 @@ cmake:
 	@echo "Running cmake..."
 	@mkdir -p build/debug
 	@mkdir -p build/release
+	@mkdir -p build/coverage
 	@cd build/debug && cmake -DCMAKE_BUILD_TYPE=Debug ../..
 	@cd build/release && cmake -DCMAKE_BUILD_TYPE=Release ../..
+	@cd build/coverage && cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_COVERAGE=ON ../..
 
 .PHONY: laslib # Build LASlib library
 laslib:
@@ -51,23 +53,24 @@ laslib:
 compile: laslib
 	cd build/debug && make -j 24
 	cd build/release && make -j 24
+	cd build/coverage && make -j 24
 
 .PHONY: clean # Clean build objects
 clean:
 	@echo "Cleaning..."
 	@rm -rf build
 
+.PHONY: unit_test
+unit_test: BUILD=debug
+unit_test:
+	@echo ===== $(BUILD) =====
+	@parallel --jobs 24 --halt now,fail=1 "echo {} && {}" ::: build/$(BUILD)/test_*
+
 .PHONY: test # Run tests
 test:
 	@echo "Testing..."
-	./build/debug/test_json
-	./build/release/test_json
-	./build/debug/test_spoc
-	./build/release/test_spoc
-	./build/debug/test_compress
-	./build/release/test_compress
-	./build/debug/test_extent
-	./build/release/test_extent
+	@$(MAKE) --no-print-directory unit_test BUILD=debug
+	@$(MAKE) --no-print-directory unit_test BUILD=release
 
 .PHONY: memcheck # Run memcheck
 memcheck:

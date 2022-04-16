@@ -44,6 +44,10 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * Streaming is not supported. Point clouds are random-access. Point
   clouds are assumed to fit into memory.
 * Linux pipes are supported (not for LASlib I/O files)
+* Avoid dependencies
+    * zlib compression library
+    * laslib for las/spoc translation utilities
+* Functional programming style: avoid OOP
 
 # TODO
 

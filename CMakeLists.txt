@@ -5,11 +5,27 @@ cmake_minimum_required(VERSION 3.0.0)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 
+find_package(OpenMP REQUIRED)
+
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
+option(BUILD_COVERAGE "Build for coverage testing" OFF)
+
+# Set appropriate compiler flags
+if(BUILD_COVERAGE)
+   set(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage -fPIC -Wall -Werror -Wno-main -Wno-sign-compare ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+else()
+   set(CMAKE_CXX_FLAGS "-Wall -Werror -Wno-main -Wno-sign-compare ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
 include_directories(./include ./include/json)
 
 macro(add_test name)
     add_executable(${name} ./tests/${name}.cpp)
-    target_link_libraries(${name} z)
+    target_link_libraries(${name} gmp z)
 endmacro()
 
 add_test(test_compress)
@@ -19,7 +35,7 @@ add_test(test_spoc)
 
 macro(add_app name)
     add_executable(${name} ./apps/${name}.cpp)
-    target_link_libraries(${name} z)
+    target_link_libraries(${name} gmp z)
 endmacro()
 
 add_app(text2spoc)
@@ -28,7 +44,7 @@ add_app(spoc_info)
 
 macro(add_laslib_app name)
     add_executable(${name} ./apps/${name}.cpp)
-    target_link_libraries(${name} z ${CMAKE_SOURCE_DIR}/laslib/LASlib/lib/liblas.a)
+    target_link_libraries(${name} gmp z ${CMAKE_SOURCE_DIR}/laslib/LASlib/lib/liblas.a)
     include_directories(laslib/LASlib/inc)
     include_directories(laslib/LASzip/src)
 endmacro()
