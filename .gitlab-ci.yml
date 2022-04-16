@@ -2,7 +2,7 @@ build:
   stage: build
   script:
     - make cppcheck
-    - make cmake compile
+    - make cmake build
   artifacts:
     paths:
       - build/debug/*
