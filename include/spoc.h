@@ -266,7 +266,9 @@ inline std::ostream &operator<< (std::ostream &s, const spoc_file &f)
     for (size_t j = 0; j < f.extra.size (); ++j)
     {
         s << "extra[" << j << "]";
-        for (auto i : f.extra[j]) s << " " << i; s << std::endl;
+        for (auto i : f.extra[j])
+            s << " " << i;
+        s << std::endl;
     }
     return s;
 }

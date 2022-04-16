@@ -1,4 +1,4 @@
-default: compile test
+default: build test
 
 .PHONY: convert_laz # Convert LAS files to LAZ files
 convert_laz:
@@ -23,7 +23,7 @@ compare:
 		$$(realpath ../results/spoc_file_format)
 
 .PHONY: prep_merge # Prepare for merging
-prep_merge: cppcheck clean cmake compile test memcheck
+prep_merge: cppcheck clean cmake build test memcheck
 
 .PHONY: cppcheck # Run cppcheck
 cppcheck:
@@ -49,8 +49,8 @@ cmake:
 laslib:
 	$(MAKE) -j -C laslib/LASlib
 
-.PHONY: compile # Compile all applications and tests
-compile: laslib
+.PHONY: build # Compile all applications and tests
+build: laslib
 	cd build/debug && make -j 24
 	cd build/release && make -j 24
 	cd build/coverage && make -j 24

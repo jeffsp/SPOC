@@ -14,11 +14,10 @@ endif()
 
 option(BUILD_COVERAGE "Build for coverage testing" OFF)
 
-# Set appropriate compiler flags
 if(BUILD_COVERAGE)
-   set(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage -fPIC -Wall -Werror -Wno-main -Wno-sign-compare ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+   set(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage -fPIC -Wall -Werror -Wno-class-memaccess ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 else()
-   set(CMAKE_CXX_FLAGS "-Wall -Werror -Wno-main -Wno-sign-compare ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "-Wall -Werror -Wno-class-memaccess ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 include_directories(./include ./include/json)

@@ -149,11 +149,6 @@ int main (int argc, char **argv)
 
             if (args.summary_info)
             {
-                for (size_t i = 0; i < f.get_npoints(); ++i)
-                {
-                    // Get the point record
-                    const auto p = f.get (i);
-                }
                 json::object s;
 
                 s["x"] = get_summary_object<double> (f.get_x ());
