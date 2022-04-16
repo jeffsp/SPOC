@@ -23,12 +23,13 @@ compare:
 		$$(realpath ../results/spoc_file_format)
 
 .PHONY: prep_merge # Prepare for merging
-prep_merge: cppcheck clean cmake build test memcheck
+prep_merge: cppcheck clean cmake build test memcheck coverage
 
 .PHONY: cppcheck # Run cppcheck
 cppcheck:
 	@echo "Running cppcheck..."
-	@cppcheck --enable=all -q --error-exitcode=255 \
+	@cppcheck --std=c++14 --language=c++ --enable=all \
+		-q --error-exitcode=255 \
 		-I include -I apps -I laslib/LASlib/inc \
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
@@ -81,6 +82,15 @@ memcheck:
 	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_extent
 	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_spoc
 	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_spoc
+
+.PHONY: coverage # Generate a coverage report
+coverage: build
+	@$(MAKE) --no-print-directory unit_test BUILD=coverage
+	@mkdir -p ./code_analysis
+	@echo "Running gcovr..."
+	@cd build/coverage/ && gcovr -r ../.. \
+		--filter=../../include . | tee ../../code_analysis/coverage.txt
+	@grep TOTAL code_analysis/coverage.txt
 
 .PHONY: help # Generate list of targets with descriptions
 help:

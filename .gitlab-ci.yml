@@ -17,3 +17,11 @@ test:
   script:
     - make test
     - make memcheck
+
+coverage:
+  stage: test
+  script:
+    - make coverage
+  artifacts:
+    paths:
+    - code_analysis/coverage.txt

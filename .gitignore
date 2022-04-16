@@ -1,4 +1,5 @@
 build
+code_analysis
 *.o
 *.a
 laslib/LASlib/example/lasexample
