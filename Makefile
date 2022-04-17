@@ -76,12 +76,10 @@ test:
 .PHONY: memcheck # Run memcheck
 memcheck:
 	@echo "Running memchecks..."
-	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_compress
-	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_compress
-	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_extent
-	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_extent
-	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/debug/test_spoc
-	@valgrind --leak-check=full --error-exitcode=1 --quiet ./build/release/test_spoc
+	@parallel --jobs 24 --halt now,fail=1 \
+		"echo {} && valgrind --leak-check=full --error-exitcode=1 --quiet {}" ::: build/debug/test_*
+	@parallel --jobs 24 --halt now,fail=1 \
+		"echo {} && valgrind --leak-check=full --error-exitcode=1 --quiet {}" ::: build/release/test_*
 
 .PHONY: coverage # Generate a coverage report
 coverage: build
