@@ -90,6 +90,11 @@ coverage: build
 		--filter=../../include . | tee ../../code_analysis/coverage.txt
 	@grep TOTAL code_analysis/coverage.txt
 
+.PHONY: man_pages # Generate man pages
+man_pages:
+	@mkdir -p build/man
+	@find apps/*.md | xargs --verbose -P 8 -I {} bash -c 'pandoc -s -t man {} -o build/man/`basename {} .md`'
+
 .PHONY: help # Generate list of targets with descriptions
 help:
 	@grep '^.PHONY: .* #' Makefile | sed 's/\.PHONY: \(.*\) # \(.*\)/\1	\2/' | expand -t20

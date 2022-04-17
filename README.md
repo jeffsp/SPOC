@@ -56,9 +56,10 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [X] CI/CD
 * [X] Version number in header
 * [ ] Test data files
-* [ ] Unit test suite
+* [X] Unit test suite
 * [ ] Integration test suite
-* [ ] Coverage
+* [X] Man page generation
+* [X] Coverage
 * [X] Cppcheck
 * [X] read/write spoc files
 * [X] read/write las files
@@ -66,12 +67,13 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [ ] spoc connect: Connected components, saved in extra fields
 * [ ] spoc crop: 2D/3D meters/percentage/by classification/by component
 * [ ] spoc decimate
-* [ ] spoc dump: Dump the contents of a spoc file as text
+* [X] spoc spoc2text/text2spoc
 * [ ] spoc field\_filter: 2D/3D spatial filtering: does not changes xyz coords
 * [X] spoc info
 * [ ] spoc interpolate
 * [ ] spoc las2spoc
-* [ ] spoc merge
+* [ ] spoc merge: optionally set point source id
+* [ ] spoc neighbors: set index of neighbors in the extra fields
 * [ ] spoc octree: break into files arranged as an octree
 * [ ] spoc quantize: on voxel boundaries
 * [ ] spoc sort: by field/by voxel
