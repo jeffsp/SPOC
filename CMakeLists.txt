@@ -37,8 +37,8 @@ macro(add_app name)
     target_link_libraries(${name} gmp z)
 endmacro()
 
-add_app(text2spoc)
-add_app(spoc2text)
+add_app(spoc_text2spoc)
+add_app(spoc_spoc2text)
 add_app(spoc_info)
 
 macro(add_laslib_app name)
@@ -48,5 +48,5 @@ macro(add_laslib_app name)
     include_directories(laslib/LASzip/src)
 endmacro()
 
-add_laslib_app(las2spoc)
-add_laslib_app(spoc2las)
+add_laslib_app(spoc_las2spoc)
+add_laslib_app(spoc_spoc2las)

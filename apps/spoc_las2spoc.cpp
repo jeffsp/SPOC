@@ -1,4 +1,4 @@
-#include "las2spoc_cmd.h"
+#include "spoc_las2spoc_cmd.h"
 #include "lasreader.hpp"
 #include "spoc.h"
 #include <iostream>
@@ -73,11 +73,12 @@ int main (int argc, char **argv)
         }
 
         if (args.verbose)
+        {
             clog << point_records.size () << " point records read" << endl;
 
-        // Write them to specified file
-        if (args.verbose)
+            // Write them to specified file
             clog << "writing records to " << args.output_fn << endl;
+        }
 
         ofstream ofs (args.output_fn);
         if (!ofs)

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include "spoc.h"
-#include "text2spoc_cmd.h"
+#include "spoc_text2spoc_cmd.h"
 
 int main (int argc, char **argv)
 {

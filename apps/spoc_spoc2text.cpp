@@ -3,7 +3,7 @@
 #include <limits>
 #include <sstream>
 #include "spoc.h"
-#include "spoc2text_cmd.h"
+#include "spoc_spoc2text_cmd.h"
 
 int main (int argc, char **argv)
 {

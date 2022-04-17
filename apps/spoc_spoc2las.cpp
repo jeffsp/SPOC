@@ -1,4 +1,4 @@
-#include "las2spoc_cmd.h"
+#include "spoc_las2spoc_cmd.h"
 #include "laswriter.hpp"
 #include "spoc.h"
 #include <chrono>
@@ -59,10 +59,10 @@ int main (int argc, char **argv)
         auto point_records = read_spoc_file (ifs, wkt);
 
         if (args.verbose)
+        {
             clog << point_records.size () << " point records read" << endl;
-
-        if (args.verbose)
             clog << "read " << wkt.size () << " byte WKT" << endl;
+        }
 
         // Get min x, y, z
         double min_x = numeric_limits<double>::max ();
