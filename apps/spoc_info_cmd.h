@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include <stdexcept>
 #include <string>
+#include <vector>
 #include "cmd.h"
 
 namespace spoc
@@ -19,6 +20,7 @@ struct args
     bool header_info = true;
     bool summary_info = true;
     bool compact = true;
+    std::vector<std::string> fns;
 };
 
 inline args get_args (int argc, char **argv, const std::string &usage)
@@ -61,8 +63,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
         }
     }
 
-    if (optind != argc)
-        throw std::runtime_error ("Too many command line arguments were specified");
+    while (optind < argc)
+        args.fns.push_back (argv[optind++]);
 
     return args;
 }

@@ -8,7 +8,7 @@ spoc_info - Print information about a SPOC file to stdout
 
 # USAGE
 
-spoc_info [*options*] < *filename.spoc*
+spoc_info [*options*] [*file*]
 
 # DESCRIPTION
 

@@ -74,7 +74,7 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [ ] spoc las2spoc
 * [ ] spoc merge: optionally set point source id
 * [ ] spoc neighbors: set index of neighbors in the extra fields
-* [ ] spoc octree: break into files arranged as an octree
+* [ ] spoc octree: break into files arranged as an octree, access/create spoc files
 * [ ] spoc quantize: on voxel boundaries
 * [ ] spoc sort: by field/by voxel
 * [ ] spoc spatial\_filter: 2D/3D spatial filtering: changes 3D structure

@@ -100,6 +100,87 @@ std::string get_summary_string (const std::string &label, const U &x, const bool
     return s.str ();
 }
 
+// Process a spoc file and write to stdout
+void process (const spoc::cmd::args &args, const spoc::spoc_file &f)
+{
+    using namespace std;
+    using namespace spoc;
+
+    cout.precision (15);
+    cout << fixed;
+
+    if (args.json)
+    {
+        json::object j;
+
+        if (args.header_info)
+        {
+            json::object h;
+            h["major_version"] = f.get_major_version ();
+            h["minor_version"] = f.get_minor_version ();
+            h["wkt"] = f.get_wkt ();
+            h["npoints"] = f.get_npoints ();
+            j["header"] = h;
+        }
+
+        if (args.summary_info)
+        {
+            json::object s;
+
+            s["x"] = get_summary_object<double> (f.get_x ());
+            s["y"] = get_summary_object<double> (f.get_y ());
+            s["z"] = get_summary_object<double> (f.get_z ());
+            s["c"] = get_summary_object<uint16_t> (f.get_c ());
+            s["p"] = get_summary_object<uint16_t> (f.get_p ());
+            s["i"] = get_summary_object<uint16_t> (f.get_i ());
+            s["r"] = get_summary_object<uint16_t> (f.get_r ());
+            s["g"] = get_summary_object<uint16_t> (f.get_g ());
+            s["b"] = get_summary_object<uint16_t> (f.get_b ());
+            json::array a;
+            for (size_t k = 0; k < f.get_extra ().size (); ++k)
+                a.push_back (get_summary_object<uint64_t> (f.get_extra ()[k]));
+            s["extra"] = a;
+            j["summary"] = s;
+        }
+
+        if (args.compact)
+            spoc::json::operator<<(cout, j);
+        else
+            json::pretty_print (cout, j, 0);
+    }
+    else
+    {
+        if (args.header_info)
+        {
+            cout << "major_version\t" << int (f.get_major_version ()) << endl;
+            cout << "minor_version\t" << int (f.get_minor_version ()) << endl;
+            cout << "wkt\t" << f.get_wkt () << endl;
+            cout << "npoints\t" << f.get_npoints () << endl;
+        }
+
+        if (args.summary_info)
+        {
+            cout << get_summary_string<double> ("x\t", f.get_x (), args.compact);
+            cout << get_summary_string<double> ("y\t", f.get_y (), args.compact);
+            cout << get_summary_string<double> ("z\t", f.get_z (), args.compact);
+            cout << get_summary_string<uint16_t> ("c\t", f.get_c (), args.compact);
+            cout << get_summary_string<uint16_t> ("p\t", f.get_p (), args.compact);
+            cout << get_summary_string<uint16_t> ("i\t", f.get_i (), args.compact);
+            cout << get_summary_string<uint16_t> ("r\t", f.get_r (), args.compact);
+            cout << get_summary_string<uint16_t> ("g\t", f.get_g (), args.compact);
+            cout << get_summary_string<uint16_t> ("b\t", f.get_b (), args.compact);
+            for (size_t k = 0; k < f.get_extra ().size (); ++k)
+            {
+                stringstream s;
+                s.precision (3);
+                s << fixed;
+                s << "extra " << k << "\t";
+                cout << get_summary_string<uint16_t> (s.str (), f.get_extra ()[k], args.compact);
+            }
+        }
+    }
+}
+
 int main (int argc, char **argv)
 {
     using namespace std;
@@ -119,88 +200,38 @@ int main (int argc, char **argv)
         if (args.verbose)
         {
             clog << "verbose\t" << args.verbose << endl;
-            clog << "json\t " << args.json << endl;
-            clog << "header-info\t " << args.header_info << endl;
-            clog << "summary-info\t " << args.summary_info << endl;
+            clog << "json\t" << args.json << endl;
+            clog << "header-info\t" << args.header_info << endl;
+            clog << "summary-info\t" << args.summary_info << endl;
+            clog << "filenames\t" << args.fns.size () << endl;
         }
 
-        if (args.verbose)
-            clog << "Reading from stdin" << endl;
-
-        // Read into spoc_file struct
-        spoc_file f = read_spoc_file (cin);
-
-        cout.precision (15);
-        cout << fixed;
-
-        if (args.json)
+        if (args.fns.empty ())
         {
-            json::object j;
+            if (args.verbose)
+                clog << "Reading from stdin" << endl;
 
-            if (args.header_info)
-            {
-                json::object h;
-                h["major_version"] = f.get_major_version ();
-                h["minor_version"] = f.get_minor_version ();
-                h["wkt"] = f.get_wkt ();
-                h["npoints"] = f.get_npoints ();
-                j["header"] = h;
-            }
+            // Read into spoc_file struct
+            spoc_file f = read_spoc_file (cin);
 
-            if (args.summary_info)
-            {
-                json::object s;
-
-                s["x"] = get_summary_object<double> (f.get_x ());
-                s["y"] = get_summary_object<double> (f.get_y ());
-                s["z"] = get_summary_object<double> (f.get_z ());
-                s["c"] = get_summary_object<uint16_t> (f.get_c ());
-                s["p"] = get_summary_object<uint16_t> (f.get_p ());
-                s["i"] = get_summary_object<uint16_t> (f.get_i ());
-                s["r"] = get_summary_object<uint16_t> (f.get_r ());
-                s["g"] = get_summary_object<uint16_t> (f.get_g ());
-                s["b"] = get_summary_object<uint16_t> (f.get_b ());
-                json::array a;
-                for (size_t k = 0; k < f.get_extra ().size (); ++k)
-                    a.push_back (get_summary_object<uint64_t> (f.get_extra ()[k]));
-                s["extra"] = a;
-                j["summary"] = s;
-            }
-
-            if (args.compact)
-                spoc::json::operator<<(cout, j);
-            else
-                json::pretty_print (cout, j, 0);
+            process (args, f);
         }
         else
         {
-            if (args.header_info)
+            for (auto fn : args.fns)
             {
-                cout << "major_version\t" << int (f.get_major_version ()) << endl;
-                cout << "minor_version\t" << int (f.get_minor_version ()) << endl;
-                cout << "wkt\t" << f.get_wkt () << endl;
-                cout << "npoints\t" << f.get_npoints () << endl;
-            }
+                if (args.verbose)
+                    clog << "Reading " << fn << endl;
 
-            if (args.summary_info)
-            {
-                cout << get_summary_string<double> ("x\t", f.get_x (), args.compact);
-                cout << get_summary_string<double> ("y\t", f.get_y (), args.compact);
-                cout << get_summary_string<double> ("z\t", f.get_z (), args.compact);
-                cout << get_summary_string<uint16_t> ("c\t", f.get_c (), args.compact);
-                cout << get_summary_string<uint16_t> ("p\t", f.get_p (), args.compact);
-                cout << get_summary_string<uint16_t> ("i\t", f.get_i (), args.compact);
-                cout << get_summary_string<uint16_t> ("r\t", f.get_r (), args.compact);
-                cout << get_summary_string<uint16_t> ("g\t", f.get_g (), args.compact);
-                cout << get_summary_string<uint16_t> ("b\t", f.get_b (), args.compact);
-                for (size_t k = 0; k < f.get_extra ().size (); ++k)
-                {
-                    stringstream s;
-                    s.precision (3);
-                    s << fixed;
-                    s << "extra " << k << "\t";
-                    cout << get_summary_string<uint16_t> (s.str (), f.get_extra ()[k], args.compact);
-                }
+                ifstream ifs (fn);
+
+                if (!ifs)
+                    throw runtime_error ("Could not open file for reading");
+
+                // Read into spoc_file struct
+                spoc_file f = read_spoc_file (ifs);
+
+                process (args, f);
             }
         }
 

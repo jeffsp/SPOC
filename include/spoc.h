@@ -190,7 +190,7 @@ class spoc_file
     const char *get_signature () const { return signature; }
     const uint8_t get_major_version () const { return major_version; }
     const uint8_t get_minor_version () const { return minor_version; }
-    const std::string get_wkt () { return wkt; }
+    const std::string get_wkt () const { return wkt; }
     const size_t get_npoints () const { return npoints; }
     const std::vector<double> get_x () const { return x; }
     const std::vector<double> get_y () const { return y; }
