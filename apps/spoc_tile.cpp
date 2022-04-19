@@ -1,11 +1,10 @@
 #include "spoc.h"
 #include "spoc_tile_cmd.h"
 #include <algorithm>
-#include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <stdexcept>
-#include <string>
 
 using namespace std;
 using namespace spoc;
@@ -18,7 +17,7 @@ int main (int argc, char **argv)
     try
     {
         // Parse command line
-        cmd::args args = cmd::get_args (argc, argv,
+        const cmd::args args = cmd::get_args (argc, argv,
                 string (argv[0]) + " [options] < spocfile");
 
         // If you are getting help, exit without an error
@@ -35,132 +34,176 @@ int main (int argc, char **argv)
             clog << "prefix\t'" << args.prefix << "'" << endl;
         }
 
-        /*
-        // Open the las file
-        using P = point3d<point_data>;
-        using L = las_file<P>;
+        if (args.verbose)
+            clog << "Reading " << args.fn << endl;
+
+        ifstream ifs (args.fn);
+
+        if (!ifs)
+            throw runtime_error ("Could not open file for reading");
+
+        // Read into spoc_file struct
+        spoc_file f = read_spoc_file (ifs);
 
         if (args.verbose)
-            clog << "Opening " << args.input_filename << endl;
+            clog << "Total points " << f.get_npoints () << endl;
 
-        L las (args.input_filename);
+        const auto x = f.get_x ();
+        const auto y = f.get_y ();
+
+        if (x.empty ())
+            throw std::runtime_error ("No X values");
+        if (y.empty ())
+            throw std::runtime_error ("No Y values");
+
+        // Get minimum and maximum X and Y values
+        const double minx = *std::min_element (begin(x), end(x));
+        const double maxx = *std::max_element (begin(x), end(x));
+        const double miny = *std::min_element (begin(y), end(y));
+        const double maxy = *std::max_element (begin(y), end(y));
+
+        // Get difference in X and Y extents
+        //
+        // Add a small amount to handle rounding
+        const double dx = maxx - minx + std::numeric_limits<float>::epsilon ();
+        const double dy = maxy - miny + std::numeric_limits<float>::epsilon ();
+
+        // Determine dimension of one side of a tile
+        const double units_per_tile = (args.tile_size > 0.0)
+            ? args.tile_size
+            : ((dx > dy) ? dx / args.tiles : dy / args.tiles);
 
         if (args.verbose)
-            clog << "Reading points " << endl;
-
-        auto pc = las.get_points ();
-
-        if (args.verbose)
-            clog << "Total points " << pc.size () << endl;
-
-        const double resolution = 1.0;
-        const auto min = get_rounded_min_coords (pc, resolution);
-        const auto max = get_rounded_max_coords (pc, resolution);
-        const auto delta_x = max.x - min.x;
-        const auto delta_y = max.y - min.y;
-
-        if (args.verbose)
-        {
-            write_las_info (clog, las);
-            write_pc_info (clog, pc);
-        }
-
-        // Determine dimension of one side in meters -- always round up
-        // to the next highest integral number of meters.
-        double meters_per_tile = std::ceil (delta_x > delta_y ? delta_x / args.tiles : delta_y / args.tiles);
-
-        if (args.verbose)
-            clog << meters_per_tile << " X " << meters_per_tile << " meter tiles" << endl;
+            clog << "Tiles are " << units_per_tile << " X " << units_per_tile << " tiles" << endl;
 
         // Determine number of tiles
-        const size_t x_tiles = std::ceil (delta_x / meters_per_tile);
-        const size_t y_tiles = std::ceil (delta_y / meters_per_tile);
-        const size_t total_tiles = x_tiles * y_tiles;
+        const size_t xtiles = dx / units_per_tile;
+        const size_t ytiles = dy / units_per_tile;
+        const size_t total_tiles = xtiles * ytiles;
 
         if (args.verbose)
-            clog << x_tiles << " X " << y_tiles << " = " << total_tiles << " total tiles" << endl;
+            clog << xtiles << " X " << ytiles << " = " << total_tiles << " total tiles" << endl;
 
-        // Allocate 2D grid of tiles
-        raster<vector<P>> pcs (y_tiles, x_tiles);
+        // Count the number of points in each tile
+        std::vector<size_t> point_counts (xtiles * ytiles);
 
-        // Split into tiles
         if (args.verbose)
-            clog << "Splitting point cloud into tiles" << endl;
+            clog << "Counting points in each tile" << endl;
 
-        // For each point in the point cloud
-        for (auto p : pc)
+        // For each point in the file...
+        for (size_t n = 0; n < f.get_npoints (); ++n)
         {
-            // Get the point
-            const auto x = p.x;
-            const auto y = p.y;
+            // Get point 'n'
+            const auto p = f.get (n);
 
-            assert (min.y <= y);
-            assert (min.y <= y);
+            // Determine which tile the point belongs to
+            size_t nx = (p.x - minx) / units_per_tile;
+            size_t ny = (p.y - miny) / units_per_tile;
 
-            // Determine grid cell
-            size_t row = (y - min.y) / meters_per_tile;
-            size_t col = (x - min.x) / meters_per_tile;
+            assert (nx < xtiles);
+            assert (ny < ytiles);
 
-            // Handle special cases
-            if (row > 0 && row == pcs.rows ())
-                --row;
-            if (col > 0 && col == pcs.cols ())
-                --col;
+            // Map tile to vector index
+            const size_t point_counts_index = ny * xtiles + nx;
+            assert (point_counts_index < point_counts.size ());
 
-            assert (row < pcs.rows ());
-            assert (col < pcs.cols ());
+            // Count it
+            ++point_counts[point_counts_index];
+        }
 
-            // Insert it in at this grid cell
-            pcs (row, col).push_back (p);
+        // Allocate vector of spoc_files, one for each tile
+        std::vector<spoc_file> spoc_files (point_counts.size ());
+
+        // Resize each spoc_file according to its counts
+        for (size_t i = 0; i < spoc_files.size (); ++i)
+            spoc_files.resize (point_counts[i]);
+
+        // Keep track of the current spoc_file point index
+        std::vector<size_t> current_point_indexes (spoc_files.size ());
+
+        if (args.verbose)
+            clog << "Splitting spoc file into tiles" << endl;
+
+        // For each point in the file...
+        for (size_t n = 0; n < f.get_npoints (); ++n)
+        {
+            // Get point 'n'
+            const auto p = f.get (n);
+
+            // Determine which tile the point belongs to
+            size_t nx = (p.x - minx) / units_per_tile;
+            size_t ny = (p.y - miny) / units_per_tile;
+
+            assert (nx < xtiles);
+            assert (ny < ytiles);
+
+            // Map tile to vector index
+            const size_t spoc_file_index = ny * xtiles + nx;
+            assert (spoc_file_index < spoc_files.size ());
+            assert (spoc_file_index < current_point_indexes.size ());
+
+            // Get the current index for this spoc file, and update the index
+            const size_t index = current_point_indexes[spoc_file_index]++;
+            // Set the point in the appropriate spoc file
+            spoc_files[spoc_file_index].set (index, p);
         }
 
         // Check the prefix
-        if (args.prefix.empty ())
+        auto prefix = args.prefix;
+        if (prefix.empty ())
         {
+            // TODO: use C++ pathname header instead
+            //
             // It's empty, so use the filename
-            string fn = args.input_filename;
+            string fn = args.fn;
             // Get rid of the path
             fn = fn.substr (fn.find_last_of("/\\") + 1);
             // Get rid of extension
-            args.prefix = fn.substr (0, fn.find_last_of ("."));
+            prefix = fn.substr (0, fn.find_last_of ("."));
         }
 
-        assert (!args.prefix.empty ());
+        assert (!prefix.empty ());
 
         // Write each tile
         if (args.verbose)
             clog << "Writing tiles" << endl;
 
-        for (size_t i = 0; i < total_tiles; ++i)
+        for (size_t i = 0; i < spoc_files.size (); ++i)
         {
             // Get the filename extension
-            const string &fn = args.input_filename;
+            const string &fn = args.fn;
             const string ext = fn.substr (fn.find_last_of ("."));
 
             // Generate the filename
-            stringstream sfn;
-            sfn << args.prefix << i << ext;
+            std::stringstream sfn;
 
-            // Check if file already exists, but only if we might prompt
-            if (!args.yes)
+            // TODO determine how many significant digits are needed
+            sfn << prefix << i << ext;
+
+            // Check if file already exists
+            if (!args.force)
             {
                 if (args.verbose)
-                    clog << "Checking " << sfn.str () << endl;
-                ifstream f (sfn.str ());
-                if (f.good() && !yes_no_prompt ("File exists. Overwrite? [yn]"))
-                    continue;
+                    clog << "Checking if '" << sfn.str () << "' exists" << endl;
+                ifstream tmp_ifs (sfn.str ());
+                if (tmp_ifs.good())
+                    throw std::runtime_error ("File already exists. "
+                        "Use the force option to overwrite. "
+                        "Aborting.");
             }
 
             if (args.verbose)
                 clog << "Writing " << sfn.str () << endl;
 
-            // Set the points for this tile
-            las.set_points (pcs[i]);
+            std::ofstream ofs (sfn.str ());
 
-            // Write it
-            las.write (sfn.str ());
-        /////
-        */
+            if (!ofs)
+                throw std::runtime_error ("Could not open file for writing");
+
+            // Write it out
+            assert (i < spoc_files.size ());
+            spoc::write_spoc_file (ofs, spoc_files[i]);
+        }
 
         return 0;
     }
