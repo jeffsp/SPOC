@@ -34,7 +34,7 @@ cppcheck:
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
 		--suppress='*:laslib/LASlib/inc/*' \
-		apps/*.cpp
+		apps/*/*.cpp
 
 .PHONY: cmake # Use cmake to generate Makefiles
 cmake:

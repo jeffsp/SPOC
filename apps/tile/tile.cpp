@@ -1,5 +1,5 @@
 #include "spoc.h"
-#include "spoc_tile_cmd.h"
+#include "tile_cmd.h"
 #include <algorithm>
 #include <iostream>
 #include <limits>

@@ -1,6 +1,6 @@
 #include "json.h"
 #include "spoc.h"
-#include "spoc_info_cmd.h"
+#include "info_cmd.h"
 #include "json.h"
 #include <iostream>
 #include <map>

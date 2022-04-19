@@ -1,4 +1,4 @@
-#include "spoc_las2spoc_cmd.h"
+#include "las2spoc_cmd.h"
 #include "lasreader.hpp"
 #include "spoc.h"
 #include <iostream>

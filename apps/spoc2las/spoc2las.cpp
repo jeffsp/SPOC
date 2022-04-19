@@ -1,4 +1,4 @@
-#include "spoc_las2spoc_cmd.h"
+#include "spoc2las_cmd.h"
 #include "laswriter.hpp"
 #include "spoc.h"
 #include <chrono>
