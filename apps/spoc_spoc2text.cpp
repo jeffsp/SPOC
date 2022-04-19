@@ -13,7 +13,7 @@ int main (int argc, char **argv)
     try
     {
         // Parse command line
-        cmd::args args = cmd::get_args (argc, argv,
+        const cmd::args args = cmd::get_args (argc, argv,
             string (argv[0]) + " [options] < spocfile > textfile");
 
         // If you are getting help, exit without an error

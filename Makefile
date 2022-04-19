@@ -64,7 +64,6 @@ clean:
 .PHONY: unit_test
 unit_test: BUILD=debug
 unit_test:
-	@echo ===== $(BUILD) =====
 	@parallel --jobs 24 --halt now,fail=1 "echo {} && {}" ::: build/$(BUILD)/test_*
 
 .PHONY: test # Run tests
