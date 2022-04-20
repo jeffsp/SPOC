@@ -12,7 +12,7 @@ namespace info
 {
 
 template<typename T,typename U>
-spoc::json::object get_summary_object (const U &x)
+inline spoc::json::object get_summary_object (const U &x)
 {
     // Return value
     spoc::json::object s;
@@ -42,7 +42,7 @@ spoc::json::object get_summary_object (const U &x)
 }
 
 template<typename T,typename U>
-std::string get_summary_string (const std::string &label, const U &x, const bool compact)
+inline std::string get_summary_string (const std::string &label, const U &x, const bool compact)
 {
     // Return value
     std::stringstream s;
@@ -184,7 +184,6 @@ void process (const T &args, const spoc::spoc_file &f)
         }
     }
 }
-
 
 } // namespace info
 
