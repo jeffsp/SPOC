@@ -48,6 +48,9 @@ to force overwrites.
 --tiles=*#*, -t *#*
 :   Number of tiles along the largest dimension
 
+--tile-size=*#*, -s *#*
+:   Length of one side of a tile
+
 --prefix=*string*, -p *string*
 :   The prefix to use for the output files
 

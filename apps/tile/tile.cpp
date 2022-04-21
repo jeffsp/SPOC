@@ -1,4 +1,5 @@
 #include "spoc.h"
+#include "tile.h"
 #include "tile_cmd.h"
 #include <algorithm>
 #include <iostream>
@@ -48,105 +49,23 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "Total points " << f.get_npoints () << endl;
 
-        const auto x = f.get_x ();
-        const auto y = f.get_y ();
-
-        if (x.empty ())
-            throw std::runtime_error ("No X values");
-        if (y.empty ())
-            throw std::runtime_error ("No Y values");
-
-        // Get minimum and maximum X and Y values
-        const double minx = *std::min_element (begin(x), end(x));
-        const double maxx = *std::max_element (begin(x), end(x));
-        const double miny = *std::min_element (begin(y), end(y));
-        const double maxy = *std::max_element (begin(y), end(y));
-
-        // Get difference in X and Y extents
-        //
-        // Add a small amount to handle rounding
-        const double dx = maxx - minx + std::numeric_limits<float>::epsilon ();
-        const double dy = maxy - miny + std::numeric_limits<float>::epsilon ();
-
-        // Determine dimension of one side of a tile
-        const double units_per_tile = (args.tile_size > 0.0)
+        // Get the length of one side of a tile
+        const double tile_size = args.tile_size > 0.0
             ? args.tile_size
-            : ((dx > dy) ? dx / args.tiles : dy / args.tiles);
+            : spoc::tile::get_tile_size (f.get_x (), f.get_y (), args.tiles);
 
         if (args.verbose)
-            clog << "Tiles are " << units_per_tile << " X " << units_per_tile << " tiles" << endl;
+            clog << "Tiles are " << tile_size << " X " << tile_size << endl;
 
-        // Determine number of tiles
-        const size_t xtiles = dx / units_per_tile;
-        const size_t ytiles = dy / units_per_tile;
-        const size_t total_tiles = xtiles * ytiles;
+        // Get the tile index of each point in the point cloud
+        const auto indexes = spoc::tile::get_tile_indexes (f.get_x (), f.get_y (), tile_size);
 
+        // Map each tile index to a vector of point cloud indexes
+        const auto tile_map = spoc::tile::get_tile_map (indexes);
+
+        // Write each tile
         if (args.verbose)
-            clog << xtiles << " X " << ytiles << " = " << total_tiles << " total tiles" << endl;
-
-        // Count the number of points in each tile
-        std::vector<size_t> point_counts (xtiles * ytiles);
-
-        if (args.verbose)
-            clog << "Counting points in each tile" << endl;
-
-        // For each point in the file...
-        for (size_t n = 0; n < f.get_npoints (); ++n)
-        {
-            // Get point 'n'
-            const auto p = f.get (n);
-
-            // Determine which tile the point belongs to
-            size_t nx = (p.x - minx) / units_per_tile;
-            size_t ny = (p.y - miny) / units_per_tile;
-
-            assert (nx < xtiles);
-            assert (ny < ytiles);
-
-            // Map tile to vector index
-            const size_t point_counts_index = ny * xtiles + nx;
-            assert (point_counts_index < point_counts.size ());
-
-            // Count it
-            ++point_counts[point_counts_index];
-        }
-
-        // Allocate vector of spoc_files, one for each tile
-        std::vector<spoc_file> spoc_files (point_counts.size ());
-
-        // Resize each spoc_file according to its counts
-        for (size_t i = 0; i < spoc_files.size (); ++i)
-            spoc_files.resize (point_counts[i]);
-
-        // Keep track of the current spoc_file point index
-        std::vector<size_t> current_point_indexes (spoc_files.size ());
-
-        if (args.verbose)
-            clog << "Splitting spoc file into tiles" << endl;
-
-        // For each point in the file...
-        for (size_t n = 0; n < f.get_npoints (); ++n)
-        {
-            // Get point 'n'
-            const auto p = f.get (n);
-
-            // Determine which tile the point belongs to
-            size_t nx = (p.x - minx) / units_per_tile;
-            size_t ny = (p.y - miny) / units_per_tile;
-
-            assert (nx < xtiles);
-            assert (ny < ytiles);
-
-            // Map tile to vector index
-            const size_t spoc_file_index = ny * xtiles + nx;
-            assert (spoc_file_index < spoc_files.size ());
-            assert (spoc_file_index < current_point_indexes.size ());
-
-            // Get the current index for this spoc file, and update the index
-            const size_t index = current_point_indexes[spoc_file_index]++;
-            // Set the point in the appropriate spoc file
-            spoc_files[spoc_file_index].set (index, p);
-        }
+            clog << "Writing tiles" << endl;
 
         // Check the prefix
         auto prefix = args.prefix;
@@ -164,12 +83,30 @@ int main (int argc, char **argv)
 
         assert (!prefix.empty ());
 
-        // Write each tile
-        if (args.verbose)
-            clog << "Writing tiles" << endl;
-
-        for (size_t i = 0; i < spoc_files.size (); ++i)
+        // For each map entry
+        for (const auto &i : tile_map)
         {
+            // Get tile number
+            const auto n = i.first;
+
+            // The the vector of point cloud indexes
+            const auto &v = i.second;
+
+            // The file to write
+            spoc_file t;
+
+            // Set the number of points in the file
+            t.resize (v.size ());
+
+            // For each point index in this tile...
+            size_t point_index = 0;
+            for (const auto j : v)
+            {
+                // Get point 'j'
+                const auto p = f.get (j);
+                t.set (point_index++, p);
+            }
+
             // Get the filename extension
             const string &fn = args.fn;
             const string ext = fn.substr (fn.find_last_of ("."));
@@ -178,7 +115,7 @@ int main (int argc, char **argv)
             std::stringstream sfn;
 
             // TODO determine how many significant digits are needed
-            sfn << prefix << i << ext;
+            sfn << prefix << n << ext;
 
             // Check if file already exists
             if (!args.force)
@@ -201,8 +138,7 @@ int main (int argc, char **argv)
                 throw std::runtime_error ("Could not open file for writing");
 
             // Write it out
-            assert (i < spoc_files.size ());
-            spoc::write_spoc_file (ofs, spoc_files[i]);
+            spoc::write_spoc_file (ofs, t);
         }
 
         return 0;
