@@ -104,20 +104,24 @@ inline std::string get_summary_string (const std::string &label, const U &x, con
 }
 
 // Process a spoc file and write to stdout
-template<typename T>
-void process (const T &args, const spoc::spoc_file &f)
+void process (std::ostream &os,
+    const spoc::spoc_file &f,
+    const bool json,
+    const bool header_info,
+    const bool summary_info,
+    const bool compact)
 {
     using namespace std;
     using namespace spoc;
 
-    cout.precision (15);
-    cout << fixed;
+    os.precision (15);
+    os << fixed;
 
-    if (args.json)
+    if (json)
     {
         json::object j;
 
-        if (args.header_info)
+        if (header_info)
         {
             json::object h;
             h["major_version"] = f.get_major_version ();
@@ -127,7 +131,7 @@ void process (const T &args, const spoc::spoc_file &f)
             j["header"] = h;
         }
 
-        if (args.summary_info)
+        if (summary_info)
         {
             json::object s;
 
@@ -147,39 +151,39 @@ void process (const T &args, const spoc::spoc_file &f)
             j["summary"] = s;
         }
 
-        if (args.compact)
-            spoc::json::operator<<(cout, j);
+        if (compact)
+            spoc::json::operator<<(os, j);
         else
-            json::pretty_print (cout, j, 0);
+            json::pretty_print (os, j, 0);
     }
     else
     {
-        if (args.header_info)
+        if (header_info)
         {
-            cout << "major_version\t" << int (f.get_major_version ()) << endl;
-            cout << "minor_version\t" << int (f.get_minor_version ()) << endl;
-            cout << "wkt\t" << f.get_wkt () << endl;
-            cout << "npoints\t" << f.get_npoints () << endl;
+            os << "major_version\t" << int (f.get_major_version ()) << endl;
+            os << "minor_version\t" << int (f.get_minor_version ()) << endl;
+            os << "wkt\t" << f.get_wkt () << endl;
+            os << "npoints\t" << f.get_npoints () << endl;
         }
 
-        if (args.summary_info)
+        if (summary_info)
         {
-            cout << get_summary_string<double> ("x\t", f.get_x (), args.compact);
-            cout << get_summary_string<double> ("y\t", f.get_y (), args.compact);
-            cout << get_summary_string<double> ("z\t", f.get_z (), args.compact);
-            cout << get_summary_string<uint16_t> ("c\t", f.get_c (), args.compact);
-            cout << get_summary_string<uint16_t> ("p\t", f.get_p (), args.compact);
-            cout << get_summary_string<uint16_t> ("i\t", f.get_i (), args.compact);
-            cout << get_summary_string<uint16_t> ("r\t", f.get_r (), args.compact);
-            cout << get_summary_string<uint16_t> ("g\t", f.get_g (), args.compact);
-            cout << get_summary_string<uint16_t> ("b\t", f.get_b (), args.compact);
+            os << get_summary_string<double> ("x\t", f.get_x (), compact);
+            os << get_summary_string<double> ("y\t", f.get_y (), compact);
+            os << get_summary_string<double> ("z\t", f.get_z (), compact);
+            os << get_summary_string<uint16_t> ("c\t", f.get_c (), compact);
+            os << get_summary_string<uint16_t> ("p\t", f.get_p (), compact);
+            os << get_summary_string<uint16_t> ("i\t", f.get_i (), compact);
+            os << get_summary_string<uint16_t> ("r\t", f.get_r (), compact);
+            os << get_summary_string<uint16_t> ("g\t", f.get_g (), compact);
+            os << get_summary_string<uint16_t> ("b\t", f.get_b (), compact);
             for (size_t k = 0; k < f.get_extra ().size (); ++k)
             {
                 stringstream s;
                 s.precision (3);
                 s << fixed;
                 s << "extra " << k << "\t";
-                cout << get_summary_string<uint16_t> (s.str (), f.get_extra ()[k], args.compact);
+                os << get_summary_string<uint16_t> (s.str (), f.get_extra ()[k], compact);
             }
         }
     }

@@ -36,7 +36,7 @@ int main (int argc, char **argv)
             // Read into spoc_file struct
             spoc_file f = read_spoc_file (cin);
 
-            info::process (args, f);
+            info::process (cout, f, args.json, args.header_info, args.summary_info, args.compact);
         }
         else
         {
@@ -53,7 +53,7 @@ int main (int argc, char **argv)
                 // Read into spoc_file struct
                 spoc_file f = read_spoc_file (ifs);
 
-                info::process (args, f);
+                info::process (cout, f, args.json, args.header_info, args.summary_info, args.compact);
             }
         }
 

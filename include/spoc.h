@@ -419,9 +419,11 @@ inline spoc_file read_spoc_file (std::istream &s)
     for (size_t j = 0; j < f.extra.size (); ++j)
         f.extra[j] = read_compressed<uint64_t> (s, f.npoints);
 
+    // GCOV_EXCL_START
     // Make sure 'f' is valid
     if (!f.check ())
         throw std::runtime_error ("Invalid spoc file format");
+    // GCOV_EXCL_STOP
 
     return f;
 }

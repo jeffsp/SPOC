@@ -11,12 +11,14 @@ void test_json ()
     using namespace spoc;
     using namespace json;
     json::object j;
+    j["a"] = 'z';
     j[std::string ("xyz")] = 12345;
     j["hammy"] = "asdf";
     j["blah"] = 1.0f;
     j["foo"] = std::string ("bar");
     j[std::string ("x")] = 2.3;
     j["y"] = false;
+    j["long long"] = static_cast<long long> (321);
 
     json::array ja;
     ja.push_back (333);

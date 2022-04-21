@@ -9,26 +9,6 @@
 using namespace std;
 using namespace spoc;
 
-vector<point_record> get_random_point_records (const size_t n)
-{
-    default_random_engine g;
-    uniform_int_distribution<int> di (0, 1 << 15);
-    uniform_real_distribution<double> dr (-1.0, 1.0);
-
-    vector<point_record> p (n);
-
-    for (auto &i : p)
-    {
-        i.x = dr (g); i.y = dr (g); i.z = dr (g);
-        i.c = di (g); i.p = di (g); i.i = di (g);
-        i.r = di (g); i.g = di (g); i.b = di (g);
-        for (auto &j : i.extra)
-            j = di (g);
-    }
-
-    return p;
-}
-
 void test_point_record ()
 {
     const auto p = get_random_point_records (10);
@@ -72,6 +52,7 @@ void test_spoc_file_io ()
 {
     const auto p = get_random_point_records (1000);
 
+    {
     stringstream s;
     const string wkt1 = "Test wkt";
     write_spoc_file (s, wkt1, p);
@@ -80,6 +61,45 @@ void test_spoc_file_io ()
 
     verify (wkt1 == wkt2);
     verify (p == q);
+    }
+
+    // Fail when reading signature
+    {
+    stringstream s;
+    // Write an invalid signature
+    s << "SPOX" << endl;
+    bool failed = false;
+    try
+    {
+        auto q = read_spoc_file (s);
+    }
+    catch (...)
+    {
+        failed = true;
+    }
+    verify (failed);
+    }
+
+    // Fail when writing
+    {
+    stringstream s;
+    const string wkt = "Test wkt";
+    write_spoc_file (s, wkt, p);
+    auto f = read_spoc_file (s);
+    // Overwrite signature
+    char *sig = const_cast<char *> (f.get_signature ());
+    sig[0] = 'X';
+    bool failed = false;
+    try
+    {
+        write_spoc_file (s, f);
+    }
+    catch (...)
+    {
+        failed = true;
+    }
+    verify (failed);
+    }
 }
 
 void test_spoc_file ()

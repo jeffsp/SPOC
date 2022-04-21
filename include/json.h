@@ -19,7 +19,6 @@ namespace json
 //      char,
 //      uint8_t,
 //      uint16_t,
-//      uint32_t,
 //      uint64_t,
 //      float,
 //      double,
@@ -92,10 +91,6 @@ inline void pretty_print (std::ostream &s, const json::value &v, const int inden
     else if (v.type () == typeid (uint16_t))
     {
         s << std::any_cast<uint16_t> (v);
-    }
-    else if (v.type () == typeid (uint32_t))
-    {
-        s << std::any_cast<uint32_t> (v);
     }
     else if (v.type () == typeid (uint64_t))
     {
@@ -176,8 +171,6 @@ inline std::ostream &operator<< (std::ostream &s, const json::value &v)
         s << int (std::any_cast<uint8_t> (v));
     else if (v.type () == typeid (uint16_t))
         s << std::any_cast<uint16_t> (v);
-    else if (v.type () == typeid (uint32_t))
-        s << std::any_cast<uint32_t> (v);
     else if (v.type () == typeid (uint64_t))
         s << std::any_cast<uint64_t> (v);
     else if (v.type () == typeid (float))

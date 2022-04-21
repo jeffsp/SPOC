@@ -1,6 +1,7 @@
 #pragma once
 
 #include "point.h"
+#include "spoc.h"
 #include <cassert>
 #include <cmath>
 #include <random>
@@ -43,3 +44,29 @@ inline std::vector<spoc::point<double>> generate_points (
 
     return points;
 }
+
+std::vector<spoc::point_record> get_random_point_records (const size_t n, const bool rgb = true)
+{
+    std::default_random_engine g;
+    std::uniform_int_distribution<int> di (0, 1 << 15);
+    std::uniform_real_distribution<double> dr (-1.0, 1.0);
+
+    std::vector<spoc::point_record> p (n);
+
+    for (auto &i : p)
+    {
+        i.x = dr (g); i.y = dr (g); i.z = dr (g);
+        i.c = di (g); i.p = di (g); i.i = di (g);
+        if (rgb)
+        {
+            i.r = di (g);
+            i.g = di (g);
+            i.b = di (g);
+        }
+        for (auto &j : i.extra)
+            j = di (g);
+    }
+
+    return p;
+}
+
