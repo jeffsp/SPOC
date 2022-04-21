@@ -52,9 +52,9 @@ laslib:
 
 .PHONY: build # Compile all applications and tests
 build: laslib
-	cd build/debug && make -j 24
-	cd build/release && make -j 24
-	cd build/coverage && make -j 24
+	cd build/debug && make -j 8
+	cd build/release && make -j 8
+	cd build/coverage && make -j 8
 
 .PHONY: clean # Clean build objects
 clean:
