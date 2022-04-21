@@ -8,7 +8,7 @@ void test_cmd ()
     static struct option long_options[] = {
         {"help", no_argument, 0,  'h' },
         {"verbose", no_argument, 0,  'v' },
-        {"blah", no_argument, 0,  'b' },
+        {"tiles", required_argument, 0,  't' },
         {0,      0,           0,  0 }
     };
 
@@ -16,6 +16,7 @@ void test_cmd ()
     const size_t noptions = sizeof (long_options) / sizeof (struct option);
     const std::string usage ("usage");
     spoc::cmd::print_help (ss, usage, noptions, long_options);
+    spoc::cmd::print_help (ss, usage, 0, long_options);
 }
 
 int main (int argc, char **argv)

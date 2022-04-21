@@ -201,8 +201,10 @@ inline void decompress (std::istream &is, std::ostream &os)
         is.read (reinterpret_cast<char *> (&input_buffer[0]), BUFFER_SIZE);
         inflator.s.avail_in = is.gcount();
 
+        // GCOV_EXCL_START
         if (inflator.s.avail_in == 0)
             break;
+        // GCOV_EXCL_STOP
 
         inflator.s.next_in = &input_buffer[0];
 
@@ -210,6 +212,7 @@ inline void decompress (std::istream &is, std::ostream &os)
             inflator.s.avail_out = BUFFER_SIZE;
             inflator.s.next_out = &output_buffer[0];
             const auto ret = inflate (&inflator.s, Z_NO_FLUSH);
+            // GCOV_EXCL_START
             switch (ret)
             {
                 case Z_NEED_DICT:
@@ -220,12 +223,15 @@ inline void decompress (std::istream &is, std::ostream &os)
                     done = true;
                 break;
             }
+            // GCOV_EXCL_STOP
             const auto decompressed_bytes = BUFFER_SIZE - inflator.s.avail_out;
 
             // Write decompressed bytes
             os.write (reinterpret_cast<char *> (&output_buffer[0]), decompressed_bytes);
+            // GCOV_EXCL_START
             if (os.fail ())
                 throw std::runtime_error (zlib_error_string (Z_ERRNO));
+            // GCOV_EXCL_STOP
         } while (inflator.s.avail_out == 0);
     } while (!done);
 }
