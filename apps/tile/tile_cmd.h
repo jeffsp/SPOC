@@ -1,6 +1,5 @@
 #pragma once
 
-#include <getopt.h>
 #include <stdexcept>
 #include <string>
 #include "cmd.h"

@@ -10,6 +10,7 @@
 namespace spoc
 {
 
+// GCOV_EXCL_START
 inline std::string zlib_error_string (int ret)
 {
     switch (ret)
@@ -27,6 +28,7 @@ inline std::string zlib_error_string (int ret)
             return std::string ("Zlib version mismatch");
     }
 }
+// GCOV_EXCL_STOP
 
 struct Deflator
 {
@@ -39,8 +41,10 @@ struct Deflator
         s.avail_in = 0;
         s.next_in = Z_NULL;
         const auto ret = deflateInit (&s, level);
+        // GCOV_EXCL_START
         if (ret != Z_OK)
             throw std::runtime_error (zlib_error_string (ret));
+        // GCOV_EXCL_STOP
     }
     ~Deflator ()
     {
@@ -59,8 +63,10 @@ struct Inflator
         s.avail_in = 0;
         s.next_in = Z_NULL;
         const auto ret = inflateInit (&s);
+        // GCOV_EXCL_START
         if (ret != Z_OK)
             throw std::runtime_error (zlib_error_string (ret));
+        // GCOV_EXCL_STOP
     }
     ~Inflator ()
     {
@@ -126,8 +132,10 @@ inline void compress (std::istream &is, std::ostream &os, const int level)
 
             // Write compressed bytes
             os.write (reinterpret_cast<char *> (&output_buffer[0]), compressed_bytes);
+            // GCOV_EXCL_START
             if (os.fail ())
                 throw std::runtime_error (zlib_error_string (Z_ERRNO));
+            // GCOV_EXCL_STOP
         } while (deflator.s.avail_out == 0);
     } while (!is.eof ());
 }
@@ -150,10 +158,12 @@ inline std::vector<uint8_t> decompress (const std::vector<uint8_t> &input)
         const auto ret = inflate (&inflator.s, Z_NO_FLUSH);
         switch (ret)
         {
+            // GCOV_EXCL_START
             case Z_NEED_DICT:
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
                 throw std::runtime_error (zlib_error_string (ret));
+            // GCOV_EXCL_STOP
         }
         const auto decompressed_bytes = BUFFER_SIZE - inflator.s.avail_out;
 
@@ -170,8 +180,10 @@ inline std::vector<uint8_t> decompress (const std::vector<uint8_t> &input)
 inline void decompress (const std::vector<uint8_t> &input, uint8_t *output, const size_t output_bytes)
 {
     const auto d = decompress (input);
+    // GCOV_EXCL_START
     if (d.size () != output_bytes)
         throw std::runtime_error ("Can't decompress: unexpected number of decompressed bytes");;
+    // GCOV_EXCL_STOP
     std::copy (&d[0], &d[0] + output_bytes, output);
 }
 

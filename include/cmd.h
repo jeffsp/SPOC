@@ -1,5 +1,6 @@
 #pragma once
 
+#include <getopt.h>
 #include <iostream>
 
 namespace spoc

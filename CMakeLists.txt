@@ -27,6 +27,7 @@ macro(add_test name)
     target_link_libraries(${name} gmp z)
 endmacro()
 
+add_test(test_cmd)
 add_test(test_compress)
 add_test(test_extent)
 add_test(test_info)

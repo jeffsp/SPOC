@@ -1,9 +1,6 @@
 #include "info.h"
 #include "test_utils.h"
-#include <any>
 #include <iostream>
-#include <map>
-#include <vector>
 #include <stdexcept>
 
 void test_info ()
