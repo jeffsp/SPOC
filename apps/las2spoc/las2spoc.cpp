@@ -1,30 +1,9 @@
+#include "las2spoc.h"
 #include "las2spoc_cmd.h"
-#include "lasreader.hpp"
 #include "spoc.h"
 #include <iostream>
 #include <stdexcept>
 #include <string>
-
-struct las_reader
-{
-    explicit las_reader (const std::string &fn)
-        : lasreader (nullptr)
-    {
-        lasreadopener.set_file_name (fn.c_str ());
-        lasreader = lasreadopener.open ();
-        if (lasreader == nullptr)
-            throw std::runtime_error ("Could not open LASlib lasreader");
-    }
-    ~las_reader ()
-    {
-        if (lasreader == nullptr)
-            return;
-        lasreader->close();
-        delete lasreader;
-    }
-    LASreadOpener lasreadopener;
-    LASreader *lasreader;
-};
 
 int main (int argc, char **argv)
 {
@@ -44,7 +23,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "reading " << args.input_fn << endl;
 
-        las_reader l (args.input_fn);
+        las2spoc::las_reader l (args.input_fn);
 
         // Check the coordinate system
         if (l.lasreader->header.vlr_geo_ogc_wkt == nullptr)

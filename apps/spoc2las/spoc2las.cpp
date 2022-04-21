@@ -1,35 +1,10 @@
+#include "spoc2las.h"
 #include "spoc2las_cmd.h"
-#include "laswriter.hpp"
 #include "spoc.h"
 #include <chrono>
 #include <iostream>
 #include <stdexcept>
 #include <string>
-
-struct las_writer
-{
-    explicit las_writer (const std::string &fn, const LASheader &lasheader)
-        : laswriter (nullptr)
-        , lasheader (lasheader)
-    {
-        laswriteopener.set_file_name(fn.c_str ());
-        laswriter = laswriteopener.open(&lasheader);
-        if (laswriter == nullptr)
-            throw std::runtime_error ("Could not open LASlib laswriter");
-    }
-    ~las_writer ()
-    {
-        if (laswriter == nullptr)
-            return;
-        laswriter->update_header (&lasheader, true);
-        laswriter->close();
-        delete laswriter;
-    }
-    LASwriteOpener laswriteopener;
-    LASwriter *laswriter;
-    const LASheader &lasheader;
-
-};
 
 int main (int argc, char **argv)
 {
@@ -101,7 +76,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "writing records to " << args.output_fn << endl;
 
-        las_writer l (args.output_fn, lasheader);
+        spoc2las::las_writer l (args.output_fn, lasheader);
 
         for (size_t i = 0; i < point_records.size (); ++i)
         {
