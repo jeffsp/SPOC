@@ -70,3 +70,11 @@ std::vector<spoc::point_record> get_random_point_records (const size_t n, const 
     return p;
 }
 
+/// @brief Ensure that two values are equal up to 'precision' decimal places
+bool about_equal (double a, double b, unsigned precision = 3)
+{
+    int c = static_cast<int> (std::round (a * std::pow (10.0, precision)));
+    int d = static_cast<int> (std::round (b * std::pow (10.0, precision)));
+    return c == d;
+}
+

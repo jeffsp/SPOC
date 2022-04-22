@@ -57,6 +57,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "Tiles are " << tile_size << " X " << tile_size << endl;
 
+        /*
         // Get the tile index of each point in the point cloud
         const auto indexes = spoc::tile::get_tile_indexes (f.get_x (), f.get_y (), tile_size);
 
@@ -91,6 +92,10 @@ int main (int argc, char **argv)
 
             // The the vector of point cloud indexes
             const auto &v = i.second;
+
+            // Make sure the tile has points in it.
+            if (v.empty ())
+                continue;
 
             // The file to write
             spoc_file t;
@@ -140,6 +145,7 @@ int main (int argc, char **argv)
             // Write it out
             spoc::write_spoc_file (ofs, t);
         }
+        */
 
         return 0;
     }
