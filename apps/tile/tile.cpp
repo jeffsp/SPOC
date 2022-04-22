@@ -57,13 +57,19 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "Tiles are " << tile_size << " X " << tile_size << endl;
 
-        /*
+        if (f.get_x ().empty () or f.get_y ().empty ())
+            throw runtime_error ("The X and Y coordinate vectors cannot be empty");
+
+        if (f.get_x ().size () != f.get_y ().size ())
+            throw runtime_error ("The X and Y coordinate vectors are not the same size");
+
         // Get the tile index of each point in the point cloud
         const auto indexes = spoc::tile::get_tile_indexes (f.get_x (), f.get_y (), tile_size);
 
         // Map each tile index to a vector of point cloud indexes
         const auto tile_map = spoc::tile::get_tile_map (indexes);
 
+        /*
         // Write each tile
         if (args.verbose)
             clog << "Writing tiles" << endl;
