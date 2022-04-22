@@ -2,6 +2,7 @@
 #include "tile.h"
 #include "tile_cmd.h"
 #include <algorithm>
+#include <filesystem>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -69,39 +70,25 @@ int main (int argc, char **argv)
         // Map each tile index to a vector of point cloud indexes
         const auto tile_map = spoc::tile::get_tile_map (indexes);
 
-        /*
         // Write each tile
         if (args.verbose)
             clog << "Writing tiles" << endl;
 
         // Check the prefix
-        auto prefix = args.prefix;
-        if (prefix.empty ())
-        {
-            // TODO: use C++ pathname header instead
-            //
-            // It's empty, so use the filename
-            string fn = args.fn;
-            // Get rid of the path
-            fn = fn.substr (fn.find_last_of("/\\") + 1);
-            // Get rid of extension
-            prefix = fn.substr (0, fn.find_last_of ("."));
-        }
+        const auto prefix = args.prefix.empty ()
+            ? std::string (std::filesystem::path (args.fn).stem ())
+            : args.prefix;
 
         assert (!prefix.empty ());
 
         // For each map entry
         for (const auto &i : tile_map)
         {
-            // Get tile number
-            const auto n = i.first;
-
-            // The the vector of point cloud indexes
+            // Get the vector of point cloud indexes in this tile
             const auto &v = i.second;
 
-            // Make sure the tile has points in it.
-            if (v.empty ())
-                continue;
+            // It won't have an entry in the map if the vector is empty
+            assert (!v.empty ());
 
             // The file to write
             spoc_file t;
@@ -110,23 +97,21 @@ int main (int argc, char **argv)
             t.resize (v.size ());
 
             // For each point index in this tile...
-            size_t point_index = 0;
-            for (const auto j : v)
+            for (size_t j = 0; j < v.size (); ++j)
             {
-                // Get point 'j'
-                const auto p = f.get (j);
-                t.set (point_index++, p);
+                // Get the point from the input file
+                const auto p = f.get (v[j]);
+
+                // Set it in the output file
+                t.set (j, p);
             }
 
             // Get the filename extension
-            const string &fn = args.fn;
-            const string ext = fn.substr (fn.find_last_of ("."));
+            const string ext = std::filesystem::path (args.fn).extension();
 
             // Generate the filename
             std::stringstream sfn;
-
-            // TODO determine how many significant digits are needed
-            sfn << prefix << n << ext;
+            sfn << prefix << ext;
 
             // Check if file already exists
             if (!args.force)
@@ -151,7 +136,6 @@ int main (int argc, char **argv)
             // Write it out
             spoc::write_spoc_file (ofs, t);
         }
-        */
 
         return 0;
     }
