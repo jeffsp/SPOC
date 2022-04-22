@@ -84,6 +84,9 @@ int main (int argc, char **argv)
         // For each map entry
         for (const auto &i : tile_map)
         {
+            // Get the tile number
+            const size_t tile = i.first;
+
             // Get the vector of point cloud indexes in this tile
             const auto &v = i.second;
 
@@ -109,9 +112,13 @@ int main (int argc, char **argv)
             // Get the filename extension
             const string ext = std::filesystem::path (args.fn).extension();
 
+            // How many significant digits are needed for the tile number?
+            const size_t digits = 2;
+
             // Generate the filename
             std::stringstream sfn;
-            sfn << prefix << ext;
+            sfn << std::setw(digits) << std::setfill('0');
+            sfn << prefix << tile << ext;
 
             // Check if file already exists
             if (!args.force)
