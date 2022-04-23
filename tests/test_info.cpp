@@ -24,11 +24,18 @@ void test_info ()
         {
             for (auto summary_info : {true, false})
             {
-                for (auto compact : {true, false})
+                for (auto classifications : {true, false})
                 {
-                    stringstream t;
-                    spoc::info::process (t, f1, json, header_info, summary_info, compact);
-                    spoc::info::process (t, f2, json, header_info, summary_info, compact);
+                    for (auto compact : {true, false})
+                    {
+                        stringstream t;
+                        spoc::info::process (t, f1, json,
+                            header_info, summary_info,
+                            classifications, compact);
+                        spoc::info::process (t, f2, json,
+                            header_info, summary_info,
+                            classifications, compact);
+                    }
                 }
             }
         }

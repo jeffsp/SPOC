@@ -25,6 +25,8 @@ int main (int argc, char **argv)
             clog << "json\t" << args.json << endl;
             clog << "header-info\t" << args.header_info << endl;
             clog << "summary-info\t" << args.summary_info << endl;
+            clog << "classifications\t" << args.classifications << endl;
+            clog << "compact\t" << args.compact << endl;
             clog << "filenames\t" << args.fns.size () << endl;
         }
 
@@ -36,7 +38,9 @@ int main (int argc, char **argv)
             // Read into spoc_file struct
             spoc_file f = read_spoc_file (cin);
 
-            info::process (cout, f, args.json, args.header_info, args.summary_info, args.compact);
+            info::process (cout, f,
+                args.json, args.header_info, args.summary_info,
+                args.classifications, args.compact);
         }
         else
         {
@@ -53,7 +57,9 @@ int main (int argc, char **argv)
                 // Read into spoc_file struct
                 spoc_file f = read_spoc_file (ifs);
 
-                info::process (cout, f, args.json, args.header_info, args.summary_info, args.compact);
+                info::process (cout, f,
+                    args.json, args.header_info, args.summary_info,
+                    args.classifications, args.compact);
             }
         }
 

@@ -3,13 +3,35 @@
 #include "json.h"
 #include "spoc.h"
 #include <iostream>
+#include <map>
 #include <sstream>
+#include <unordered_map>
 
 namespace spoc
 {
 
 namespace info
 {
+
+template<typename T>
+std::map<std::string,size_t> get_class_map (const T &c)
+{
+    std::unordered_map<int,size_t> m;
+
+    // Count each classification
+    //
+    // Use an unordered map for speed
+    for (auto i : c)
+        ++m[i];
+
+    // Put them in a map so that they are sorted
+    std::map<std::string,size_t> a;
+
+    for (auto i : m)
+        a[std::to_string (i.first)] = i.second;
+
+    return a;
+}
 
 template<typename T,typename U>
 inline spoc::json::object get_summary_object (const U &x)
@@ -109,6 +131,7 @@ void process (std::ostream &os,
     const bool json,
     const bool header_info,
     const bool summary_info,
+    const bool classifications,
     const bool compact)
 {
     using namespace std;
@@ -151,6 +174,18 @@ void process (std::ostream &os,
             j["summary"] = s;
         }
 
+        if (classifications)
+        {
+            json::object c;
+
+            const auto cls_map = get_class_map (f.get_c ());
+
+            for (auto i : cls_map)
+                c[i.first] = i.second;
+
+            j["classifications"] = c;
+        }
+
         if (compact)
             spoc::json::operator<<(os, j);
         else
@@ -185,6 +220,14 @@ void process (std::ostream &os,
                 s << "extra " << k << "\t";
                 os << get_summary_string<uint16_t> (s.str (), f.get_extra ()[k], compact);
             }
+        }
+
+        if (classifications)
+        {
+            const auto cls_map = get_class_map (f.get_c ());
+
+            for (auto i : cls_map)
+                os << "cls_" << i.first << "\t" << i.second << std::endl;
         }
     }
 }

@@ -19,6 +19,7 @@ struct args
     bool header_info = true;
     bool summary_info = true;
     bool compact = true;
+    bool classifications = true;
     std::vector<std::string> fns;
 };
 
@@ -34,11 +35,12 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"json", no_argument, 0,  'j' },
             {"header-info", no_argument, 0,  'e' },
             {"summary-info", no_argument, 0,  's' },
+            {"classifications", no_argument, 0,  'l' },
             {"compact", no_argument, 0,  'c' },
             {0,      0,           0,  0 }
         };
 
-        int c = getopt_long(argc, argv, "hvjesc", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvjeslc", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -58,6 +60,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 'j': args.json = !args.json; break;
             case 'e': args.header_info = !args.header_info; break;
             case 's': args.summary_info = !args.summary_info; break;
+            case 'l': args.classifications = !args.classifications; break;
             case 'c': args.compact = !args.compact; break;
         }
     }
