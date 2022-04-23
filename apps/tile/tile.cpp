@@ -96,6 +96,9 @@ int main (int argc, char **argv)
             // The file to write
             spoc_file t;
 
+            // Set the SRS
+            t.set_wkt (f.get_wkt ());
+
             // Set the number of points in the file
             t.resize (v.size ());
 
