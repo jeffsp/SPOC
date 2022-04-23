@@ -16,7 +16,7 @@ The aim of this file format is to be a subset of the LAS file format.
 
 # Description of new format
 
-The proposed extension is SPOC, standing for Simple POint Cloud.
+The proposed extension is SPOC, or Simple POint Cloud.
 
 * Points are stored as vectors
     * The order of the point records is preserved
