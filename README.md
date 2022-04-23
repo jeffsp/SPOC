@@ -55,9 +55,9 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [X] Gitlab runner
 * [X] CI/CD
 * [X] Version number in header
-* [ ] Test data files
+* [X] Test data files
 * [X] Unit test suite
-* [ ] Integration test suite
+* [X] Integration test suite
 * [X] Man page generation
 * [X] Coverage
 * [X] Cppcheck
@@ -71,14 +71,13 @@ The proposed extension is SPOC, standing for Simple POint Cloud.
 * [ ] spoc field\_filter: 2D/3D spatial filtering: does not changes xyz coords
 * [X] spoc info
 * [ ] spoc interpolate
-* [ ] spoc las2spoc
+* [X] spoc spoc2las/las2spoc
 * [ ] spoc merge: optionally set point source id
 * [ ] spoc neighbors: set index of neighbors in the extra fields
 * [ ] spoc octree: break into files arranged as an octree, access/create spoc files
 * [ ] spoc quantize: on voxel boundaries
 * [ ] spoc sort: by field/by voxel
 * [ ] spoc spatial\_filter: 2D/3D spatial filtering: changes 3D structure
-* [ ] spoc spoc2las: warn when fields are lost, warn when precision is lost
 * [ ] spoc srs: Get/set SRS
 * [ ] spoc tile
 * [ ] spoc transform/transform\_lambda: Functional plugins with python/bash
