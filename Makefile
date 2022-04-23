@@ -66,11 +66,19 @@ unit_test: BUILD=debug
 unit_test:
 	@parallel --jobs 24 --halt now,fail=1 "echo {} && {}" ::: build/$(BUILD)/test_*
 
+.PHONY: integration_test
+integration_test: BUILD=debug
+integration_test:
+	@parallel --jobs 24 --halt now,fail=1 \
+		"echo $(BUILD): {} && PATH=./build/$(BUILD)/:$$PATH {}" ::: tests/test_*.sh
+
 .PHONY: test # Run tests
 test:
 	@echo "Testing..."
 	@$(MAKE) --no-print-directory unit_test BUILD=debug
 	@$(MAKE) --no-print-directory unit_test BUILD=release
+	@$(MAKE) --no-print-directory integration_test BUILD=debug
+	@$(MAKE) --no-print-directory integration_test BUILD=release
 
 .PHONY: memcheck # Run memcheck
 memcheck:

@@ -12,7 +12,7 @@ int main (int argc, char **argv)
     {
         // Parse command line
         const cmd::args args = cmd::get_args (argc, argv,
-                string (argv[0]) + " [options] < spocfile");
+                string (argv[0]) + " [options] [spocfile] [spocfile] [...]");
 
         // If you are getting help, exit without an error
         if (args.help)
