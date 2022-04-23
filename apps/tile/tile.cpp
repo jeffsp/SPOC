@@ -85,7 +85,7 @@ int main (int argc, char **argv)
         // Get the map keys
         vector<size_t> keys;
         for (const auto &i : tile_map)
-            keys.push_back (i.first);
+            keys.push_back (i.first); // cppcheck-suppress useStlAlgorithm
 
         // Sort the map keys
         sort (begin (keys), end (keys));
