@@ -15,7 +15,8 @@ struct args
     bool help = false;
     bool verbose = false;
     bool force = false;
-    int tiles = 2;
+    unsigned tiles = 2;
+    unsigned digits = 3;
     double tile_size = -1;
     std::string prefix;
     std::string fn;
@@ -32,12 +33,13 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"verbose", no_argument, 0,  'v' },
             {"force", no_argument, 0,  'f' },
             {"tiles", required_argument, 0,  't' },
+            {"digits", required_argument, 0,  'd' },
             {"tile-size", required_argument, 0,  's' },
             {"prefix", required_argument, 0,  'p' },
             {0,      0,           0,  0 }
         };
 
-        int c = getopt_long(argc, argv, "hvft:s:p:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvft:d:s:p:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -56,6 +58,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 'v': args.verbose = true; break;
             case 'f': args.force = true; break;
             case 't': args.tiles = atoi (optarg); break;
+            case 'd': args.digits = atoi (optarg); break;
             case 's': args.tile_size = atof (optarg); break;
             case 'p': args.prefix = std::string (optarg); break;
         }

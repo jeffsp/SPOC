@@ -48,6 +48,9 @@ to force overwrites.
 --tiles=*#*, -t *#*
 :   Number of tiles along the largest dimension
 
+--digits=*#*, -d *#*
+:   Number of digits to use when numbering the output filenames.
+
 --tile-size=*#*, -s *#*
 :   Length of one side of a tile
 

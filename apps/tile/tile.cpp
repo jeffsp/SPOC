@@ -32,6 +32,7 @@ int main (int argc, char **argv)
             clog << "verbose\t" << args.verbose << endl;
             clog << "force\t" << args.force << endl;
             clog << "tiles\t" << args.tiles << endl;
+            clog << "digits\t" << args.digits << endl;
             clog << "tile-size\t" << args.tile_size << endl;
             clog << "prefix\t'" << args.prefix << "'" << endl;
         }
@@ -76,19 +77,24 @@ int main (int argc, char **argv)
 
         // Check the prefix
         const auto prefix = args.prefix.empty ()
-            ? std::string (std::filesystem::path (args.fn).stem ())
+            ? string (filesystem::path (args.fn).stem ())
             : args.prefix;
 
         assert (!prefix.empty ());
 
-        // For each map entry
+        // Get the map keys
+        vector<size_t> keys;
         for (const auto &i : tile_map)
-        {
-            // Get the tile number
-            const size_t tile = i.first;
+            keys.push_back (i.first);
 
+        // Sort the map keys
+        sort (begin (keys), end (keys));
+
+        // For each tile number
+        for (const auto tile : keys)
+        {
             // Get the vector of point cloud indexes in this tile
-            const auto &v = i.second;
+            const auto &v = tile_map.at (tile);
 
             // It won't have an entry in the map if the vector is empty
             assert (!v.empty ());
@@ -115,13 +121,11 @@ int main (int argc, char **argv)
             // Get the filename extension
             const string ext = std::filesystem::path (args.fn).extension();
 
-            // How many significant digits are needed for the tile number?
-            const size_t digits = 2;
-
             // Generate the filename
             std::stringstream sfn;
-            sfn << std::setw(digits) << std::setfill('0');
-            sfn << prefix << tile << ext;
+            sfn << prefix;
+            sfn << std::setw(args.digits) << std::setfill('0') << tile;
+            sfn << ext;
 
             // Check if file already exists
             if (!args.force)
