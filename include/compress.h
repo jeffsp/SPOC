@@ -74,6 +74,9 @@ struct Inflator
     }
 };
 
+// Compress 'nbytes' pointed to by 'p'. The 'level' parameter can be 1
+// to 9, where 1 is the fastest, and 9 is the best compression. 0 means
+// no compression, and -1 means use the default compression.
 inline std::vector<uint8_t> compress (const uint8_t *p, const size_t nbytes, const int level = -1)
 {
     constexpr size_t BUFFER_SIZE = (1 << 20);
@@ -85,7 +88,6 @@ inline std::vector<uint8_t> compress (const uint8_t *p, const size_t nbytes, con
     // Get bytes directly from the input vector
     deflator.s.avail_in = nbytes;
     deflator.s.next_in = const_cast<unsigned char *> (p);
-
 
     do {
         // Compress from input to output buffer

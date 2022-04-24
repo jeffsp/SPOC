@@ -274,26 +274,41 @@ inline std::ostream &operator<< (std::ostream &s, const spoc_file &f)
 }
 
 template<typename T>
-inline void write_compressed (std::ostream &s, const std::vector<T> &x)
+inline std::vector<uint8_t> compress_field (const std::vector<T> &x)
 {
     // Check to see if they are all zero
     if (all_zero (x))
+        return std::vector<uint8_t> (); // Return empty vector
+
+    // Compress
+    //  -1 = default compression
+    //   0 = no compression
+    //   1 = fastest compression
+    //   9 = smallest compression
+    const int compression_level = -1;
+    const auto c = spoc::compress (reinterpret_cast<const uint8_t *> (&x[0]), x.size () * sizeof(T), compression_level);
+
+    return c;
+}
+
+template<typename T>
+inline void write_compressed (std::ostream &s, const std::vector<T> &x)
+{
+    // Check for empty vector
+    if (x.empty ())
     {
-        // If they are all zero, write the length as '0'
+        // Write the length as '0'
         const uint64_t n = 0;
         s.write (reinterpret_cast<const char*>(&n), sizeof(uint64_t));
         return;
     }
 
-    // Compress
-    const auto c = spoc::compress (reinterpret_cast<const uint8_t *> (&x[0]), x.size () * sizeof(T));
-
     // Write compressed length
-    const uint64_t n = c.size ();
+    const uint64_t n = x.size ();
     s.write (reinterpret_cast<const char*>(&n), sizeof(uint64_t));
 
     // Write compressed bytes
-    s.write (reinterpret_cast<const char*>(&c[0]), c.size ());
+    s.write (reinterpret_cast<const char*>(&x[0]), x.size ());
 }
 
 inline void write_spoc_file (std::ostream &s, const spoc_file &f)
@@ -317,20 +332,42 @@ inline void write_spoc_file (std::ostream &s, const spoc_file &f)
     // Number of points
     s.write (reinterpret_cast<const char*>(&f.npoints), sizeof(uint64_t));
 
-    // Data
-    write_compressed (s, f.x);
-    write_compressed (s, f.y);
-    write_compressed (s, f.z);
-    write_compressed (s, f.c);
-    write_compressed (s, f.p);
-    write_compressed (s, f.i);
-    write_compressed (s, f.r);
-    write_compressed (s, f.g);
-    write_compressed (s, f.b);
+    // Compress fields in parallel
+    std::vector<std::vector<uint8_t>> c (9);
+    #pragma omp parallel sections
+    {
+        #pragma omp section
+        { c[0] = compress_field (f.x); }
+        #pragma omp section
+        { c[1] = compress_field (f.y); }
+        #pragma omp section
+        { c[2] = compress_field (f.z); }
+        #pragma omp section
+        { c[3] = compress_field (f.c); }
+        #pragma omp section
+        { c[4] = compress_field (f.p); }
+        #pragma omp section
+        { c[5] = compress_field (f.i); }
+        #pragma omp section
+        { c[6] = compress_field (f.r); }
+        #pragma omp section
+        { c[7] = compress_field (f.g); }
+        #pragma omp section
+        { c[8] = compress_field (f.b); }
+    }
 
-    // Extra fields
-    for (size_t j = 0; j < f.extra.size (); ++j)
-        write_compressed (s, f.extra[j]);
+    // Compress extra fields in parallel
+    std::vector<std::vector<uint8_t>> e (f.extra.size ());
+    #pragma omp parallel for
+    for (size_t i = 0; i < f.extra.size (); ++i)
+        e[i] = compress_field (f.extra[i]);
+
+    // Write it out
+    for (size_t i = 0; i < c.size (); ++i)
+        write_compressed (s, c[i]);
+
+    for (size_t i = 0; i < e.size (); ++i)
+        write_compressed (s, e[i]);
 }
 
 inline void write_spoc_file (std::ostream &s,
