@@ -84,9 +84,9 @@ test:
 memcheck:
 	@echo "Running memchecks..."
 	@parallel --jobs 24 --halt now,fail=1 \
-		"echo {} && valgrind --leak-check=full --error-exitcode=1 --quiet {}" ::: build/debug/test_*
+		"echo {} && valgrind --leak-check=full --error-exitcode=1 --quiet --suppressions=valgrind.suppressions {}" ::: build/debug/test_*
 	@parallel --jobs 24 --halt now,fail=1 \
-		"echo {} && valgrind --leak-check=full --error-exitcode=1 --quiet {}" ::: build/release/test_*
+		"echo {} && valgrind --leak-check=full --error-exitcode=1 --quiet --suppressions=valgrind.suppressions {}" ::: build/release/test_*
 
 .PHONY: coverage # Generate a coverage report
 coverage: build
