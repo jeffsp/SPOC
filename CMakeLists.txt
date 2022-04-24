@@ -47,6 +47,7 @@ endmacro()
 add_app(text2spoc)
 add_app(spoc2text)
 add_app(info)
+add_app(srs)
 add_app(tile)
 
 macro(add_laslib_app name)

@@ -1,5 +1,14 @@
 # Introduction
 
+SPOC is the Simple POint Cloud format used to store 3D geospatial point
+data. Each record in a SPOC file has an associated X, Y, and Z
+coordinate, and possibly other data fields, like red, green, and blue
+color information, classification information, point source identifier,
+intensity information, or arbitrary integer values.
+
+The X, Y, and Z values are stored at 64-bit precision floating point
+numbers.
+
 The ASPRS LAS file format is used to store geospatial data in the form
 of point clouds.
 
@@ -79,5 +88,5 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [ ] spoc sort: by field/by voxel
 * [ ] spoc spatial\_filter: 2D/3D spatial filtering: changes 3D structure
 * [ ] spoc srs: Get/set SRS
-* [ ] spoc tile
+* [X] spoc tile
 * [ ] spoc transform/transform\_lambda: Functional plugins with python/bash

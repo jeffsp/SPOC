@@ -29,14 +29,14 @@ inline args get_args (int argc, char **argv, const std::string &usage)
     {
         int option_index = 0;
         static struct option long_options[] = {
-            {"help", no_argument, 0,  'h' },
-            {"verbose", no_argument, 0,  'v' },
-            {"force", no_argument, 0,  'f' },
-            {"tiles", required_argument, 0,  't' },
-            {"digits", required_argument, 0,  'd' },
-            {"tile-size", required_argument, 0,  's' },
-            {"prefix", required_argument, 0,  'p' },
-            {0,      0,           0,  0 }
+            {"help", no_argument, 0, 'h'},
+            {"verbose", no_argument, 0, 'v'},
+            {"force", no_argument, 0, 'f'},
+            {"tiles", required_argument, 0, 't'},
+            {"digits", required_argument, 0, 'd'},
+            {"tile-size", required_argument, 0, 's'},
+            {"prefix", required_argument, 0, 'p'},
+            {0, 0, 0, 0}
         };
 
         int c = getopt_long(argc, argv, "hvft:d:s:p:", long_options, &option_index);

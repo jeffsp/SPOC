@@ -30,14 +30,14 @@ inline args get_args (int argc, char **argv, const std::string &usage)
     {
         int option_index = 0;
         static struct option long_options[] = {
-            {"help", no_argument, 0,  'h' },
-            {"verbose", no_argument, 0,  'v' },
-            {"json", no_argument, 0,  'j' },
-            {"header-info", no_argument, 0,  'e' },
-            {"summary-info", no_argument, 0,  's' },
-            {"classifications", no_argument, 0,  'l' },
-            {"compact", no_argument, 0,  'c' },
-            {0,      0,           0,  0 }
+            {"help", no_argument, 0, 'h'},
+            {"verbose", no_argument, 0, 'v'},
+            {"json", no_argument, 0, 'j'},
+            {"header-info", no_argument, 0, 'e'},
+            {"summary-info", no_argument, 0, 's'},
+            {"classifications", no_argument, 0, 'l'},
+            {"compact", no_argument, 0, 'c'},
+            {0, 0, 0, 0}
         };
 
         int c = getopt_long(argc, argv, "hvjeslc", long_options, &option_index);

@@ -125,7 +125,7 @@ inline std::string get_summary_string (const std::string &label, const U &x, con
     return s.str ();
 }
 
-// Process a spoc file and write to stdout
+// Process a spoc file and write to 'os'
 void process (std::ostream &os,
     const spoc::spoc_file &f,
     const bool json,
