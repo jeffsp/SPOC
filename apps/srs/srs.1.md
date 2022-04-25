@@ -9,7 +9,8 @@ file.
 
 # USAGE
 
-spoc_srs [*options*] [*file*]
+spoc_srs [*options*] [*input1*] [*input2*] [*...*]
+spoc_srs [*options*] -s '<OGR WKT string>' *input* *output*
 
 # DESCRIPTION
 
@@ -35,13 +36,35 @@ This is the same format used by the ASPRS LAS 1.4 standard.
 
 Get the SRS
 
-    $ spoc_srs < Austin.spoc
-    $ spoc_srs aoi1.spoc aoi2.spoc aoi3.spoc
+    $ ls omaha?.spoc
+    omaha1.spoc  omaha2.spoc  omaha3.spoc
+    $ spoc_srs < omaha1.spoc
+    PROJCS["WGS 84 / WGS 84 / UTM 18N",...
+    $ spoc_srs omaha*.spoc
+    PROJCS["WGS 84 / WGS 84 / UTM 18N",...
+    PROJCS["WGS 84 / WGS 84 / UTM 18N",...
+    PROJCS["WGS 84 / WGS 84 / UTM 18N",...
 
 Set the SRS
 
-    $ spoc_srs -s $(cat ogr_wkt.txt) < Austin.spoc > Austin2.spoc
+    $ spoc_srs -s "invalid" omaha3.spoc omaha3_no_srs.spoc
+    $ spoc_srs omaha3_no_srs.spoc
+    invalid
+    $ spoc_srs omaha1.spoc > srs.txt
+    $ spoc_srs -s "$(cat srs.txt)" omaha3_no_srs.spoc omaha3_with_srs.spoc
+    $ spoc_srs omaha3_with_srs.spoc
+    PROJCS["WGS 84 / WGS 84 / UTM 18N",...
+
+Equivalently
+
+    $ spoc_srs -s "invalid" < omaha3.spoc > omaha3_no_srs.spoc
+    $ spoc_srs omaha3_no_srs.spoc
+    invalid
+    $ spoc_srs omaha1.spoc > srs.txt
+    $ spoc_srs -s "$(cat srs.txt)" < omaha3_no_srs.spoc > omaha3_with_srs.spoc
+    $ spoc_srs omaha3_with_srs.spoc
+    PROJCS["WGS 84 / WGS 84 / UTM 18N",...
 
 # SEE ALSO
 
-SPOC_SRS(1)
+SPOC_INFO(1)
