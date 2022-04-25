@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-spoc_spoc2las --help 2> /dev/null
+spoc_las2spoc --help 2> /dev/null
 
 # Create a tmp directory for intermediate files
 TMPDIR=$(mktemp --tmpdir --directory spoc.XXXXXXXX)
@@ -12,4 +12,4 @@ function cleanup {
 # Run cleanup on exit
 trap cleanup EXIT
 
-spoc_spoc2las ./test_data/lidar/juarez50.spoc ${TMPDIR}/juarez50.las
+spoc_las2spoc ./test_data/lidar/juarez50.las ${TMPDIR}/juarez50.spoc
