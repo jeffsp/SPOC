@@ -36,11 +36,48 @@ int main (int argc, char **argv)
 
             if (args.set_srs)
             {
+                // Set SRS
                 f.set_wkt (args.srs);
+
+                if (args.verbose)
+                    clog << "Writing to stdout" << endl;
+
                 write_spoc_file (cout, f);
             }
             else
+            {
                 cout << f.get_wkt () << endl;
+            }
+        }
+        else if (args.set_srs)
+        {
+            if (args.fns.size () != 2)
+                throw std::runtime_error (
+                    "When setting the SRS, you need to specify one input file and one output file");
+
+            if (args.verbose)
+                clog << "Reading " << args.fns[0] << endl;
+
+            ifstream ifs (args.fns[0]);
+
+            if (!ifs)
+                throw runtime_error ("Could not open file for reading");
+
+            // Read into spoc_file struct
+            spoc_file f = read_spoc_file (ifs);
+
+            // Set SRS
+            f.set_wkt (args.srs);
+
+            if (args.verbose)
+                clog << "Writing " << args.fns[1] << endl;
+
+            ofstream ofs (args.fns[1]);
+
+            if (!ofs)
+                throw runtime_error ("Could not open file for writing");
+
+            write_spoc_file (ofs, f);
         }
         else
         {
@@ -57,13 +94,7 @@ int main (int argc, char **argv)
                 // Read into spoc_file struct
                 spoc_file f = read_spoc_file (ifs);
 
-                if (args.set_srs)
-                {
-                    f.set_wkt (args.srs);
-                    write_spoc_file (cout, f);
-                }
-                else
-                    cout << f.get_wkt () << endl;
+                cout << f.get_wkt () << endl;
             }
         }
 
