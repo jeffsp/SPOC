@@ -22,6 +22,7 @@ int main (int argc, char **argv)
         if (args.verbose)
         {
             clog << "verbose\t" << args.verbose << endl;
+            clog << "srs\t'" << args.srs << "'" << endl;
             clog << "filenames\t" << args.fns.size () << endl;
         }
 
