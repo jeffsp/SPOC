@@ -1,4 +1,19 @@
 {
+   <test_info_openmp_parallel>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:pthread_create@@GLIBC_2.34
+   fun:gomp_team_start
+   fun:GOMP_parallel_sections
+   fun:_ZN4spoc15write_spoc_fileERSoRKNS_9spoc_fileE
+   fun:_ZN4spoc15write_spoc_fileERSoRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKSt6vectorINS_12point_recordESaISA_EE
+   fun:_Z9test_infov
+   fun:main
+}
+{
    <test_spoc_file_openmp_parallel>
    Memcheck:Leak
    match-leak-kinds: possible
@@ -23,8 +38,22 @@
    fun:pthread_create@@GLIBC_2.34
    fun:gomp_team_start
    fun:GOMP_parallel_sections
-   fun:_ZN4spoc15write_spoc_fileERSoRKNS_9spoc_fileE
    fun:_ZN4spoc15write_spoc_fileERSoRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKSt6vectorINS_12point_recordESaISA_EE
    fun:_Z9test_infov
+   fun:main
+}
+{
+   <test_spoc_file_openmp_parallel>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:pthread_create@@GLIBC_2.34
+   fun:gomp_team_start
+   fun:GOMP_parallel_sections
+   fun:_ZN4spoc15write_spoc_fileERSoRKNS_9spoc_fileE
+   fun:_ZN4spoc15write_spoc_fileERSoRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKSt6vectorINS_12point_recordESaISA_EE
+   fun:_Z17test_spoc_file_iov
    fun:main
 }
