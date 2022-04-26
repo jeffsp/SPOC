@@ -72,21 +72,27 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] Cppcheck
 * [X] read/write spoc files
 * [X] read/write las files
+* [X] spoc info
+* [X] spoc spoc2text/text2spoc
+* [X] spoc spoc2las/las2spoc
+* [X] spoc srs: Get/set SRS
+* [X] spoc tile
 * [ ] spoc compare: Compare two point clouds, specifying fields
-* [ ] spoc connect: Connected components, saved in extra fields
+           header, srs, fields, not(invert return value)
+           x, y, z, c, p, i, r, g, b, extra 0-7
+* [ ] spoc connect: Connected components, component id saved in extra field
 * [ ] spoc crop: 2D/3D meters/percentage/by classification/by component
 * [ ] spoc decimate
-* [X] spoc spoc2text/text2spoc
 * [ ] spoc field\_filter: 2D/3D spatial filtering: does not changes xyz coords
-* [X] spoc info
+* [ ] spoc voxels: set i, j, k voxel indexes in extra[[0, 1, 2]
+           offset, random offset (radius), seed
 * [ ] spoc interpolate
-* [X] spoc spoc2las/las2spoc
 * [ ] spoc merge: optionally set point source id
 * [ ] spoc neighbors: set index of neighbors in the extra fields
-* [ ] spoc octree: break into files arranged as an octree, access/create spoc files
-* [ ] spoc quantize: on voxel boundaries
-* [ ] spoc sort: by field/by voxel
+* [ ] spoc sort: by field, multiple fields
 * [ ] spoc spatial\_filter: 2D/3D spatial filtering: changes 3D structure
-* [ ] spoc srs: Get/set SRS
-* [X] spoc tile
-* [ ] spoc transform/transform\_lambda: Functional plugins with python/bash
+           guassian filter, quantize on voxel boundaries, median filter
+* [ ] spoc transform: Replace fields
+* [ ] spoc lambda: Functional plugins using named pipes
+           single point filter
+* [ ] spoc octree: break into files arranged as an octree, access/create spoc files
