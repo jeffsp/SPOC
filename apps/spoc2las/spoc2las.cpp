@@ -68,6 +68,9 @@ int main (int argc, char **argv)
         lasheader.point_data_format = 2;
         lasheader.point_data_record_length = 26;
 
+        if (!wkt.empty ())
+            lasheader.set_geo_ogc_wkt (wkt.size (), wkt.data ());
+
         // Initialize the point
         LASpoint laspoint;
         laspoint.init(&lasheader, lasheader.point_data_format, lasheader.point_data_record_length, 0);
