@@ -10,7 +10,7 @@ file.
 # USAGE
 
 spoc_srs [*options*] [*input1*] [*input2*] [*...*]
-spoc_srs [*options*] -s '<OGR WKT string>' *input* *output*
+spoc_srs [*options*] -s '<OGC WKT string>' *input* *output*
 
 # DESCRIPTION
 
