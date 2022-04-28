@@ -10,8 +10,8 @@ namespace diff
 {
 
 inline int diff (const spoc_file &f1, const spoc_file &f2,
-    const bool header = false,
-    const bool data = false,
+    const bool header_only = false,
+    const bool data_only = false,
     const std::vector<int> fields = std::vector<int> (),
     const bool reverse = false)
 {
@@ -22,13 +22,13 @@ inline int diff (const spoc_file &f1, const spoc_file &f2,
     bool check_data = true;
     bool check_fields = false;
 
-    if (header)
+    if (header_only)
     {
         check_header = true;
         check_data = false;
         check_fields = false;
     }
-    if (data)
+    if (data_only)
     {
         check_header = false;
         check_data = true;

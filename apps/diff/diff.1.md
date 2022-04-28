@@ -23,10 +23,10 @@ otherwise return a success code (0);
 --verbose, -v
 :   Set verbose mode ON
 
---header, -e
+--header-only, -e
 : Only compare the headers
 
---data, -d
+--data-only, -d
 : Only compare the data fields
 
 --field=*F*, -f *F*

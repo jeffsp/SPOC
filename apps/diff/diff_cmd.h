@@ -15,10 +15,10 @@ struct args
 {
     bool help = false;
     bool verbose = false;
-    bool header = false;
-    bool data = true;
+    bool header_only = false;
+    bool data_only = false;
     std::vector<int> fields;
-    bool reverse = true;
+    bool reverse = false;
     std::string fn1;
     std::string fn2;
 };
@@ -32,8 +32,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
-            {"header", no_argument, 0, 'e'},
-            {"data", no_argument, 0, 'd'},
+            {"header-only", no_argument, 0, 'e'},
+            {"data-only", no_argument, 0, 'd'},
             {"field", required_argument, 0, 'f'},
             {"reverse", no_argument, 0, 'r'},
             {0, 0, 0, 0}
@@ -56,8 +56,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 return args;
             }
             case 'v': args.verbose = true; break;
-            case 'e': args.header = true; break;
-            case 'd': args.data = true; break;
+            case 'e': args.header_only = true; break;
+            case 'd': args.data_only = true; break;
             case 'f': args.fields.push_back (atoi (optarg)); break;
             case 'r': args.reverse = true; break;
         }

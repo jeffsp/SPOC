@@ -22,15 +22,15 @@ int main (int argc, char **argv)
         if (args.verbose)
         {
             clog << "verbose\t" << args.verbose << endl;
-            clog << "header\t" << args.header << endl;
-            clog << "data\t" << args.data << endl;
+            clog << "header-only\t" << args.header_only << endl;
+            clog << "data-only\t" << args.data_only << endl;
             clog << "fields\t" << args.fields.size () << endl;
             clog << "reverse\t" << args.reverse << endl;
             clog << "filename1\t'" << args.fn1 << "'" << endl;
             clog << "filename2\t'" << args.fn2 << "'" << endl;
         }
 
-        if (args.header + args.data + !args.fields.empty () > 2)
+        if (args.header_only + args.data_only + !args.fields.empty () > 2)
             throw std::runtime_error ("Can't specify more than 1 of 'header-only', 'data-only', and specific fields");
 
         if (args.verbose)
@@ -55,7 +55,7 @@ int main (int argc, char **argv)
 
         const int return_code =
             spoc::diff::diff (f1, f2,
-                args.header, args.data, args.fields, args.reverse);
+                args.header_only, args.data_only, args.fields, args.reverse);
 
         return return_code;
     }
