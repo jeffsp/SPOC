@@ -77,9 +77,12 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] spoc spoc2las/las2spoc
 * [X] spoc srs: Get/set SRS
 * [X] spoc tile
-* [ ] spoc compare: Compare two point clouds, specifying fields
-           header, srs, fields, not(invert return value)
-           x, y, z, c, p, i, r, g, b, extra 0-7
+* [ ] spoc diff: diff two point clouds, return error if different
+           header only
+           fields only
+           srs only
+           field F only: x, y, z, c, p, i, r, g, b, 0-7
+           not, inverse results
 * [ ] spoc connect: Connected components, component id saved in extra field
 * [ ] spoc crop: 2D/3D meters/percentage/by classification/by component
 * [ ] spoc decimate
@@ -88,7 +91,8 @@ The proposed extension is SPOC, or Simple POint Cloud.
            offset, random offset (radius), seed
 * [ ] spoc interpolate
 * [ ] spoc merge: optionally set point source id
-* [ ] spoc neighbors: set index of neighbors in the extra fields
+* [ ] spoc neighbors: get indexes of neighbors within a radius
+           Set in extra fields 0-7
 * [ ] spoc sort: by field, multiple fields
 * [ ] spoc spatial\_filter: 2D/3D spatial filtering: changes 3D structure
            guassian filter, quantize on voxel boundaries, median filter
