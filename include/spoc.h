@@ -159,6 +159,12 @@ class spoc_file
         for (size_t j = 0; j < extra.size (); ++j)
             set (extra[j], n, pr.extra[j]);
     }
+    // Set the version for testing
+    void set_version (const uint8_t major, const uint8_t minor)
+    {
+        major_version = major;
+        minor_version = minor;
+    }
     // Set the well-known-text SRS string
     void set_wkt (const std::string &s)
     {
