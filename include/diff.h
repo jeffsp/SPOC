@@ -2,6 +2,7 @@
 
 #include "spoc.h"
 #include <iostream>
+#include <sstream>
 
 namespace spoc
 {
@@ -82,9 +83,10 @@ inline int diff (const spoc_file &f1, const spoc_file &f2,
             switch (field)
             {
                 default: {
-                             std::string s ("Unknown field specifier: ");
-                             s += std::to_string (static_cast<char> (field));
-                             throw std::runtime_error (s);
+                             std::stringstream ss;
+                             ss << "Unknown field specifier: ";
+                             ss << static_cast<char> (field);
+                             throw std::runtime_error (ss.str ());
                          }
                 case 'x': {
                               if (f1.get_x () != f2.get_x ())
