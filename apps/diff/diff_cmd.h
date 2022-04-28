@@ -58,7 +58,13 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 'v': args.verbose = true; break;
             case 'e': args.header_only = true; break;
             case 'd': args.data_only = true; break;
-            case 'f': args.fields.push_back (atoi (optarg)); break;
+            case 'f':
+            {
+                std::string s = std::string (optarg);
+                for (size_t i = 0; i < s.size (); ++i)
+                    args.fields.push_back (s[i]);
+                break;
+            }
             case 'r': args.reverse = true; break;
         }
     }
