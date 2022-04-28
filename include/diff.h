@@ -12,7 +12,7 @@ namespace diff
 inline int diff (const spoc_file &f1, const spoc_file &f2,
     const bool header_only = false,
     const bool data_only = false,
-    const std::vector<int> fields = std::vector<int> (),
+    const std::vector<int> &fields = std::vector<int> (),
     const bool reverse = false)
 {
     // Assume it's a success
