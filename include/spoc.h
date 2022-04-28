@@ -159,7 +159,7 @@ class spoc_file
         for (size_t j = 0; j < extra.size (); ++j)
             set (extra[j], n, pr.extra[j]);
     }
-    // Set the wll-known-text SRS string
+    // Set the well-known-text SRS string
     void set_wkt (const std::string &s)
     {
         wkt = s;
@@ -190,18 +190,18 @@ class spoc_file
     const char *get_signature () const { return signature; }
     const uint8_t get_major_version () const { return major_version; }
     const uint8_t get_minor_version () const { return minor_version; }
-    const std::string get_wkt () const { return wkt; }
+    const std::string &get_wkt () const { return wkt; }
     const size_t get_npoints () const { return npoints; }
-    const std::vector<double> get_x () const { return x; }
-    const std::vector<double> get_y () const { return y; }
-    const std::vector<double> get_z () const { return z; }
-    const std::vector<uint16_t> get_c () const { return c; }
-    const std::vector<uint16_t> get_p () const { return p; }
-    const std::vector<uint16_t> get_i () const { return i; }
-    const std::vector<uint16_t> get_r () const { return r; }
-    const std::vector<uint16_t> get_g () const { return g; }
-    const std::vector<uint16_t> get_b () const { return b; }
-    const std::array<std::vector<uint64_t>,8> get_extra () const { return extra; }
+    const std::vector<double> &get_x () const { return x; }
+    const std::vector<double> &get_y () const { return y; }
+    const std::vector<double> &get_z () const { return z; }
+    const std::vector<uint16_t> &get_c () const { return c; }
+    const std::vector<uint16_t> &get_p () const { return p; }
+    const std::vector<uint16_t> &get_i () const { return i; }
+    const std::vector<uint16_t> &get_r () const { return r; }
+    const std::vector<uint16_t> &get_g () const { return g; }
+    const std::vector<uint16_t> &get_b () const { return b; }
+    const std::array<std::vector<uint64_t>,8> &get_extra () const { return extra; }
 
     // I/O
     friend std::ostream &operator<< (std::ostream &s, const spoc_file &f);
