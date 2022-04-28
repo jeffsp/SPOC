@@ -1,4 +1,8 @@
 #!/usr/bin/bash
+
+# Fail on error
+set -e
+
 spoc_las2spoc --help 2> /dev/null
 
 # Create a tmp directory for intermediate files
