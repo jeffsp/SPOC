@@ -83,10 +83,11 @@ The proposed extension is SPOC, or Simple POint Cloud.
            -field F only: x, y, z, c, p, i, r, g, b, 0-7
            -not, inverse results
 * [ ] spoc connect: Connected components, component id saved in extra field
+* [ ] spoc croptile: Tile into irregular tiles based upon fields, like ID
 * [ ] spoc crop: 2D/3D meters/percentage/by classification/by component
 * [ ] spoc decimate
 * [ ] spoc field\_filter: 2D/3D spatial filtering: does not changes xyz coords
-* [ ] spoc voxels: set i, j, k voxel indexes in extra[[0, 1, 2]
+* [ ] spoc voxelize: set i, j, k voxel indexes in extra[[0, 1, 2]
            offset, random offset (radius), seed
 * [ ] spoc interpolate
 * [ ] spoc merge: optionally set point source id

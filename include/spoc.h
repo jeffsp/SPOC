@@ -48,6 +48,22 @@ inline std::ostream &operator<< (std::ostream &s, const point_record &p)
     return s;
 }
 
+inline std::istream &operator>> (std::istream &s, point_record &p)
+{
+    s >> p.x;
+    s >> p.y;
+    s >> p.z;
+    s >> p.c;
+    s >> p.p;
+    s >> p.i;
+    s >> p.r;
+    s >> p.g;
+    s >> p.b;
+    for (size_t i = 0; i < p.extra.size (); ++i)
+        s >> p.extra[i];
+    return s;
+}
+
 inline bool operator== (const point_record &a, const point_record &b)
 {
     if (a.x != b.x) return false;
@@ -126,7 +142,7 @@ class spoc_file
         return true;
     }
     // Get record number 'n'
-    point_record get (const size_t n)
+    point_record get (const size_t n) const
     {
         assert (n < npoints);
         point_record pr;
