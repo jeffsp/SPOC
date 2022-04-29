@@ -62,7 +62,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
         args.input_fn = argv[optind++];
 
     // Get optional output filename
-    if (optind < argc)
+    if (optind < argc) // cppcheck-suppress duplicateCondition
         args.output_fn = argv[optind++];
 
     // Check command line
