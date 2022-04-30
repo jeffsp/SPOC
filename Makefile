@@ -30,7 +30,7 @@ cppcheck:
 	@echo "Running cppcheck..."
 	@cppcheck --std=c++14 --language=c++ --enable=all \
 		-q --error-exitcode=255 \
-		-I include -I apps -I laslib/LASlib/inc \
+		-I include -I apps -I laslib/LASlib/inc -I filters \
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
 		--suppress='*:laslib/LASlib/inc/*' \
