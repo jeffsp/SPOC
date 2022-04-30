@@ -14,11 +14,10 @@ struct args
 {
     bool help = false;
     bool verbose = false;
-    bool force = false;
     std::string input_fn;
     std::string output_fn;
-    std::string output_pipe_name;
     std::string input_pipe_name;
+    std::string output_pipe_name;
 };
 
 inline args get_args (int argc, char **argv, const std::string &usage)
@@ -30,12 +29,12 @@ inline args get_args (int argc, char **argv, const std::string &usage)
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
-            {"output-pipe-name", required_argument, 0, 'o'},
             {"input-pipe-name", required_argument, 0, 'i'},
+            {"output-pipe-name", required_argument, 0, 'o'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvo:i:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvi:o:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -52,8 +51,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 return args;
             }
             case 'v': args.verbose = true; break;
-            case 'o': args.output_pipe_name = std::string (optarg); break;
             case 'i': args.input_pipe_name = std::string (optarg); break;
+            case 'o': args.output_pipe_name = std::string (optarg); break;
         }
     }
 

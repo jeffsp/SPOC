@@ -30,9 +30,8 @@ int main (int argc, char **argv)
         if (args.verbose)
         {
             clog << "verbose\t" << args.verbose << endl;
-            clog << "force\t" << args.force << endl;
-            clog << "output_pipe_name\t'" << args.output_pipe_name << "'" << endl;
-            clog << "input_pipe_name\t'" << args.input_pipe_name << "'" << endl;
+            clog << "input-pipe-name\t'" << args.input_pipe_name << "'" << endl;
+            clog << "output-pipe-name\t'" << args.output_pipe_name << "'" << endl;
         }
 
         // Input file
@@ -61,29 +60,34 @@ int main (int argc, char **argv)
         }
 
         // Open the pipes
-        if (args.output_pipe_name.empty ())
-            throw runtime_error ("No output pipe name was specified");
-
         if (args.input_pipe_name.empty ())
             throw runtime_error ("No input pipe name was specified");
 
+        if (args.output_pipe_name.empty ())
+            throw runtime_error ("No output pipe name was specified");
+
+        // The transformer writes to the filter's input pipe
         if (args.verbose)
-            clog << "Opening " << args.output_pipe_name << " for writing" << endl;
+            clog << "Opening " << args.input_pipe_name << " for writing" << endl;
 
-        ofstream ops (args.output_pipe_name);
-
-        if (!ops)
-            throw runtime_error ("Could not open file for writing");
-
-        if (args.verbose)
-            clog << "Opening " << args.input_pipe_name << " for reading" << endl;
-
-        ifstream ips (args.input_pipe_name);
+        ofstream ips (args.input_pipe_name);
 
         if (!ips)
+            throw runtime_error ("Could not open file for writing");
+
+        // The transformer reads from the filter's output pipe
+        if (args.verbose)
+            clog << "Opening " << args.output_pipe_name << " for reading" << endl;
+
+        ifstream ops (args.output_pipe_name);
+
+        if (!ops)
             throw runtime_error ("Could not open file for reading");
 
-        spoc_file g = spoc::transform::process (f, ops, ips);
+        if (args.verbose)
+            clog << "Processing " << f.get_npoints () << " point records" << endl;
+
+        spoc_file g = spoc::transform::process (f, ips, ops);
 
         if (args.output_fn.empty ())
         {

@@ -57,6 +57,8 @@ The proposed extension is SPOC, or Simple POint Cloud.
     * zlib compression library
     * laslib for las/spoc translation utilities
 * Functional programming style: avoid OOP
+* SPOC makes assumptions about the byte ordering, and is therefore not
+  portable
 
 # TODO
 

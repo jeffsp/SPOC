@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdint>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -48,20 +49,62 @@ inline std::ostream &operator<< (std::ostream &s, const point_record &p)
     return s;
 }
 
-inline std::istream &operator>> (std::istream &s, point_record &p)
+inline void write_binary_header (std::ostream &s,
+    const uint8_t major_version,
+    const uint8_t minor_version,
+    const uint64_t npoints)
 {
-    s >> p.x;
-    s >> p.y;
-    s >> p.z;
-    s >> p.c;
-    s >> p.p;
-    s >> p.i;
-    s >> p.r;
-    s >> p.g;
-    s >> p.b;
-    for (size_t i = 0; i < p.extra.size (); ++i)
-        s >> p.extra[i];
-    return s;
+    const char *signature = "SPOC";
+    s.write (reinterpret_cast<const char*>(signature), 4 * sizeof(char));
+    s.write (reinterpret_cast<const char*>(&major_version), sizeof(uint8_t));
+    s.write (reinterpret_cast<const char*>(&minor_version), sizeof(uint8_t));
+    s.write (reinterpret_cast<const char*>(&npoints), sizeof(uint64_t));
+    s.flush ();
+}
+
+inline void read_binary_header (std::istream &s,
+    char signature[4],
+    uint8_t &major_version,
+    uint8_t &minor_version,
+    size_t &npoints)
+{
+    s.read (reinterpret_cast<char*>(&signature), 4 * sizeof(char));
+    s.read (reinterpret_cast<char*>(&major_version), sizeof(uint8_t));
+    s.read (reinterpret_cast<char*>(&minor_version), sizeof(uint8_t));
+    s.read (reinterpret_cast<char*>(&npoints), sizeof(uint64_t));
+}
+
+inline void write_binary (std::ostream &s, const point_record &p)
+{
+    s.write (reinterpret_cast<const char*>(&p.x), sizeof(double));
+    s.write (reinterpret_cast<const char*>(&p.y), sizeof(double));
+    s.write (reinterpret_cast<const char*>(&p.z), sizeof(double));
+    s.write (reinterpret_cast<const char*>(&p.c), sizeof(uint16_t));
+    s.write (reinterpret_cast<const char*>(&p.p), sizeof(uint16_t));
+    s.write (reinterpret_cast<const char*>(&p.i), sizeof(uint16_t));
+    s.write (reinterpret_cast<const char*>(&p.r), sizeof(uint16_t));
+    s.write (reinterpret_cast<const char*>(&p.g), sizeof(uint16_t));
+    s.write (reinterpret_cast<const char*>(&p.b), sizeof(uint16_t));
+    for (size_t j = 0; j < p.extra.size (); ++j)
+        s.write (reinterpret_cast<const char*>(&p.extra[j]), sizeof(uint64_t));
+    s.flush ();
+}
+
+inline point_record read_binary (std::istream &s)
+{
+    point_record p;
+    s.read (reinterpret_cast<char*>(&p.x), sizeof(double));
+    s.read (reinterpret_cast<char*>(&p.y), sizeof(double));
+    s.read (reinterpret_cast<char*>(&p.z), sizeof(double));
+    s.read (reinterpret_cast<char*>(&p.c), sizeof(uint16_t));
+    s.read (reinterpret_cast<char*>(&p.p), sizeof(uint16_t));
+    s.read (reinterpret_cast<char*>(&p.i), sizeof(uint16_t));
+    s.read (reinterpret_cast<char*>(&p.r), sizeof(uint16_t));
+    s.read (reinterpret_cast<char*>(&p.g), sizeof(uint16_t));
+    s.read (reinterpret_cast<char*>(&p.b), sizeof(uint16_t));
+    for (size_t j = 0; j < p.extra.size (); ++j)
+        s.read (reinterpret_cast<char*>(&p.extra[j]), sizeof(uint64_t));
+    return p;
 }
 
 inline bool operator== (const point_record &a, const point_record &b)
