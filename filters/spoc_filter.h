@@ -89,14 +89,9 @@ int filter_entry (int argc, char **argv, T process_function)
         uint8_t major_version;
         uint8_t minor_version;
         size_t npoints;
-
         read_header (ifs, signature, major_version, minor_version, npoints);
 
-        clog << "Signature '" << signature << "'" << endl;
-        clog << "Major version " << static_cast<int> (major_version) << endl;
-        clog << "Minor version " << static_cast<int> (minor_version) << endl;
-        clog << "Total points " << npoints << endl;
-
+        // Check the header
         if (string (signature) != string ("SPOC"))
             throw runtime_error ("The header signature is incorrect");
 
@@ -106,6 +101,7 @@ int filter_entry (int argc, char **argv, T process_function)
         if (minor_version > MINOR_VERSION)
             throw runtime_error ("The minor version is newer than the filter version");
 
+        // Process the points one by one
         for (size_t i = 0; i < npoints; ++i)
         {
             // Get a point

@@ -78,31 +78,34 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] spoc spoc2text/text2spoc
 * [X] spoc spoc2las/las2spoc
 * [X] spoc srs: Get/set SRS
-* [X] spoc tile
+* [X] spoc tile: Tile into regular non-overlapping tiles.
 * [X] spoc diff: diff two point clouds, return error if different
-           -header only
-           -data only
-           -field F only: x, y, z, c, p, i, r, g, b, 0-7
-           -not, inverse results
-* [ ] spoc connect: Connected components, component id saved in extra field
-* [ ] spoc croptile: Tile into irregular tiles based upon fields, like ID
+           Header only
+           Data only
+           Field F only - x, y, z, c, p, i, r, g, b, 0-7
+           Not - inverse results
+* [X] spoc transform:
+           Replace fields
+           Allow arbitrary operations using named pipes
+* [ ] spoc filter:
+           2D/3D field filtering - does not changes xyz coords
+           Decimate - Remove points
+           Voxelize - Replace X, Y, Z locations with voxelized locations
+                    - offset, random offset (radius), seed
+           Unique - Replace duplicate locations, use voting to set field values
+           Spatial Filter - 2D/3D spatial filtering, changes 3D structure
+                          - Guassian filter
+                          - Median filter
+                          - X, Y, Z
+           Allow arbitrary operations using named pipes
+* [ ] spoc numeric: Allow numeric operations on fields, using parallel calls to `bc`
+* [ ] spoc connect: Connected components, component id saved in extra[n]
 * [ ] spoc crop: 2D/3D meters/percentage/by classification/by component
-* [ ] spoc decimate
-* [ ] spoc field\_filter: 2D/3D spatial filtering: does not changes xyz coords
-* [ ] spoc voxelize: set i, j, k voxel indexes in extra[[0, 1, 2]
-           offset, random offset (radius), seed
-* [ ] spoc interpolate
 * [ ] spoc merge: optionally set point source id
            -f force merge
            -size threshold = 16 (X number of point clouds), don't merge
            if area increases by more than a factor of this threshold
 * [ ] spoc neighbors: get indexes of neighbors within a radius
            Set in extra fields 0-7
-* [ ] spoc sort: by field, multiple fields
-* [ ] spoc spatial\_filter: 2D/3D spatial filtering: changes 3D structure
-           guassian filter, quantize on voxel boundaries, median filter
-* [ ] spoc transform: Replace fields
-* [ ] spoc lambda: Functional plugins using named pipes
-           single point filter
 * [ ] spoc octree: break into files arranged as an octree, access/create spoc files
            -z Don't break on z value (create quadtrees)

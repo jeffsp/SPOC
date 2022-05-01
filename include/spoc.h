@@ -268,6 +268,18 @@ class spoc_file
     const std::vector<uint16_t> &get_b () const { return b; }
     const std::array<std::vector<uint64_t>,8> &get_extra () const { return extra; }
 
+    // Write accessors
+    void set_x (const size_t n, const double v) { set (x, n, v); }
+    void set_y (const size_t n, const double v) { set (y, n, v); }
+    void set_z (const size_t n, const double v) { set (z, n, v); }
+    void set_c (const size_t n, const uint16_t v) { set (c, n, v); }
+    void set_p (const size_t n, const uint16_t v) { set (p, n, v); }
+    void set_i (const size_t n, const uint16_t v) { set (i, n, v); }
+    void set_r (const size_t n, const uint16_t v) { set (r, n, v); }
+    void set_g (const size_t n, const uint16_t v) { set (g, n, v); }
+    void set_b (const size_t n, const uint16_t v) { set (b, n, v); }
+    void set_extra (const size_t n, const size_t j, const uint64_t v) { set (extra[j], n, v); }
+
     // I/O
     friend std::ostream &operator<< (std::ostream &s, const spoc_file &f);
     friend void write_spoc_file (std::ostream &s, const spoc_file &f);

@@ -1,15 +1,44 @@
 #include "spoc.h"
 #include "transform.h"
 #include "transform_cmd.h"
-#include <algorithm>
-#include <filesystem>
 #include <iostream>
-#include <limits>
-#include <sstream>
 #include <stdexcept>
 
 using namespace std;
 using namespace spoc;
+
+// Check arguments
+void check (const cmd::args &args)
+{
+    // Show args
+    if (args.verbose)
+    {
+        clog << "verbose\t" << args.verbose << endl;
+        clog << "field-name\t'" << args.field_name << "'" << endl;
+        if (args.set_flag)
+            clog << "set\t" << args.set_value << endl;
+        for (auto i : args.replace_pairs)
+            clog << "replace\t" << i.first << "->" << i.second << std::endl;
+        clog << "input-pipe-name\t'" << args.input_pipe_name << "'" << endl;
+        clog << "output-pipe-name\t'" << args.output_pipe_name << "'" << endl;
+    }
+
+    if (args.set_flag && !args.replace_pairs.empty ())
+        throw runtime_error ("You can't use the set option together with the replace option");
+
+    if (args.input_pipe_name.empty () != args.output_pipe_name.empty ())
+        throw runtime_error ("The pipe names must either be both empty or set to a pipename");
+
+    if (!args.input_pipe_name.empty ())
+    {
+        if (args.input_pipe_name == args.output_pipe_name)
+            throw runtime_error ("The input and output pipes cannot have the same name");
+        if (args.set_flag)
+            throw runtime_error ("You can't use pipes with the set option");
+        if (!args.replace_pairs.empty ())
+            throw runtime_error ("You can't use pipes with the replace option");
+    }
+}
 
 int main (int argc, char **argv)
 {
@@ -26,15 +55,10 @@ int main (int argc, char **argv)
         if (args.help)
             return 0;
 
-        // Show args
-        if (args.verbose)
-        {
-            clog << "verbose\t" << args.verbose << endl;
-            clog << "input-pipe-name\t'" << args.input_pipe_name << "'" << endl;
-            clog << "output-pipe-name\t'" << args.output_pipe_name << "'" << endl;
-        }
+        // Check the arguments
+        check (args);
 
-        // Input file
+        // Read the input file
         spoc_file f;
 
         if (args.input_fn.empty ())
@@ -59,36 +83,19 @@ int main (int argc, char **argv)
             f = read_spoc_file (ifs);
         }
 
-        // Open the pipes
-        if (args.input_pipe_name.empty ())
-            throw runtime_error ("No input pipe name was specified");
+        // The result goes here
+        spoc_file g;
 
-        if (args.output_pipe_name.empty ())
-            throw runtime_error ("No output pipe name was specified");
+        if (args.set_flag)
+            g = spoc::transform::run_set_command (f, args.verbose, args.field_name, args.set_value);
+        else if (!args.replace_pairs.empty ())
+            g = spoc::transform::run_replace_command (f, args.verbose, args.field_name, args.replace_pairs);
+        else if (args.input_pipe_name.empty ())
+            g = spoc::transform::run_pipe_command (f, args.verbose, args.input_pipe_name, args.output_pipe_name);
+        else
+            throw runtime_error ("There is nothing to do.");
 
-        // The transformer writes to the filter's input pipe
-        if (args.verbose)
-            clog << "Opening " << args.input_pipe_name << " for writing" << endl;
-
-        ofstream ips (args.input_pipe_name);
-
-        if (!ips)
-            throw runtime_error ("Could not open file for writing");
-
-        // The transformer reads from the filter's output pipe
-        if (args.verbose)
-            clog << "Opening " << args.output_pipe_name << " for reading" << endl;
-
-        ifstream ops (args.output_pipe_name);
-
-        if (!ops)
-            throw runtime_error ("Could not open file for reading");
-
-        if (args.verbose)
-            clog << "Processing " << f.get_npoints () << " point records" << endl;
-
-        spoc_file g = spoc::transform::process (f, ips, ops);
-
+        // Write the output file
         if (args.output_fn.empty ())
         {
             if (args.verbose)

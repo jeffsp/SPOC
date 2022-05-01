@@ -22,12 +22,26 @@ Transform point records in a spoc file.
 --verbose, -v
 :   Set verbose mode ON
 
---output_pipe=*string*, -o *string*
+--field=*F*, -f *F*
+:   Set the field to transform. May be one of 'x', 'y', 'z', 'c', 'p',
+    'i', 'r', 'g', 'b', '0', '1', ..., '7'. The default is 'c'.
+
+--set=*#* -s *#*
+    Set the selected field's values to *#*.
+
+--replace=*A*,*B* -r *A*,*B*
+    Replace the selected field whose value is *A* to the value *B*. You
+    can specify this option multiple times. They will be applied in the
+    order they occur on the command line.
+
+--output-pipe=*string*, -o *string*
 :   The filename of the output pipe
 
---input_pipe=*string*, -i *string*
+--input-pipe=*string*, -i *string*
 :   The filename of the input pipe
+
+# FILTERS
 
 # SEE ALSO
 
-SPOC_CONNECT(1)
+SPOC_FILTER(1)
