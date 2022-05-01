@@ -57,6 +57,11 @@ int main (int argc, char **argv)
             spoc::diff::diff (f1, f2,
                 args.header_only, args.data_only, args.fields, args.reverse);
 
+        if (args.verbose)
+            clog << "The files are "
+                << (return_code == 0 ? "the same" : "different")
+                << endl;
+
         return return_code;
     }
     catch (const exception &e)
