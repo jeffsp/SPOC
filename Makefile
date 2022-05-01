@@ -100,7 +100,7 @@ coverage: build
 .PHONY: man_pages # Generate man pages
 man_pages:
 	@mkdir -p build/man
-	@find apps/*.md | xargs --verbose -P 8 -I {} bash -c 'pandoc -s -t man {} -o build/man/`basename {} .md`'
+	@find apps/*/*.md | xargs --verbose -P 8 -I {} bash -c 'pandoc -s -t man {} -o build/man/spoc_`basename {} .md`'
 
 .PHONY: help # Generate list of targets with descriptions
 help:
