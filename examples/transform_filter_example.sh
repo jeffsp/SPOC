@@ -11,7 +11,7 @@ echo Output pipe = ${output}
 filter_source=./filters/spoc_transform_filter.cpp
 filter_executable=/tmp/spoc_transform_filter
 echo Compiling transform filter...
-c++ -o ${filter_executable} ${filter_source}
+c++ -I ./filters -o ${filter_executable} ${filter_source}
 
 echo Creating pipes...
 rm -f ${input}
@@ -19,16 +19,16 @@ rm -f ${output}
 mkfifo ${input}
 mkfifo ${output}
 
-echo Running transform application...
+echo Running transform application in the background...
 ./build/debug/spoc_transform -v -i ${input} -o ${output} \
     test_data/lidar/juarez50.spoc \
     /tmp/juarez50_transformed.spoc \
     &
 
-echo Processing...
+echo Running the transform filter...
 ${filter_executable} ${input} ${output}
 
-# Make sure spoc_transform finishes
+# Wait for the background process to finish
 wait
 
 echo The file checksums should match
