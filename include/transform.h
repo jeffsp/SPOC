@@ -81,9 +81,9 @@ spoc_file run_replace_command (const spoc_file &f,
                 s += "'";
                 throw std::runtime_error (s);
             }
-            case 'x': throw std::runtime_error ("Cannot run replace command on floating point fields (X, Y, Z)");
-            case 'y': throw std::runtime_error ("Cannot run replace command on floating point fields (X, Y, Z)");
-            case 'z': throw std::runtime_error ("Cannot run replace command on floating point fields (X, Y, Z)");
+            case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+            case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+            case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
             case 'c': for (size_t i = 0; i < n; ++i) if (g.get_c (i) == v1) g.set_c (i, v2); break;
             case 'p': for (size_t i = 0; i < n; ++i) if (g.get_p (i) == v1) g.set_p (i, v2); break;
             case 'i': for (size_t i = 0; i < n; ++i) if (g.get_i (i) == v1) g.set_i (i, v2); break;
