@@ -83,7 +83,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] spoc srs: Get/set SRS
 * [X] spoc tile: Tile into regular non-overlapping tiles.
       [ ] Tile into irregular, overlapping tiles by component, point
-          source ID
+          source ID, cluster ID -- specified by any field
 * [X] spoc diff: diff two point clouds, return error if different
       [X] Header only
       [X] Data only
