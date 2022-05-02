@@ -26,7 +26,8 @@ ${filter_executable} ${input} ${output}
 # Wait for the background process to finish
 wait
 
-./build/debug/spoc_diff -v test_data/lidar/juarez50.spoc /tmp/juarez50_transformed.spoc
+# Return an error code if the files differ
+./build/debug/spoc_diff test_data/lidar/juarez50.spoc /tmp/juarez50_transformed.spoc
 
 # Run checksums
 md5sum test_data/lidar/juarez50.spoc /tmp/juarez50_transformed.spoc

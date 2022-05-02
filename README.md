@@ -82,6 +82,8 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] spoc spoc2las/las2spoc
 * [X] spoc srs: Get/set SRS
 * [X] spoc tile: Tile into regular non-overlapping tiles.
+      [ ] Tile into irregular, overlapping tiles by component, point
+          source ID
 * [X] spoc diff: diff two point clouds, return error if different
       [X] Header only
       [X] Data only
@@ -104,12 +106,20 @@ The proposed extension is SPOC, or Simple POint Cloud.
                          - X, Y, Z
       [ ] Allow arbitrary operations using named pipes
 * [ ] spoc connect: Connected components, component id saved in extra[n]
+* [ ] spoc cluster: Separate into K clusters based upon:
+      [ ] Location, X/Y/Z, X/Y
+      [ ] Intensity
+      [ ] Color
 * [ ] spoc crop: 2D/3D meters/percentage/by classification/by component
 * [ ] spoc merge: optionally set point source id
-           -f force merge
-           -size threshold = 16 (X number of point clouds), don't merge
-           if area increases by more than a factor of this threshold
+      [ ] -f force merge
+      [ ] -size threshold = 16 (X number of point clouds), don't merge
+          if area increases by more than a factor of this threshold
 * [ ] spoc neighbors: get indexes of neighbors within a radius
-           Set in extra fields 0-7
+      [ ] Set in extra fields 0-7
+      [ ] Save to a text file
+      [ ] Save the nearest K neighbors
+      [ ] Randomly select K neighbors within the radius
+      [ ] Set a random seed
 * [ ] spoc octree: break into files arranged as an octree, access/create spoc files
            -z Don't break on z value (create quadtrees)
