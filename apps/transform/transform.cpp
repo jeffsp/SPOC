@@ -18,7 +18,7 @@ void check (const cmd::args &args)
         if (args.set_flag)
             clog << "set\t" << args.set_value << endl;
         for (auto i : args.replace_pairs)
-            clog << "replace\t" << i.first << "->" << i.second << std::endl;
+            clog << "replace\t" << i.first << "->" << i.second << endl;
         clog << "input-pipe-name\t'" << args.input_pipe_name << "'" << endl;
         clog << "output-pipe-name\t'" << args.output_pipe_name << "'" << endl;
     }
@@ -38,6 +38,46 @@ void check (const cmd::args &args)
         if (!args.replace_pairs.empty ())
             throw runtime_error ("You can't use pipes with the replace option");
     }
+}
+
+spoc_file process_with_pipes (const spoc_file &f,
+    const bool verbose,
+    const string &input_pipe_name,
+    const string &output_pipe_name)
+{
+    using namespace std;
+
+    // Open the pipes
+    if (input_pipe_name.empty ())
+        throw runtime_error ("No input pipe name was specified");
+
+    if (output_pipe_name.empty ())
+        throw runtime_error ("No output pipe name was specified");
+
+    // The transformer writes to the filter's input pipe
+    if (verbose)
+        clog << "Opening " << input_pipe_name << " for writing" << endl;
+
+    ofstream ips (input_pipe_name);
+
+    if (!ips)
+        throw runtime_error ("Could not open file for writing");
+
+    // The transformer reads from the filter's output pipe
+    if (verbose)
+        clog << "Opening " << output_pipe_name << " for reading" << endl;
+
+    ifstream ops (output_pipe_name);
+
+    if (!ops)
+        throw runtime_error ("Could not open file for reading");
+
+    if (verbose)
+        clog << "Processing " << f.get_npoints () << " point records" << endl;
+
+    spoc_file g = spoc::transform::run_pipe_command (f, ips, ops);
+
+    return g;
 }
 
 int main (int argc, char **argv)
@@ -87,11 +127,11 @@ int main (int argc, char **argv)
         spoc_file g;
 
         if (args.set_flag)
-            g = spoc::transform::run_set_command (f, args.verbose, args.field_name, args.set_value);
+            g = spoc::transform::run_set_command (f, args.field_name, args.set_value);
         else if (!args.replace_pairs.empty ())
-            g = spoc::transform::run_replace_command (f, args.verbose, args.field_name, args.replace_pairs);
+            g = spoc::transform::run_replace_command (f, args.field_name, args.replace_pairs);
         else if (args.input_pipe_name.empty ())
-            g = spoc::transform::run_pipe_command (f, args.verbose, args.input_pipe_name, args.output_pipe_name);
+            g = process_with_pipes (f, args.verbose, args.input_pipe_name, args.output_pipe_name);
         else
             throw runtime_error ("There is nothing to do.");
 
