@@ -5,6 +5,7 @@
 
 void test_las2spoc ()
 {
+    spoc::las2spoc::las_reader l ("./test_data/lidar/juarez50.las");
 }
 
 int main (int argc, char **argv)
