@@ -80,25 +80,26 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] spoc srs: Get/set SRS
 * [X] spoc tile: Tile into regular non-overlapping tiles.
 * [X] spoc diff: diff two point clouds, return error if different
-           Header only
-           Data only
-           Field F only - x, y, z, c, p, i, r, g, b, 0-7
-           Not - inverse results
+      [X] Header only
+      [X] Data only
+      [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
+      [X] Not - inverse results
 * [X] spoc transform:
-           Replace fields
-           Allow arbitrary operations using named pipes
+      [X] Replace fields
+      [X] Allow arbitrary operations using named pipes
+      [ ] Allow numeric operations on fields, using parallel calls to `bc`
 * [ ] spoc filter:
-           2D/3D field filtering - does not changes xyz coords
-           Decimate - Remove points
-           Voxelize - Replace X, Y, Z locations with voxelized locations
-                    - offset, random offset (radius), seed
-           Unique - Replace duplicate locations, use voting to set field values
-           Spatial Filter - 2D/3D spatial filtering, changes 3D structure
-                          - Guassian filter
-                          - Median filter
-                          - X, Y, Z
-           Allow arbitrary operations using named pipes
-* [ ] spoc numeric: Allow numeric operations on fields, using parallel calls to `bc`
+      [ ] Remove/keep points with certain properties
+      [ ] 2D/3D field filtering - does not changes xyz coords
+      [ ] Decimate - Remove points
+      [ ] Voxelize - Replace X, Y, Z locations with voxelized locations
+                   - offset, random offset (radius), seed
+      [ ] Unique - Replace duplicate locations, use voting to set field values
+      [ ] Spatial Filter - 2D/3D spatial filtering, changes 3D structure
+                         - Guassian filter
+                         - Median filter
+                         - X, Y, Z
+      [ ] Allow arbitrary operations using named pipes
 * [ ] spoc connect: Connected components, component id saved in extra[n]
 * [ ] spoc crop: 2D/3D meters/percentage/by classification/by component
 * [ ] spoc merge: optionally set point source id
