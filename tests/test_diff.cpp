@@ -13,8 +13,8 @@ void test_diff ()
 
     // Generate a spoc_file
     stringstream s;
-    write_spoc_file (s, string ("Text WKT"), p);
-    write_spoc_file (s, string ("Text WKT"), q);
+    write_spoc_file (s, string ("Test WKT"), p);
+    write_spoc_file (s, string ("Test WKT"), q);
     auto f1 = spoc::read_spoc_file (s);
     auto f2 = spoc::read_spoc_file (s);
     verify (spoc::diff::diff (f1, f2) != 0);
