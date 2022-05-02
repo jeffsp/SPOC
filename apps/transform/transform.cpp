@@ -130,7 +130,7 @@ int main (int argc, char **argv)
             g = spoc::transform::run_set_command (f, args.field_name, args.set_value);
         else if (!args.replace_pairs.empty ())
             g = spoc::transform::run_replace_command (f, args.field_name, args.replace_pairs);
-        else if (args.input_pipe_name.empty ())
+        else if (!args.input_pipe_name.empty ())
             g = process_with_pipes (f, args.verbose, args.input_pipe_name, args.output_pipe_name);
         else
             throw runtime_error ("There is nothing to do.");
