@@ -22,6 +22,13 @@ void test_transform_set ()
                 'c', 'p', 'i', 'r', 'g', 'b',
                 '0', '1', '2', '3', '4', '5', '6', '7' })
             const auto g = run_set_command (f, c, 123);
+        for (auto c : { 'q', 'w'})
+        {
+            bool failed = false;
+            try { const auto g = run_set_command (f, c, 123); }
+            catch (...) { failed = true; }
+            verify (failed);
+        }
     }
 }
 
