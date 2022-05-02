@@ -23,6 +23,9 @@ data collected from EO, SAR, ...
 
 The aim of this file format is to be a subset of the LAS file format.
 
+This project is defined for Linux-based systems, including MAC OS and
+the Windows Linux subsystem.
+
 # Description of new format
 
 The proposed extension is SPOC, or Simple POint Cloud.
