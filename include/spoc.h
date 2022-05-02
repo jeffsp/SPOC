@@ -267,6 +267,16 @@ class spoc_file
     const std::vector<uint16_t> &get_g () const { return g; }
     const std::vector<uint16_t> &get_b () const { return b; }
     const std::array<std::vector<uint64_t>,8> &get_extra () const { return extra; }
+    const double get_x (const size_t n) const { return x.empty () ? 0.0 : x[n]; }
+    const double get_y (const size_t n) const { return y.empty () ? 0.0 : y[n]; }
+    const double get_z (const size_t n) const { return z.empty () ? 0.0 : z[n]; }
+    const uint16_t get_c (const size_t n) const { return c.empty () ? 0 : c[n]; }
+    const uint16_t get_p (const size_t n) const { return p.empty () ? 0 : c[n]; }
+    const uint16_t get_i (const size_t n) const { return i.empty () ? 0 : c[n]; }
+    const uint16_t get_r (const size_t n) const { return r.empty () ? 0 : c[n]; }
+    const uint16_t get_g (const size_t n) const { return g.empty () ? 0 : c[n]; }
+    const uint16_t get_b (const size_t n) const { return b.empty () ? 0 : c[n]; }
+    const uint64_t get_extra (const size_t n, const size_t j) const { return extra[j].empty () ? 0 : extra[j][n]; }
 
     // Write accessors
     void set_x (const size_t n, const double v) { set (x, n, v); }
