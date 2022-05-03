@@ -98,13 +98,20 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [X] Replace fields
       [X] Allow arbitrary operations using named pipes
       [ ] Allow numeric operations on fields, using parallel calls to `bc`
+* [ ] spoc decimate - Remove points
+* [ ] spoc voxelize - Replace X, Y, Z locations with voxelized locations
+      [ ] Offset, random offset (radius)
+      [ ] Seed
+      [ ] Unique - Replace duplicate locations, use voting to set field values
+* [ ] spoc radius search: get indexes of neighbors within a radius
+      [ ] Set in extra fields 0-7
+      [ ] Save to a text file
+      [ ] Save the nearest K neighbors
+      [ ] Randomly select K neighbors within the radius
+      [ ] Set a random seed
 * [ ] spoc filter:
       [ ] Remove/keep points with certain properties
       [ ] 2D/3D field filtering - does not changes xyz coords
-      [ ] Decimate - Remove points
-      [ ] Voxelize - Replace X, Y, Z locations with voxelized locations
-                   - offset, random offset (radius), seed
-      [ ] Unique - Replace duplicate locations, use voting to set field values
       [ ] Spatial Filter - 2D/3D spatial filtering, changes 3D structure
                          - Guassian filter
                          - Median filter
@@ -120,11 +127,5 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] -f force merge
       [ ] -size threshold = 16 (X number of point clouds), don't merge
           if area increases by more than a factor of this threshold
-* [ ] spoc neighbors: get indexes of neighbors within a radius
-      [ ] Set in extra fields 0-7
-      [ ] Save to a text file
-      [ ] Save the nearest K neighbors
-      [ ] Randomly select K neighbors within the radius
-      [ ] Set a random seed
 * [ ] spoc octree: break into files arranged as an octree, access/create spoc files
            -z Don't break on z value (create quadtrees)
