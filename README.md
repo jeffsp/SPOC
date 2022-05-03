@@ -3,7 +3,7 @@
 SPOC is the Simple POint Cloud format used to store 3D geospatial point
 data. Each record in a SPOC file has an associated X, Y, and Z
 coordinate, and possibly other data fields, like red, green, and blue
-color information, classification information, point source identifier,
+color information, classification information, point collection identifier,
 intensity information, or arbitrary integer values.
 
 The X, Y, and Z values are stored at 64-bit precision floating point
@@ -26,7 +26,7 @@ The aim of this file format is to be a subset of the LAS file format.
 This project is defined for Linux-based systems, including MAC OS and
 the Windows Linux subsystem.
 
-# Description of new format
+# Description of SPOC Format
 
 The proposed extension is SPOC, or Simple POint Cloud.
 
@@ -48,6 +48,11 @@ The proposed extension is SPOC, or Simple POint Cloud.
     only resizing operations, or a explicit call to `reallocate()` will
     trigger checks. Also, writing a non-zero value to a field that
     contains all zeros will trigger a resize operation for that field.
+    Files are compressed on disk, so this doesn't have as much effect on
+    the disk footprint, although most compression schemes have some
+    overhead associated with each large block stored on disk. This
+    scheme stores a single flag for the entire field, regardless of its
+    size.
 * Linear complexity
 * 64-bit doubles
 * Don't rely on data being spatially arranged
