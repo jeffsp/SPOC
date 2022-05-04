@@ -98,6 +98,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [X] Replace fields
       [X] Allow arbitrary operations using named pipes
       [ ] Allow numeric operations on fields, using parallel calls to `bc`
+      [ ] Convert between m/f/y/d/s
 * [ ] spoc decimate - Remove points
 * [ ] spoc voxelize - Replace X, Y, Z locations with voxelized locations
       [ ] Offset, random offset (radius)
