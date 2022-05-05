@@ -97,12 +97,16 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] spoc transform:
       [X] Replace fields
       [X] Allow arbitrary operations using named pipes
+      [ ] Rotate by N degrees
+      [ ] Add offset of x, y, z
       [ ] Allow numeric operations on fields, using parallel calls to `bc`
 * [ ] spoc decimate - Remove points
-* [ ] spoc voxelize - Replace X, Y, Z locations with voxelized locations
-      [ ] Offset, random offset (radius)
-      [ ] Seed
-      [ ] Unique - Replace duplicate locations, use voting to set field values
+      [ ] Decimate radius
+      [ ] Choose N points within radius
+      [ ] Set random seed
+      [ ] Undecimate, given original point cloud, voxel offset, and seed
+      [ ] Voxelize- set point locations to center of voxels
+      [ ] Set voxelization offset to X, Y, Z
 * [ ] spoc radius search: get indexes of neighbors within a radius
       [ ] Set in extra fields 0-7
       [ ] Save to a text file
