@@ -161,8 +161,8 @@ void process (std::ostream &os,
             s["x"] = get_summary_object<double> (f.get_x ());
             s["y"] = get_summary_object<double> (f.get_y ());
             s["z"] = get_summary_object<double> (f.get_z ());
-            s["c"] = get_summary_object<uint16_t> (f.get_c ());
-            s["p"] = get_summary_object<uint16_t> (f.get_p ());
+            s["c"] = get_summary_object<uint32_t> (f.get_c ());
+            s["p"] = get_summary_object<uint32_t> (f.get_p ());
             s["i"] = get_summary_object<uint16_t> (f.get_i ());
             s["r"] = get_summary_object<uint16_t> (f.get_r ());
             s["g"] = get_summary_object<uint16_t> (f.get_g ());
@@ -206,8 +206,8 @@ void process (std::ostream &os,
             os << get_summary_string<double> ("x\t", f.get_x (), compact);
             os << get_summary_string<double> ("y\t", f.get_y (), compact);
             os << get_summary_string<double> ("z\t", f.get_z (), compact);
-            os << get_summary_string<uint16_t> ("c\t", f.get_c (), compact);
-            os << get_summary_string<uint16_t> ("p\t", f.get_p (), compact);
+            os << get_summary_string<uint32_t> ("c\t", f.get_c (), compact);
+            os << get_summary_string<uint32_t> ("p\t", f.get_p (), compact);
             os << get_summary_string<uint16_t> ("i\t", f.get_i (), compact);
             os << get_summary_string<uint16_t> ("r\t", f.get_r (), compact);
             os << get_summary_string<uint16_t> ("g\t", f.get_g (), compact);
@@ -218,7 +218,7 @@ void process (std::ostream &os,
                 s.precision (3);
                 s << fixed;
                 s << "extra " << k << "\t";
-                os << get_summary_string<uint16_t> (s.str (), f.get_extra ()[k], compact);
+                os << get_summary_string<uint64_t> (s.str (), f.get_extra ()[k], compact);
             }
         }
 

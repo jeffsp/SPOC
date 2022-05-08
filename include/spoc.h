@@ -22,13 +22,13 @@ struct point_record
     double x;
     double y;
     double z;
-    unsigned c; // classification
-    unsigned p; // point source ID
-    unsigned i; // intensity
-    unsigned r; // red
-    unsigned g; // green
-    unsigned b; // blue
-    std::array<unsigned,8> extra;
+    uint32_t c; // classification
+    uint32_t p; // point ID
+    uint16_t i; // intensity
+    uint16_t r; // red
+    uint16_t g; // green
+    uint16_t b; // blue
+    std::array<uint64_t,8> extra;
 
     point_record ()
         : x (0.0) , y (0.0) , z (0.0)
@@ -79,8 +79,8 @@ inline void write_binary (std::ostream &s, const point_record &p)
     s.write (reinterpret_cast<const char*>(&p.x), sizeof(double));
     s.write (reinterpret_cast<const char*>(&p.y), sizeof(double));
     s.write (reinterpret_cast<const char*>(&p.z), sizeof(double));
-    s.write (reinterpret_cast<const char*>(&p.c), sizeof(uint16_t));
-    s.write (reinterpret_cast<const char*>(&p.p), sizeof(uint16_t));
+    s.write (reinterpret_cast<const char*>(&p.c), sizeof(uint32_t));
+    s.write (reinterpret_cast<const char*>(&p.p), sizeof(uint32_t));
     s.write (reinterpret_cast<const char*>(&p.i), sizeof(uint16_t));
     s.write (reinterpret_cast<const char*>(&p.r), sizeof(uint16_t));
     s.write (reinterpret_cast<const char*>(&p.g), sizeof(uint16_t));
@@ -96,8 +96,8 @@ inline point_record read_binary (std::istream &s)
     s.read (reinterpret_cast<char*>(&p.x), sizeof(double));
     s.read (reinterpret_cast<char*>(&p.y), sizeof(double));
     s.read (reinterpret_cast<char*>(&p.z), sizeof(double));
-    s.read (reinterpret_cast<char*>(&p.c), sizeof(uint16_t));
-    s.read (reinterpret_cast<char*>(&p.p), sizeof(uint16_t));
+    s.read (reinterpret_cast<char*>(&p.c), sizeof(uint32_t));
+    s.read (reinterpret_cast<char*>(&p.p), sizeof(uint32_t));
     s.read (reinterpret_cast<char*>(&p.i), sizeof(uint16_t));
     s.read (reinterpret_cast<char*>(&p.r), sizeof(uint16_t));
     s.read (reinterpret_cast<char*>(&p.g), sizeof(uint16_t));
@@ -260,8 +260,8 @@ class spoc_file
     const std::vector<double> &get_x () const { return x; }
     const std::vector<double> &get_y () const { return y; }
     const std::vector<double> &get_z () const { return z; }
-    const std::vector<uint16_t> &get_c () const { return c; }
-    const std::vector<uint16_t> &get_p () const { return p; }
+    const std::vector<uint32_t> &get_c () const { return c; }
+    const std::vector<uint32_t> &get_p () const { return p; }
     const std::vector<uint16_t> &get_i () const { return i; }
     const std::vector<uint16_t> &get_r () const { return r; }
     const std::vector<uint16_t> &get_g () const { return g; }
@@ -270,8 +270,8 @@ class spoc_file
     const double get_x (const size_t n) const { return x.empty () ? 0.0 : x[n]; }
     const double get_y (const size_t n) const { return y.empty () ? 0.0 : y[n]; }
     const double get_z (const size_t n) const { return z.empty () ? 0.0 : z[n]; }
-    const uint16_t get_c (const size_t n) const { return c.empty () ? 0 : c[n]; }
-    const uint16_t get_p (const size_t n) const { return p.empty () ? 0 : c[n]; }
+    const uint32_t get_c (const size_t n) const { return c.empty () ? 0 : c[n]; }
+    const uint32_t get_p (const size_t n) const { return p.empty () ? 0 : c[n]; }
     const uint16_t get_i (const size_t n) const { return i.empty () ? 0 : c[n]; }
     const uint16_t get_r (const size_t n) const { return r.empty () ? 0 : c[n]; }
     const uint16_t get_g (const size_t n) const { return g.empty () ? 0 : c[n]; }
@@ -282,8 +282,8 @@ class spoc_file
     void set_x (const size_t n, const double v) { set (x, n, v); }
     void set_y (const size_t n, const double v) { set (y, n, v); }
     void set_z (const size_t n, const double v) { set (z, n, v); }
-    void set_c (const size_t n, const uint16_t v) { set (c, n, v); }
-    void set_p (const size_t n, const uint16_t v) { set (p, n, v); }
+    void set_c (const size_t n, const uint32_t v) { set (c, n, v); }
+    void set_p (const size_t n, const uint32_t v) { set (p, n, v); }
     void set_i (const size_t n, const uint16_t v) { set (i, n, v); }
     void set_r (const size_t n, const uint16_t v) { set (r, n, v); }
     void set_g (const size_t n, const uint16_t v) { set (g, n, v); }
@@ -305,8 +305,8 @@ class spoc_file
     std::vector<double> x;
     std::vector<double> y;
     std::vector<double> z;
-    std::vector<uint16_t> c;
-    std::vector<uint16_t> p;
+    std::vector<uint32_t> c;
+    std::vector<uint32_t> p;
     std::vector<uint16_t> i;
     std::vector<uint16_t> r;
     std::vector<uint16_t> g;
@@ -532,8 +532,8 @@ inline spoc_file read_spoc_file (std::istream &s)
     f.x = read_compressed<double> (s, f.npoints);
     f.y = read_compressed<double> (s, f.npoints);
     f.z = read_compressed<double> (s, f.npoints);
-    f.c = read_compressed<uint16_t> (s, f.npoints);
-    f.p = read_compressed<uint16_t> (s, f.npoints);
+    f.c = read_compressed<uint32_t> (s, f.npoints);
+    f.p = read_compressed<uint32_t> (s, f.npoints);
     f.i = read_compressed<uint16_t> (s, f.npoints);
     f.r = read_compressed<uint16_t> (s, f.npoints);
     f.g = read_compressed<uint16_t> (s, f.npoints);
