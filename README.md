@@ -119,7 +119,8 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] spoc transform: Change fields in a point cloud, the output point
                       cloud points will be in the same order
       [X] Replace fields
-      [ ] Rotate by N degrees about Z axis
+      [ ] Center points about mean
+      [ ] Rotate by N degrees about X/Y/Z axis
       [ ] Add offset to X,Y,Z
       [ ] Scale by X,Y,Z
       [ ] Set random seed
@@ -127,17 +128,19 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Add random uniform noise to X,Y,Z
       [ ] Allow numeric operations on fields using parallel calls to `bc`
       [X] Allow arbitrary operations using named pipes
-* [ ] spoc decimate: Remove points
-      [ ] Decimatation radius
-      [ ] Choose N points within radius
+* [ ] spoc subsample: Remove points
+      [ ] subsampling radius
+      [ ] choose N random points within subsampling radius
       [ ] Set random seed
-* [ ] spoc voxelize: Relocate points to voxel centers
+      [ ] voxelize flag Relocate points to voxel centers
       [ ] Average R, G, B within voxels
       [ ] Average intensity within voxels
       [ ] Vote for c and p fields within voxels
-* [ ] spoc populate: Populate fields in one point cloud with fields
-                     from another point cloud
-      [ ] Specify which fields to assign: all,c,p,i,r,g,b,extra
+* [ ] spoc assign: Assign fields in one point cloud with fields
+                   from another point cloud
+      [ ] Specify which fields to assign: all,x,y,z,c,p,i,r,g,b,extra
+          Note that assigning X,Y,Z is useful for unrotating/uncentering
+          a point cloud after performing transformations
       [ ] Use voxels of size R for assignment
       [ ] Use nearest neighbors for assignment
       [ ] Use point index in extra field N for assignment
