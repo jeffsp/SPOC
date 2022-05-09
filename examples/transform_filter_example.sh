@@ -2,8 +2,8 @@
 set -e
 
 # Compile the filter
-filter_source=./filters/spoc_transform_filter.cpp
-filter_executable=/tmp/spoc_transform_filter
+filter_source=./filters/spoc_noop_transform_filter.cpp
+filter_executable=/tmp/spoc_noop_transform_filter
 c++ -I ./filters -o ${filter_executable} ${filter_source}
 
 # Create the input and output pipes
