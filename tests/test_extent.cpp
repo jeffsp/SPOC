@@ -73,7 +73,7 @@ int main (int argc, char **argv)
         test (10'000, -20, 20);
         test (10'000, -40, 0);
         test (10'000, -50, 0);
-        test (1'000'000, 0, 12);
+        test (1'000, 0, 12);
 
         return 0;
     }
