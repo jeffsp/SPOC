@@ -94,13 +94,6 @@ void test_vim ()
     auto vim2 = get_voxel_index_map (v2);
     verify(vim1.at ({0, 0, 0}).size() == 2);
     verify(vim2.at ({1, 1, 1}).size() == 1);
-    for (auto &&i : vim1)
-    {
-        clog << i.first.i;
-        clog << '\t' << i.first.j;
-        clog << '\t' << i.first.k;
-        clog << endl;
-    }
     verify (vim1.size () == 2);
     verify (vim2.size () == 3);
     verify (vim1.find ({0, 0, 0}) != vim1.end ());
