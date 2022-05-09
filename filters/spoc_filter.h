@@ -40,8 +40,8 @@ point_record read_point (std::istream &is)
     is.read (reinterpret_cast<char *> (&p.x), sizeof (double));
     is.read (reinterpret_cast<char *> (&p.y), sizeof (double));
     is.read (reinterpret_cast<char *> (&p.z), sizeof (double));
-    is.read (reinterpret_cast<char *> (&p.c), sizeof (uint16_t));
-    is.read (reinterpret_cast<char *> (&p.p), sizeof (uint16_t));
+    is.read (reinterpret_cast<char *> (&p.c), sizeof (uint32_t));
+    is.read (reinterpret_cast<char *> (&p.p), sizeof (uint32_t));
     is.read (reinterpret_cast<char *> (&p.i), sizeof (uint16_t));
     is.read (reinterpret_cast<char *> (&p.r), sizeof (uint16_t));
     is.read (reinterpret_cast<char *> (&p.g), sizeof (uint16_t));
@@ -56,8 +56,8 @@ void write_point (std::ostream &os, const point_record &p)
     os.write (reinterpret_cast<const char *> (&p.x), sizeof (double));
     os.write (reinterpret_cast<const char *> (&p.y), sizeof (double));
     os.write (reinterpret_cast<const char *> (&p.z), sizeof (double));
-    os.write (reinterpret_cast<const char *> (&p.c), sizeof (uint16_t));
-    os.write (reinterpret_cast<const char *> (&p.p), sizeof (uint16_t));
+    os.write (reinterpret_cast<const char *> (&p.c), sizeof (uint32_t));
+    os.write (reinterpret_cast<const char *> (&p.p), sizeof (uint32_t));
     os.write (reinterpret_cast<const char *> (&p.i), sizeof (uint16_t));
     os.write (reinterpret_cast<const char *> (&p.r), sizeof (uint16_t));
     os.write (reinterpret_cast<const char *> (&p.g), sizeof (uint16_t));
