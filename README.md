@@ -97,31 +97,49 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] spoc spoc2text/text2spoc
 * [X] spoc spoc2las/las2spoc
 * [X] spoc srs: Get/set SRS
-* [X] spoc tile: Tile into regular non-overlapping tiles.
-      [ ] Tile into irregular, overlapping tiles by component, point
-          source ID, cluster ID -- specified by any field
 * [X] spoc diff: diff two point clouds, return error if different
       [X] Header only
       [X] Data only
       [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
       [X] Not - inverse results
-* [X] spoc transform:
+* [X] spoc tile: Tile into regular non-overlapping tiles.
+      [X] Number of tiles on largest size
+* [ ] spoc merge: Combine several point clouds into one
+      [ ] Set point id
+      [ ] Size threshold = 16 (X number of point clouds), don't merge
+          if area increases by more than a factor of this threshold
+      [ ] Force merge
+* [ ] spoc crop: Remove edge points from a point cloud
+      [ ] 2D/3D
+      [ ] meters/percentage
+      [ ] Top/bottom/north/south/east/west
+* [X] spoc transform: Change fields in a point cloud, the output point
+                      cloud points will be in the same order
       [X] Replace fields
-      [X] Allow arbitrary operations using named pipes
       [ ] Rotate by N degrees about Z axis
       [ ] Add offset to X,Y,Z
       [ ] Scale by X,Y,Z
       [ ] Set random seed
       [ ] Add random Gaussian noise to X,Y,Z
-      [ ] Allow numeric operations on fields, using parallel calls to `bc`
-* [ ] spoc decimate - Remove points
+      [ ] Add random uniform noise to X,Y,Z
+      [ ] Allow numeric operations on fields using parallel calls to `bc`
+      [X] Allow arbitrary operations using named pipes
+* [ ] spoc decimate: Remove points
       [ ] Decimate radius
       [ ] Choose N points within radius
       [ ] Set random seed
-      [ ] Undecimate, given original point cloud, voxel offset, and seed
-      [ ] Voxelize- set point locations to center of voxels
-      [ ] Set voxelization offset to X, Y, Z
+* [ ] spoc voxelize: Relocate points to voxel centers
+      [ ] Average R, G, B within voxels
+      [ ] Average intensity within voxels
+      [ ] Vote for c and p fields within voxels
+* [ ] spoc populate: Populate fields in one point cloud with fields
+                     from another point cloud
+      [ ] Specify which fields to assign: all,c,p,i,r,g,b,extra
+      [ ] Use nearest neighbors for assignment
+      [ ] Use voxels of size R for assignment
+      [ ] Use point index in extra field N for assignment
 * [ ] spoc radius search: get indexes of neighbors within a radius
+      [ ] Automatically determine the search radius
       [ ] Set in extra fields 0-7
       [ ] Save to a text file
       [ ] Save the nearest K neighbors
@@ -135,17 +153,18 @@ The proposed extension is SPOC, or Simple POint Cloud.
                          - Median filter
                          - X, Y, Z
       [ ] Allow arbitrary operations using named pipes
-* [ ] spoc connect: Connected components, component id saved in extra[n]
-* [ ] spoc cluster: Separate into K clusters based upon data fields,
-                    xyz, cpi, rgb, extra[n]:
+* [ ] spoc connect: Generate connected component IDs based upon location
+                    and, optionally, other fields
+      [ ] Save component ID to extra[n]
+      [ ] Connection radius
+      [ ] Connection field
+      [ ] Allow arbitrary connections using named pipes
+* [ ] spoc cluster: Generate cluster IDs based upon data fields, xyz,
+                    cpi, rgb, extra[n]:
+      [ ] Save component ID to extra[n]
       [ ] Set value of K
       [ ] Use K means clustering
       [ ] Use spectral clustering
       [ ] Use Newman clustering
-* [ ] spoc crop: 2D/3D meters/percentage/by classification/by extra[n]
-* [ ] spoc merge: optionally set point source id
-      [ ] -f force merge
-      [ ] -size threshold = 16 (X number of point clouds), don't merge
-          if area increases by more than a factor of this threshold
 * [ ] spoc octree: break into files arranged as an octree, access/create spoc files
            -z Don't break on z value (create quadtrees)
