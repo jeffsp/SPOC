@@ -138,9 +138,11 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [ ] spoc populate: Populate fields in one point cloud with fields
                      from another point cloud
       [ ] Specify which fields to assign: all,c,p,i,r,g,b,extra
-      [ ] Use nearest neighbors for assignment
       [ ] Use voxels of size R for assignment
+      [ ] Use nearest neighbors for assignment
       [ ] Use point index in extra field N for assignment
+      [ ] Use component ID for assignment
+      [ ] Use cluster ID for assignment
 * [ ] spoc filter:
       [ ] Remove/keep points with certain properties
       [ ] 2D/3D field filtering - does not changes xyz coords
