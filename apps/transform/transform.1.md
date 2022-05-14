@@ -34,14 +34,6 @@ Transform point records in a spoc file.
     can specify this option multiple times. They will be applied in the
     order they occur on the command line.
 
---output-pipe=*string*, -o *string*
-:   The filename of the output pipe
-
---input-pipe=*string*, -i *string*
-:   The filename of the input pipe
-
-# FILTERS
-
 # SEE ALSO
 
 SPOC_FILTER(1)

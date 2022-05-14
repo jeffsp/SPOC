@@ -20,8 +20,6 @@ struct args
     std::vector<std::pair<unsigned,unsigned>> replace_pairs;
     std::string input_fn;
     std::string output_fn;
-    std::string input_pipe_name;
-    std::string output_pipe_name;
 };
 
 inline args get_args (int argc, char **argv, const std::string &usage)
@@ -36,12 +34,10 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"field-name", required_argument, 0, 'f'},
             {"set", required_argument, 0, 's'},
             {"replace", required_argument, 0, 'r'},
-            {"input-pipe-name", required_argument, 0, 'i'},
-            {"output-pipe-name", required_argument, 0, 'o'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvf:s:r:i:o:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvf:s:r:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -81,8 +77,6 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 args.replace_pairs.push_back (std::make_pair (i1, i2));
                 break;
             }
-            case 'i': args.input_pipe_name = std::string (optarg); break;
-            case 'o': args.output_pipe_name = std::string (optarg); break;
         }
     }
 
