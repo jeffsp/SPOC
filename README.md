@@ -116,8 +116,9 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] 2D/3D
       [ ] meters/percentage
       [ ] Top/bottom/north/south/east/west
-* [X] spoc transform: Change fields in a point cloud, the output point
-                      cloud points will be in the same order
+* [X] spoc transform: Change fields in a point cloud. The output point
+                      cloud will have the same number of points and the
+                      points will be in the same order.
       [X] Replace fields
       [ ] Center points about mean
       [ ] Rotate by N degrees about X/Y/Z axis
@@ -127,7 +128,6 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Add random Gaussian noise to X,Y,Z
       [ ] Add random uniform noise to X,Y,Z
       [ ] Allow numeric operations on fields using parallel calls to `bc`
-      [X] Allow arbitrary operations using named pipes
 * [ ] spoc subsample: Remove points
       [ ] subsampling radius
       [ ] choose N random points within subsampling radius
@@ -153,13 +153,18 @@ The proposed extension is SPOC, or Simple POint Cloud.
                          - Guassian filter
                          - Median filter
                          - X, Y, Z
-      [ ] Allow arbitrary operations using named pipes
+      [X] Allow arbitrary operations using a filter interface and pipes
+      [ ] Add support for a two pass filter so that points can be
+          changed based upon global point cloud properties, e.g.: add a
+          preprocess() function
+      [ ] Add support for point removal in filter interface by adding a
+          function that accepts a vector of point records and returns a
+          filtered vector of point records
 * [ ] spoc connect: Generate connected component IDs based upon location
                     and, optionally, other fields
       [ ] Save component ID to extra[n]
       [ ] Connection radius
       [ ] Connection field
-      [ ] Allow arbitrary connections using named pipes
 * [ ] spoc cluster: Generate cluster IDs based upon data fields, xyz,
                     cpi, rgb, extra[n]:
       [ ] Save component ID to extra[n]
@@ -175,4 +180,6 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Randomly select K neighbors within the radius
       [ ] Set a random seed
 * [ ] spoc octree: break into files arranged as an octree, access/create spoc files
-           -z Don't break on z value (create quadtrees)
+      [ ] Given a bunch of spoc files, create a quadtree structure
+      [ ] Don't divide on z value (create quadtrees)
+      [ ] Create a spoc file from an octree given an extent
