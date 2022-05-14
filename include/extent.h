@@ -36,28 +36,6 @@ extent get_extent (const T &points)
     return extent {minp, maxp};
 }
 
-extent get_new_extent (const extent &e,
-    const point<double> &p,
-    const point<double> &midp)
-{
-    auto f (e);
-    if (p.x < midp.x) f.maxp.x = midp.x; else f.minp.x = midp.x;
-    if (p.y < midp.y) f.maxp.y = midp.y; else f.minp.y = midp.y;
-    if (p.z < midp.z) f.maxp.z = midp.z; else f.minp.z = midp.z;
-    return f;
-}
-
-extent get_new_extent (const extent &e,
-    const unsigned octant_index,
-    const point<double> &midp)
-{
-    auto f (e);
-    if (octant_index & 0x01) f.maxp.x = midp.x; else f.minp.x = midp.x;
-    if (octant_index & 0x02) f.maxp.y = midp.y; else f.minp.y = midp.y;
-    if (octant_index & 0x04) f.maxp.z = midp.z; else f.minp.z = midp.z;
-    return f;
-}
-
 // All dimensions <=
 inline bool all_less_equal (const point<double> &a, const point<double> &b)
 {
