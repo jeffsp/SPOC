@@ -1,13 +1,19 @@
 # Introduction
 
-SPOC is the Simple POint Cloud format used to store 3D geospatial point
-data. Each record in a SPOC file has an associated X, Y, and Z
-coordinate, and possibly other data fields, like red, green, and blue
-color information, classification information, point collection identifier,
-intensity information, or arbitrary integer values.
+SPOC is the Simple POint Cloud format used to store 3D geospatial data.
 
-The X, Y, and Z values are stored at 64-bit precision floating point
-numbers.
+A SPOC file consists of a header followed by point records.
+
+The header contains a SPOC file identifier, the spoc format version
+numbers, the number of points records contained in the file, and an
+arbitrary length data string that can be used to store spatial reference
+system data.
+
+Each point record in a SPOC file contains an X, Y, and Z coordinate
+stored as 64-bit precision floating point numbers. A point record can
+optionally have other associated data fields, like red, green, and blue
+color information, classification information, point identifier,
+intensity information, or arbitrary integer values.
 
 ## Motivation
 
@@ -121,6 +127,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
                       points will be in the same order.
       [X] Replace fields
       [ ] Center points about mean
+      [ ] Subtract minimum X, Y, and Z from all points
       [ ] Rotate by N degrees about X/Y/Z axis
       [ ] Add offset to X,Y,Z
       [ ] Scale by X,Y,Z
@@ -160,6 +167,8 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Add support for point removal in filter interface by adding a
           function that accepts a vector of point records and returns a
           filtered vector of point records
+* [ ] spoc pca: Perform a principal components analysis
+      [ ] Set the PCA radius
 * [ ] spoc connect: Generate connected component IDs based upon location
                     and, optionally, other fields
       [ ] Save component ID to extra[n]
