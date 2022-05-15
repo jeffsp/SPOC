@@ -104,7 +104,6 @@ void test_get_tile_map ()
 
 int main (int argc, char **argv)
 {
-    using namespace std;
     try
     {
         test_get_tile_size ();
