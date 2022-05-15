@@ -114,10 +114,10 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] spoc tile: Tile into regular non-overlapping tiles.
       [X] Number of tiles on largest size
 * [ ] spoc merge: Combine several point clouds into one
-      [ ] Set point id
-      [ ] Size threshold = 16 (X number of point clouds), don't merge
-          if area increases by more than a factor of this threshold
-      [ ] Force merge
+      [X] Set point id
+      [X] Warn if the SRS info strings differ
+      [ ] Warn if the area of the merged file is too big
+      [X] Quiet (don't warn)
 * [ ] spoc crop: Remove edge points from a point cloud
       [ ] 2D/3D
       [ ] meters/percentage
