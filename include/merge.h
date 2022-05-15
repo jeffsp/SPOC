@@ -17,6 +17,8 @@ void append (const spoc_file &a, spoc_file &b, const unsigned id, const bool qui
         std::clog << "WARNING: The spatial reference systems differ" << std::endl;
 
     // Append 'b' to 'a'
+    b.resize (b.get_npoints () + a.get_npoints ());
+
     // TODO
 }
 
