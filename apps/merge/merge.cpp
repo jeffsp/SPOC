@@ -1,3 +1,4 @@
+#include "extent.h"
 #include "merge.h"
 #include "merge_cmd.h"
 #include "spoc.h"
@@ -35,6 +36,8 @@ int main (int argc, char **argv)
         // The result goes here
         spoc_file g;
 
+        double area_sum = 0.0;
+
         for (size_t i = 0; i < args.fns.size (); ++i)
         {
             // Get the filename
@@ -52,11 +55,46 @@ int main (int argc, char **argv)
             // Read into spoc_file struct
             spoc_file f = read_spoc_file (ifs);
 
+            // Get the xyz's
+            const auto p = spoc::get_points (f);
+
+            // Get the extent
+            const auto e = spoc::extent::get_extent (p);
+
+            // Get the area
+            const auto a = (e.maxp.x - e.minp.x) * (e.maxp.y - e.minp.y);
+
+            // Sum areas
+            area_sum += a;
+
             // Get the point ID
             const auto id = args.point_id < 0 ? i : args.point_id;
 
             // Add it to the result
             merge::append (f, g, id, args.quiet);
+        }
+
+        // Check the area ratios
+        if (!args.quiet)
+        {
+            // Get the points
+            const auto p = spoc::get_points (g);
+
+            // Get the extent
+            const auto e = spoc::extent::get_extent (p);
+
+            // Get the area
+            const auto a = (e.maxp.x - e.minp.x) * (e.maxp.y - e.minp.y);
+
+            // What is the ratio of the total final area to the sum
+            // of the areas of each individual file?
+            const double r = a / area_sum;
+
+            // If the area grew by too much, give a warning
+            if (r < 100)
+                std::clog
+                    << "WARNING: 99% of the final merged area does not contain any points"
+                    << std::endl;
         }
 
         if (args.verbose)

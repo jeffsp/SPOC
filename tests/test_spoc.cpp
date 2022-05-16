@@ -245,6 +245,16 @@ void test_free_wydu ()
     verify (s0 == s3);
 }
 
+void test_get_points ()
+{
+    const auto p = get_random_point_records (100);
+    stringstream s;
+    write_spoc_file (s, "Test wkt", p);
+    auto f = read_spoc_file (s);
+    const auto xyz = get_points (f);
+    verify (xyz.size () == 100);
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -253,6 +263,7 @@ int main (int argc, char **argv)
         test_spoc_file_io ();
         test_spoc_file ();
         test_free_wydu ();
+        test_get_points ();
         return 0;
     }
     catch (const exception &e)

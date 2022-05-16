@@ -9,6 +9,9 @@
 namespace spoc
 {
 
+namespace extent
+{
+
 struct extent
 {
     point<double> minp;
@@ -52,7 +55,7 @@ inline bool operator== (const extent &a, const extent &b)
 
 using extent_pair = std::pair<std::vector<uint8_t>,std::vector<uint8_t>>;
 
-inline extent_pair encode_extent (const spoc::extent &e)
+inline extent_pair encode_extent (const spoc::extent::extent &e)
 {
     extent_pair bytes;
     bytes.first = encode_point (e.minp);
@@ -60,9 +63,9 @@ inline extent_pair encode_extent (const spoc::extent &e)
     return bytes;
 }
 
-inline spoc::extent decode_extent (const extent_pair &bytes)
+inline spoc::extent::extent decode_extent (const extent_pair &bytes)
 {
-    spoc::extent e;
+    spoc::extent::extent e;
     e.minp = decode_point (bytes.first);
     e.maxp = decode_point (bytes.second);
     return e;
@@ -93,7 +96,7 @@ inline point<double> restore (const point<uint64_t> &p,
 }
 
 inline std::vector<point<uint64_t>> rescale (
-    const std::vector<point<double>> p,
+    const std::vector<point<double>> &p,
     const extent &e)
 {
     assert (all_less_equal (e.minp, e.maxp));
@@ -105,8 +108,8 @@ inline std::vector<point<uint64_t>> rescale (
 }
 
 inline std::vector<point<double>> restore (
-    const std::vector<point<uint64_t>> p,
-    const spoc::extent &e)
+    const std::vector<point<uint64_t>> &p,
+    const spoc::extent::extent &e)
 {
     assert (all_less_equal (e.minp, e.maxp));
     const point<double> s = e.maxp - e.minp;
@@ -116,4 +119,6 @@ inline std::vector<point<double>> restore (
     return q;
 }
 
-}
+} // namespace extent
+
+} // namespace spoc

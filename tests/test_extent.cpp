@@ -18,6 +18,7 @@ void test_extent (const T &points)
 {
     using namespace std;
     using namespace spoc;
+    using namespace spoc::extent;
     const auto e = get_extent (points);
 
     const auto e_e = encode_extent (e);

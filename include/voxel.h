@@ -51,7 +51,7 @@ std::vector<voxel_index> get_voxel_indexes (const T &points, const double res)
 {
     // Return value
     std::vector<voxel_index> voxel_indexes (points.size ());
-    const auto e = get_extent (points);
+    const auto e = spoc::extent::get_extent (points);
 #pragma omp parallel for
     for (size_t i = 0; i < voxel_indexes.size (); ++i)
         voxel_indexes[i] = get_voxel_index (points[i], e.minp, res);

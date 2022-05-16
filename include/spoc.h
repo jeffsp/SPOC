@@ -334,6 +334,19 @@ class spoc_file
     }
 };
 
+inline std::vector<spoc::point<double>> get_points (const spoc_file &f)
+{
+    const size_t npoints = f.get_npoints ();
+    std::vector<spoc::point<double>> points (npoints);
+    for (size_t i = 0; i < npoints; ++i)
+    {
+        const auto p = f.get (i);
+        points[i] = { p.x, p.y, p.z };
+    }
+
+    return points;
+}
+
 inline std::ostream &operator<< (std::ostream &s, const spoc_file &f)
 {
     s << f.signature[0];
