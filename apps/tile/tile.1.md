@@ -8,7 +8,7 @@ spoc_tile - Split a spoc file into non-overlapping square tiles
 
 # USAGE
 
-spoc_tile [*options*] *filename.spoc* *output_prefix*
+spoc_tile [*options*] *filename.spoc*
 
 # DESCRIPTION
 
