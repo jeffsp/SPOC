@@ -129,6 +129,8 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] spoc transform: Change fields in a point cloud. The output point
                       cloud will have the same number of points and the
                       points will be in the same order.
+                      Transformations occur in the order in which they
+                      were encounterd on the command line.
       [X] Replace fields
       [ ] Recenter points about mean
       [ ] Subtract minimum X, Y, and Z from all points
