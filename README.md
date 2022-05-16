@@ -126,16 +126,11 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [X] Warn if the area of the merged file is too big
       [X] Quiet (don't warn)
       [X] Unit/integration tests
-* [ ] spoc crop: Remove edge points from a point cloud
-      [ ] 2D/3D
-      [ ] meters/percentage
-      [ ] Top/bottom/north/south/east/west
-      [ ] Unit/integration tests
 * [X] spoc transform: Change fields in a point cloud. The output point
                       cloud will have the same number of points and the
                       points will be in the same order.
       [X] Replace fields
-      [ ] Center points about mean
+      [ ] Recenter points about mean
       [ ] Subtract minimum X, Y, and Z from all points
       [ ] Rotate by N degrees about X/Y/Z axis
       [ ] Add offset to X,Y,Z
@@ -144,6 +139,11 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Add random Gaussian noise to X,Y,Z
       [ ] Add random uniform noise to X,Y,Z
       [ ] Allow numeric operations on fields using parallel calls to `bc`
+      [ ] Unit/integration tests
+* [ ] spoc crop: Remove edge points from a point cloud
+      [ ] 2D/3D
+      [ ] meters/percentage
+      [ ] Top/bottom/north/south/east/west
       [ ] Unit/integration tests
 * [ ] spoc subsample: Remove points
       [ ] subsampling radius
