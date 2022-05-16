@@ -103,25 +103,34 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] read/write spoc files
 * [X] read/write las files
 * [X] spoc info
+      [X] Header/summary
+      [X] Unit/integration tests
 * [X] spoc spoc2text/text2spoc
+      [X] Unit/integration tests
 * [X] spoc spoc2las/las2spoc
+      [X] Unit/integration tests
 * [X] spoc srs: Get/set SRS
+      [X] Unit/integration tests
 * [X] spoc diff: diff two point clouds, return error if different
       [X] Header only
       [X] Data only
       [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
       [X] Not - inverse results
+      [X] Unit/integration tests
 * [X] spoc tile: Tile into regular non-overlapping tiles.
       [X] Number of tiles on largest size
-* [ ] spoc merge: Combine several point clouds into one
+      [X] Unit/integration tests
+* [X] spoc merge: Combine several point clouds into one
       [X] Set point id
       [X] Warn if the SRS info strings differ
-      [ ] Warn if the area of the merged file is too big
+      [X] Warn if the area of the merged file is too big
       [X] Quiet (don't warn)
+      [X] Unit/integration tests
 * [ ] spoc crop: Remove edge points from a point cloud
       [ ] 2D/3D
       [ ] meters/percentage
       [ ] Top/bottom/north/south/east/west
+      [ ] Unit/integration tests
 * [X] spoc transform: Change fields in a point cloud. The output point
                       cloud will have the same number of points and the
                       points will be in the same order.
@@ -135,6 +144,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Add random Gaussian noise to X,Y,Z
       [ ] Add random uniform noise to X,Y,Z
       [ ] Allow numeric operations on fields using parallel calls to `bc`
+      [ ] Unit/integration tests
 * [ ] spoc subsample: Remove points
       [ ] subsampling radius
       [ ] choose N random points within subsampling radius
@@ -143,6 +153,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Average R, G, B within voxels
       [ ] Average intensity within voxels
       [ ] Vote for c and p fields within voxels
+      [ ] Unit/integration tests
 * [ ] spoc assign: Assign fields in one point cloud with fields
                    from another point cloud
       [ ] Specify which fields to assign: all,x,y,z,c,p,i,r,g,b,extra
@@ -153,6 +164,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Use point index in extra field N for assignment
       [ ] Use component ID for assignment
       [ ] Use cluster ID for assignment
+      [ ] Unit/integration tests
 * [ ] spoc filter:
       [ ] Remove/keep points with certain properties
       [ ] 2D/3D field filtering - does not changes xyz coords
@@ -167,13 +179,16 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Add support for point removal in filter interface by adding a
           function that accepts a vector of point records and returns a
           filtered vector of point records
+      [ ] Unit/integration tests
 * [ ] spoc pca: Perform a principal components analysis
       [ ] Set the PCA radius
+      [ ] Unit/integration tests
 * [ ] spoc connect: Generate connected component IDs based upon location
                     and, optionally, other fields
       [ ] Save component ID to extra[n]
       [ ] Connection radius
       [ ] Connection field
+      [ ] Unit/integration tests
 * [ ] spoc cluster: Generate cluster IDs based upon data fields, xyz,
                     cpi, rgb, extra[n]:
       [ ] Save component ID to extra[n]
@@ -181,6 +196,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Use K means clustering
       [ ] Use spectral clustering
       [ ] Use Newman clustering
+      [ ] Unit/integration tests
 * [ ] spoc radius search: get indexes of neighbors within a radius
       [ ] Automatically determine the search radius
       [ ] Set in extra fields 0-7
@@ -188,7 +204,9 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Save the nearest K neighbors
       [ ] Randomly select K neighbors within the radius
       [ ] Set a random seed
+      [ ] Unit/integration tests
 * [ ] spoc octree: break into files arranged as an octree, access/create spoc files
       [ ] Given a bunch of spoc files, create a quadtree structure
       [ ] Don't divide on z value (create quadtrees)
       [ ] Create a spoc file from an octree given an extent
+      [ ] Unit/integration tests
