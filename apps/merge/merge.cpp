@@ -55,6 +55,10 @@ int main (int argc, char **argv)
             // Read into spoc_file struct
             spoc_file f = read_spoc_file (ifs);
 
+            // Set the wkt to the first file's wkt
+            if (i == 0)
+                g.set_wkt (f.get_wkt ());
+
             // Get the xyz's
             const auto p = spoc::get_points (f);
 
@@ -91,7 +95,7 @@ int main (int argc, char **argv)
             const double r = a / area_sum;
 
             // If the area grew by too much, give a warning
-            if (r < 100)
+            if (r > 100)
                 std::clog
                     << "WARNING: 99% of the final merged area does not contain any points"
                     << std::endl;
