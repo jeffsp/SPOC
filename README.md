@@ -212,3 +212,14 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Don't divide on z value (create quadtrees)
       [ ] Create a spoc file from an octree given an extent
       [ ] Unit/integration tests
+
+## Use Cases
+
+* Given contiguous tiles/octrees of point clouds, create a point cloud
+  covering a specified extent.
+* Given contiguous tiles/octrees of point clouds, create products across
+  all point clouds, but without artifacts near tile boundaries.
+* Given contiguous tiles/octrees of point clouds, generate
+  multi-resolution points clouds across the entire extent, adjusting
+  extents to support lower resolutions as needed. For example, increase
+  extent by 4X, while lowering resolution by 4X.
