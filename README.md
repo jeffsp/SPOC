@@ -103,123 +103,123 @@ The proposed extension is SPOC, or Simple POint Cloud.
 * [X] read/write spoc files
 * [X] read/write las files
 * [X] spoc info
-      * [X] Header/summary
-      * [X] Unit/integration tests
+      [X] Header/summary
+      [X] Unit/integration tests
 * [X] spoc spoc2text/text2spoc
-      * [X] Unit/integration tests
+      [X] Unit/integration tests
 * [X] spoc spoc2las/las2spoc
-      * [X] Unit/integration tests
+      [X] Unit/integration tests
 * [X] spoc srs: Get/set SRS
-      * [X] Unit/integration tests
+      [X] Unit/integration tests
 * [X] spoc diff: diff two point clouds, return error if different
-      * [X] Header only
-      * [X] Data only
-      * [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
-      * [X] Not - inverse results
-      * [X] Unit/integration tests
+      [X] Header only
+      [X] Data only
+      [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
+      [X] Not - inverse results
+      [X] Unit/integration tests
 * [X] spoc tile: Tile into regular non-overlapping tiles.
-      * [X] Number of tiles on largest size
-      * [X] Unit/integration tests
+      [X] Number of tiles on largest size
+      [X] Unit/integration tests
 * [X] spoc merge: Combine several point clouds into one
-      * [X] Set point id
-      * [X] Warn if the SRS info strings differ
-      * [X] Warn if the area of the merged file is too big
-      * [X] Quiet (don't warn)
-      * [X] Unit/integration tests
+      [X] Set point id
+      [X] Warn if the SRS info strings differ
+      [X] Warn if the area of the merged file is too big
+      [X] Quiet (don't warn)
+      [X] Unit/integration tests
 * [X] spoc transform: Change fields in a point cloud. The output point
                       cloud will have the same number of points and the
                       points will be in the same order.
                       Transformations occur in the order in which they
                       were encounterd on the command line.
       [X] Replace fields
-      * [ ] Recenter points about mean
-      * [ ] Subtract minimum X, Y, and Z from all points
-      * [ ] Rotate by N degrees about X/Y/Z axis
-      * [ ] Add offset to X,Y,Z
-      * [ ] Scale by X,Y,Z
-      * [ ] Set random seed
-      * [ ] Add random Gaussian noise to X,Y,Z
-      * [ ] Add random uniform noise to X,Y,Z
-      * [ ] Allow numeric operations on fields using parallel calls to `bc`
-      * [ ] Unit/integration tests
+      [ ] Recenter points about mean
+      [ ] Subtract minimum X, Y, and Z from all points
+      [ ] Rotate by N degrees about X/Y/Z axis
+      [ ] Add offset to X,Y,Z
+      [ ] Scale by X,Y,Z
+      [ ] Set random seed
+      [ ] Add random Gaussian noise to X,Y,Z
+      [ ] Add random uniform noise to X,Y,Z
+      [ ] Allow numeric operations on fields using parallel calls to `bc`
+      [ ] Unit/integration tests
 * [ ] spoc config: Show configuration values
-      * [ ] ~/.config/spoc/config
-      * [ ] ~/.config/spoc/palettes
+      [ ] ~/.config/spoc/config
+      [ ] ~/.config/spoc/palettes
 * [ ] spoc color: Change RGB values
-      * [ ] Color by classification
-      * [ ] Color by elevation
-      * [ ] Get/set palette
+      [ ] Color by classification
+      [ ] Color by elevation
+      [ ] Get/set palette
 * [ ] spoc crop: Remove edge points from a point cloud
-      * [ ] 2D/3D
-      * [ ] meters/percentage
-      * [ ] Top/bottom/north/south/east/west
-      * [ ] Unit/integration tests
+      [ ] 2D/3D
+      [ ] meters/percentage
+      [ ] Top/bottom/north/south/east/west
+      [ ] Unit/integration tests
 * [ ] spoc subsample: Remove points
-      * [ ] subsampling radius
-      * [ ] choose N random points within subsampling radius
-      * [ ] Set random seed
-      * [ ] voxelize flag Relocate points to voxel centers
-      * [ ] Average R, G, B within voxels
-      * [ ] Average intensity within voxels
-      * [ ] Vote for c and p fields within voxels
-      * [ ] Unit/integration tests
+      [ ] subsampling radius
+      [ ] choose N random points within subsampling radius
+      [ ] Set random seed
+      [ ] voxelize flag Relocate points to voxel centers
+      [ ] Average R, G, B within voxels
+      [ ] Average intensity within voxels
+      [ ] Vote for c and p fields within voxels
+      [ ] Unit/integration tests
 * [ ] spoc assign: Assign fields in one point cloud with fields
                    from another point cloud
-      * [ ] Specify which fields to assign: all,x,y,z,c,p,i,r,g,b,extra
+      [ ] Specify which fields to assign: all,x,y,z,c,p,i,r,g,b,extra
           Note that assigning X,Y,Z is useful for unrotating/uncentering
           a point cloud after performing transformations
-      * [ ] Use voxels of size R for assignment
-      * [ ] Use nearest neighbors for assignment
-      * [ ] Use point index in extra field N for assignment
-      * [ ] Use component ID for assignment
-      * [ ] Use cluster ID for assignment
-      * [ ] Unit/integration tests
+      [ ] Use voxels of size R for assignment
+      [ ] Use nearest neighbors for assignment
+      [ ] Use point index in extra field N for assignment
+      [ ] Use component ID for assignment
+      [ ] Use cluster ID for assignment
+      [ ] Unit/integration tests
 * [ ] spoc filter:
-      * [ ] Remove/keep points with certain properties
-      * [ ] 2D/3D field filtering - does not changes xyz coords
-      * [ ] Spatial Filter - 2D/3D spatial filtering, changes 3D structure
+      [ ] Remove/keep points with certain properties
+      [ ] 2D/3D field filtering - does not changes xyz coords
+      [ ] Spatial Filter - 2D/3D spatial filtering, changes 3D structure
                          - Guassian filter
                          - Median filter
                          - X, Y, Z
-      * [X] Allow arbitrary operations using a filter interface and pipes
-      * [ ] Add support for a two pass filter so that points can be
+      [X] Allow arbitrary operations using a filter interface and pipes
+      [ ] Add support for a two pass filter so that points can be
           changed based upon global point cloud properties, e.g.: add a
           preprocess() function
-      * [ ] Add support for point removal in filter interface by adding a
+      [ ] Add support for point removal in filter interface by adding a
           function that accepts a vector of point records and returns a
           filtered vector of point records
-      * [ ] Unit/integration tests
+      [ ] Unit/integration tests
 * [ ] spoc pca: Perform a principal components analysis
-      * [ ] Set the PCA radius
-      * [ ] Unit/integration tests
+      [ ] Set the PCA radius
+      [ ] Unit/integration tests
 * [ ] spoc connect: Generate connected component IDs based upon location
                     and, optionally, other fields
-      * [ ] Save component ID to extra[n]
-      * [ ] Connection radius
-      * [ ] Connection field
-      * [ ] Unit/integration tests
+      [ ] Save component ID to extra[n]
+      [ ] Connection radius
+      [ ] Connection field
+      [ ] Unit/integration tests
 * [ ] spoc cluster: Generate cluster IDs based upon data fields, xyz,
                     cpi, rgb, extra[n]:
-      * [ ] Save component ID to extra[n]
-      * [ ] Set value of K
-      * [ ] Use K means clustering
-      * [ ] Use spectral clustering
-      * [ ] Use Newman clustering
-      * [ ] Unit/integration tests
+      [ ] Save component ID to extra[n]
+      [ ] Set value of K
+      [ ] Use K means clustering
+      [ ] Use spectral clustering
+      [ ] Use Newman clustering
+      [ ] Unit/integration tests
 * [ ] spoc radius search: get indexes of neighbors within a radius
-      * [ ] Show progress
-      * [ ] Automatically determine the search radius
-      * [ ] Set in extra fields 0-7
-      * [ ] Save to a text file
-      * [ ] Save the nearest K neighbors
-      * [ ] Randomly select K neighbors within the radius
-      * [ ] Set a random seed
-      * [ ] Unit/integration tests
+      [ ] Show progress
+      [ ] Automatically determine the search radius
+      [ ] Set in extra fields 0-7
+      [ ] Save to a text file
+      [ ] Save the nearest K neighbors
+      [ ] Randomly select K neighbors within the radius
+      [ ] Set a random seed
+      [ ] Unit/integration tests
 * [ ] spoc octree: break into files arranged as an octree, access/create spoc files
-      * [ ] Given a bunch of spoc files, create a quadtree structure
-      * [ ] Don't divide on z value (create quadtrees)
-      * [ ] Create a spoc file from an octree given an extent
-      * [ ] Unit/integration tests
+      [ ] Given a bunch of spoc files, create a quadtree structure
+      [ ] Don't divide on z value (create quadtrees)
+      [ ] Create a spoc file from an octree given an extent
+      [ ] Unit/integration tests
 
 ## Use Cases
 
