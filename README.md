@@ -142,6 +142,13 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Add random uniform noise to X,Y,Z
       [ ] Allow numeric operations on fields using parallel calls to `bc`
       [ ] Unit/integration tests
+* [ ] spoc config: Show configuration values
+      [ ] ~/.config/spoc/config
+      [ ] ~/.config/spoc/palettes
+* [ ] spoc color: Change RGB values
+      [ ] Color by classification
+      [ ] Color by elevation
+      [ ] Get/set palette
 * [ ] spoc crop: Remove edge points from a point cloud
       [ ] 2D/3D
       [ ] meters/percentage
@@ -200,6 +207,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
       [ ] Use Newman clustering
       [ ] Unit/integration tests
 * [ ] spoc radius search: get indexes of neighbors within a radius
+      [ ] Show progress
       [ ] Automatically determine the search radius
       [ ] Set in extra fields 0-7
       [ ] Save to a text file
