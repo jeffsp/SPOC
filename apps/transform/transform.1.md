@@ -34,6 +34,12 @@ Transform point records in a spoc file.
     can specify this option multiple times. They will be applied in the
     order they occur on the command line.
 
+--recenter
+--recenter-xyz
+    Recenter the point cloud by subtracting the mean X and Y value from
+    each point's X and Y value. Also recenter the Z value when
+    **--recenter-xyz** is specified.
+
 # SEE ALSO
 
 SPOC_FILTER(1)

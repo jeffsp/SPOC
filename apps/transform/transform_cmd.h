@@ -18,6 +18,8 @@ struct args
     bool set_flag = false;
     double set_value = 0.0;
     std::vector<std::pair<unsigned,unsigned>> replace_pairs;
+    bool recenter = false;
+    bool recenter_xyz = false;
     std::string input_fn;
     std::string output_fn;
 };
@@ -27,6 +29,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
     args args;
     while (1)
     {
+        const int RECENTER = 256;
+        const int RECENTER_XYZ = 257;
         int option_index = 0;
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
@@ -34,6 +38,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"field-name", required_argument, 0, 'f'},
             {"set", required_argument, 0, 's'},
             {"replace", required_argument, 0, 'r'},
+            {"recenter", required_argument, 0, RECENTER},
+            {"recenter-xyz", required_argument, 0, RECENTER_XYZ},
             {0, 0, 0, 0}
         };
 
@@ -77,6 +83,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 args.replace_pairs.push_back (std::make_pair (i1, i2));
                 break;
             }
+            case RECENTER: args.recenter = true; break;
+            case RECENTER_XYZ: args.recenter_xyz = true; break;
         }
     }
 

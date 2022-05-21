@@ -132,7 +132,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
                       Transformations occur in the order in which they
                       were encounterd on the command line.
   - [X] Replace fields
-  - [ ] Recenter points about mean
+  - [X] Recenter points about mean
   - [ ] Subtract minimum X, Y, and Z from all points
   - [ ] Rotate by N degrees about X/Y/Z axis
   - [ ] Add offset to X,Y,Z

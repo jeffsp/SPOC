@@ -73,10 +73,12 @@ int main (int argc, char **argv)
 
         if (args.set_flag)
             g = spoc::transform::run_set_command (f, args.field_name, args.set_value);
-        else if (!args.replace_pairs.empty ())
+        if (!args.replace_pairs.empty ())
             g = spoc::transform::run_replace_command (f, args.field_name, args.replace_pairs);
-        else
-            throw runtime_error ("There is nothing to do.");
+        if (args.recenter)
+            g = spoc::transform::recenter (f);
+        if (args.recenter_xyz)
+            g = spoc::transform::recenter (f, true);
 
         // Write the output file
         if (args.output_fn.empty ())

@@ -137,6 +137,33 @@ spoc::spoc_file run_pipe_command (const spoc_file &f,
     return g;
 }
 
+// Recenter a point cloud about its mean
+spoc_file recenter (const spoc_file &f, const bool z_flag = false)
+{
+    // Make a copy
+    spoc::spoc_file g (f);
+    const auto x = g.get_x ();
+    const auto y = g.get_y ();
+    const auto z = g.get_z ();
+    const auto n = g.get_npoints ();
+
+    // Get average X, Y, and (optionally) Z
+    const double cx = std::accumulate (begin (x), end (x), 0.0) / n;
+    const double cy = std::accumulate (begin (y), end (y), 0.0) / n;
+    const double cz = z_flag ? std::accumulate (begin (z), end (z), 0.0) / n : 0.0;
+
+    // Subtract off mean x, y, z
+    for (size_t i = 0; i < n; ++i)
+    {
+        auto p = g.get (i);
+        p.x -= cx;
+        p.y -= cy;
+        p.z -= cz;
+        g.set (i, p);
+    }
+    return g;
+}
+
 } // namespace transform
 
 } // namespace spoc
