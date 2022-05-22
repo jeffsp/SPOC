@@ -82,3 +82,11 @@ macro(add_filter name)
 endmacro()
 
 add_filter(noop)
+
+macro(add_transformer name)
+    add_executable(spoc_transformer_${name} ./transformers/${name}.cpp)
+    target_link_libraries(spoc_transformer_${name} gmp z)
+    include_directories(transformers)
+endmacro()
+
+add_transformer(noop)

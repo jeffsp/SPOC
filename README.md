@@ -133,6 +133,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
                       were encounterd on the command line.
   - [X] Replace fields
   - [X] Recenter points about mean
+  - [X] Allow arbitrary operations using a transformer interface
   - [ ] Subtract minimum X, Y, and Z from all points
   - [ ] Rotate by N degrees about X/Y/Z axis
   - [ ] Add offset to X,Y,Z
@@ -181,7 +182,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
                          - Guassian filter
                          - Median filter
                          - X, Y, Z
-  - [X] Allow arbitrary operations using a filter interface and pipes
+  - [ ] Allow arbitrary operations using a filter interface and pipes
   - [ ] Add support for a two pass filter so that points can be
           changed based upon global point cloud properties, e.g.: add a
           preprocess() function

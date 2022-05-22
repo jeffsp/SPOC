@@ -9,17 +9,16 @@
 namespace spoc
 {
 
-namespace filter
+namespace transformer
 {
 
-template<typename T,typename U,typename V,typename W>
-int filter_entry (const bool verbose,
+template<typename T,typename U,typename V>
+int transformer_entry (const bool verbose,
     const std::string &input_fn,
     const std::string &output_fn,
     T init_function,
     U preprocess_function,
-    V get_npoints,
-    W get_point)
+    V process_function)
 {
     using namespace std;
     using namespace spoc;
@@ -51,7 +50,7 @@ int filter_entry (const bool verbose,
             f = read_spoc_file (ifs);
         }
 
-        // Initialize the filter
+        // Initialize the transformer
         init_function (f.get_npoints ());
 
         // Preprocess the points
@@ -64,15 +63,18 @@ int filter_entry (const bool verbose,
             preprocess_function (i, p);
         }
 
-        // Get the number of filtered points
-        const size_t npoints = get_npoints ();
-
-        // Resize the spoc file
-        f.resize (npoints);
-
-        // Get the filtered points
+        // Process the points one by one
         for (size_t i = 0; i < f.get_npoints (); ++i)
-            f.set (i, get_point (i));
+        {
+            // Get a point
+            const auto p = f.get (i);
+
+            // Run it through the transformer
+            const auto q = process_function (i, p);
+
+            // Set the transformed point
+            f.set (i, q);
+        }
 
         // Write the points back out
         if (output_fn.empty ())
@@ -106,6 +108,6 @@ int filter_entry (const bool verbose,
     }
 }
 
-} // namespace filter
+} // namespace transformer
 
 } // namespace spoc

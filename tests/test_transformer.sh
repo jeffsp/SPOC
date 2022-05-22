@@ -12,11 +12,11 @@ function cleanup {
 # Run cleanup on exit
 trap cleanup EXIT
 
-# Run the filter
-./build/debug/spoc_filter_noop \
+# Run the transformer
+./build/debug/spoc_transformer_noop \
     test_data/lidar/juarez50.spoc \
-    ${TMPDIR}/juarez50_filtered.spoc
+    ${TMPDIR}/juarez50_transformed.spoc
 
 # Return an error code if the files differ
 ./build/debug/spoc_diff test_data/lidar/juarez50.spoc \
-    ${TMPDIR}/juarez50_filtered.spoc
+    ${TMPDIR}/juarez50_transformed.spoc
