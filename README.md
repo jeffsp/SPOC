@@ -126,47 +126,9 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Warn if the area of the merged file is too big
   - [X] Quiet (don't warn)
   - [X] Unit/integration tests
-- [X] spoc transform: Change fields in a point cloud. The output point
-                      cloud will have the same number of points and the
-                      points will be in the same order.
-                      Transformations occur in the order in which they
-                      were encounterd on the command line.
-  - [X] Replace fields
-  - [X] Recenter points about mean
-  - [X] Allow arbitrary operations using a transformer interface
-  - [X] Add support for a two pass filter so that points can be
-        changed based upon global point cloud properties, e.g.: add a
-        preprocess() function
-  - [ ] Subtract minimum X, Y, and Z from all points
-  - [ ] Rotate by N degrees about X/Y/Z axis
-  - [ ] Add offset to X,Y,Z
-  - [ ] Scale by X,Y,Z
-  - [ ] Set random seed
-  - [ ] Add random Gaussian noise to X,Y,Z
-  - [ ] Add random uniform noise to X,Y,Z
-  - [ ] Allow numeric operations on fields using parallel calls to `bc`
-  - [ ] Unit/integration tests
 - [ ] spoc config: Show configuration values
   - [ ] ~/.config/spoc/config
   - [ ] ~/.config/spoc/palettes
-- [ ] spoc color: Change RGB values
-  - [ ] Color by classification
-  - [ ] Color by elevation
-  - [ ] Get/set palette
-- [ ] spoc crop: Remove edge points from a point cloud
-  - [ ] 2D/3D
-  - [ ] meters/percentage
-  - [ ] Top/bottom/north/south/east/west
-  - [ ] Unit/integration tests
-- [ ] spoc subsample: Remove points
-  - [ ] subsampling radius
-  - [ ] choose N random points within subsampling radius
-  - [ ] Set random seed
-  - [ ] voxelize flag Relocate points to voxel centers
-  - [ ] Average R, G, B within voxels
-  - [ ] Average intensity within voxels
-  - [ ] Vote for c and p fields within voxels
-  - [ ] Unit/integration tests
 - [ ] spoc assign: Assign fields in one point cloud with fields
                    from another point cloud
   - [ ] Specify which fields to assign: all,x,y,z,c,p,i,r,g,b,extra
@@ -178,44 +140,84 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [ ] Use component ID for assignment
   - [ ] Use cluster ID for assignment
   - [ ] Unit/integration tests
-- [ ] spoc filter:
-  - [ ] Remove/keep points with certain properties
-  - [ ] 2D/3D field filtering - does not changes xyz coords
-  - [ ] Spatial Filter - 2D/3D spatial filtering, changes 3D structure
-                         - Guassian filter
+- [X] spoc transform: Change fields in a point cloud. The output point
+                      cloud will have the same number of points and the
+                      points will be in the same order.
+                      Transformations occur in the order in which they
+                      were encounterd on the command line.
+  - [ ] Commands in the form: 'spoc\_transform cmd'
+  - [ ] Check args against command
+  - [X] Replace fields
+  - [X] Allow arbitrary operations using a transformer interface
+  - [X] Add support for a two pass filter so that points can be
+        changed based upon global point cloud properties, e.g.: add a
+        preprocess() function
+  - [X] Recenter points about mean
+  - [ ] Quantize field
+  - [ ] Quantile field
+  - [ ] Subtract minimum X, Y, and Z from all points
+  - [ ] Rotate by N degrees about X/Y/Z axis
+  - [ ] Add offset to X,Y,Z
+  - [ ] Scale by X,Y,Z
+  - [ ] 2D/3D field smoothing - does not changes xyz coords
+  - [ ] Spatial smoothing - 2D/3D spatial filtering, changes 3D structure
+                         - Gaussian filter
                          - Median filter
                          - X, Y, Z
+  - [ ] Set random seed
+  - [ ] Add random Gaussian noise to X,Y,Z
+  - [ ] Add random uniform noise to X,Y,Z
+  - [ ] Color by classification
+  - [ ] Color by elevation
+  - [ ] Get/set palette
+  - [ ] Allow numeric operations on fields using parallel calls to `bc`
+  - [ ] Unit/integration tests
+- [ ] spoc filter: Remove points with certain properties
+  - [ ] Commands in the form: 'spoc\_filter cmd'
+  - [ ] Check args against command
+  - [ ] Set random seed
+  - [ ] subsample: Remove points
+    - [ ] subsampling radius
+    - [ ] choose N random points within subsampling radius
+    - [ ] voxelize flag Relocate point to voxel centers
+    - [ ] Average R, G, B within voxels
+    - [ ] Average intensity within voxels
+    - [ ] Vote for c and p fields within voxels
+  - [ ] crop 2D/3D
+    - [ ] meters/percentage
+    - [ ] Top/bottom/north/south/east/west
   - [X] Allow arbitrary operations using a filter interface and pipes
-  - [ ] Add support for point removal in filter interface by adding a
-          function that accepts a vector of point records and returns a
-          filtered vector of point records
+  - [X] Add support for point removal in filter interface by adding a
+        function that accepts a vector of point records and returns a
+        filtered vector of point records
   - [ ] Unit/integration tests
-- [ ] spoc pca: Perform a principal components analysis
-  - [ ] Set the PCA radius
-  - [ ] Unit/integration tests
-- [ ] spoc connect: Generate connected component IDs based upon location
-                    and, optionally, other fields
-  - [ ] Save component ID to extra[n]
-  - [ ] Connection radius
-  - [ ] Connection field
-  - [ ] Unit/integration tests
-- [ ] spoc cluster: Generate cluster IDs based upon data fields, xyz,
-                    cpi, rgb, extra[n]:
-  - [ ] Save component ID to extra[n]
-  - [ ] Set value of K
-  - [ ] Use K means clustering
-  - [ ] Use spectral clustering
-  - [ ] Use Newman clustering
-  - [ ] Unit/integration tests
-- [ ] spoc radius search: get indexes of neighbors within a radius
+- [ ] spoc generate: Generate data for each point
   - [ ] Show progress
-  - [ ] Automatically determine the search radius
-  - [ ] Set in extra fields 0-7
-  - [ ] Save to a text file
-  - [ ] Save the nearest K neighbors
-  - [ ] Randomly select K neighbors within the radius
-  - [ ] Set a random seed
+  - [ ] Commands in the form: 'spoc\_generate cmd'
+  - [ ] Check args against command
+  - [ ] pca: Perform a principal components analysis
+    - [ ] Set the PCA radius
+  - [ ] connected component IDs based upon location and, optionally, other fields
+    - [ ] Save component ID to extra[n]
+    - [ ] Connection radius
+    - [ ] Connection field(s)
+  - [ ] cluster IDs based upon data fields, xyz, cpi, rgb, extra[n]:
+    - [ ] Save component ID to extra[n]
+    - [ ] Set value of K
+    - [ ] Use K means clustering
+    - [ ] Use spectral clustering
+    - [ ] Use Newman clustering
+  - [ ] neighbor indexes within a radius
+    - [ ] Automatically determine the search radius
+    - [ ] Save to a text file
+    - [ ] Save the nearest K neighbors
+    - [ ] Randomly select K neighbors within the radius
+    - [ ] Set a random seed
   - [ ] Unit/integration tests
+- [ ] spoc project: project points onto the XY plane
+  - [ ] field: c, p, i, r, g, b, 0-7
+  - [ ] min/max/%quantile
+  - [ ] randomly select/vote
 - [ ] spoc octree: break into files arranged as an octree, access/create spoc files
   - [ ] Given a bunch of spoc files, create a quadtree structure
   - [ ] Don't divide on z value (create quadtrees)
@@ -232,3 +234,5 @@ The proposed extension is SPOC, or Simple POint Cloud.
   multi-resolution points clouds across the entire extent, adjusting
   extents to support lower resolutions as needed. For example, increase
   extent by 4X, while lowering resolution by 4X.
+* Machine learning:
+    * Rotate, project, etc.
