@@ -126,9 +126,6 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Warn if the area of the merged file is too big
   - [X] Quiet (don't warn)
   - [X] Unit/integration tests
-- [ ] spoc config: Show configuration values
-  - [ ] ~/.config/spoc/config
-  - [ ] ~/.config/spoc/palettes
 - [ ] spoc assign: Assign fields in one point cloud with fields
                    from another point cloud
   - [ ] Specify which fields to assign: all,x,y,z,c,p,i,r,g,b,extra
@@ -214,6 +211,9 @@ The proposed extension is SPOC, or Simple POint Cloud.
     - [ ] Randomly select K neighbors within the radius
     - [ ] Set a random seed
   - [ ] Unit/integration tests
+- [ ] spoc config: Show configuration values
+  - [ ] ~/.config/spoc/config
+  - [ ] ~/.config/spoc/palettes
 - [ ] spoc project: project points onto the XY plane
   - [ ] field: c, p, i, r, g, b, 0-7
   - [ ] min/max/%quantile
