@@ -1,7 +1,9 @@
 #pragma once
 
+#include <set>
 #include <stdexcept>
 #include <string>
+#include <variant>
 #include "cmd.h"
 
 namespace spoc
@@ -10,40 +12,88 @@ namespace spoc
 namespace cmd
 {
 
+struct set_command { char f; double v; };
+struct replace_command { char f; int v1; int v2; };
+struct recenter_xy_command { };
+struct recenter_xyz_command { };
+
+using command = std::variant<
+    set_command,
+    replace_command,
+    recenter_xy_command,
+    recenter_xyz_command
+    >;
+
 struct args
 {
     bool help = false;
     bool verbose = false;
-    char field_name = 'c';
-    bool set_flag = false;
-    double set_value = 0.0;
-    std::vector<std::pair<unsigned,unsigned>> replace_pairs;
-    bool recenter = false;
-    bool recenter_xyz = false;
+    std::vector<command> commands;
     std::string input_fn;
     std::string output_fn;
 };
+
+enum command_values
+{
+    SET = 1000,
+    REPLACE, // = 1001
+    RECENTER_XY, // = 1002
+    RECENTER_XYZ, // ...
+};
+
+const std::set<char> field_chars {'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b'};
+
+bool check_field (const char f)
+{
+    if (field_chars.find (f) == field_chars.end ())
+        return false;
+    return true;
+}
+
+char consume_field (std::string &s)
+{
+    // Get the field
+    const char c = s[0];
+    // Check it
+    if (!check_field (c))
+        throw std::runtime_error (std::string ("Invalid field name: ") + s);
+    // Make sure the next char is a ','
+    if (!check_field (c))
+        throw std::runtime_error (std::string ("Invalid field specification: ") + s);
+    s.erase (0, 2);
+    return c;
+}
+
+double consume_value (std::string &s)
+{
+    size_t sz = 0;
+    double v = 0.0;
+    try { v = std::stod (s, &sz); }
+    catch (const std::invalid_argument &e) {
+        throw std::runtime_error (std::string ("Could not parse field string: ") + s);
+    }
+
+    s.erase (0, sz + 1);
+    return v;
+}
 
 inline args get_args (int argc, char **argv, const std::string &usage)
 {
     args args;
     while (1)
     {
-        const int RECENTER = 256;
-        const int RECENTER_XYZ = 257;
         int option_index = 0;
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
-            {"field-name", required_argument, 0, 'f'},
-            {"set", required_argument, 0, 's'},
-            {"replace", required_argument, 0, 'r'},
-            {"recenter", required_argument, 0, RECENTER},
-            {"recenter-xyz", required_argument, 0, RECENTER_XYZ},
+            {"set", required_argument, 0, SET},
+            {"replace", required_argument, 0, REPLACE},
+            {"recenter-xy", no_argument, 0, RECENTER_XY},
+            {"recenter-xyz", no_argument, 0, RECENTER_XYZ},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvf:s:r:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hv", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -59,32 +109,40 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 args.help = true;
                 return args;
             }
-            case 'v': args.verbose = true; break;
-            case 'f': args.field_name = optarg[0]; break;
-            case 's':
+            case 'v':
             {
-                args.set_flag = true;
-                args.set_value = std::atof (optarg);
+                args.verbose = true;
                 break;
             }
-            case 'r':
+            case SET:
             {
-                // Put argument in a string for processing
                 std::string s (optarg);
-                size_t sz = 0;
-                // Get first value
-                const unsigned i1 = std::stoi (s, &sz);
-                std::clog << "i1 = " << i1 << std::endl;
-                s.erase (0, sz + 1);
-                // Get second value
-                const unsigned i2 = std::stoi (s);
-                std::clog << "i2 = " << i2 << std::endl;
-                // Save it
-                args.replace_pairs.push_back (std::make_pair (i1, i2));
+                set_command cmd;
+                cmd.f = consume_field (s);
+                cmd.v = consume_value (s);
+                args.commands.push_back (cmd);
                 break;
             }
-            case RECENTER: args.recenter = true; break;
-            case RECENTER_XYZ: args.recenter_xyz = true; break;
+            case REPLACE:
+            {
+                std::string s (optarg);
+                replace_command cmd;
+                cmd.f = consume_field (s);
+                cmd.v1 = consume_value (s);
+                cmd.v2 = consume_value (s);
+                args.commands.push_back (cmd);
+                break;
+            }
+            case RECENTER_XY:
+            {
+                args.commands.push_back (recenter_xy_command ());
+                break;
+            }
+            case RECENTER_XYZ:
+            {
+                args.commands.push_back (recenter_xyz_command ());
+                break;
+            }
         }
     }
 

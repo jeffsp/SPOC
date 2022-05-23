@@ -49,7 +49,7 @@ the Windows Linux subsystem.
 
 The proposed extension is SPOC, or Simple POint Cloud.
 
-* Points are stored as vectors
+* Points are stored as a vector of point records
 * The order of the point records is preserved
 * Point locations are stored as 64-bit double precision numbers, so
   about 16 decimal digits of precision is preserved, assuming an IEEE
@@ -126,8 +126,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Warn if the area of the merged file is too big
   - [X] Quiet (don't warn)
   - [X] Unit/integration tests
-- [ ] spoc assign: Assign fields in one point cloud with fields
-                   from another point cloud
+- [ ] spoc copy: Copy fields in one point cloud to fields in another point cloud
   - [ ] Specify which fields to assign: all,x,y,z,c,p,i,r,g,b,extra
           Note that assigning X,Y,Z is useful for unrotating/uncentering
           a point cloud after performing transformations
@@ -144,19 +143,21 @@ The proposed extension is SPOC, or Simple POint Cloud.
                       were encounterd on the command line.
   - [ ] Commands in the form: 'spoc\_transform cmd'
   - [ ] Check args against command
-  - [X] Replace fields
   - [X] Allow arbitrary operations using a transformer interface
   - [X] Add support for a two pass filter so that points can be
         changed based upon global point cloud properties, e.g.: add a
         preprocess() function
+  - [X] Set fields: set f #
+  - [X] Replace fields: replace f # #
   - [X] Recenter points about mean
-  - [ ] Quantize field
-  - [ ] Quantile field
-  - [ ] Subtract minimum X, Y, and Z from all points
-  - [ ] Rotate by N degrees about X/Y/Z axis
-  - [ ] Add offset to X,Y,Z
-  - [ ] Scale by X,Y,Z
+  - [ ] Subtract minimum X, Y, and Z from all points: subtract-min
+  - [ ] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
+  - [ ] Add offset to X,Y,Z: addx/y/z #
+  - [ ] Scale by X,Y,Z: scale, scalex/y/z
+  - [ ] Quantize field: quantize f res
+  - [ ] Quantile field: quantile f bins
   - [ ] 2D/3D field smoothing - does not changes xyz coords
+        smooth f sigma
   - [ ] Spatial smoothing - 2D/3D spatial filtering, changes 3D structure
                          - Gaussian filter
                          - Median filter

@@ -13,16 +13,7 @@ void check (const cmd::args &args)
     // Show args
     if (args.verbose)
     {
-        clog << "verbose\t" << args.verbose << endl;
-        clog << "field-name\t'" << args.field_name << "'" << endl;
-        if (args.set_flag)
-            clog << "set\t" << args.set_value << endl;
-        for (auto i : args.replace_pairs)
-            clog << "replace\t" << i.first << "->" << i.second << endl;
     }
-
-    if (args.set_flag && !args.replace_pairs.empty ())
-        throw runtime_error ("You can't use the set option together with the replace option");
 }
 
 int main (int argc, char **argv)
@@ -34,7 +25,7 @@ int main (int argc, char **argv)
     {
         // Parse command line
         const cmd::args args = cmd::get_args (argc, argv,
-                string (argv[0]) + " [options] [input] [output]");
+                string (argv[0]) + " [options] command [input] [output]");
 
         // If you are getting help, exit without an error
         if (args.help)
@@ -71,6 +62,32 @@ int main (int argc, char **argv)
         // The result goes here
         spoc_file g;
 
+        for (const auto cmd : args.commands)
+        {
+            std::clog << "COMMAND" << std::endl;
+            using namespace spoc::cmd;
+            if (std::get_if<set_command>(&cmd))
+            {
+                std::clog << "SET" << std::endl;
+            }
+            else if (std::get_if<replace_command>(&cmd))
+            {
+                std::clog << "REPLACE" << std::endl;
+            }
+            else if (std::get_if<recenter_xy_command>(&cmd))
+            {
+                std::clog << "RECENTER_XY" << std::endl;
+            }
+            else if (std::get_if<recenter_xyz_command>(&cmd))
+            {
+                std::clog << "RECENTER_XYZ" << std::endl;
+            }
+            else
+            {
+                throw std::runtime_error ("An unknown command was encountered");
+            }
+        }
+        /*
         if (args.set_flag)
             g = spoc::transform::run_set_command (f, args.field_name, args.set_value);
         if (!args.replace_pairs.empty ())
@@ -79,6 +96,7 @@ int main (int argc, char **argv)
             g = spoc::transform::recenter (f);
         if (args.recenter_xyz)
             g = spoc::transform::recenter (f, true);
+            */
 
         // Write the output file
         if (args.output_fn.empty ())
