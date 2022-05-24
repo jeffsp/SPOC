@@ -64,7 +64,19 @@ char consume_field (std::string &s)
     return c;
 }
 
-double consume_value (std::string &s)
+int consume_int (std::string &s)
+{
+    size_t sz = 0;
+    int v = 0.0;
+    try { v = std::stoi (s, &sz); }
+    catch (const std::invalid_argument &e) {
+        throw std::runtime_error (std::string ("Could not parse field string: ") + s);
+    }
+    s.erase (0, sz + 1);
+    return v;
+}
+
+double consume_double (std::string &s)
 {
     size_t sz = 0;
     double v = 0.0;
@@ -72,7 +84,6 @@ double consume_value (std::string &s)
     catch (const std::invalid_argument &e) {
         throw std::runtime_error (std::string ("Could not parse field string: ") + s);
     }
-
     s.erase (0, sz + 1);
     return v;
 }
@@ -119,7 +130,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 std::string s (optarg);
                 set_command cmd;
                 cmd.f = consume_field (s);
-                cmd.v = consume_value (s);
+                cmd.v = consume_double (s);
                 args.commands.push_back (cmd);
                 break;
             }
@@ -128,8 +139,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 std::string s (optarg);
                 replace_command cmd;
                 cmd.f = consume_field (s);
-                cmd.v1 = consume_value (s);
-                cmd.v2 = consume_value (s);
+                cmd.v1 = consume_int (s);
+                cmd.v2 = consume_int (s);
                 args.commands.push_back (cmd);
                 break;
             }

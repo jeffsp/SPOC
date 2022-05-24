@@ -13,6 +13,21 @@ void check (const cmd::args &args)
     // Show args
     if (args.verbose)
     {
+        std::clog << "commands:" << std::endl;
+        for (const auto cmd : args.commands)
+        {
+            using namespace spoc::cmd;
+            if (const set_command *p = std::get_if<set_command>(&cmd))
+                std::clog << "\tset " << p->f << " " << p->v << std::endl;
+            else if (const replace_command *p = std::get_if<replace_command>(&cmd))
+                std::clog << "\treplace " << p->f << " " << p->v1 << "->" << p->v2 << std::endl;
+            else if (std::get_if<recenter_xy_command>(&cmd))
+                std::clog << "\trecenter-xy" << std::endl;
+            else if (std::get_if<recenter_xyz_command>(&cmd))
+                std::clog << "\trecenter-xyz" << std::endl;
+            else
+                throw std::runtime_error ("An unknown command was encountered");
+        }
     }
 }
 
@@ -64,39 +79,19 @@ int main (int argc, char **argv)
 
         for (const auto cmd : args.commands)
         {
-            std::clog << "COMMAND" << std::endl;
             using namespace spoc::cmd;
-            if (std::get_if<set_command>(&cmd))
-            {
-                std::clog << "SET" << std::endl;
-            }
-            else if (std::get_if<replace_command>(&cmd))
-            {
-                std::clog << "REPLACE" << std::endl;
-            }
+            using namespace spoc::transform;
+            if (const set_command *p = std::get_if<set_command>(&cmd))
+                g = run_set_command (f, p->f, p->v);
+            else if (const replace_command *p = std::get_if<replace_command>(&cmd))
+                g = run_replace_command (f, p->f, p->v1, p->v2);
             else if (std::get_if<recenter_xy_command>(&cmd))
-            {
-                std::clog << "RECENTER_XY" << std::endl;
-            }
+                g = recenter (f);
             else if (std::get_if<recenter_xyz_command>(&cmd))
-            {
-                std::clog << "RECENTER_XYZ" << std::endl;
-            }
+                g = recenter (f, true);
             else
-            {
                 throw std::runtime_error ("An unknown command was encountered");
-            }
         }
-        /*
-        if (args.set_flag)
-            g = spoc::transform::run_set_command (f, args.field_name, args.set_value);
-        if (!args.replace_pairs.empty ())
-            g = spoc::transform::run_replace_command (f, args.field_name, args.replace_pairs);
-        if (args.recenter)
-            g = spoc::transform::recenter (f);
-        if (args.recenter_xyz)
-            g = spoc::transform::recenter (f, true);
-            */
 
         // Write the output file
         if (args.output_fn.empty ())

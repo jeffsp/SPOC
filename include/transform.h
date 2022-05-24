@@ -55,10 +55,10 @@ spoc_file run_set_command (const spoc_file &f,
     return g;
 }
 
-template<typename T>
 spoc_file run_replace_command (const spoc_file &f,
     const char field_name,
-    const T &replace_pairs)
+    const double v1,
+    const double v2)
 {
     // Get number of points
     const size_t n = f.get_npoints ();
@@ -66,39 +66,32 @@ spoc_file run_replace_command (const spoc_file &f,
     // Return value
     spoc_file g (f);
 
-    // Do each replacement in order
-    for (auto r : replace_pairs)
+    switch (field_name)
     {
-        // Get the pair values
-        const auto v1 = r.first;
-        const auto v2 = r.second;
-        switch (field_name)
+        default:
         {
-            default:
-            {
-                std::string s ("Unknown field name '");
-                s += field_name;
-                s += "'";
-                throw std::runtime_error (s);
-            }
-            case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-            case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-            case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-            case 'c': for (size_t i = 0; i < n; ++i) if (g.get_c (i) == v1) g.set_c (i, v2); break;
-            case 'p': for (size_t i = 0; i < n; ++i) if (g.get_p (i) == v1) g.set_p (i, v2); break;
-            case 'i': for (size_t i = 0; i < n; ++i) if (g.get_i (i) == v1) g.set_i (i, v2); break;
-            case 'r': for (size_t i = 0; i < n; ++i) if (g.get_r (i) == v1) g.set_r (i, v2); break;
-            case 'g': for (size_t i = 0; i < n; ++i) if (g.get_g (i) == v1) g.set_g (i, v2); break;
-            case 'b': for (size_t i = 0; i < n; ++i) if (g.get_b (i) == v1) g.set_b (i, v2); break;
-            case '0': case '1': case '2': case '3':
-            case '4': case '5': case '6': case '7':
-            {
-                  const size_t j = field_name - '0';
-                  for (size_t i = 0; i < n; ++i)
-                      if (g.get_extra (i, j) == v1)
-                          g.set_extra (i, j, v2);
-                  break;
-            }
+            std::string s ("Unknown field name '");
+            s += field_name;
+            s += "'";
+            throw std::runtime_error (s);
+        }
+        case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'c': for (size_t i = 0; i < n; ++i) if (g.get_c (i) == v1) g.set_c (i, v2); break;
+        case 'p': for (size_t i = 0; i < n; ++i) if (g.get_p (i) == v1) g.set_p (i, v2); break;
+        case 'i': for (size_t i = 0; i < n; ++i) if (g.get_i (i) == v1) g.set_i (i, v2); break;
+        case 'r': for (size_t i = 0; i < n; ++i) if (g.get_r (i) == v1) g.set_r (i, v2); break;
+        case 'g': for (size_t i = 0; i < n; ++i) if (g.get_g (i) == v1) g.set_g (i, v2); break;
+        case 'b': for (size_t i = 0; i < n; ++i) if (g.get_b (i) == v1) g.set_b (i, v2); break;
+        case '0': case '1': case '2': case '3':
+        case '4': case '5': case '6': case '7':
+        {
+              const size_t j = field_name - '0';
+              for (size_t i = 0; i < n; ++i)
+                  if (g.get_extra (i, j) == v1)
+                      g.set_extra (i, j, v2);
+              break;
         }
     }
 

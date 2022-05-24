@@ -44,19 +44,21 @@ void test_transform_replace ()
         write_spoc_file (s, string ("Test WKT"), p);
         auto f = spoc::read_spoc_file (s);
 
-        vector<pair<unsigned,unsigned>> r;
-        for (auto r1 : { 1, 2, 3, 4, 5 })
-            for (auto r2 : { 1, 2, 3, 4, 5 })
-                r.push_back (make_pair (r1, r2));
-        for (auto c : { 'c', 'p', 'i', 'r', 'g', 'b',
-                '0', '1', '2', '3', '4', '5', '6', '7' })
-            const auto g = run_replace_command (f, c, r);
-        for (auto c : { 'x', 'y', 'z', 'q', 'w'})
+        for (auto v1 : { 1.0, 2.0, 3.0, 4.0, 5.0 })
         {
-            bool failed = false;
-            try { const auto g = run_replace_command (f, c, r); }
-            catch (...) { failed = true; }
-            verify (failed);
+            for (auto v2 : { 1.0, 2.0, 3.0, 4.0, 5.0 })
+            {
+                for (auto c : { 'c', 'p', 'i', 'r', 'g', 'b',
+                        '0', '1', '2', '3', '4', '5', '6', '7' })
+                    const auto g = run_replace_command (f, c, v1, v2);
+                for (auto c : { 'x', 'y', 'z', 'q', 'w'})
+                {
+                    bool failed = false;
+                    try { const auto g = run_replace_command (f, c, v1, v2); }
+                    catch (...) { failed = true; }
+                    verify (failed);
+                }
+            }
         }
     }
 }
