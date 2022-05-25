@@ -16,12 +16,16 @@ struct set_command { char f; double v; };
 struct replace_command { char f; int v1; int v2; };
 struct recenter_xy_command { };
 struct recenter_xyz_command { };
+struct subtract_min_xy_command { };
+struct subtract_min_xyz_command { };
 
 using command = std::variant<
     set_command,
     replace_command,
     recenter_xy_command,
-    recenter_xyz_command
+    recenter_xyz_command,
+    subtract_min_xy_command,
+    subtract_min_xyz_command
     >;
 
 struct args
@@ -39,6 +43,8 @@ enum command_values
     REPLACE, // = 1001
     RECENTER_XY, // = 1002
     RECENTER_XYZ, // ...
+    SUBTRACT_MIN_XY,
+    SUBTRACT_MIN_XYZ,
 };
 
 const std::set<char> field_chars {'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b'};
@@ -101,6 +107,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"replace", required_argument, 0, REPLACE},
             {"recenter-xy", no_argument, 0, RECENTER_XY},
             {"recenter-xyz", no_argument, 0, RECENTER_XYZ},
+            {"subtract-min-xy", no_argument, 0, SUBTRACT_MIN_XY},
+            {"subtract-min-xyz", no_argument, 0, SUBTRACT_MIN_XYZ},
             {0, 0, 0, 0}
         };
 
@@ -152,6 +160,16 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case RECENTER_XYZ:
             {
                 args.commands.push_back (recenter_xyz_command ());
+                break;
+            }
+            case SUBTRACT_MIN_XY:
+            {
+                args.commands.push_back (subtract_min_xy_command ());
+                break;
+            }
+            case SUBTRACT_MIN_XYZ:
+            {
+                args.commands.push_back (subtract_min_xyz_command ());
                 break;
             }
         }

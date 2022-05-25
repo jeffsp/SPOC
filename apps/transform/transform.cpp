@@ -25,6 +25,10 @@ void check (const cmd::args &args)
                 std::clog << "\trecenter-xy" << std::endl;
             else if (std::get_if<recenter_xyz_command>(&cmd))
                 std::clog << "\trecenter-xyz" << std::endl;
+            else if (std::get_if<subtract_min_xy_command>(&cmd))
+                std::clog << "\tsubtract-min-xy" << std::endl;
+            else if (std::get_if<subtract_min_xyz_command>(&cmd))
+                std::clog << "\tsubtract-min-xyz" << std::endl;
             else
                 throw std::runtime_error ("An unknown command was encountered");
         }
@@ -89,6 +93,10 @@ int main (int argc, char **argv)
                 g = recenter (f);
             else if (std::get_if<recenter_xyz_command>(&cmd))
                 g = recenter (f, true);
+            else if (std::get_if<subtract_min_xy_command>(&cmd))
+                g = subtract_min (f);
+            else if (std::get_if<subtract_min_xyz_command>(&cmd))
+                g = subtract_min (f, true);
             else
                 throw std::runtime_error ("An unknown command was encountered");
         }

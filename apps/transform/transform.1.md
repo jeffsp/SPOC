@@ -33,7 +33,14 @@ Transform point records in a spoc file.
     each point's X and Y value
 
 --recenter-xyz
-:   Same are recenter-xy, but also recenter the Z value
+:   Same as recenter-xy, but also recenter the Z value
+
+--subtract-min-xy
+:   Subtract minimum X and Y values from all X and Y values, thereby
+    translating the point cloud's minimum to 0.0, 0.0.
+
+--subtract-min-xyz
+:   Same as subtract-min-xy, but also subtract min from the Z value
 
 # SEE ALSO
 

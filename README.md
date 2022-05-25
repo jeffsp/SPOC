@@ -127,22 +127,24 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Quiet (don't warn)
   - [X] Unit/integration tests
 - [ ] spoc copy: Copy fields in one point cloud to fields in another point cloud
-  - [ ] Specify which fields to assign: all,x,y,z,c,p,i,r,g,b,extra
-          Note that assigning X,Y,Z is useful for unrotating/uncentering
-          a point cloud after performing transformations
+  - [ ] Specify which fields to copy: all,x,y,z,c,p,i,r,g,b,extra
+        Note that copying X,Y,Z is useful for unrotating/uncentering
+        a point cloud after performing transformations
+        The point clouds must have the same number of points
   - [ ] Use voxels of size R for assignment
-  - [ ] Use nearest neighbors for assignment
-  - [ ] Use point index in extra field N for assignment
-  - [ ] Use component ID for assignment
-  - [ ] Use cluster ID for assignment
+        Note the this is useful for restoring points to a point cloud
+        that has been subsampled (decimated).
+        The voxels of the point cloud with the most points must overlap
+        all the points in the point cloud with the lesser points. That
+        is, the point cloud with the less points must have been derived
+        from (by decimation/subsampling) the larger point cloud.
   - [ ] Unit/integration tests
 - [X] spoc transform: Change fields in a point cloud. The output point
                       cloud will have the same number of points and the
                       points will be in the same order.
                       Transformations occur in the order in which they
                       were encounterd on the command line.
-  - [ ] Commands in the form: 'spoc\_transform cmd'
-  - [ ] Check args against command
+  - [X] Commands executed in the order in which they appear on command line
   - [X] Allow arbitrary operations using a transformer interface
   - [X] Add support for a two pass filter so that points can be
         changed based upon global point cloud properties, e.g.: add a
@@ -150,12 +152,11 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Set fields: set f #
   - [X] Replace fields: replace f # #
   - [X] Recenter points about mean
-  - [ ] Subtract minimum X, Y, and Z from all points: subtract-min
+  - [X] Subtract minimum X, Y, and Z from all points: subtract-min
+  - [ ] Get/Set field F as text
   - [ ] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
   - [ ] Add offset to X,Y,Z: addx/y/z #
   - [ ] Scale by X,Y,Z: scale, scalex/y/z
-  - [ ] Quantize field: quantize f res
-  - [ ] Quantile field: quantile f bins
   - [ ] 2D/3D field smoothing - does not changes xyz coords
         smooth f sigma
   - [ ] Spatial smoothing - 2D/3D spatial filtering, changes 3D structure
@@ -171,8 +172,6 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [ ] Allow numeric operations on fields using parallel calls to `bc`
   - [ ] Unit/integration tests
 - [ ] spoc filter: Remove points with certain properties
-  - [ ] Commands in the form: 'spoc\_filter cmd'
-  - [ ] Check args against command
   - [ ] Set random seed
   - [ ] subsample: Remove points
     - [ ] subsampling radius
@@ -191,8 +190,6 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [ ] Unit/integration tests
 - [ ] spoc generate: Generate data for each point
   - [ ] Show progress
-  - [ ] Commands in the form: 'spoc\_generate cmd'
-  - [ ] Check args against command
   - [ ] pca: Perform a principal components analysis
     - [ ] Set the PCA radius
   - [ ] connected component IDs based upon location and, optionally, other fields
@@ -216,7 +213,9 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [ ] ~/.config/spoc/config
   - [ ] ~/.config/spoc/palettes
 - [ ] spoc project: project points onto the XY plane
-  - [ ] field: c, p, i, r, g, b, 0-7
+  - [ ] pixel size in m/pixel
+  - [ ] nodata value
+  - [ ] field: norm\_Z, c, p, i, r, g, b, 0-7
   - [ ] min/max/%quantile
   - [ ] randomly select/vote
 - [ ] spoc octree: break into files arranged as an octree, access/create spoc files
@@ -237,3 +236,5 @@ The proposed extension is SPOC, or Simple POint Cloud.
   extent by 4X, while lowering resolution by 4X.
 * Machine learning:
     * Rotate, project, etc.
+    * Regularization, add noise
+* Decimate/undecimate

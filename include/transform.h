@@ -157,6 +157,33 @@ spoc_file recenter (const spoc_file &f, const bool z_flag = false)
     return g;
 }
 
+// Subtract min x/y/z values from all values
+spoc_file subtract_min (const spoc_file &f, const bool z_flag = false)
+{
+    // Make a copy
+    spoc::spoc_file g (f);
+    const auto x = g.get_x ();
+    const auto y = g.get_y ();
+    const auto z = g.get_z ();
+    const auto n = g.get_npoints ();
+
+    // Get min X, Y, and (optionally) Z
+    const double minx = *std::min_element (begin (x), end (x));
+    const double miny = *std::min_element (begin (y), end (y));
+    const double minz = z_flag ? *std::min_element (begin (z), end (z)) : 0.0;
+
+    // Subtract off min x, y, z
+    for (size_t i = 0; i < n; ++i)
+    {
+        auto p = g.get (i);
+        p.x -= minx;
+        p.y -= miny;
+        p.z -= minz;
+        g.set (i, p);
+    }
+    return g;
+}
+
 } // namespace transform
 
 } // namespace spoc
