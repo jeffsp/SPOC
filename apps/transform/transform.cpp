@@ -86,9 +86,9 @@ int main (int argc, char **argv)
             using namespace spoc::cmd;
             using namespace spoc::transform;
             if (const set_command *p = std::get_if<set_command>(&cmd))
-                g = run_set_command (f, p->f, p->v);
+                g = spoc::transform::set (f, p->f, p->v);
             else if (const replace_command *p = std::get_if<replace_command>(&cmd))
-                g = run_replace_command (f, p->f, p->v1, p->v2);
+                g = replace (f, p->f, p->v1, p->v2);
             else if (std::get_if<recenter_xy_command>(&cmd))
                 g = recenter (f);
             else if (std::get_if<recenter_xyz_command>(&cmd))

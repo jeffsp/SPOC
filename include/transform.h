@@ -13,7 +13,7 @@ namespace spoc
 namespace transform
 {
 
-spoc_file run_set_command (const spoc_file &f,
+spoc_file set (const spoc_file &f,
     const char field_name,
     const double v)
 {
@@ -55,7 +55,7 @@ spoc_file run_set_command (const spoc_file &f,
     return g;
 }
 
-spoc_file run_replace_command (const spoc_file &f,
+spoc_file replace (const spoc_file &f,
     const char field_name,
     const double v1,
     const double v2)

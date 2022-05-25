@@ -21,11 +21,11 @@ void test_transform_set ()
         for (auto c : { 'x', 'y', 'z',
                 'c', 'p', 'i', 'r', 'g', 'b',
                 '0', '1', '2', '3', '4', '5', '6', '7' })
-            const auto g = run_set_command (f, c, 123);
+            const auto g = set (f, c, 123);
         for (auto c : { 'q', 'w'})
         {
             bool failed = false;
-            try { const auto g = run_set_command (f, c, 123); }
+            try { const auto g = set (f, c, 123); }
             catch (...) { failed = true; }
             verify (failed);
         }
@@ -50,11 +50,11 @@ void test_transform_replace ()
             {
                 for (auto c : { 'c', 'p', 'i', 'r', 'g', 'b',
                         '0', '1', '2', '3', '4', '5', '6', '7' })
-                    const auto g = run_replace_command (f, c, v1, v2);
+                    const auto g = replace (f, c, v1, v2);
                 for (auto c : { 'x', 'y', 'z', 'q', 'w'})
                 {
                     bool failed = false;
-                    try { const auto g = run_replace_command (f, c, v1, v2); }
+                    try { const auto g = replace (f, c, v1, v2); }
                     catch (...) { failed = true; }
                     verify (failed);
                 }
@@ -104,6 +104,19 @@ void test_transform_recenter ()
     }
 }
 
+void test_transform_subtract_min ()
+{
+    // Generate some records
+    const auto p = get_random_point_records (100);
+
+    // Generate a spoc_file
+    stringstream s;
+    write_spoc_file (s, string ("Test WKT"), p);
+    auto f = spoc::read_spoc_file (s);
+    auto g = subtract_min (f);
+    auto h = subtract_min (g, true);
+}
+
 void test_transform_pipes ()
 {
     for (auto rgb : {true, false})
@@ -128,6 +141,7 @@ int main (int argc, char **argv)
         test_transform_set ();
         test_transform_replace ();
         test_transform_recenter ();
+        test_transform_subtract_min ();
         test_transform_pipes ();
         return 0;
     }
