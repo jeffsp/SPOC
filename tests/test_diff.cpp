@@ -7,17 +7,9 @@ void test_diff ()
 {
     using namespace std;
 
-    // Generate some records
-    const auto p = get_random_point_records (100, true);
-    const auto q = get_random_point_records (100, false);
-
-    // Generate a spoc_file
-    stringstream s;
-    write_spoc_file (s, string ("Test WKT"), p);
-    write_spoc_file (s, string ("Test WKT"), q);
-    auto f1 = spoc::read_spoc_file (s);
-    auto f2 = spoc::read_spoc_file (s);
-    verify (spoc::diff::diff (f1, f2) != 0);
+    // Generate spoc files
+    auto f1 = generate_random_spoc_file (100, 5, true);
+    auto f2 = generate_random_spoc_file (100, 5, false);
 
     vector<vector<int>> fields {
         {'x', 'y', 'z'},
@@ -45,29 +37,37 @@ void test_diff_header ()
     spoc::spoc_file f1;
     spoc::spoc_file f2;
     verify (spoc::diff::diff (f1, f2) == 0);
-    f1.set_version (1, 3);
-    f2.set_version (2, 3);
+    f1.h.major_version = 1;
+    f1.h.minor_version = 3;
+    f2.h.major_version = 2;
+    f2.h.minor_version = 3;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set_version (10, 11);
-    f2.set_version (10, 11);
+    f1.h.major_version = 10;
+    f1.h.minor_version = 11;
+    f2.h.major_version = 10;
+    f2.h.minor_version = 11;
     verify (spoc::diff::diff (f1, f2) == 0);
-    f1.set_version (10, 11);
-    f2.set_version (10, 12);
+    f1.h.major_version = 10;
+    f1.h.minor_version = 11;
+    f2.h.major_version = 10;
+    f2.h.minor_version = 12;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set_version (10, 11);
-    f2.set_version (10, 11);
+    f1.h.major_version = 10;
+    f1.h.minor_version = 11;
+    f2.h.major_version = 10;
+    f2.h.minor_version = 11;
     verify (spoc::diff::diff (f1, f2) == 0);
-    f1.set_wkt ("WKT 1");
-    f2.set_wkt ("WKT 2");
+    f1.h.wkt = "WKT 1";
+    f2.h.wkt = "WKT 2";
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set_wkt ("WKT");
-    f2.set_wkt ("WKT");
+    f1.h.wkt = "WKT";
+    f2.h.wkt = "WKT";
     verify (spoc::diff::diff (f1, f2) == 0);
-    f1.resize (2);
-    f2.resize (3);
+    f1.p.resize (2);
+    f2.p.resize (3);
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.resize (3);
-    f2.resize (3);
+    f1.p.resize (3);
+    f2.p.resize (3);
     verify (spoc::diff::diff (f1, f2) == 0);
 }
 
@@ -75,68 +75,62 @@ void test_diff_fields ()
 {
     using namespace std;
 
-    // Generate some records
-    const auto p = get_random_point_records (10, true);
-
-    // Generate a spoc_file
-    stringstream s;
-    write_spoc_file (s, string ("Test WKT"), p);
-    write_spoc_file (s, string ("Test WKT"), p);
-    auto f1 = spoc::read_spoc_file (s);
-    auto f2 = spoc::read_spoc_file (s);
+    // Generate spoc files
+    auto f1 = generate_random_spoc_file (100, 5, true);
+    auto f2 (f1);
 
     verify (spoc::diff::diff (f1, f2) == 0);
 
-    auto a = f1.get (3); a.x = 123; f2.set (3, a);
+    f1.p[0].x = f1.p[0].x + 1;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set (3, a);
+    f2.p[0].x = f1.p[0].x;
     verify (spoc::diff::diff (f1, f2) == 0);
 
-    a.y = 123; f2.set (3, a);
+    f1.p[0].y = f1.p[0].y + 1;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set (3, a);
+    f2.p[0].y = f1.p[0].y;
     verify (spoc::diff::diff (f1, f2) == 0);
 
-    a.z = 123; f2.set (3, a);
+    f1.p[0].z = f1.p[0].z + 1;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set (3, a);
+    f2.p[0].z = f1.p[0].z;
     verify (spoc::diff::diff (f1, f2) == 0);
 
-    a.c = 123; f2.set (3, a);
+    f1.p[0].c = f1.p[0].c + 1;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set (3, a);
+    f2.p[0].c = f1.p[0].c;
     verify (spoc::diff::diff (f1, f2) == 0);
 
-    a.p = 123; f2.set (3, a);
+    f1.p[0].p = f1.p[0].p + 1;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set (3, a);
+    f2.p[0].p = f1.p[0].p;
     verify (spoc::diff::diff (f1, f2) == 0);
 
-    a.i = 123; f2.set (3, a);
+    f1.p[0].i = f1.p[0].i + 1;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set (3, a);
+    f2.p[0].i = f1.p[0].i;
     verify (spoc::diff::diff (f1, f2) == 0);
 
-    a.r = 123; f2.set (3, a);
+    f1.p[0].r = f1.p[0].r + 1;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set (3, a);
+    f2.p[0].r = f1.p[0].r;
     verify (spoc::diff::diff (f1, f2) == 0);
 
-    a.g = 123; f2.set (3, a);
+    f1.p[0].g = f1.p[0].g + 1;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set (3, a);
+    f2.p[0].g = f1.p[0].g;
     verify (spoc::diff::diff (f1, f2) == 0);
 
-    a.b = 123; f2.set (3, a);
+    f1.p[0].b = f1.p[0].b + 1;
     verify (spoc::diff::diff (f1, f2) != 0);
-    f1.set (3, a);
+    f2.p[0].b = f1.p[0].b;
     verify (spoc::diff::diff (f1, f2) == 0);
 
-    for (size_t i = 0; i < a.extra.size (); ++i)
+    for (size_t i = 0; i < f1.p[0].extra.size (); ++i)
     {
-        a.extra[i] = 123; f2.set (3, a);
+        f1.p[0].extra[i] = f1.p[0].extra[i] + 1;
         verify (spoc::diff::diff (f1, f2) != 0);
-        f1.set (3, a);
+        f2.p[0].extra[i] = f1.p[0].extra[i];
         verify (spoc::diff::diff (f1, f2) == 0);
     }
 }
@@ -145,74 +139,28 @@ void test_diff_individual_fields ()
 {
     using namespace std;
 
-    // Generate some records
-    const auto p = get_random_point_records (10, true);
-
-    // Generate a spoc_file
-    stringstream s;
-    write_spoc_file (s, string ("Test WKT"), p);
-    write_spoc_file (s, string ("Test WKT"), p);
-    auto f1 = spoc::read_spoc_file (s);
-    auto f2 = spoc::read_spoc_file (s);
+    // Generate spoc files
+    auto f1 = generate_random_spoc_file (100, 5, true);
+    auto f2 (f1);
 
     verify (spoc::diff::diff (f1, f2) == 0);
 
     vector<int> fields { 'x' };
     verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
 
-    auto a = f1.get (5); a.x = 123; f2.set (5, a);
+    f1.p[0].x = f1.p[0].x + 1;
     verify (spoc::diff::diff (f1, f2, false, false, fields) != 0);
-
-    fields[0] = 'y';
-    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
-    a.y = 123; f2.set (5, a);
-    verify (spoc::diff::diff (f1, f2, false, false, fields) != 0);
-
-    fields[0] = 'z';
-    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
-    a.z = 123; f2.set (5, a);
-    verify (spoc::diff::diff (f1, f2, false, false, fields) != 0);
-
-    fields[0] = 'c';
-    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
-    a.c = 123; f2.set (5, a);
-    verify (spoc::diff::diff (f1, f2, false, false, fields) != 0);
-
-    fields[0] = 'p';
-    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
-    a.p = 123; f2.set (5, a);
-    verify (spoc::diff::diff (f1, f2, false, false, fields) != 0);
-
-    fields[0] = 'i';
-    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
-    a.i = 123; f2.set (5, a);
-    verify (spoc::diff::diff (f1, f2, false, false, fields) != 0);
-
-    fields[0] = 'r';
-    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
-    a.r = 123; f2.set (5, a);
-    verify (spoc::diff::diff (f1, f2, false, false, fields) != 0);
-
-    fields[0] = 'g';
-    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
-    a.g = 123; f2.set (5, a);
-    verify (spoc::diff::diff (f1, f2, false, false, fields) != 0);
-
-    fields[0] = 'b';
-    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
-    a.b = 123; f2.set (5, a);
-    verify (spoc::diff::diff (f1, f2, false, false, fields) != 0);
-
-    fields[0] = '0';
-    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
-    a.extra[0] = 123; f2.set (5, a);
-    verify (spoc::diff::diff (f1, f2, false, false, fields) != 0);
-
     // Reverse meaning
-    fields[0] = '7';
-    verify (spoc::diff::diff (f1, f2, false, false, fields, true) != 0);
-    a.extra[7] = 123; f2.set (5, a);
     verify (spoc::diff::diff (f1, f2, false, false, fields, true) == 0);
+    f2.p[0].x = f1.p[0].x;
+    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
+    // Reverse meaning
+    verify (spoc::diff::diff (f1, f2, false, false, fields, true) != 0);
+
+    // Different field
+    fields[0] = 'y';
+    f1.p[0].x = f1.p[0].x + 1;
+    verify (spoc::diff::diff (f1, f2, false, false, fields) == 0);
 
     // Bad field name
     fields[0] = 'q';

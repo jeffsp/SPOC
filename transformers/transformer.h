@@ -51,10 +51,10 @@ int transformer_entry (const bool verbose,
         }
 
         // Initialize the transformer
-        init_function (f.get_npoints ());
+        init_function (f.get_total_points ());
 
         // Preprocess the points
-        for (size_t i = 0; i < f.get_npoints (); ++i)
+        for (size_t i = 0; i < f.get_total_points (); ++i)
         {
             // Get a point
             const auto p = f.get (i);
@@ -64,7 +64,7 @@ int transformer_entry (const bool verbose,
         }
 
         // Process the points one by one
-        for (size_t i = 0; i < f.get_npoints (); ++i)
+        for (size_t i = 0; i < f.get_total_points (); ++i)
         {
             // Get a point
             const auto p = f.get (i);

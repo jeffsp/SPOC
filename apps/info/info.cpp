@@ -35,10 +35,10 @@ int main (int argc, char **argv)
             if (args.verbose)
                 clog << "Reading from stdin" << endl;
 
-            // Read into spoc_file struct
+            // Read the file
             spoc_file f = read_spoc_file (cin);
 
-            info::process (cout, f,
+            info::process (cout, h, p,
                 args.json, args.header_info, args.summary_info,
                 args.classifications, args.compact);
         }

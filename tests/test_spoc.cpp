@@ -9,9 +9,58 @@
 using namespace std;
 using namespace spoc;
 
+void test_header ()
+{
+    {
+    header h;
+    h.wkt = "Test WKT";
+    verify (h.check_signature ());
+    stringstream s;
+    write_header (s, h);
+
+    const auto g = read_header (s);
+
+    verify (h == g);
+    }
+
+    // Fail when reading signature
+    {
+    stringstream s;
+    // Write an invalid signature
+    s << "SPOX" << endl;
+    bool failed = false;
+    try
+    {
+        const auto q = read_header (s);
+    }
+    catch (...)
+    {
+        failed = true;
+    }
+    verify (failed);
+    }
+
+    // Fail when writing
+    {
+    stringstream s;
+    header h;
+    h.signature[3] = 'X';
+    bool failed = false;
+    try
+    {
+        write_header (s, h);
+    }
+    catch (...)
+    {
+        failed = true;
+    }
+    verify (failed);
+    }
+}
+
 void test_point_record ()
 {
-    const auto p = get_random_point_records (10);
+    const auto p = generate_random_point_records (10, 8);
 
     for (const auto &i : p)
     {
@@ -50,16 +99,19 @@ void test_point_record ()
 
 void test_spoc_file_io ()
 {
-    const auto p = get_random_point_records (1000);
+    const size_t total_points = 1000;
+    const size_t extra_size = 8;
+    auto p = generate_random_point_records (total_points, extra_size);
 
     {
     stringstream s;
-    const string wkt1 = "Test wkt";
-    write_spoc_file (s, wkt1, p);
-    string wkt2;
-    auto q = read_spoc_file (s, wkt2);
+    const string wkt = "Test wkt";
+    write_spoc_file (s, wkt, p);
+    decltype(p) q;
+    header h;
+    read_spoc_file (s, h, q);
 
-    verify (wkt1 == wkt2);
+    verify (wkt == h.wkt);
     verify (p == q);
     }
 
@@ -71,7 +123,9 @@ void test_spoc_file_io ()
     bool failed = false;
     try
     {
-        auto q = read_spoc_file (s);
+        header h;
+        decltype(p) q;
+        read_spoc_file (s, h, q);
     }
     catch (...)
     {
@@ -79,191 +133,63 @@ void test_spoc_file_io ()
     }
     verify (failed);
     }
+}
 
-    // Fail when writing
+void test_spoc_file_compressed_io ()
+{
+    const size_t total_points = 1000;
+    const size_t extra_size = 8;
+    auto p = generate_random_point_records (total_points, extra_size);
+
     {
     stringstream s;
     const string wkt = "Test wkt";
-    write_spoc_file (s, wkt, p);
-    auto f = read_spoc_file (s);
-    // Overwrite signature
-    char *sig = const_cast<char *> (f.get_signature ());
-    sig[0] = 'X';
-    bool failed = false;
-    try
-    {
-        write_spoc_file (s, f);
-    }
-    catch (...)
-    {
-        failed = true;
-    }
-    verify (failed);
-    }
-}
+    write_spoc_file_compressed (s, wkt, p);
+    header h;
+    decltype(p) q;
+    read_spoc_file_compressed (s, h, q);
 
-void test_spoc_file ()
-{
-    spoc_file f;
-    verify (f.get_signature ()[0] == 'S');
-    verify (f.get_signature ()[1] == 'P');
-    verify (f.get_signature ()[2] == 'O');
-    verify (f.get_signature ()[3] == 'C');
-    verify (f.get_x ().empty () == true);
-    verify (f.get_npoints () == 0);
-    verify (f.get_x ().size () == 0);
-    verify (f.get_y ().size () == 0);
-    verify (f.get_z ().size () == 0);
-    f.resize (1);
-    verify (f.get_npoints () == 1);
-    auto p = f.get (0);
-    verify (f.get_x ().size () == 0);
-    verify (f.get_y ().size () == 0);
-    verify (f.get_z ().size () == 0);
-    verify (p.x == 0);
-    verify (p.y == 0);
-    verify (p.z == 0);
-    p.z = 123;
-    f.set (0, p);
-    verify (f.get_x ().size () == 0);
-    verify (f.get_y ().size () == 0);
-    verify (f.get_z ().size () == 1);
-    verify (f.get_extra ()[7].size () == 0);
-    p.extra[7] = 456;
-    f.set (0, p);
-    verify (f.get_extra ()[7].size () == 1);
-    f.resize (10);
-    verify (f.get_npoints () == 10);
-    verify (f.get_x ().size () == 0);
-    verify (f.get_z ().size () == 10);
-    verify (f.get_extra ()[7].size () == 10);
-    f.set (9, p);
-    verify (f.get_z ().at (0) == 123);
-    verify (f.get_z ().at (9) == 123);
-    verify (f.get_extra ()[7].at (0) == 456);
-    verify (f.get_extra ()[7].at (1) == 0);
-    verify (f.get_extra ()[7].at (8) == 0);
-    verify (f.get_extra ()[7].at (9) == 456);
-    p.z = 0;
-    f.set (0, p);
-    verify (f.get_z ().at (0) == 0);
-    f.set (9, p);
-    verify (f.get_z ().at (9) == 0);
-    verify (f.get_z ().size () == 10);
-    f.reallocate ();
-    verify (f.get_z ().size () == 0);
-    verify (f.get_npoints () == 10);
-    p.extra[7] = 0;
-    f.set (0, p);
-    f.set (9, p);
-    f.resize (11);
-    verify (f.get_npoints () == 11);
-    const auto q = get_random_point_records (3);
-    f.set (0, q[0]);
-    f.set (9, q[1]);
-    f.set (10, q[2]);
-    point_record p0;
-    f.set (0, p0);
-    f.set (9, p0);
-    f.reallocate ();
-    verify (f.get_npoints () == 11);
-    verify (f.get_x ().size () == 11);
-    verify (f.get_y ().size () == 11);
-    verify (f.get_z ().size () == 11);
-    verify (f.get_c ().size () == 11);
-    verify (f.get_p ().size () == 11);
-    verify (f.get_i ().size () == 11);
-    verify (f.get_r ().size () == 11);
-    verify (f.get_g ().size () == 11);
-    verify (f.get_b ().size () == 11);
-    for (size_t j = 0; j < f.get_extra ().size (); ++j)
-        verify (f.get_extra ()[j].size () == 11);
-    f.set (10, p0);
-    f.reallocate ();
-    verify (f.get_x ().size () == 0);
-    verify (f.get_y ().size () == 0);
-    verify (f.get_z ().size () == 0);
-    verify (f.get_c ().size () == 0);
-    verify (f.get_p ().size () == 0);
-    verify (f.get_i ().size () == 0);
-    verify (f.get_r ().size () == 0);
-    verify (f.get_g ().size () == 0);
-    verify (f.get_b ().size () == 0);
-    for (size_t j = 0; j < f.get_extra ().size (); ++j)
-        verify (f.get_extra ()[j].size () == 0);
-}
+    verify (wkt == h.wkt);
+    verify (p == q);
+    }
 
-void test_free_wydu ()
-{
-    const size_t N = 1000;
-    size_t s0, s1, s2, s3;
-    vector<point_record> pc (N);
+    // Compare sizes
     {
-    stringstream s;
-    const string wkt = "WKT";
-    write_spoc_file (s, wkt, pc);
-    // Save the size on disk
-    s0 = s.str().size ();
-    }
-    pc = get_random_point_records (1000);
+    const string wkt = "Test wkt";
+    stringstream s1;
+    stringstream s2;
+    stringstream s3;
+    write_spoc_file (s1, wkt, p);
+    write_spoc_file_compressed (s2, wkt, p);
+    // Zero some fields
+    for (auto &i : p)
     {
-    stringstream s;
-    const string wkt = "WKT";
-    write_spoc_file (s, wkt, pc);
-    // Save the size on disk
-    s1 = s.str().size ();
+        i.c = 0;
+        i.extra[3] = 0;
+        i.extra[7] = 0;
     }
-    // Zero out Z coordinate
-    for (auto &p : pc)
-        p.z = 0.0;
-    {
-    stringstream s;
-    const string wkt = "WKT";
-    write_spoc_file (s, wkt, pc);
-    // Save the size on disk
-    s2 = s.str().size ();
+    write_spoc_file_compressed (s3, wkt, p);
+    header h1; decltype(p) q1;
+    header h2; decltype(p) q2;
+    header h3; decltype(p) q3;
+    read_spoc_file (s1, h1, q1);
+    read_spoc_file_compressed (s2, h2, q2);
+    read_spoc_file_compressed (s3, h3, q3);
+    // Compressed file should be smaller
+    verify (s1.str ().size () > s2.str ().size ());
+    // File with zero fields should be smaller
+    verify (s2.str ().size () > s3.str ().size ());
     }
-    // Zero out all fields
-    for (auto &p : pc)
-    {
-        p.x = p.y = p.c = p.p = p.i = p.r = p.g = p.b = 0;
-        for (size_t j = 0; j < p.extra.size (); ++j)
-            p.extra[j] = 0;
-    }
-    {
-    stringstream s;
-    const string wkt = "WKT";
-    write_spoc_file (s, wkt, pc);
-    // Save the size on disk
-    s3 = s.str().size ();
-    }
-    // All zeros is much smaller than random data
-    verify (s0 * 10 < s1);
-    // Zeroing out a field makes it smaller
-    verify (s2 < s1);
-    // All zeros is same size as all zeros
-    verify (s0 == s3);
-}
-
-void test_get_points ()
-{
-    const auto p = get_random_point_records (100);
-    stringstream s;
-    write_spoc_file (s, "Test wkt", p);
-    auto f = read_spoc_file (s);
-    const auto xyz = get_points (f);
-    verify (xyz.size () == 100);
 }
 
 int main (int argc, char **argv)
 {
     try
     {
+        test_header ();
         test_point_record ();
         test_spoc_file_io ();
-        test_spoc_file ();
-        test_free_wydu ();
-        test_get_points ();
+        test_spoc_file_compressed_io ();
         return 0;
     }
     catch (const exception &e)

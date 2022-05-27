@@ -10,13 +10,8 @@ void test_transform_set ()
 {
     for (auto rgb : {true, false})
     {
-        // Generate some records
-        const auto p = get_random_point_records (100, rgb);
-
-        // Generate a spoc_file
-        stringstream s;
-        write_spoc_file (s, string ("Test WKT"), p);
-        auto f = spoc::read_spoc_file (s);
+        // Generate spoc files
+        auto f = generate_random_spoc_file (100, 8, rgb);
 
         for (auto c : { 'x', 'y', 'z',
                 'c', 'p', 'i', 'r', 'g', 'b',
@@ -36,13 +31,8 @@ void test_transform_replace ()
 {
     for (auto rgb : {true, false})
     {
-        // Generate some records
-        const auto p = get_random_point_records (100, rgb);
-
-        // Generate a spoc_file
-        stringstream s;
-        write_spoc_file (s, string ("Test WKT"), p);
-        auto f = spoc::read_spoc_file (s);
+        // Generate spoc files
+        auto f = generate_random_spoc_file (100, 8, rgb);
 
         for (auto v1 : { 1.0, 2.0, 3.0, 4.0, 5.0 })
         {
@@ -67,25 +57,21 @@ void test_transform_recenter ()
 {
     for (auto rgb : {true, false})
     {
-        // Generate some records
-        const auto p = get_random_point_records (100, rgb);
+        // Generate spoc files
+        auto f = generate_random_spoc_file (100, 8, rgb);
 
-        // Generate a spoc_file
-        stringstream s;
-        write_spoc_file (s, string ("Test WKT"), p);
-        auto f = spoc::read_spoc_file (s);
         auto g = recenter (f);
         auto h = recenter (g, true);
-        const auto fx = f.get_x ();
-        const auto fy = f.get_y ();
-        const auto fz = f.get_z ();
-        const auto gx = g.get_x ();
-        const auto gy = g.get_y ();
-        const auto gz = g.get_z ();
-        const auto hx = h.get_x ();
-        const auto hy = h.get_y ();
-        const auto hz = h.get_z ();
-        const auto n = f.get_npoints ();
+        const auto fx = get_x (f.p);
+        const auto fy = get_y (f.p);
+        const auto fz = get_z (f.p);
+        const auto gx = get_x (g.p);
+        const auto gy = get_y (g.p);
+        const auto gz = get_z (g.p);
+        const auto hx = get_x (h.p);
+        const auto hy = get_y (h.p);
+        const auto hz = get_z (h.p);
+        const auto n = f.h.total_points;
         const auto cfx = std::accumulate (begin (fx), end (fx), 0.0) / n;
         const auto cfy = std::accumulate (begin (fy), end (fy), 0.0) / n;
         const auto cfz = std::accumulate (begin (fz), end (fz), 0.0) / n;
@@ -106,31 +92,10 @@ void test_transform_recenter ()
 
 void test_transform_subtract_min ()
 {
-    // Generate some records
-    const auto p = get_random_point_records (100);
-
-    // Generate a spoc_file
-    stringstream s;
-    write_spoc_file (s, string ("Test WKT"), p);
-    auto f = spoc::read_spoc_file (s);
+    // Generate spoc files
+    auto f = generate_random_spoc_file (100, 8, true);
     auto g = subtract_min (f);
     auto h = subtract_min (g, true);
-}
-
-void test_transform_pipes ()
-{
-    for (auto rgb : {true, false})
-    {
-        // Generate some records
-        const auto p = get_random_point_records (100, rgb);
-
-        // Generate a spoc_file
-        stringstream s;
-        write_spoc_file (s, string ("Test WKT"), p);
-        auto f = spoc::read_spoc_file (s);
-        stringstream ss;
-        auto g = run_pipe_command (f, ss, ss);
-    }
 }
 
 int main (int argc, char **argv)
@@ -142,7 +107,6 @@ int main (int argc, char **argv)
         test_transform_replace ();
         test_transform_recenter ();
         test_transform_subtract_min ();
-        test_transform_pipes ();
         return 0;
     }
     catch (const exception &e)

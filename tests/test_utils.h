@@ -6,6 +6,7 @@
 #include <cmath>
 #include <random>
 #include <sstream>
+#include <tuple>
 #include <vector>
 
 inline void Verify (const char *e, const char *file, const unsigned line)
@@ -45,13 +46,16 @@ inline std::vector<spoc::point<double>> generate_points (
     return points;
 }
 
-std::vector<spoc::point_record> get_random_point_records (const size_t n, const bool rgb = true)
+std::vector<spoc::point_record> generate_random_point_records (
+    const size_t total_points,
+    const size_t extra_size = 0,
+    const bool rgb = true)
 {
     std::default_random_engine g;
     std::uniform_int_distribution<int> di (0, 1 << 15);
     std::uniform_real_distribution<double> dr (-1.0, 1.0);
 
-    std::vector<spoc::point_record> p (n);
+    std::vector<spoc::point_record> p (total_points, spoc::point_record (extra_size));
 
     for (auto &i : p)
     {
@@ -68,6 +72,19 @@ std::vector<spoc::point_record> get_random_point_records (const size_t n, const 
     }
 
     return p;
+}
+
+spoc::spoc_file generate_random_spoc_file (
+    const size_t total_points,
+    const size_t extra_size = 0,
+    const bool rgb = true)
+{
+    spoc::spoc_file f;
+    f.h.wkt = "WKT";
+    f.h.extra_size = extra_size;
+    f.h.total_points = total_points;
+    f.p = generate_random_point_records (total_points, extra_size, true);
+    return f;
 }
 
 /// @brief Ensure that two values are equal up to 'precision' decimal places

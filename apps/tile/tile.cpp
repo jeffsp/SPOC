@@ -49,7 +49,7 @@ int main (int argc, char **argv)
         spoc_file f = read_spoc_file (ifs);
 
         if (args.verbose)
-            clog << "Total points " << f.get_npoints () << endl;
+            clog << "Total points " << f.get_total_points () << endl;
 
         // Get the length of one side of a tile
         const double tile_size = args.tile_size > 0.0

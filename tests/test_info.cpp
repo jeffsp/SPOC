@@ -7,16 +7,9 @@ void test_info ()
 {
     using namespace std;
 
-    // Generate some records
-    const auto p = get_random_point_records (100, true);
-    const auto q = get_random_point_records (100, false);
-
-    // Generate a spoc_file
-    stringstream s;
-    write_spoc_file (s, string ("Text WKT"), p);
-    write_spoc_file (s, string ("Text WKT"), q);
-    auto f1 = spoc::read_spoc_file (s);
-    auto f2 = spoc::read_spoc_file (s);
+    // Generate spoc files
+    auto f1 = generate_random_spoc_file (100, 5, true);
+    auto f2 = generate_random_spoc_file (100, 5, false);
 
     for (auto json : {true, false})
     {

@@ -60,26 +60,11 @@ The proposed extension is SPOC, or Simple POint Cloud.
 
 # Requirements
 
-* Don't pay for what you don't use: FreeWYDU
-    The memory footprint is zero for fields that are all zero. When
-    point clouds are resized each field is checked, and fields that
-    contain all 0's are cleared and their memory is freed.
-    Setting individual point values does not trigger a resizing check --
-    only resizing operations, or a explicit call to `reallocate()` will
-    trigger checks. Also, writing a non-zero value to a field that
-    contains all zeros will trigger a resize operation for that field.
-    Files are compressed on disk, so this doesn't have as much effect on
-    the disk footprint, although most compression schemes have some
-    overhead associated with each large block stored on disk. This
-    scheme stores a single flag for the entire field, regardless of its
-    size.
 * Linear complexity
 * 64-bit doubles
 * Don't rely on data being spatially arranged
 * Don't reinvent the wheel: rely on the system's optimization mechanisms
   (disk/memory cache)
-* Streaming is not supported. Point clouds are random-access. Point
-  clouds are assumed to fit into memory.
 * Linux pipes are supported (not for LASlib I/O files)
 * Avoid dependencies
     * zlib compression library
@@ -90,7 +75,14 @@ The proposed extension is SPOC, or Simple POint Cloud.
 
 # TODO
 
-- [X] FreeWYDU support in memory and disk footprints
+- [ ] Read/write uncompressed
+- [ ] Create compression utilities read/write compressed files
+- [ ] Add NEXTRA field in header
+- [ ] Allow arbitrary number of extra fields
+- [ ] Change utilities to use streaming
+- [ ] Combine utilities into a single SPOC utility
+- [ ] Create interface to spoc\_file, so header file size and point
+      vector size do not get out of line. Same for 'extra_size'
 - [X] Gitlab runner
 - [X] CI/CD
 - [X] Version number in header
@@ -119,6 +111,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Unit/integration tests
 - [X] spoc tile: Tile into regular non-overlapping tiles.
   - [X] Number of tiles on largest size
+  - [ ] Multi-pass tiling for large files
   - [X] Unit/integration tests
 - [X] spoc merge: Combine several point clouds into one
   - [X] Set point id

@@ -18,7 +18,7 @@ spoc_file set (const spoc_file &f,
     const double v)
 {
     // Get number of points
-    const size_t n = f.get_npoints ();
+    const size_t n = f.h.total_points;
 
     // Return value
     spoc_file g (f);
@@ -33,21 +33,26 @@ spoc_file set (const spoc_file &f,
             s += "'";
             throw std::runtime_error (s);
         }
-        case 'x': for (size_t i = 0; i < n; ++i) g.set_x (i, v); break;
-        case 'y': for (size_t i = 0; i < n; ++i) g.set_y (i, v); break;
-        case 'z': for (size_t i = 0; i < n; ++i) g.set_z (i, v); break;
-        case 'c': for (size_t i = 0; i < n; ++i) g.set_c (i, v); break;
-        case 'p': for (size_t i = 0; i < n; ++i) g.set_p (i, v); break;
-        case 'i': for (size_t i = 0; i < n; ++i) g.set_i (i, v); break;
-        case 'r': for (size_t i = 0; i < n; ++i) g.set_r (i, v); break;
-        case 'g': for (size_t i = 0; i < n; ++i) g.set_g (i, v); break;
-        case 'b': for (size_t i = 0; i < n; ++i) g.set_b (i, v); break;
+        case 'x': for (size_t i = 0; i < n; ++i) g.p[i].x = v; break;
+        case 'y': for (size_t i = 0; i < n; ++i) g.p[i].y = v; break;
+        case 'z': for (size_t i = 0; i < n; ++i) g.p[i].z = v; break;
+        case 'c': for (size_t i = 0; i < n; ++i) g.p[i].c = v; break;
+        case 'p': for (size_t i = 0; i < n; ++i) g.p[i].p = v; break;
+        case 'i': for (size_t i = 0; i < n; ++i) g.p[i].i = v; break;
+        case 'r': for (size_t i = 0; i < n; ++i) g.p[i].r = v; break;
+        case 'g': for (size_t i = 0; i < n; ++i) g.p[i].g = v; break;
+        case 'b': for (size_t i = 0; i < n; ++i) g.p[i].b = v; break;
         case '0': case '1': case '2': case '3':
         case '4': case '5': case '6': case '7':
+        case '8': case '9':
         {
               const size_t j = field_name - '0';
               for (size_t i = 0; i < n; ++i)
-                  g.set_extra (i, j, v);
+              {
+                  if (j >= g.p[i].extra.size ())
+                      throw std::runtime_error ("Specified extra index is too large");
+                  g.p[i].extra[j] = v;
+              }
               break;
         }
     }
@@ -61,7 +66,7 @@ spoc_file replace (const spoc_file &f,
     const double v2)
 {
     // Get number of points
-    const size_t n = f.get_npoints ();
+    const size_t n = f.h.total_points;
 
     // Return value
     spoc_file g (f);
@@ -78,53 +83,26 @@ spoc_file replace (const spoc_file &f,
         case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
         case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
         case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'c': for (size_t i = 0; i < n; ++i) if (g.get_c (i) == v1) g.set_c (i, v2); break;
-        case 'p': for (size_t i = 0; i < n; ++i) if (g.get_p (i) == v1) g.set_p (i, v2); break;
-        case 'i': for (size_t i = 0; i < n; ++i) if (g.get_i (i) == v1) g.set_i (i, v2); break;
-        case 'r': for (size_t i = 0; i < n; ++i) if (g.get_r (i) == v1) g.set_r (i, v2); break;
-        case 'g': for (size_t i = 0; i < n; ++i) if (g.get_g (i) == v1) g.set_g (i, v2); break;
-        case 'b': for (size_t i = 0; i < n; ++i) if (g.get_b (i) == v1) g.set_b (i, v2); break;
+        case 'c': for (size_t i = 0; i < n; ++i) if (g.p[i].c == v1) g.p[i].c = v2; break;
+        case 'p': for (size_t i = 0; i < n; ++i) if (g.p[i].p == v1) g.p[i].p = v2; break;
+        case 'i': for (size_t i = 0; i < n; ++i) if (g.p[i].i == v1) g.p[i].i = v2; break;
+        case 'r': for (size_t i = 0; i < n; ++i) if (g.p[i].r == v1) g.p[i].r = v2; break;
+        case 'g': for (size_t i = 0; i < n; ++i) if (g.p[i].g == v1) g.p[i].g = v2; break;
+        case 'b': for (size_t i = 0; i < n; ++i) if (g.p[i].b == v1) g.p[i].b = v2; break;
         case '0': case '1': case '2': case '3':
         case '4': case '5': case '6': case '7':
+        case '8': case '9':
         {
               const size_t j = field_name - '0';
               for (size_t i = 0; i < n; ++i)
-                  if (g.get_extra (i, j) == v1)
-                      g.set_extra (i, j, v2);
+              {
+                  if (j >= g.p[i].extra.size ())
+                      throw std::runtime_error ("Specified extra index is too large");
+                  if (g.p[i].extra[j] == v1)
+                      g.p[i].extra[j] = v2;
+              }
               break;
         }
-    }
-
-    return g;
-}
-
-// Process a spoc_file using named pipes
-spoc::spoc_file run_pipe_command (const spoc_file &f,
-    std::ostream &ips,
-    std::istream &ops)
-{
-    spoc::spoc_file g (f);
-
-    // Write a header
-    write_binary_header (ips,
-        f.get_major_version (),
-        f.get_minor_version (),
-        f.get_npoints ());
-
-    // For each record
-    for (size_t i = 0; i < f.get_npoints (); ++i)
-    {
-        // Get the record
-        auto p = f.get (i);
-
-        // Write the record to the filter's input pipe
-        spoc::write_binary (ips, p);
-
-        // Read the transformed record from the filter's output pipe
-        const spoc::point_record q = spoc::read_binary (ops);
-
-        // Set it in the new spoc_file
-        g.set (i, q);
     }
 
     return g;
@@ -135,10 +113,10 @@ spoc_file recenter (const spoc_file &f, const bool z_flag = false)
 {
     // Make a copy
     spoc::spoc_file g (f);
-    const auto x = g.get_x ();
-    const auto y = g.get_y ();
-    const auto z = g.get_z ();
-    const auto n = g.get_npoints ();
+    const auto x = get_x (g.p);
+    const auto y = get_y (g.p);
+    const auto z = get_z (g.p);
+    const auto n = f.h.total_points;
 
     // Get average X, Y, and (optionally) Z
     const double cx = std::accumulate (begin (x), end (x), 0.0) / n;
@@ -148,11 +126,11 @@ spoc_file recenter (const spoc_file &f, const bool z_flag = false)
     // Subtract off mean x, y, z
     for (size_t i = 0; i < n; ++i)
     {
-        auto p = g.get (i);
+        auto p = g.p[i];
         p.x -= cx;
         p.y -= cy;
         p.z -= cz;
-        g.set (i, p);
+        g.p[i] = p;
     }
     return g;
 }
@@ -162,10 +140,10 @@ spoc_file subtract_min (const spoc_file &f, const bool z_flag = false)
 {
     // Make a copy
     spoc::spoc_file g (f);
-    const auto x = g.get_x ();
-    const auto y = g.get_y ();
-    const auto z = g.get_z ();
-    const auto n = g.get_npoints ();
+    const auto x = get_x (g.p);
+    const auto y = get_y (g.p);
+    const auto z = get_z (g.p);
+    const auto n = g.h.total_points;
 
     // Get min X, Y, and (optionally) Z
     const double minx = *std::min_element (begin (x), end (x));
@@ -175,11 +153,11 @@ spoc_file subtract_min (const spoc_file &f, const bool z_flag = false)
     // Subtract off min x, y, z
     for (size_t i = 0; i < n; ++i)
     {
-        auto p = g.get (i);
+        auto p = g.p[i];
         p.x -= minx;
         p.y -= miny;
         p.z -= minz;
-        g.set (i, p);
+        g.p[i] = p;
     }
     return g;
 }

@@ -18,7 +18,7 @@ int filter_entry (const bool verbose,
     const std::string &output_fn,
     T init_function,
     U preprocess_function,
-    V get_npoints,
+    V get_total_points,
     W get_point)
 {
     using namespace std;
@@ -52,10 +52,10 @@ int filter_entry (const bool verbose,
         }
 
         // Initialize the filter
-        init_function (f.get_npoints ());
+        init_function (f.get_total_points ());
 
         // Preprocess the points
-        for (size_t i = 0; i < f.get_npoints (); ++i)
+        for (size_t i = 0; i < f.get_total_points (); ++i)
         {
             // Get a point
             const auto p = f.get (i);
@@ -65,13 +65,13 @@ int filter_entry (const bool verbose,
         }
 
         // Get the number of filtered points
-        const size_t npoints = get_npoints ();
+        const size_t total_points = get_total_points ();
 
         // Resize the spoc file
-        f.resize (npoints);
+        f.resize (total_points);
 
         // Get the filtered points
-        for (size_t i = 0; i < f.get_npoints (); ++i)
+        for (size_t i = 0; i < f.get_total_points (); ++i)
             f.set (i, get_point (i));
 
         // Write the points back out

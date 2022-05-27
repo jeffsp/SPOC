@@ -147,10 +147,10 @@ void process (std::ostream &os,
         if (header_info)
         {
             json::object h;
-            h["major_version"] = f.get_major_version ();
-            h["minor_version"] = f.get_minor_version ();
-            h["wkt"] = f.get_wkt ();
-            h["npoints"] = f.get_npoints ();
+            h["major_version"] = f.h.major_version;
+            h["minor_version"] = f.h.minor_version;
+            h["wkt"] = f.h.wkt;
+            h["total_points"] = f.h.total_points;
             j["header"] = h;
         }
 
@@ -158,18 +158,18 @@ void process (std::ostream &os,
         {
             json::object s;
 
-            s["x"] = get_summary_object<double> (f.get_x ());
-            s["y"] = get_summary_object<double> (f.get_y ());
-            s["z"] = get_summary_object<double> (f.get_z ());
-            s["c"] = get_summary_object<uint32_t> (f.get_c ());
-            s["p"] = get_summary_object<uint32_t> (f.get_p ());
-            s["i"] = get_summary_object<uint16_t> (f.get_i ());
-            s["r"] = get_summary_object<uint16_t> (f.get_r ());
-            s["g"] = get_summary_object<uint16_t> (f.get_g ());
-            s["b"] = get_summary_object<uint16_t> (f.get_b ());
+            s["x"] = get_summary_object<double> (get_x (f.p));
+            s["y"] = get_summary_object<double> (get_y (f.p));
+            s["z"] = get_summary_object<double> (get_z (f.p));
+            s["c"] = get_summary_object<uint32_t> (get_c (f.p));
+            s["p"] = get_summary_object<uint32_t> (get_p (f.p));
+            s["i"] = get_summary_object<uint16_t> (get_i (f.p));
+            s["r"] = get_summary_object<uint16_t> (get_r (f.p));
+            s["g"] = get_summary_object<uint16_t> (get_g (f.p));
+            s["b"] = get_summary_object<uint16_t> (get_b (f.p));
             json::array a;
-            for (size_t k = 0; k < f.get_extra ().size (); ++k)
-                a.push_back (get_summary_object<uint64_t> (f.get_extra ()[k]));
+            for (size_t k = 0; k < get_extra_size (f.p); ++k)
+                a.push_back (get_summary_object<uint64_t> (get_extra (k, f.p)));
             s["extra"] = a;
             j["summary"] = s;
         }
@@ -178,7 +178,7 @@ void process (std::ostream &os,
         {
             json::object c;
 
-            const auto cls_map = get_class_map (f.get_c ());
+            const auto cls_map = get_class_map (get_c (f.p));
 
             for (auto i : cls_map)
                 c[i.first] = i.second;
@@ -195,36 +195,36 @@ void process (std::ostream &os,
     {
         if (header_info)
         {
-            os << "major_version\t" << int (f.get_major_version ()) << endl;
-            os << "minor_version\t" << int (f.get_minor_version ()) << endl;
-            os << "wkt\t" << f.get_wkt () << endl;
-            os << "npoints\t" << f.get_npoints () << endl;
+            os << "major_version\t" << int (f.h.major_version) << endl;
+            os << "minor_version\t" << int (f.h.minor_version) << endl;
+            os << "wkt\t" << f.h.wkt << endl;
+            os << "total_points\t" << f.h.total_points << endl;
         }
 
         if (summary_info)
         {
-            os << get_summary_string<double> ("x\t", f.get_x (), compact);
-            os << get_summary_string<double> ("y\t", f.get_y (), compact);
-            os << get_summary_string<double> ("z\t", f.get_z (), compact);
-            os << get_summary_string<uint32_t> ("c\t", f.get_c (), compact);
-            os << get_summary_string<uint32_t> ("p\t", f.get_p (), compact);
-            os << get_summary_string<uint16_t> ("i\t", f.get_i (), compact);
-            os << get_summary_string<uint16_t> ("r\t", f.get_r (), compact);
-            os << get_summary_string<uint16_t> ("g\t", f.get_g (), compact);
-            os << get_summary_string<uint16_t> ("b\t", f.get_b (), compact);
-            for (size_t k = 0; k < f.get_extra ().size (); ++k)
+            os << get_summary_string<double> ("x\t", get_x (f.p), compact);
+            os << get_summary_string<double> ("y\t", get_y (f.p), compact);
+            os << get_summary_string<double> ("z\t", get_z (f.p), compact);
+            os << get_summary_string<uint32_t> ("c\t", get_c (f.p), compact);
+            os << get_summary_string<uint32_t> ("p\t", get_p (f.p), compact);
+            os << get_summary_string<uint16_t> ("i\t", get_i (f.p), compact);
+            os << get_summary_string<uint16_t> ("r\t", get_r (f.p), compact);
+            os << get_summary_string<uint16_t> ("g\t", get_g (f.p), compact);
+            os << get_summary_string<uint16_t> ("b\t", get_b (f.p), compact);
+            for (size_t k = 0; k < get_extra_size (f.p); ++k)
             {
                 stringstream s;
                 s.precision (3);
                 s << fixed;
                 s << "extra " << k << "\t";
-                os << get_summary_string<uint64_t> (s.str (), f.get_extra ()[k], compact);
+                os << get_summary_string<uint64_t> (s.str (), get_extra (k, f.p), compact);
             }
         }
 
         if (classifications)
         {
-            const auto cls_map = get_class_map (f.get_c ());
+            const auto cls_map = get_class_map (get_c (f.p));
 
             for (auto i : cls_map)
                 os << "cls_" << i.first << "\t" << i.second << std::endl;
