@@ -596,6 +596,12 @@ class spoc_file
         p.resize (new_size);
         h.total_points = new_size;
     }
+    void resize_extra (const size_t new_size)
+    {
+        for (size_t i = 0; i < p.size (); ++i)
+            p[i].extra.resize (new_size);
+        h.extra_size = new_size;
+    }
 };
 
 } // namespace spoc

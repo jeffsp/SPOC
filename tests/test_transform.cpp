@@ -32,7 +32,7 @@ void test_transform_replace ()
     for (auto rgb : {true, false})
     {
         // Generate spoc files
-        auto f = generate_random_spoc_file (100, 8, rgb);
+        auto f = generate_random_spoc_file (10000, 8, rgb);
 
         for (auto v1 : { 1.0, 2.0, 3.0, 4.0, 5.0 })
         {
@@ -58,7 +58,7 @@ void test_transform_recenter ()
     for (auto rgb : {true, false})
     {
         // Generate spoc files
-        auto f = generate_random_spoc_file (100, 8, rgb);
+        auto f = generate_random_spoc_file (1000, 8, rgb);
 
         auto g = recenter (f);
         auto h = recenter (g, true);

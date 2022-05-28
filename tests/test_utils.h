@@ -49,9 +49,10 @@ inline std::vector<spoc::point<double>> generate_points (
 std::vector<spoc::point_record> generate_random_point_records (
     const size_t total_points,
     const size_t extra_size = 0,
-    const bool rgb = true)
+    const bool rgb = true,
+    const size_t seed = 123)
 {
-    std::default_random_engine g;
+    std::default_random_engine g (seed);
     std::uniform_int_distribution<int> di (0, 1 << 15);
     std::uniform_real_distribution<double> dr (-1.0, 1.0);
 
@@ -77,10 +78,11 @@ std::vector<spoc::point_record> generate_random_point_records (
 spoc::spoc_file generate_random_spoc_file (
     const size_t total_points,
     const size_t extra_size = 0,
-    const bool rgb = true)
+    const bool rgb = true,
+    const size_t seed = 123)
 {
     spoc::header h ("WKT", extra_size, total_points);
-    spoc::spoc_file f (h, generate_random_point_records (total_points, extra_size, true));
+    spoc::spoc_file f (h, generate_random_point_records (total_points, extra_size, rgb, seed));
     return f;
 }
 
