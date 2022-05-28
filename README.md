@@ -106,6 +106,9 @@ The proposed extension is SPOC, or Simple POint Cloud.
 - [X] spoc diff: diff two point clouds, return error if different
   - [X] Header only
   - [X] Data only
+  - [ ] Exclude extra
+  - [ ] Exclude header
+  - [ ] Exclude data
   - [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
   - [X] Not - inverse results
   - [X] Unit/integration tests

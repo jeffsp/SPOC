@@ -62,16 +62,16 @@ void test_transform_recenter ()
 
         auto g = recenter (f);
         auto h = recenter (g, true);
-        const auto fx = get_x (f.p);
-        const auto fy = get_y (f.p);
-        const auto fz = get_z (f.p);
-        const auto gx = get_x (g.p);
-        const auto gy = get_y (g.p);
-        const auto gz = get_z (g.p);
-        const auto hx = get_x (h.p);
-        const auto hy = get_y (h.p);
-        const auto hz = get_z (h.p);
-        const auto n = f.h.total_points;
+        const auto fx = get_x (f.get_points ());
+        const auto fy = get_y (f.get_points ());
+        const auto fz = get_z (f.get_points ());
+        const auto gx = get_x (g.get_points ());
+        const auto gy = get_y (g.get_points ());
+        const auto gz = get_z (g.get_points ());
+        const auto hx = get_x (h.get_points ());
+        const auto hy = get_y (h.get_points ());
+        const auto hz = get_z (h.get_points ());
+        const auto n = f.get_header ().total_points;
         const auto cfx = std::accumulate (begin (fx), end (fx), 0.0) / n;
         const auto cfy = std::accumulate (begin (fy), end (fy), 0.0) / n;
         const auto cfz = std::accumulate (begin (fz), end (fz), 0.0) / n;

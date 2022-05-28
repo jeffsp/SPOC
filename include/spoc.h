@@ -19,15 +19,21 @@ namespace spoc
 // File format
 struct header
 {
-    header ()
-        : extra_size (0)
-        , total_points (0)
+    header (const std::string &wkt,
+            const size_t extra_size,
+            const size_t total_points)
+        : wkt (wkt)
+        , extra_size (extra_size)
+        , total_points (total_points)
     {
         signature[0] = 'S'; // Simple
         signature[1] = 'P'; // Point
         signature[2] = 'O';
         signature[3] = 'C'; // Cloud
         signature[4] = '\0'; // Terminate
+    }
+    header () : header (std::string (), 0, 0)
+    {
     }
     bool check_signature () const
     {
@@ -552,10 +558,44 @@ std::vector<uint64_t> get_extra (const size_t k, const points &p)
     return x;
 }
 
-struct spoc_file
+class spoc_file
 {
+    private:
     header h;
     points p;
+    public:
+    spoc_file () { }
+    spoc_file (const header &h, const points &p)
+        : h (h)
+        , p (p)
+    {
+        if (h.total_points != p.size ())
+            throw std::runtime_error ("The header total points does not match the data total points");
+        if (!p.empty () && p[0].extra.size () != h.extra_size)
+            throw std::runtime_error ("The header extra size does not match the point records");
+        if (!check_records (p))
+            throw std::runtime_error ("The point records are inconsistent");
+    }
+    // Readonly access
+    const header &get_header () const { return h; }
+    const points &get_points () const { return p; }
+
+    // R/W access
+    point_record &operator[] (const size_t n)
+    {
+        assert (n < p.size ());
+        return p[n];
+    }
+    void set_point (const size_t n, const point_record &r)
+    {
+        assert (n < p.size ());
+        p[n] = r;
+    }
+    void resize (const size_t new_size)
+    {
+        p.resize (new_size);
+        h.total_points = new_size;
+    }
 };
 
 } // namespace spoc

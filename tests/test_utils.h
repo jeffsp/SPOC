@@ -79,11 +79,8 @@ spoc::spoc_file generate_random_spoc_file (
     const size_t extra_size = 0,
     const bool rgb = true)
 {
-    spoc::spoc_file f;
-    f.h.wkt = "WKT";
-    f.h.extra_size = extra_size;
-    f.h.total_points = total_points;
-    f.p = generate_random_point_records (total_points, extra_size, true);
+    spoc::header h ("WKT", extra_size, total_points);
+    spoc::spoc_file f (h, generate_random_point_records (total_points, extra_size, true));
     return f;
 }
 
