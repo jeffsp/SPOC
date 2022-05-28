@@ -32,7 +32,12 @@ void test_transform_replace ()
     for (auto rgb : {true, false})
     {
         // Generate spoc files
-        auto f = generate_random_spoc_file (10000, 8, rgb);
+        const size_t total_points = 100;
+        const size_t extra_size = 8;
+        auto f = generate_random_spoc_file (total_points, extra_size, rgb);
+        for (size_t i = 0; i < total_points; ++i)
+            for (size_t j = 0; j < extra_size; ++j)
+                f[i].extra[j] = f[i].extra[j] % 5;
 
         for (auto v1 : { 1.0, 2.0, 3.0, 4.0, 5.0 })
         {
