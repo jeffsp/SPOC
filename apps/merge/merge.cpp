@@ -57,10 +57,10 @@ int main (int argc, char **argv)
 
             // Set the wkt to the first file's wkt
             if (i == 0)
-                g.set_wkt (f.get_wkt ());
+                g.set_wkt (f.get_header ().wkt);
 
             // Get the xyz's
-            const auto p = spoc::get_points (f);
+            const auto p = f.get_point_records ();
 
             // Get the extent
             const auto e = spoc::extent::get_extent (p);
@@ -82,7 +82,7 @@ int main (int argc, char **argv)
         if (!args.quiet)
         {
             // Get the points
-            const auto p = spoc::get_points (g);
+            const auto p = g.get_point_records ();
 
             // Get the extent
             const auto e = spoc::extent::get_extent (p);

@@ -115,7 +115,7 @@ void test_spoc_file ()
     try {
         stringstream s;
         const string wkt = "Test wkt";
-        write_spoc_file (s, wkt, p);
+        write_spoc_file (s, spoc_file (wkt, p));
     }
     catch (...)
     { failed = true; }
@@ -125,7 +125,7 @@ void test_spoc_file ()
     try {
         stringstream s;
         const string wkt = "Test wkt";
-        write_spoc_file_compressed (s, wkt, p);
+        write_spoc_file_compressed (s, spoc_file (wkt, p));
     }
     catch (...)
     { failed = true; }
@@ -155,13 +155,11 @@ void test_spoc_file_io ()
     {
     stringstream s;
     const string wkt = "Test wkt";
-    write_spoc_file (s, wkt, p);
-    decltype(p) q;
-    header h;
-    read_spoc_file (s, h, q);
+    write_spoc_file (s, spoc_file (wkt, p));
+    const auto f = read_spoc_file (s);
 
-    verify (wkt == h.wkt);
-    verify (p == q);
+    verify (f.get_header ().wkt == wkt);
+    verify (p == f.get_point_records ());
     }
 
     // Fail when reading signature
@@ -172,9 +170,7 @@ void test_spoc_file_io ()
     bool failed = false;
     try
     {
-        header h;
-        decltype(p) q;
-        read_spoc_file (s, h, q);
+        const auto f = read_spoc_file (s);
     }
     catch (...)
     {
@@ -193,13 +189,11 @@ void test_spoc_file_compressed_io ()
     {
     stringstream s;
     const string wkt = "Test wkt";
-    write_spoc_file_compressed (s, wkt, p);
-    header h;
-    decltype(p) q;
-    read_spoc_file_compressed (s, h, q);
+    write_spoc_file_compressed (s, spoc_file (wkt, p));
+    const auto f = read_spoc_file_compressed (s);
 
-    verify (wkt == h.wkt);
-    verify (p == q);
+    verify (wkt == f.get_header ().wkt);
+    verify (p == f.get_point_records ());
     }
 
     // Compare sizes
@@ -208,8 +202,8 @@ void test_spoc_file_compressed_io ()
     stringstream s1;
     stringstream s2;
     stringstream s3;
-    write_spoc_file (s1, wkt, p);
-    write_spoc_file_compressed (s2, wkt, p);
+    write_spoc_file (s1, spoc_file (wkt, p));
+    write_spoc_file_compressed (s2, spoc_file (wkt, p));
     // Zero some fields
     for (auto &i : p)
     {
@@ -217,13 +211,10 @@ void test_spoc_file_compressed_io ()
         i.extra[3] = 0;
         i.extra[7] = 0;
     }
-    write_spoc_file_compressed (s3, wkt, p);
-    header h1; decltype(p) q1;
-    header h2; decltype(p) q2;
-    header h3; decltype(p) q3;
-    read_spoc_file (s1, h1, q1);
-    read_spoc_file_compressed (s2, h2, q2);
-    read_spoc_file_compressed (s3, h3, q3);
+    write_spoc_file_compressed (s3, spoc_file (wkt, p));
+    const auto f1 = read_spoc_file (s1);
+    const auto f2 = read_spoc_file_compressed (s2);
+    const auto f3 = read_spoc_file_compressed (s3);
     // Compressed file should be smaller
     verify (s1.str ().size () > s2.str ().size ());
     // File with zero fields should be smaller

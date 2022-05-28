@@ -235,39 +235,6 @@ bool check_records (const point_records &prs)
     return true;
 }
 
-// File I/O
-inline void write_spoc_file (std::ostream &s,
-    const std::string &wkt,
-    const point_records &prs)
-{
-    // Make sure the points records are OK
-    if (!check_records (prs))
-        throw std::runtime_error ("Invalid point records");
-
-    header h;
-    h.wkt = wkt;
-    h.extra_size = prs.empty () ? 0 : prs[0].extra.size ();
-    h.total_points = prs.size ();
-
-    // Write the file
-    write_header (s, h);
-    for (const auto &p : prs)
-        write_point_record (s, p);
-}
-
-inline void read_spoc_file (std::istream &s,
-    header &h,
-    point_records &prs)
-{
-    // Read the header
-    h = read_header (s);
-
-    // Read the data
-    prs.resize (h.total_points);
-    for (size_t i = 0; i < prs.size (); ++i)
-        prs[i] = read_point_record (s, h.extra_size);
-}
-
 template<typename T>
 inline bool all_zero (const std::vector<T> &x)
 {
@@ -315,90 +282,6 @@ inline void write_compressed (std::ostream &s, const std::vector<T> &x)
     s.write (reinterpret_cast<const char*>(&x[0]), x.size ());
 }
 
-inline void write_spoc_file_compressed (std::ostream &s,
-    const std::string &wkt,
-    const point_records &prs)
-{
-    // Make sure the points records are OK
-    if (!check_records (prs))
-        throw std::runtime_error ("Invalid point records");
-
-    // Stuff the data into vectors
-    const size_t total_points = prs.size ();
-    const size_t extra_size = prs.empty ()
-        ? 0
-        : prs[0].extra.size ();
-    std::vector<double> x (total_points);
-    std::vector<double> y (total_points);
-    std::vector<double> z (total_points);
-    std::vector<uint32_t> c (total_points);
-    std::vector<uint32_t> p (total_points);
-    std::vector<uint16_t> i (total_points);
-    std::vector<uint16_t> r (total_points);
-    std::vector<uint16_t> g (total_points);
-    std::vector<uint16_t> b (total_points);
-    std::vector<std::vector<uint64_t>> e (extra_size, std::vector<uint64_t>(total_points));
-
-    for (size_t n = 0; n < total_points; ++n)
-    {
-        x[n] = prs[n].x;
-        y[n] = prs[n].y;
-        z[n] = prs[n].z;
-        c[n] = prs[n].c;
-        p[n] = prs[n].p;
-        i[n] = prs[n].i;
-        r[n] = prs[n].r;
-        g[n] = prs[n].g;
-        b[n] = prs[n].b;
-        for (size_t j = 0; j < extra_size; ++j)
-            e[j][n] = prs[n].extra[j];
-    }
-
-    // Compress fields in parallel
-    std::vector<std::vector<uint8_t>> fields (9);
-    #pragma omp parallel sections
-    {
-        #pragma omp section
-        { fields[0] = compress_field (x); }
-        #pragma omp section
-        { fields[1] = compress_field (y); }
-        #pragma omp section
-        { fields[2] = compress_field (z); }
-        #pragma omp section
-        { fields[3] = compress_field (c); }
-        #pragma omp section
-        { fields[4] = compress_field (p); }
-        #pragma omp section
-        { fields[5] = compress_field (i); }
-        #pragma omp section
-        { fields[6] = compress_field (r); }
-        #pragma omp section
-        { fields[7] = compress_field (g); }
-        #pragma omp section
-        { fields[8] = compress_field (b); }
-    }
-
-    // Compress extra fields in parallel
-    std::vector<std::vector<uint8_t>> extras (e.size ());
-    #pragma omp parallel for
-    for (size_t j = 0; j < extras.size (); ++j)
-        extras[j] = compress_field (e[j]);
-
-    // Write the header
-    header h;
-    h.wkt = wkt;
-    h.extra_size = extra_size;
-    h.total_points = total_points;
-    write_header (s, h);
-
-    // Write the compressed data
-    for (size_t j = 0; j < fields.size (); ++j)
-        write_compressed (s, fields[j]);
-
-    for (size_t j = 0; j < extras.size (); ++j)
-        write_compressed (s, extras[j]);
-}
-
 template<typename T>
 inline std::vector<T> read_compressed (std::istream &s, const size_t size)
 {
@@ -419,52 +302,6 @@ inline std::vector<T> read_compressed (std::istream &s, const size_t size)
     spoc::decompress (c, reinterpret_cast<uint8_t *> (&x[0]), x.size () * sizeof(T));
 
     return x;
-}
-
-inline void read_spoc_file_compressed (std::istream &s,
-    header &h,
-    point_records &prs)
-{
-    // Read the header
-    h = read_header (s);
-
-    // Read the data
-    prs.resize (h.total_points);
-
-    // Read data
-    std::vector<double> x = read_compressed<double> (s, h.total_points);
-    std::vector<double> y = read_compressed<double> (s, h.total_points);
-    std::vector<double> z = read_compressed<double> (s, h.total_points);
-    std::vector<uint32_t> c = read_compressed<uint32_t> (s, h.total_points);
-    std::vector<uint32_t> p = read_compressed<uint32_t> (s, h.total_points);
-    std::vector<uint16_t> i = read_compressed<uint16_t> (s, h.total_points);
-    std::vector<uint16_t> r = read_compressed<uint16_t> (s, h.total_points);
-    std::vector<uint16_t> g = read_compressed<uint16_t> (s, h.total_points);
-    std::vector<uint16_t> b = read_compressed<uint16_t> (s, h.total_points);
-
-    std::vector<std::vector<uint64_t>> extra (h.extra_size);
-    for (size_t j = 0; j < extra.size (); ++j)
-        extra[j] = read_compressed<uint64_t> (s, h.total_points);
-
-    // Copy them into the point records
-    prs.resize (h.total_points);
-
-    #pragma omp parallel for
-    for (size_t n = 0; n < prs.size (); ++n)
-    {
-        if (!x.empty ()) prs[n].x = x[n];
-        if (!y.empty ()) prs[n].y = y[n];
-        if (!z.empty ()) prs[n].z = z[n];
-        if (!c.empty ()) prs[n].c = c[n];
-        if (!p.empty ()) prs[n].p = p[n];
-        if (!i.empty ()) prs[n].i = i[n];
-        if (!r.empty ()) prs[n].r = r[n];
-        if (!g.empty ()) prs[n].g = g[n];
-        if (!b.empty ()) prs[n].b = b[n];
-        prs[n].extra.resize (h.extra_size);
-        for (size_t j = 0; j < prs[n].extra.size (); ++j)
-            if (!extra[j].empty ()) prs[n].extra[j] = extra[j][n];
-    }
 }
 
 // Helper functions
@@ -565,6 +402,15 @@ class spoc_file
     point_records p;
     public:
     spoc_file () { }
+    spoc_file (const std::string &wkt, const point_records &p)
+        : h (header (wkt, 0, p.size ()))
+        , p (p)
+    {
+        if (!p.empty ())
+            h.extra_size = p[0].extra.size ();
+        if (!check_records (p))
+            throw std::runtime_error ("The point records are inconsistent");
+    }
     spoc_file (const header &h, const point_records &p)
         : h (h)
         , p (p)
@@ -579,12 +425,17 @@ class spoc_file
     // Readonly access
     const header &get_header () const { return h; }
     const point_records &get_point_records () const { return p; }
+    const point_record &get_point_record (const size_t n) const { return p[n]; }
 
     // R/W access
-    point_record &operator[] (const size_t n)
+    void set_wkt (const std::string s)
+    {
+        h.wkt = s;
+    }
+    void set_point_record (const size_t n, const point_record r)
     {
         assert (n < p.size ());
-        return p[n];
+        p[n] = r;
     }
     void set_point (const size_t n, const point_record &r)
     {
@@ -602,8 +453,16 @@ class spoc_file
             p[i].extra.resize (new_size);
         h.extra_size = new_size;
     }
+
+    // R/W access
+    point_record &operator[] (const size_t n)
+    {
+        assert (n < p.size ());
+        return p[n];
+    }
 };
 
+// Spoc File I/O
 inline spoc_file read_spoc_file (std::istream &s)
 {
     // Read the header
@@ -617,5 +476,148 @@ inline spoc_file read_spoc_file (std::istream &s)
 
     return spoc_file (h, p);
 }
+
+inline spoc_file read_spoc_file_compressed (std::istream &s)
+{
+    // Read the header
+    header h = read_header (s);
+
+    // Read the data
+    point_records prs;
+    prs.resize (h.total_points);
+
+    // Read data
+    std::vector<double> x = read_compressed<double> (s, h.total_points);
+    std::vector<double> y = read_compressed<double> (s, h.total_points);
+    std::vector<double> z = read_compressed<double> (s, h.total_points);
+    std::vector<uint32_t> c = read_compressed<uint32_t> (s, h.total_points);
+    std::vector<uint32_t> p = read_compressed<uint32_t> (s, h.total_points);
+    std::vector<uint16_t> i = read_compressed<uint16_t> (s, h.total_points);
+    std::vector<uint16_t> r = read_compressed<uint16_t> (s, h.total_points);
+    std::vector<uint16_t> g = read_compressed<uint16_t> (s, h.total_points);
+    std::vector<uint16_t> b = read_compressed<uint16_t> (s, h.total_points);
+
+    std::vector<std::vector<uint64_t>> extra (h.extra_size);
+    for (size_t j = 0; j < extra.size (); ++j)
+        extra[j] = read_compressed<uint64_t> (s, h.total_points);
+
+    // Copy them into the point records
+    prs.resize (h.total_points);
+
+    #pragma omp parallel for
+    for (size_t n = 0; n < prs.size (); ++n)
+    {
+        if (!x.empty ()) prs[n].x = x[n];
+        if (!y.empty ()) prs[n].y = y[n];
+        if (!z.empty ()) prs[n].z = z[n];
+        if (!c.empty ()) prs[n].c = c[n];
+        if (!p.empty ()) prs[n].p = p[n];
+        if (!i.empty ()) prs[n].i = i[n];
+        if (!r.empty ()) prs[n].r = r[n];
+        if (!g.empty ()) prs[n].g = g[n];
+        if (!b.empty ()) prs[n].b = b[n];
+        prs[n].extra.resize (h.extra_size);
+        for (size_t j = 0; j < prs[n].extra.size (); ++j)
+            if (!extra[j].empty ()) prs[n].extra[j] = extra[j][n];
+    }
+
+    return spoc_file (h, prs);
+}
+
+inline void write_spoc_file (std::ostream &s, const spoc_file &f)
+{
+    // Make sure the points records are OK
+    if (!check_records (f.get_point_records ()))
+        throw std::runtime_error ("Invalid point records");
+
+    // Write the file
+    write_header (s, f.get_header ());
+
+    const auto &prs = f.get_point_records ();
+    for (const auto &p : prs)
+        write_point_record (s, p);
+}
+
+inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
+{
+    const auto &prs = f.get_point_records ();
+
+    // Make sure the points records are OK
+    if (!check_records (prs))
+        throw std::runtime_error ("Invalid point records");
+
+    // Stuff the data into vectors
+    const size_t total_points = prs.size ();
+    const size_t extra_size = prs.empty ()
+        ? 0
+        : prs[0].extra.size ();
+    std::vector<double> x (total_points);
+    std::vector<double> y (total_points);
+    std::vector<double> z (total_points);
+    std::vector<uint32_t> c (total_points);
+    std::vector<uint32_t> p (total_points);
+    std::vector<uint16_t> i (total_points);
+    std::vector<uint16_t> r (total_points);
+    std::vector<uint16_t> g (total_points);
+    std::vector<uint16_t> b (total_points);
+    std::vector<std::vector<uint64_t>> e (extra_size, std::vector<uint64_t>(total_points));
+
+    for (size_t n = 0; n < total_points; ++n)
+    {
+        x[n] = prs[n].x;
+        y[n] = prs[n].y;
+        z[n] = prs[n].z;
+        c[n] = prs[n].c;
+        p[n] = prs[n].p;
+        i[n] = prs[n].i;
+        r[n] = prs[n].r;
+        g[n] = prs[n].g;
+        b[n] = prs[n].b;
+        for (size_t j = 0; j < extra_size; ++j)
+            e[j][n] = prs[n].extra[j];
+    }
+
+    // Compress fields in parallel
+    std::vector<std::vector<uint8_t>> fields (9);
+    #pragma omp parallel sections
+    {
+        #pragma omp section
+        { fields[0] = compress_field (x); }
+        #pragma omp section
+        { fields[1] = compress_field (y); }
+        #pragma omp section
+        { fields[2] = compress_field (z); }
+        #pragma omp section
+        { fields[3] = compress_field (c); }
+        #pragma omp section
+        { fields[4] = compress_field (p); }
+        #pragma omp section
+        { fields[5] = compress_field (i); }
+        #pragma omp section
+        { fields[6] = compress_field (r); }
+        #pragma omp section
+        { fields[7] = compress_field (g); }
+        #pragma omp section
+        { fields[8] = compress_field (b); }
+    }
+
+    // Compress extra fields in parallel
+    std::vector<std::vector<uint8_t>> extras (e.size ());
+    #pragma omp parallel for
+    for (size_t j = 0; j < extras.size (); ++j)
+        extras[j] = compress_field (e[j]);
+
+    // Write the header
+    const header &h = f.get_header ();
+    write_header (s, h);
+
+    // Write the compressed data
+    for (size_t j = 0; j < fields.size (); ++j)
+        write_compressed (s, fields[j]);
+
+    for (size_t j = 0; j < extras.size (); ++j)
+        write_compressed (s, extras[j]);
+}
+
 
 } // namespace spoc

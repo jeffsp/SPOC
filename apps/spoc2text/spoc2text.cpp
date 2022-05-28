@@ -24,11 +24,12 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "reading spoc file" << endl;
 
-        string wkt;
-        auto point_records = read_spoc_file (cin, wkt);
+        const auto f = read_spoc_file (cin);
+        const auto wkt = f.get_header ().wkt;
+        const auto &point_records = f.get_point_records ();
 
         if (args.verbose)
-            clog << point_records.size () << " point records read" << endl;
+            clog << f.get_point_records ().size () << " point records read" << endl;
 
         if (args.verbose)
             clog << "read " << wkt.size () << " byte WKT" << endl;

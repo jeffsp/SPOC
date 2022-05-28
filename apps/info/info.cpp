@@ -38,7 +38,7 @@ int main (int argc, char **argv)
             // Read the file
             spoc_file f = read_spoc_file (cin);
 
-            info::process (cout, h, p,
+            info::process (cout, f,
                 args.json, args.header_info, args.summary_info,
                 args.classifications, args.compact);
         }

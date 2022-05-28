@@ -49,24 +49,20 @@ int main (int argc, char **argv)
         spoc_file f = read_spoc_file (ifs);
 
         if (args.verbose)
-            clog << "Total points " << f.get_total_points () << endl;
+            clog << "Total points " << f.get_point_records ().size () << endl;
 
         // Get the length of one side of a tile
+        const auto x = get_x (f.get_point_records ());
+        const auto y = get_y (f.get_point_records ());
         const double tile_size = args.tile_size > 0.0
             ? args.tile_size
-            : spoc::tile::get_tile_size (f.get_x (), f.get_y (), args.tiles);
+            : spoc::tile::get_tile_size (x, y, args.tiles);
 
         if (args.verbose)
             clog << "Tiles are " << tile_size << " X " << tile_size << endl;
 
-        if (f.get_x ().empty () or f.get_y ().empty ())
-            throw runtime_error ("The X and Y coordinate vectors cannot be empty");
-
-        if (f.get_x ().size () != f.get_y ().size ())
-            throw runtime_error ("The X and Y coordinate vectors are not the same size");
-
         // Get the tile index of each point in the point cloud
-        const auto indexes = spoc::tile::get_tile_indexes (f.get_x (), f.get_y (), tile_size);
+        const auto indexes = spoc::tile::get_tile_indexes (x, y, tile_size);
 
         // Map each tile index to a vector of point cloud indexes
         const auto tile_map = spoc::tile::get_tile_map (indexes);
@@ -103,7 +99,7 @@ int main (int argc, char **argv)
             spoc_file t;
 
             // Set the SRS
-            t.set_wkt (f.get_wkt ());
+            t.set_wkt (f.get_header ().wkt);
 
             // Set the number of points in the file
             t.resize (v.size ());
@@ -112,10 +108,10 @@ int main (int argc, char **argv)
             for (size_t j = 0; j < v.size (); ++j)
             {
                 // Get the point from the input file
-                const auto p = f.get (v[j]);
+                const auto p = f.get_point_record (j);
 
                 // Set it in the output file
-                t.set (j, p);
+                t.set_point_record (j, p);
             }
 
             // Get the filename extension
