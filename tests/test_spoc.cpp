@@ -144,6 +144,20 @@ void test_spoc_file ()
     catch (...)
     { failed = true; }
     verify (failed);
+
+    {
+    const size_t total_points = 100;
+    const size_t extra_size = 3;
+    auto p = generate_random_point_records (total_points, extra_size);
+    const string wkt = "Test wkt";
+    auto f = spoc_file (wkt, p);
+    f.set_wkt ("Test WKT 2");
+    for (size_t i = 0; i < f.get_point_records ().size (); ++i)
+    {
+        const auto q = f.get_point_record (i);
+        f.set_point_record (i, q);
+    }
+    }
 }
 
 void test_spoc_file_io ()

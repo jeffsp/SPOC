@@ -437,11 +437,6 @@ class spoc_file
         assert (n < p.size ());
         p[n] = r;
     }
-    void set_point (const size_t n, const point_record &r)
-    {
-        assert (n < p.size ());
-        p[n] = r;
-    }
     void resize (const size_t new_size)
     {
         p.resize (new_size);

@@ -37,7 +37,7 @@ void append (
         p.p = id;
 
         // Add it to 'b'
-        f2.set_point (f2_size + i, p);
+        f2.set_point_record (f2_size + i, p);
     }
 }
 
