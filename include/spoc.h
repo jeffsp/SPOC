@@ -428,11 +428,11 @@ class spoc_file
     const point_record &get_point_record (const size_t n) const { return p[n]; }
 
     // R/W access
-    void set_wkt (const std::string s)
+    void set_wkt (const std::string &s)
     {
         h.wkt = s;
     }
-    void set_point_record (const size_t n, const point_record r)
+    void set_point_record (const size_t n, const point_record &r)
     {
         assert (n < p.size ());
         p[n] = r;
