@@ -56,31 +56,31 @@ inline int diff (const spoc_file &f1,
     }
     if (check_data)
     {
-        if (get_x (f1.get_points ()) != get_x (f2.get_points ()))
+        if (get_x (f1.get_point_records ()) != get_x (f2.get_point_records ()))
             return_code = -1;
-        else if (get_y (f1.get_points ()) != get_y (f2.get_points ()))
+        else if (get_y (f1.get_point_records ()) != get_y (f2.get_point_records ()))
             return_code = -1;
-        else if (get_z (f1.get_points ()) != get_z (f2.get_points ()))
+        else if (get_z (f1.get_point_records ()) != get_z (f2.get_point_records ()))
             return_code = -1;
-        else if (get_c (f1.get_points ()) != get_c (f2.get_points ()))
+        else if (get_c (f1.get_point_records ()) != get_c (f2.get_point_records ()))
             return_code = -1;
-        else if (get_p (f1.get_points ()) != get_p (f2.get_points ()))
+        else if (get_p (f1.get_point_records ()) != get_p (f2.get_point_records ()))
             return_code = -1;
-        else if (get_i (f1.get_points ()) != get_i (f2.get_points ()))
+        else if (get_i (f1.get_point_records ()) != get_i (f2.get_point_records ()))
             return_code = -1;
-        else if (get_r (f1.get_points ()) != get_r (f2.get_points ()))
+        else if (get_r (f1.get_point_records ()) != get_r (f2.get_point_records ()))
             return_code = -1;
-        else if (get_g (f1.get_points ()) != get_g (f2.get_points ()))
+        else if (get_g (f1.get_point_records ()) != get_g (f2.get_point_records ()))
             return_code = -1;
-        else if (get_b (f1.get_points ()) != get_b (f2.get_points ()))
+        else if (get_b (f1.get_point_records ()) != get_b (f2.get_point_records ()))
             return_code = -1;
-        else if (get_extra_size (f1.get_points ()) != get_extra_size (f2.get_points ()))
+        else if (get_extra_size (f1.get_point_records ()) != get_extra_size (f2.get_point_records ()))
             return_code = -1;
         else
         {
-            for (size_t k = 0; k < get_extra_size (f1.get_points ()); ++k)
+            for (size_t k = 0; k < get_extra_size (f1.get_point_records ()); ++k)
             {
-                if (get_extra (k, f1.get_points ()) != get_extra (k, f2.get_points ()))
+                if (get_extra (k, f1.get_point_records ()) != get_extra (k, f2.get_point_records ()))
                     return_code = -1;
             }
         }
@@ -98,47 +98,47 @@ inline int diff (const spoc_file &f1,
                              throw std::runtime_error (ss.str ());
                          }
                 case 'x': {
-                              if (get_x (f1.get_points ()) != get_x (f2.get_points ()))
+                              if (get_x (f1.get_point_records ()) != get_x (f2.get_point_records ()))
                                   return_code = -1;
                               break;
                           }
                 case 'y': {
-                              if (get_y (f1.get_points ()) != get_y (f2.get_points ()))
+                              if (get_y (f1.get_point_records ()) != get_y (f2.get_point_records ()))
                                   return_code = -1;
                               break;
                           }
                 case 'z': {
-                              if (get_z (f1.get_points ()) != get_z (f2.get_points ()))
+                              if (get_z (f1.get_point_records ()) != get_z (f2.get_point_records ()))
                                   return_code = -1;
                               break;
                           }
                 case 'c': {
-                              if (get_c (f1.get_points ()) != get_c (f2.get_points ()))
+                              if (get_c (f1.get_point_records ()) != get_c (f2.get_point_records ()))
                                   return_code = -1;
                               break;
                           }
                 case 'p': {
-                              if (get_p (f1.get_points ()) != get_p (f2.get_points ()))
+                              if (get_p (f1.get_point_records ()) != get_p (f2.get_point_records ()))
                                   return_code = -1;
                               break;
                           }
                 case 'i': {
-                              if (get_i (f1.get_points ()) != get_i (f2.get_points ()))
+                              if (get_i (f1.get_point_records ()) != get_i (f2.get_point_records ()))
                                   return_code = -1;
                               break;
                           }
                 case 'r': {
-                              if (get_r (f1.get_points ()) != get_r (f2.get_points ()))
+                              if (get_r (f1.get_point_records ()) != get_r (f2.get_point_records ()))
                                   return_code = -1;
                               break;
                           }
                 case 'g': {
-                              if (get_g (f1.get_points ()) != get_g (f2.get_points ()))
+                              if (get_g (f1.get_point_records ()) != get_g (f2.get_point_records ()))
                                   return_code = -1;
                               break;
                           }
                 case 'b': {
-                              if (get_b (f1.get_points ()) != get_b (f2.get_points ()))
+                              if (get_b (f1.get_point_records ()) != get_b (f2.get_point_records ()))
                                   return_code = -1;
                               break;
                           }
@@ -153,9 +153,9 @@ inline int diff (const spoc_file &f1,
                 case '8':
                 case '9': {
                               const size_t index = field - '0';
-                              if (index < get_extra_size (f1.get_points ())
-                                    && index < get_extra_size (f2.get_points ())
-                                    && (get_extra (index, f1.get_points ()) != get_extra (index, f2.get_points ())))
+                              if (index < get_extra_size (f1.get_point_records ())
+                                    && index < get_extra_size (f2.get_point_records ())
+                                    && (get_extra (index, f1.get_point_records ()) != get_extra (index, f2.get_point_records ())))
                                   return_code = -1;
                               break;
                           }

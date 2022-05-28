@@ -52,8 +52,8 @@ void test_diff_header ()
     header h2;
     h1.major_version = 1;
     h2.major_version = 2;
-    spoc_file f1 (h1, points ());
-    spoc_file f2 (h2, points ());
+    spoc_file f1 (h1, point_records ());
+    spoc_file f2 (h2, point_records ());
     verify (diff::diff (f1, f2) != 0);
     }
 
@@ -62,16 +62,16 @@ void test_diff_header ()
     header h2;
     h1.minor_version = 1;
     h2.minor_version = 2;
-    spoc_file f1 (h1, points ());
-    spoc_file f2 (h2, points ());
+    spoc_file f1 (h1, point_records ());
+    spoc_file f2 (h2, point_records ());
     verify (diff::diff (f1, f2) != 0);
     }
 
     {
     header h1 ("A", 0, 0);
     header h2 ("B", 0, 0);
-    spoc_file f1 (h1, points ());
-    spoc_file f2 (h2, points ());
+    spoc_file f1 (h1, point_records ());
+    spoc_file f2 (h2, point_records ());
     verify (diff::diff (f1, f2) != 0);
     }
 }

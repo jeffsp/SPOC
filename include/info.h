@@ -158,18 +158,18 @@ void process (std::ostream &os,
         {
             json::object s;
 
-            s["x"] = get_summary_object<double> (get_x (f.get_points ()));
-            s["y"] = get_summary_object<double> (get_y (f.get_points ()));
-            s["z"] = get_summary_object<double> (get_z (f.get_points ()));
-            s["c"] = get_summary_object<uint32_t> (get_c (f.get_points ()));
-            s["p"] = get_summary_object<uint32_t> (get_p (f.get_points ()));
-            s["i"] = get_summary_object<uint16_t> (get_i (f.get_points ()));
-            s["r"] = get_summary_object<uint16_t> (get_r (f.get_points ()));
-            s["g"] = get_summary_object<uint16_t> (get_g (f.get_points ()));
-            s["b"] = get_summary_object<uint16_t> (get_b (f.get_points ()));
+            s["x"] = get_summary_object<double> (get_x (f.get_point_records ()));
+            s["y"] = get_summary_object<double> (get_y (f.get_point_records ()));
+            s["z"] = get_summary_object<double> (get_z (f.get_point_records ()));
+            s["c"] = get_summary_object<uint32_t> (get_c (f.get_point_records ()));
+            s["p"] = get_summary_object<uint32_t> (get_p (f.get_point_records ()));
+            s["i"] = get_summary_object<uint16_t> (get_i (f.get_point_records ()));
+            s["r"] = get_summary_object<uint16_t> (get_r (f.get_point_records ()));
+            s["g"] = get_summary_object<uint16_t> (get_g (f.get_point_records ()));
+            s["b"] = get_summary_object<uint16_t> (get_b (f.get_point_records ()));
             json::array a;
-            for (size_t k = 0; k < get_extra_size (f.get_points ()); ++k)
-                a.push_back (get_summary_object<uint64_t> (get_extra (k, f.get_points ())));
+            for (size_t k = 0; k < get_extra_size (f.get_point_records ()); ++k)
+                a.push_back (get_summary_object<uint64_t> (get_extra (k, f.get_point_records ())));
             s["extra"] = a;
             j["summary"] = s;
         }
@@ -178,7 +178,7 @@ void process (std::ostream &os,
         {
             json::object c;
 
-            const auto cls_map = get_class_map (get_c (f.get_points ()));
+            const auto cls_map = get_class_map (get_c (f.get_point_records ()));
 
             for (auto i : cls_map)
                 c[i.first] = i.second;
@@ -203,28 +203,28 @@ void process (std::ostream &os,
 
         if (summary_info)
         {
-            os << get_summary_string<double> ("x\t", get_x (f.get_points ()), compact);
-            os << get_summary_string<double> ("y\t", get_y (f.get_points ()), compact);
-            os << get_summary_string<double> ("z\t", get_z (f.get_points ()), compact);
-            os << get_summary_string<uint32_t> ("c\t", get_c (f.get_points ()), compact);
-            os << get_summary_string<uint32_t> ("p\t", get_p (f.get_points ()), compact);
-            os << get_summary_string<uint16_t> ("i\t", get_i (f.get_points ()), compact);
-            os << get_summary_string<uint16_t> ("r\t", get_r (f.get_points ()), compact);
-            os << get_summary_string<uint16_t> ("g\t", get_g (f.get_points ()), compact);
-            os << get_summary_string<uint16_t> ("b\t", get_b (f.get_points ()), compact);
-            for (size_t k = 0; k < get_extra_size (f.get_points ()); ++k)
+            os << get_summary_string<double> ("x\t", get_x (f.get_point_records ()), compact);
+            os << get_summary_string<double> ("y\t", get_y (f.get_point_records ()), compact);
+            os << get_summary_string<double> ("z\t", get_z (f.get_point_records ()), compact);
+            os << get_summary_string<uint32_t> ("c\t", get_c (f.get_point_records ()), compact);
+            os << get_summary_string<uint32_t> ("p\t", get_p (f.get_point_records ()), compact);
+            os << get_summary_string<uint16_t> ("i\t", get_i (f.get_point_records ()), compact);
+            os << get_summary_string<uint16_t> ("r\t", get_r (f.get_point_records ()), compact);
+            os << get_summary_string<uint16_t> ("g\t", get_g (f.get_point_records ()), compact);
+            os << get_summary_string<uint16_t> ("b\t", get_b (f.get_point_records ()), compact);
+            for (size_t k = 0; k < get_extra_size (f.get_point_records ()); ++k)
             {
                 stringstream s;
                 s.precision (3);
                 s << fixed;
                 s << "extra " << k << "\t";
-                os << get_summary_string<uint64_t> (s.str (), get_extra (k, f.get_points ()), compact);
+                os << get_summary_string<uint64_t> (s.str (), get_extra (k, f.get_point_records ()), compact);
             }
         }
 
         if (classifications)
         {
-            const auto cls_map = get_class_map (get_c (f.get_points ()));
+            const auto cls_map = get_class_map (get_c (f.get_point_records ()));
 
             for (auto i : cls_map)
                 os << "cls_" << i.first << "\t" << i.second << std::endl;

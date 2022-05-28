@@ -113,9 +113,9 @@ spoc_file recenter (const spoc_file &f, const bool z_flag = false)
 {
     // Make a copy
     spoc::spoc_file g (f);
-    const auto x = get_x (g.get_points ());
-    const auto y = get_y (g.get_points ());
-    const auto z = get_z (g.get_points ());
+    const auto x = get_x (g.get_point_records ());
+    const auto y = get_y (g.get_point_records ());
+    const auto z = get_z (g.get_point_records ());
     const auto n = f.get_header ().total_points;
 
     // Get average X, Y, and (optionally) Z
@@ -140,9 +140,9 @@ spoc_file subtract_min (const spoc_file &f, const bool z_flag = false)
 {
     // Make a copy
     spoc::spoc_file g (f);
-    const auto x = get_x (g.get_points ());
-    const auto y = get_y (g.get_points ());
-    const auto z = get_z (g.get_points ());
+    const auto x = get_x (g.get_point_records ());
+    const auto y = get_y (g.get_point_records ());
+    const auto z = get_z (g.get_point_records ());
     const auto n = g.get_header ().total_points;
 
     // Get min X, Y, and (optionally) Z

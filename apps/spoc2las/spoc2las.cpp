@@ -30,20 +30,19 @@ int main (int argc, char **argv)
             throw runtime_error ("Can't open file for reading");
 
         // Read spoc file
-        string wkt;
-        auto point_records = read_spoc_file (ifs, wkt);
+        const auto f = read_spoc_file (ifs);
 
         if (args.verbose)
         {
-            clog << point_records.size () << " point records read" << endl;
-            clog << "read " << wkt.size () << " byte WKT" << endl;
+            clog << f.get_point_records ().size () << " point records read" << endl;
+            clog << "read " << f.get_header ().wkt.size () << " byte WKT" << endl;
         }
 
         // Get min x, y, z
         double min_x = numeric_limits<double>::max ();
         double min_y = numeric_limits<double>::max ();
         double min_z = numeric_limits<double>::max ();
-        for (auto &p : point_records)
+        for (auto &p : f.get_point_records ())
         {
             min_x = std::min (min_x, p.x);
             min_y = std::min (min_y, p.y);
@@ -68,6 +67,7 @@ int main (int argc, char **argv)
         lasheader.point_data_format = 2;
         lasheader.point_data_record_length = 26;
 
+        const auto wkt = f.get_header ().wkt;
         if (!wkt.empty ())
             lasheader.set_geo_ogc_wkt (wkt.size (), wkt.data ());
 
@@ -81,9 +81,9 @@ int main (int argc, char **argv)
 
         spoc2las::las_writer l (args.output_fn, lasheader);
 
-        for (size_t i = 0; i < point_records.size (); ++i)
+        for (size_t i = 0; i < f.get_point_records ().size (); ++i)
         {
-            const auto p = point_records[i];
+            const auto p = f.get_point_records ()[i];
             laspoint.set_X (p.x - min_x);
             laspoint.set_Y (p.y - min_y);
             laspoint.set_Z (p.z - min_z);

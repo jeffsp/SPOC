@@ -10,8 +10,8 @@ void test_merge ()
 {
     spoc::header h1 ("A", 0, 0);
     spoc::header h2 ("B", 0, 0);
-    spoc::spoc_file f1 (h1, spoc::points ());
-    spoc::spoc_file f2 (h2, spoc::points ());
+    spoc::spoc_file f1 (h1, spoc::point_records ());
+    spoc::spoc_file f2 (h2, spoc::point_records ());
 
     spoc::spoc_file f;
     const auto id = -1;
@@ -33,7 +33,7 @@ void test_merge_quiet ()
     append (f1, f, id, quiet);
     append (f2, f, id, quiet);
     verify (f.get_header ().total_points == 200);
-    verify (f.get_points ().size () == 200);
+    verify (f.get_point_records ().size () == 200);
 }
 
 int main (int argc, char **argv)

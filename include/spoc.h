@@ -215,19 +215,19 @@ inline bool operator!= (const point_record &a, const point_record &b)
 }
 
 // Helper typedefs
-using points = std::vector<point_record>;
+using point_records = std::vector<point_record>;
 
 // Helper function
-bool check_records (const points &point_records)
+bool check_records (const point_records &prs)
 {
     // Degenerate case
-    if (point_records.empty ())
+    if (prs.empty ())
         return true;
 
     // Make sure they all have the same number of extra fields
-    const size_t extra_size = point_records[0].extra.size ();
+    const size_t extra_size = prs[0].extra.size ();
 
-    if (std::any_of (point_records.cbegin(), point_records.cend(),
+    if (std::any_of (prs.cbegin(), prs.cend(),
         [&](const point_record &p)
         { return p.extra.size () != extra_size; }))
         return false;
@@ -238,34 +238,34 @@ bool check_records (const points &point_records)
 // File I/O
 inline void write_spoc_file (std::ostream &s,
     const std::string &wkt,
-    const points &point_records)
+    const point_records &prs)
 {
     // Make sure the points records are OK
-    if (!check_records (point_records))
+    if (!check_records (prs))
         throw std::runtime_error ("Invalid point records");
 
     header h;
     h.wkt = wkt;
-    h.extra_size = point_records.empty () ? 0 : point_records[0].extra.size ();
-    h.total_points = point_records.size ();
+    h.extra_size = prs.empty () ? 0 : prs[0].extra.size ();
+    h.total_points = prs.size ();
 
     // Write the file
     write_header (s, h);
-    for (const auto &p : point_records)
+    for (const auto &p : prs)
         write_point_record (s, p);
 }
 
 inline void read_spoc_file (std::istream &s,
     header &h,
-    points &point_records)
+    point_records &prs)
 {
     // Read the header
     h = read_header (s);
 
     // Read the data
-    point_records.resize (h.total_points);
-    for (size_t i = 0; i < point_records.size (); ++i)
-        point_records[i] = read_point_record (s, h.extra_size);
+    prs.resize (h.total_points);
+    for (size_t i = 0; i < prs.size (); ++i)
+        prs[i] = read_point_record (s, h.extra_size);
 }
 
 template<typename T>
@@ -317,17 +317,17 @@ inline void write_compressed (std::ostream &s, const std::vector<T> &x)
 
 inline void write_spoc_file_compressed (std::ostream &s,
     const std::string &wkt,
-    const points &point_records)
+    const point_records &prs)
 {
     // Make sure the points records are OK
-    if (!check_records (point_records))
+    if (!check_records (prs))
         throw std::runtime_error ("Invalid point records");
 
     // Stuff the data into vectors
-    const size_t total_points = point_records.size ();
-    const size_t extra_size = point_records.empty ()
+    const size_t total_points = prs.size ();
+    const size_t extra_size = prs.empty ()
         ? 0
-        : point_records[0].extra.size ();
+        : prs[0].extra.size ();
     std::vector<double> x (total_points);
     std::vector<double> y (total_points);
     std::vector<double> z (total_points);
@@ -341,17 +341,17 @@ inline void write_spoc_file_compressed (std::ostream &s,
 
     for (size_t n = 0; n < total_points; ++n)
     {
-        x[n] = point_records[n].x;
-        y[n] = point_records[n].y;
-        z[n] = point_records[n].z;
-        c[n] = point_records[n].c;
-        p[n] = point_records[n].p;
-        i[n] = point_records[n].i;
-        r[n] = point_records[n].r;
-        g[n] = point_records[n].g;
-        b[n] = point_records[n].b;
+        x[n] = prs[n].x;
+        y[n] = prs[n].y;
+        z[n] = prs[n].z;
+        c[n] = prs[n].c;
+        p[n] = prs[n].p;
+        i[n] = prs[n].i;
+        r[n] = prs[n].r;
+        g[n] = prs[n].g;
+        b[n] = prs[n].b;
         for (size_t j = 0; j < extra_size; ++j)
-            e[j][n] = point_records[n].extra[j];
+            e[j][n] = prs[n].extra[j];
     }
 
     // Compress fields in parallel
@@ -423,13 +423,13 @@ inline std::vector<T> read_compressed (std::istream &s, const size_t size)
 
 inline void read_spoc_file_compressed (std::istream &s,
     header &h,
-    points &point_records)
+    point_records &prs)
 {
     // Read the header
     h = read_header (s);
 
     // Read the data
-    point_records.resize (h.total_points);
+    prs.resize (h.total_points);
 
     // Read data
     std::vector<double> x = read_compressed<double> (s, h.total_points);
@@ -447,28 +447,28 @@ inline void read_spoc_file_compressed (std::istream &s,
         extra[j] = read_compressed<uint64_t> (s, h.total_points);
 
     // Copy them into the point records
-    point_records.resize (h.total_points);
+    prs.resize (h.total_points);
 
     #pragma omp parallel for
-    for (size_t n = 0; n < point_records.size (); ++n)
+    for (size_t n = 0; n < prs.size (); ++n)
     {
-        if (!x.empty ()) point_records[n].x = x[n];
-        if (!y.empty ()) point_records[n].y = y[n];
-        if (!z.empty ()) point_records[n].z = z[n];
-        if (!c.empty ()) point_records[n].c = c[n];
-        if (!p.empty ()) point_records[n].p = p[n];
-        if (!i.empty ()) point_records[n].i = i[n];
-        if (!r.empty ()) point_records[n].r = r[n];
-        if (!g.empty ()) point_records[n].g = g[n];
-        if (!b.empty ()) point_records[n].b = b[n];
-        point_records[n].extra.resize (h.extra_size);
-        for (size_t j = 0; j < point_records[n].extra.size (); ++j)
-            if (!extra[j].empty ()) point_records[n].extra[j] = extra[j][n];
+        if (!x.empty ()) prs[n].x = x[n];
+        if (!y.empty ()) prs[n].y = y[n];
+        if (!z.empty ()) prs[n].z = z[n];
+        if (!c.empty ()) prs[n].c = c[n];
+        if (!p.empty ()) prs[n].p = p[n];
+        if (!i.empty ()) prs[n].i = i[n];
+        if (!r.empty ()) prs[n].r = r[n];
+        if (!g.empty ()) prs[n].g = g[n];
+        if (!b.empty ()) prs[n].b = b[n];
+        prs[n].extra.resize (h.extra_size);
+        for (size_t j = 0; j < prs[n].extra.size (); ++j)
+            if (!extra[j].empty ()) prs[n].extra[j] = extra[j][n];
     }
 }
 
 // Helper functions
-std::vector<double> get_x (const points &p)
+std::vector<double> get_x (const point_records &p)
 {
     std::vector<double> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -476,7 +476,7 @@ std::vector<double> get_x (const points &p)
     return x;
 }
 
-std::vector<double> get_y (const points &p)
+std::vector<double> get_y (const point_records &p)
 {
     std::vector<double> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -484,7 +484,7 @@ std::vector<double> get_y (const points &p)
     return x;
 }
 
-std::vector<double> get_z (const points &p)
+std::vector<double> get_z (const point_records &p)
 {
     std::vector<double> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -492,7 +492,7 @@ std::vector<double> get_z (const points &p)
     return x;
 }
 
-std::vector<uint32_t> get_c (const points &p)
+std::vector<uint32_t> get_c (const point_records &p)
 {
     std::vector<uint32_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -500,7 +500,7 @@ std::vector<uint32_t> get_c (const points &p)
     return x;
 }
 
-std::vector<uint32_t> get_p (const points &p)
+std::vector<uint32_t> get_p (const point_records &p)
 {
     std::vector<uint32_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -508,7 +508,7 @@ std::vector<uint32_t> get_p (const points &p)
     return x;
 }
 
-std::vector<uint16_t> get_i (const points &p)
+std::vector<uint16_t> get_i (const point_records &p)
 {
     std::vector<uint16_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -516,7 +516,7 @@ std::vector<uint16_t> get_i (const points &p)
     return x;
 }
 
-std::vector<uint16_t> get_r (const points &p)
+std::vector<uint16_t> get_r (const point_records &p)
 {
     std::vector<uint16_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -524,7 +524,7 @@ std::vector<uint16_t> get_r (const points &p)
     return x;
 }
 
-std::vector<uint16_t> get_g (const points &p)
+std::vector<uint16_t> get_g (const point_records &p)
 {
     std::vector<uint16_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -532,7 +532,7 @@ std::vector<uint16_t> get_g (const points &p)
     return x;
 }
 
-std::vector<uint16_t> get_b (const points &p)
+std::vector<uint16_t> get_b (const point_records &p)
 {
     std::vector<uint16_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -540,14 +540,14 @@ std::vector<uint16_t> get_b (const points &p)
     return x;
 }
 
-size_t get_extra_size (const points &p)
+size_t get_extra_size (const point_records &p)
 {
     if (p.empty ())
         return 0;
     return p[0].extra.size ();
 }
 
-std::vector<uint64_t> get_extra (const size_t k, const points &p)
+std::vector<uint64_t> get_extra (const size_t k, const point_records &p)
 {
     std::vector<uint64_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -562,10 +562,10 @@ class spoc_file
 {
     private:
     header h;
-    points p;
+    point_records p;
     public:
     spoc_file () { }
-    spoc_file (const header &h, const points &p)
+    spoc_file (const header &h, const point_records &p)
         : h (h)
         , p (p)
     {
@@ -578,7 +578,7 @@ class spoc_file
     }
     // Readonly access
     const header &get_header () const { return h; }
-    const points &get_points () const { return p; }
+    const point_records &get_point_records () const { return p; }
 
     // R/W access
     point_record &operator[] (const size_t n)
@@ -603,5 +603,19 @@ class spoc_file
         h.extra_size = new_size;
     }
 };
+
+inline spoc_file read_spoc_file (std::istream &s)
+{
+    // Read the header
+    header h = read_header (s);
+
+    // Read the data
+    point_records p;
+    p.resize (h.total_points);
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i] = read_point_record (s, h.extra_size);
+
+    return spoc_file (h, p);
+}
 
 } // namespace spoc

@@ -31,7 +31,7 @@ void append (
     for (size_t i = 0; i < f1.get_header ().total_points; ++i)
     {
         // Get the point from 'f1'
-        auto p = f1.get_points ()[i];
+        auto p = f1.get_point_records ()[i];
 
         // Set its ID
         p.p = id;
