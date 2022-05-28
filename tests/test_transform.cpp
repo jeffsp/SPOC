@@ -17,7 +17,7 @@ void test_transform_set ()
                 'c', 'p', 'i', 'r', 'g', 'b',
                 '0', '1', '2', '3', '4', '5', '6', '7' })
             const auto g = set (f, c, 123);
-        for (auto c : { 'q', 'w'})
+        for (auto c : { 'q', 'w', '9'})
         {
             bool failed = false;
             try { const auto g = set (f, c, 123); }
@@ -41,7 +41,7 @@ void test_transform_replace ()
                 for (auto c : { 'c', 'p', 'i', 'r', 'g', 'b',
                         '0', '1', '2', '3', '4', '5', '6', '7' })
                     const auto g = replace (f, c, v1, v2);
-                for (auto c : { 'x', 'y', 'z', 'q', 'w'})
+                for (auto c : { 'x', 'y', 'z', 'q', 'w', '8'})
                 {
                     bool failed = false;
                     try { const auto g = replace (f, c, v1, v2); }
