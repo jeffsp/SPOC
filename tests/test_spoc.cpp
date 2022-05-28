@@ -97,6 +97,55 @@ void test_point_record ()
     }
 }
 
+void test_spoc_file ()
+{
+    const size_t total_points = 1000;
+    const size_t extra_size = 3;
+    auto p = generate_random_point_records (total_points, extra_size);
+    p[100].extra.resize (extra_size + 1);
+    spoc::header h ("WKT", extra_size, total_points);
+
+    bool failed = false;
+    try { spoc_file f (h, p); }
+    catch (...)
+    { failed = true; }
+    verify (failed);
+
+    failed = false;
+    try {
+        stringstream s;
+        const string wkt = "Test wkt";
+        write_spoc_file (s, wkt, p);
+    }
+    catch (...)
+    { failed = true; }
+    verify (failed);
+
+    failed = false;
+    try {
+        stringstream s;
+        const string wkt = "Test wkt";
+        write_spoc_file_compressed (s, wkt, p);
+    }
+    catch (...)
+    { failed = true; }
+    verify (failed);
+
+    spoc::header h2 ("WKT", extra_size, total_points + 1);
+    failed = false;
+    try { spoc_file f (h2, p); }
+    catch (...)
+    { failed = true; }
+    verify (failed);
+
+    spoc::header h3 ("WKT", extra_size + 1, total_points);
+    failed = false;
+    try { spoc_file f (h3, p); }
+    catch (...)
+    { failed = true; }
+    verify (failed);
+}
+
 void test_spoc_file_io ()
 {
     const size_t total_points = 1000;
@@ -188,6 +237,7 @@ int main (int argc, char **argv)
     {
         test_header ();
         test_point_record ();
+        test_spoc_file ();
         test_spoc_file_io ();
         test_spoc_file_compressed_io ();
         return 0;
