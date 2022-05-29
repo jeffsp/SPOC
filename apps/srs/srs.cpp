@@ -32,7 +32,7 @@ int main (int argc, char **argv)
                 clog << "Reading from stdin" << endl;
 
             // Read into spoc_file struct
-            spoc_file f = read_spoc_file (cin);
+            spoc_file f = read_spoc_file_uncompressed (cin);
 
             if (args.set_srs)
             {
@@ -42,7 +42,7 @@ int main (int argc, char **argv)
                 if (args.verbose)
                     clog << "Writing to stdout" << endl;
 
-                write_spoc_file (cout, f);
+                write_spoc_file_uncompressed (cout, f);
             }
             else
             {
@@ -64,7 +64,7 @@ int main (int argc, char **argv)
                 throw runtime_error ("Could not open file for reading");
 
             // Read into spoc_file struct
-            spoc_file f = read_spoc_file (ifs);
+            spoc_file f = read_spoc_file_uncompressed (ifs);
 
             // Set SRS
             f.set_wkt (args.srs);
@@ -77,7 +77,7 @@ int main (int argc, char **argv)
             if (!ofs)
                 throw runtime_error ("Could not open file for writing");
 
-            write_spoc_file (ofs, f);
+            write_spoc_file_uncompressed (ofs, f);
         }
         else
         {
@@ -92,7 +92,7 @@ int main (int argc, char **argv)
                     throw runtime_error ("Could not open file for reading");
 
                 // Read into spoc_file struct
-                spoc_file f = read_spoc_file (ifs);
+                spoc_file f = read_spoc_file_uncompressed (ifs);
 
                 cout << f.get_header ().wkt << endl;
             }

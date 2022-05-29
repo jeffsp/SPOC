@@ -49,7 +49,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "writing records to stdout" << endl;
 
-        write_spoc_file (cout, spoc_file (wkt, point_records));
+        write_spoc_file_uncompressed (cout, spoc_file (wkt, point_records));
 
         return 0;
     }

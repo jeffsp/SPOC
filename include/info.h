@@ -151,6 +151,7 @@ void process (std::ostream &os,
             h["minor_version"] = f.get_header ().minor_version;
             h["wkt"] = f.get_header ().wkt;
             h["total_points"] = f.get_header ().total_points;
+            h["compressed"] = f.get_header ().compressed;
             j["header"] = h;
         }
 
@@ -199,6 +200,7 @@ void process (std::ostream &os,
             os << "minor_version\t" << int (f.get_header ().minor_version) << endl;
             os << "wkt\t" << f.get_header ().wkt << endl;
             os << "total_points\t" << f.get_header ().total_points << endl;
+            os << "compressed\t" << f.get_header ().compressed << endl;
         }
 
         if (summary_info)

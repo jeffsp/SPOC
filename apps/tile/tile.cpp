@@ -46,7 +46,7 @@ int main (int argc, char **argv)
             throw runtime_error ("Could not open file for reading");
 
         // Read into spoc_file struct
-        spoc_file f = read_spoc_file (ifs);
+        spoc_file f = read_spoc_file_uncompressed (ifs);
 
         if (args.verbose)
             clog << "Total points " << f.get_point_records ().size () << endl;
@@ -144,7 +144,7 @@ int main (int argc, char **argv)
                 throw std::runtime_error ("Could not open file for writing");
 
             // Write it out
-            spoc::write_spoc_file (ofs, t);
+            spoc::write_spoc_file_uncompressed (ofs, t);
         }
 
         return 0;

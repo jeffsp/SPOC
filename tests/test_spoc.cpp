@@ -103,7 +103,7 @@ void test_spoc_file ()
     const size_t extra_size = 3;
     auto p = generate_random_point_records (total_points, extra_size);
     p[100].extra.resize (extra_size + 1);
-    spoc::header h ("WKT", extra_size, total_points);
+    spoc::header h ("WKT", extra_size, total_points, false);
 
     bool failed = false;
     try { spoc_file f (h, p); }
@@ -115,7 +115,7 @@ void test_spoc_file ()
     try {
         stringstream s;
         const string wkt = "Test wkt";
-        write_spoc_file (s, spoc_file (wkt, p));
+        write_spoc_file_uncompressed (s, spoc_file (wkt, p));
     }
     catch (...)
     { failed = true; }
@@ -131,14 +131,14 @@ void test_spoc_file ()
     { failed = true; }
     verify (failed);
 
-    spoc::header h2 ("WKT", extra_size, total_points + 1);
+    spoc::header h2 ("WKT", extra_size, total_points + 1, false);
     failed = false;
     try { spoc_file f (h2, p); }
     catch (...)
     { failed = true; }
     verify (failed);
 
-    spoc::header h3 ("WKT", extra_size + 1, total_points);
+    spoc::header h3 ("WKT", extra_size + 1, total_points, false);
     failed = false;
     try { spoc_file f (h3, p); }
     catch (...)
@@ -169,8 +169,8 @@ void test_spoc_file_io ()
     {
     stringstream s;
     const string wkt = "Test wkt";
-    write_spoc_file (s, spoc_file (wkt, p));
-    const auto f = read_spoc_file (s);
+    write_spoc_file_uncompressed (s, spoc_file (wkt, p));
+    const auto f = read_spoc_file_uncompressed (s);
 
     verify (f.get_header ().wkt == wkt);
     verify (p == f.get_point_records ());
@@ -184,7 +184,7 @@ void test_spoc_file_io ()
     bool failed = false;
     try
     {
-        const auto f = read_spoc_file (s);
+        const auto f = read_spoc_file_uncompressed (s);
     }
     catch (...)
     {
@@ -203,7 +203,7 @@ void test_spoc_file_compressed_io ()
     {
     stringstream s;
     const string wkt = "Test wkt";
-    write_spoc_file_compressed (s, spoc_file (wkt, p));
+    write_spoc_file_compressed (s, spoc_file (wkt, true, p));
     const auto f = read_spoc_file_compressed (s);
 
     verify (wkt == f.get_header ().wkt);
@@ -216,8 +216,8 @@ void test_spoc_file_compressed_io ()
     stringstream s1;
     stringstream s2;
     stringstream s3;
-    write_spoc_file (s1, spoc_file (wkt, p));
-    write_spoc_file_compressed (s2, spoc_file (wkt, p));
+    write_spoc_file_uncompressed (s1, spoc_file (wkt, p));
+    write_spoc_file_compressed (s2, spoc_file (wkt, true, p));
     // Zero some fields
     for (auto &i : p)
     {
@@ -225,14 +225,52 @@ void test_spoc_file_compressed_io ()
         i.extra[3] = 0;
         i.extra[7] = 0;
     }
-    write_spoc_file_compressed (s3, spoc_file (wkt, p));
-    const auto f1 = read_spoc_file (s1);
+    write_spoc_file_compressed (s3, spoc_file (wkt, true, p));
+    const auto f1 = read_spoc_file_uncompressed (s1);
     const auto f2 = read_spoc_file_compressed (s2);
     const auto f3 = read_spoc_file_compressed (s3);
     // Compressed file should be smaller
     verify (s1.str ().size () > s2.str ().size ());
     // File with zero fields should be smaller
     verify (s2.str ().size () > s3.str ().size ());
+    }
+
+    // Write compressed with uncompressed writer
+    {
+    stringstream s;
+    bool failed = false;
+    try { write_spoc_file_uncompressed (s, spoc_file ("WKT", true, p)); }
+    catch (...) { failed = true; }
+    verify (failed);
+    }
+
+    // Write uncompressed with compressed writer
+    {
+    stringstream s;
+    bool failed = false;
+    try { write_spoc_file_compressed (s, spoc_file ("WKT", false, p)); }
+    catch (...) { failed = true; }
+    verify (failed);
+    }
+
+    // Read uncompressed with compressed reader
+    {
+    stringstream s;
+    bool failed = false;
+    write_spoc_file_uncompressed (s, spoc_file ("WKT", false, p));
+    try { const auto f = read_spoc_file_compressed (s); }
+    catch (...) { failed = true; }
+    verify (failed);
+    }
+
+    // Read compressed with uncompressed reader
+    {
+    stringstream s;
+    bool failed = false;
+    write_spoc_file_compressed (s, spoc_file ("WKT", true, p));
+    try { const auto f = read_spoc_file_uncompressed (s); }
+    catch (...) { failed = true; }
+    verify (failed);
     }
 }
 

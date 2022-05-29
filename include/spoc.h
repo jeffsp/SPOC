@@ -21,10 +21,12 @@ struct header
 {
     header (const std::string &wkt,
             const size_t extra_size,
-            const size_t total_points)
+            const size_t total_points,
+            const bool compressed)
         : wkt (wkt)
         , extra_size (extra_size)
         , total_points (total_points)
+        , compressed (compressed)
     {
         signature[0] = 'S'; // Simple
         signature[1] = 'P'; // Point
@@ -32,7 +34,7 @@ struct header
         signature[3] = 'C'; // Cloud
         signature[4] = '\0'; // Terminate
     }
-    header () : header (std::string (), 0, 0)
+    header () : header (std::string (), 0, 0, false)
     {
     }
     bool check_signature () const
@@ -50,6 +52,7 @@ struct header
     std::string wkt;
     size_t extra_size;
     size_t total_points;
+    uint8_t compressed;
 };
 
 // Helper I/O function
@@ -65,6 +68,7 @@ inline std::ostream &operator<< (std::ostream &s, const header &h)
     s << h.wkt << std::endl;
     s << "extra_size " << h.extra_size << std::endl;
     s << "total_points " << h.total_points << std::endl;
+    s << "compressed " << h.compressed << std::endl;
     return s;
 }
 // Helper operator
@@ -78,6 +82,7 @@ inline bool operator== (const header &a, const header &b)
     if (a.wkt != b.wkt) return false;
     if (a.extra_size != b.extra_size) return false;
     if (a.total_points != b.total_points) return false;
+    if (a.compressed != b.compressed) return false;
     return true;
 }
 
@@ -94,6 +99,7 @@ inline void write_header (std::ostream &s, const header &h)
     s.write (reinterpret_cast<const char*>(&h.wkt[0]), h.wkt.size ());
     s.write (reinterpret_cast<const char*>(&h.extra_size), sizeof(uint64_t));
     s.write (reinterpret_cast<const char*>(&h.total_points), sizeof(uint64_t));
+    s.write (reinterpret_cast<const char*>(&h.compressed), sizeof(uint8_t));
     s.flush ();
 }
 
@@ -112,6 +118,7 @@ inline header read_header (std::istream &s)
     s.read (reinterpret_cast<char*>(&h.wkt[0]), len);
     s.read (reinterpret_cast<char*>(&h.extra_size), sizeof(uint64_t));
     s.read (reinterpret_cast<char*>(&h.total_points), sizeof(uint64_t));
+    s.read (reinterpret_cast<char*>(&h.compressed), sizeof(uint8_t));
     return h;
 }
 
@@ -402,14 +409,18 @@ class spoc_file
     point_records p;
     public:
     spoc_file () { }
-    spoc_file (const std::string &wkt, const point_records &p)
-        : h (header (wkt, 0, p.size ()))
+    spoc_file (const std::string &wkt, const bool compressed, const point_records &p)
+        : h (header (wkt, 0, p.size (), compressed))
         , p (p)
     {
         if (!p.empty ())
             h.extra_size = p[0].extra.size ();
         if (!check_records (p))
             throw std::runtime_error ("The point records are inconsistent");
+    }
+    spoc_file (const std::string &wkt, const point_records &p)
+        : spoc_file (wkt, false, p)
+    {
     }
     spoc_file (const header &h, const point_records &p)
         : h (h)
@@ -431,6 +442,10 @@ class spoc_file
     void set_wkt (const std::string &s)
     {
         h.wkt = s;
+    }
+    void set_compressed (const bool flag)
+    {
+        h.compressed = flag;
     }
     void set_point_record (const size_t n, const point_record &r)
     {
@@ -458,10 +473,14 @@ class spoc_file
 };
 
 // Spoc File I/O
-inline spoc_file read_spoc_file (std::istream &s)
+inline spoc_file read_spoc_file_uncompressed (std::istream &s)
 {
     // Read the header
     header h = read_header (s);
+
+    // Check compression flag
+    if (h.compressed)
+        throw std::runtime_error ("Uncompressed reader can't read a compressed file");
 
     // Read the data
     point_records p;
@@ -476,6 +495,10 @@ inline spoc_file read_spoc_file_compressed (std::istream &s)
 {
     // Read the header
     header h = read_header (s);
+
+    // Check compression flag
+    if (!h.compressed)
+        throw std::runtime_error ("Compressed reader can't read an uncompressed file");
 
     // Read the data
     point_records prs;
@@ -519,8 +542,12 @@ inline spoc_file read_spoc_file_compressed (std::istream &s)
     return spoc_file (h, prs);
 }
 
-inline void write_spoc_file (std::ostream &s, const spoc_file &f)
+inline void write_spoc_file_uncompressed (std::ostream &s, const spoc_file &f)
 {
+    // Check compression flag
+    if (f.get_header ().compressed)
+        throw std::runtime_error ("Uncompressed writer can't write a compressed file");
+
     // Make sure the points records are OK
     if (!check_records (f.get_point_records ()))
         throw std::runtime_error ("Invalid point records");
@@ -535,6 +562,10 @@ inline void write_spoc_file (std::ostream &s, const spoc_file &f)
 
 inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
 {
+    // Check compression flag
+    if (!f.get_header ().compressed)
+        throw std::runtime_error ("Compressed writer can't write an uncompressed file");
+
     const auto &prs = f.get_point_records ();
 
     // Make sure the points records are OK
@@ -613,6 +644,5 @@ inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
     for (size_t j = 0; j < extras.size (); ++j)
         write_compressed (s, extras[j]);
 }
-
 
 } // namespace spoc

@@ -53,7 +53,7 @@ int main (int argc, char **argv)
                 throw runtime_error ("Could not open file for reading");
 
             // Read into spoc_file struct
-            spoc_file f = read_spoc_file (ifs);
+            spoc_file f = read_spoc_file_uncompressed (ifs);
 
             // Set the wkt to the first file's wkt
             if (i == 0)
@@ -105,7 +105,7 @@ int main (int argc, char **argv)
             clog << "Writing to stdout" << endl;
 
         // Write it out
-        spoc::write_spoc_file (cout, g);
+        spoc::write_spoc_file_uncompressed (cout, g);
 
         return 0;
     }

@@ -78,10 +78,11 @@ std::vector<spoc::point_record> generate_random_point_records (
 spoc::spoc_file generate_random_spoc_file (
     const size_t total_points,
     const size_t extra_size = 0,
+    const bool compressed = false,
     const bool rgb = true,
     const size_t seed = 123)
 {
-    spoc::header h ("WKT", extra_size, total_points);
+    spoc::header h ("WKT", extra_size, total_points, compressed);
     spoc::spoc_file f (h, generate_random_point_records (total_points, extra_size, rgb, seed));
     return f;
 }

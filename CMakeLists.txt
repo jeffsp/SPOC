@@ -46,6 +46,8 @@ macro(add_app name)
     target_link_libraries(spoc_${name} gmp z)
 endmacro()
 
+add_app(compress)
+add_app(decompress)
 add_app(diff)
 add_app(info)
 add_app(merge)

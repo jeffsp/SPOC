@@ -67,7 +67,7 @@ int main (int argc, char **argv)
         if (l.lasreader->header.vlr_geo_ogc_wkt != nullptr)
             wkt = string (l.lasreader->header.vlr_geo_ogc_wkt);
 
-        write_spoc_file (ofs, spoc_file (wkt, point_records));
+        write_spoc_file_uncompressed (ofs, spoc_file (wkt, point_records));
 
         return 0;
     }

@@ -30,7 +30,7 @@ int main (int argc, char **argv)
             throw runtime_error ("Can't open file for reading");
 
         // Read spoc file
-        const auto f = read_spoc_file (ifs);
+        const auto f = read_spoc_file_uncompressed (ifs);
 
         if (args.verbose)
         {

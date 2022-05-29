@@ -8,8 +8,8 @@ using namespace spoc::merge;
 
 void test_merge ()
 {
-    spoc::header h1 ("A", 0, 0);
-    spoc::header h2 ("B", 0, 0);
+    spoc::header h1 ("A", 0, 0, false);
+    spoc::header h2 ("B", 0, 0, false);
     spoc::spoc_file f1 (h1, spoc::point_records ());
     spoc::spoc_file f2 (h2, spoc::point_records ());
 

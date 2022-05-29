@@ -44,7 +44,7 @@ int main (int argc, char **argv)
     {
         // Parse command line
         const cmd::args args = cmd::get_args (argc, argv,
-                string (argv[0]) + " [options] command [input] [output]");
+                string (argv[0]) + " [options] [input] [output]");
 
         // If you are getting help, exit without an error
         if (args.help)
@@ -62,7 +62,7 @@ int main (int argc, char **argv)
                 clog << "Reading from stdin" << endl;
 
             // Read into spoc_file struct
-            f = read_spoc_file (cin);
+            f = read_spoc_file_uncompressed (cin);
         }
         else
         {
@@ -75,7 +75,7 @@ int main (int argc, char **argv)
                 throw runtime_error ("Could not open file for reading");
 
             // Read into spoc_file struct
-            f = read_spoc_file (ifs);
+            f = read_spoc_file_uncompressed (ifs);
         }
 
         // The result goes here
@@ -108,7 +108,7 @@ int main (int argc, char **argv)
                 clog << "Writing to stdout" << endl;
 
             // Write it out
-            spoc::write_spoc_file (cout, g);
+            spoc::write_spoc_file_uncompressed (cout, g);
         }
         else
         {
@@ -121,7 +121,7 @@ int main (int argc, char **argv)
                 throw runtime_error ("Could not open file for writing");
 
             // Write it out
-            spoc::write_spoc_file (ofs, g);
+            spoc::write_spoc_file_uncompressed (ofs, g);
         }
 
         return 0;

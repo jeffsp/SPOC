@@ -68,8 +68,8 @@ void test_diff_header ()
     }
 
     {
-    header h1 ("A", 0, 0);
-    header h2 ("B", 0, 0);
+    header h1 ("A", 0, 0, false);
+    header h2 ("B", 0, 0, false);
     spoc_file f1 (h1, point_records ());
     spoc_file f2 (h2, point_records ());
     verify (diff::diff (f1, f2) != 0);
@@ -169,7 +169,7 @@ void test_diff_individual_fields ()
     verify (spoc::diff::diff (f1, f2, false, false, fields, true) != 0);
 
     // Different field
-    f2 = generate_random_spoc_file (100, 5, true, 456);
+    f2 = generate_random_spoc_file (100, 5, true, false, 456);
     for (auto f : {'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', '0', '4' })
     {
         fields[0] = f;
