@@ -75,13 +75,14 @@ The proposed extension is SPOC, or Simple POint Cloud.
 
 # TODO
 
-- [ ] Read/write uncompressed
-- [ ] Create compression utilities read/write compressed files
-- [ ] Add NEXTRA field in header
-- [ ] Allow arbitrary number of extra fields
+- [X] Read/write uncompressed
+- [X] Create compression utilities read/write compressed files
+- [X] Add NEXTRA field in header
+- [X] Allow arbitrary number of extra fields
 - [ ] Change utilities to use streaming
 - [ ] Combine utilities into a single SPOC utility
-- [ ] Create interface to spoc\_file, so header file size and point
+- [ ] Revisit compression rules/defaults for reading and writing
+- [X] Create interface to spoc\_file, so header file size and point
       vector size do not get out of line. Same for 'extra_size'
 - [X] Gitlab runner
 - [X] CI/CD
