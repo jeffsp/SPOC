@@ -21,7 +21,8 @@ trap cleanup EXIT
 #
 # It's a shame that you have to convert the whole file just to change
 # the coordinate system
-las2las64 -set_ogc_wkt -i $1 -o ${TMPDIR}/tmp.las
+las2las -set_ogc_wkt -i $1 -o ${TMPDIR}/tmp.las
 
 # Convert to spoc
 spoc_las2spoc -v ${TMPDIR}/tmp.las $2/${sn}.spoc
+spoc_compress -v $2/${sn}.spoc $2/${sn}.spoc.z

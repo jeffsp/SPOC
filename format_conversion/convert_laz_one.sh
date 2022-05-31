@@ -7,7 +7,7 @@ sn=$(basename ${dn})
 echo converting ${sn}...
 
 # Convert to las
-laszip64 $1 -o $2/${sn}.las
+laszip $1 -o $2/${sn}.las
 
 # Convert to laz
-laszip64 $1 -o $2/${sn}.laz
+laszip $1 -o $2/${sn}.laz
