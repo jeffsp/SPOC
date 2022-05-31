@@ -46,6 +46,9 @@ int main (int argc, char **argv)
             f = read_spoc_file_uncompressed (ifs);
         }
 
+        // Unset the compression bit
+        f.set_compressed (false);
+
         // Write the output file
         if (args.output_fn.empty ())
         {
