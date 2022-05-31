@@ -117,6 +117,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Number of tiles on largest size
   - [ ] Multi-pass tiling for large files
   - [X] Unit/integration tests
+  - [ ] Use extra[N] as the tile number, see spoc generate
 - [X] spoc merge: Combine several point clouds into one
   - [X] Set point id
   - [X] Warn if the SRS info strings differ
@@ -147,6 +148,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
         changed based upon global point cloud properties, e.g.: add a
         preprocess() function
   - [X] Set fields: set f #
+  - [ ] Allow string field specifications for extra[0..N]
   - [X] Replace fields: replace f # #
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
@@ -187,6 +189,9 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [ ] Unit/integration tests
 - [ ] spoc generate: Generate data for each point
   - [ ] Show progress
+  - [ ] Generate tile numbers for input into tiler
+  - [ ] Generate overlapping tile numbers based upon connected component IDs
+        for input into the tiler
   - [ ] pca: Perform a principal components analysis
     - [ ] Set the PCA radius
   - [ ] connected component IDs based upon location and, optionally, other fields
@@ -209,6 +214,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
 - [ ] spoc config: Show configuration values
   - [ ] ~/.config/spoc/config
   - [ ] ~/.config/spoc/palettes
+- [ ] spoc geotiff: create geotiff by projecting points onto a plane
 - [ ] spoc project: project points onto the XY plane
   - [ ] pixel size in m/pixel
   - [ ] nodata value
