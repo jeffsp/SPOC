@@ -80,7 +80,6 @@ The proposed extension is SPOC, or Simple POint Cloud.
 - [X] Add NEXTRA field in header
 - [X] Allow arbitrary number of extra fields
 - [ ] Change utilities to use streaming
-- [ ] Combine utilities into a single SPOC utility
 - [ ] Revisit compression rules/defaults for reading and writing
 - [X] Create interface to spoc\_file, so header file size and point
       vector size do not get out of line. Same for 'extra_size'
@@ -108,16 +107,14 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Header only
   - [X] Data only
   - [ ] Exclude extra
-  - [ ] Exclude header
-  - [ ] Exclude data
   - [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
+  - [ ] Allow string field specifications for extra[0..N]
   - [X] Not - inverse results
   - [X] Unit/integration tests
 - [X] spoc tile: Tile into regular non-overlapping tiles.
   - [X] Number of tiles on largest size
   - [ ] Multi-pass tiling for large files
   - [X] Unit/integration tests
-  - [ ] Use extra[N] as the tile number, see spoc generate
 - [X] spoc merge: Combine several point clouds into one
   - [X] Set point id
   - [X] Warn if the SRS info strings differ
@@ -129,13 +126,13 @@ The proposed extension is SPOC, or Simple POint Cloud.
         Note that copying X,Y,Z is useful for unrotating/uncentering
         a point cloud after performing transformations
         The point clouds must have the same number of points
-  - [ ] Use voxels of size R for assignment
-        Note the this is useful for restoring points to a point cloud
+  - [ ] Allow string field specifications for extra[0..N]
+  - [ ] Use the voxel indexes in extra[0,1,2] for aligning points when
+        the point clouds contain a different number of points.
+        1. Generate voxel indexes 2. subsample using those indexes. 3. restore
+        the points using the original voxel indexes
+        Note that this is useful for restoring points to a point cloud
         that has been subsampled (decimated).
-        The voxels of the point cloud with the most points must overlap
-        all the points in the point cloud with the lesser points. That
-        is, the point cloud with the less points must have been derived
-        from (by decimation/subsampling) the larger point cloud.
   - [ ] Unit/integration tests
 - [X] spoc transform: Change fields in a point cloud. The output point
                       cloud will have the same number of points and the
@@ -152,6 +149,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Replace fields: replace f # #
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
+  - [ ] Quantize: round X, Y, Z to nearest Nth decimal place
   - [ ] Get/Set field F as text
   - [ ] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
   - [ ] Add offset to X,Y,Z: addx/y/z #
@@ -172,16 +170,12 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [ ] Unit/integration tests
 - [ ] spoc filter: Remove points with certain properties
   - [ ] Set random seed
-  - [ ] subsample: Remove points
-    - [ ] subsampling radius
-    - [ ] choose N random points within subsampling radius
-    - [ ] voxelize flag Relocate point to voxel centers
-    - [ ] Average R, G, B within voxels
-    - [ ] Average intensity within voxels
-    - [ ] Vote for c and p fields within voxels
-  - [ ] crop 2D/3D
-    - [ ] meters/percentage
-    - [ ] Top/bottom/north/south/east/west
+  - [ ] Remove when field f==, <=, >= value
+  - [ ] Unique / Subsample: Remove points
+    - [ ] Uniform random selection of duplicates
+    - [ ] Remove duplicates with same X, Y, Z values
+    - [ ] Remove duplicates with same voxel indexes in extra[0,1,2] fields
+    - [ ] Keep N (default=1) duplicates
   - [X] Allow arbitrary operations using a filter interface and pipes
   - [X] Add support for point removal in filter interface by adding a
         function that accepts a vector of point records and returns a
@@ -189,24 +183,34 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [ ] Unit/integration tests
 - [ ] spoc generate: Generate data for each point
   - [ ] Show progress
-  - [ ] Generate tile numbers for input into tiler
-  - [ ] Generate overlapping tile numbers based upon connected component IDs
-        for input into the tiler
-  - [ ] pca: Perform a principal components analysis
+  - [ ] Generate grid indexes for each point
+    - [ ] Specify a projection plane
+    - [ ] Save in extra[0,1]
+    - [ ] Append to extra[-1]
+    - [ ] Save as text
+  - [ ] Generate voxel indexes for each point
+    - [ ] Save in extra[0..2]
+    - [ ] Append to extra[-1]
+    - [ ] Save as text
+  - [ ] Perform a principal components analysis
+    - [ ] Compute within voxels
     - [ ] Set the PCA radius
-  - [ ] connected component IDs based upon location and, optionally, other fields
+    - [ ] Save in extra[0..11]
+    - [ ] Save as text
+  - [ ] Generate connected component IDs based upon location and, optionally, other fields
     - [ ] Save component ID to extra[n]
     - [ ] Connection radius
     - [ ] Connection field(s)
-  - [ ] cluster IDs based upon data fields, xyz, cpi, rgb, extra[n]:
+  - [ ] Generate cluster IDs based upon data fields, xyz, cpi, rgb, extra[n]:
     - [ ] Save component ID to extra[n]
     - [ ] Set value of K
     - [ ] Use K means clustering
     - [ ] Use spectral clustering
     - [ ] Use Newman clustering
-  - [ ] neighbor indexes within a radius
+  - [ ] Generate neighbor indexes within a radius
     - [ ] Automatically determine the search radius
     - [ ] Save to a text file
+    - [ ] Save extra[0..n]
     - [ ] Save the nearest K neighbors
     - [ ] Randomly select K neighbors within the radius
     - [ ] Set a random seed
@@ -214,13 +218,14 @@ The proposed extension is SPOC, or Simple POint Cloud.
 - [ ] spoc config: Show configuration values
   - [ ] ~/.config/spoc/config
   - [ ] ~/.config/spoc/palettes
-- [ ] spoc geotiff: create geotiff by projecting points onto a plane
-- [ ] spoc project: project points onto the XY plane
+- [ ] spoc project: project points onto a plane
   - [ ] pixel size in m/pixel
   - [ ] nodata value
   - [ ] field: norm\_Z, c, p, i, r, g, b, 0-7
   - [ ] min/max/%quantile
   - [ ] randomly select/vote
+  - [ ] geotiff output
+  - [ ] png output
 - [ ] spoc octree: break into files arranged as an octree, access/create spoc files
   - [ ] Given a bunch of spoc files, create a quadtree structure
   - [ ] Don't divide on z value (create quadtrees)
