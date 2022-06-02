@@ -75,6 +75,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
 
 # TODO
 
+- [ ] Create header only library with examples
 - [X] Read/write uncompressed
 - [X] Create compression utilities read/write compressed files
 - [X] Add NEXTRA field in header
