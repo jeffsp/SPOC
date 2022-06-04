@@ -149,7 +149,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
     - [X] Replace fields: replace f # #
     - [X] Recenter points about mean
     - [X] Subtract minimum X, Y, and Z from all points: subtract-min
-    - [ ] Quantize: round X, Y, Z to nearest Nth decimal place
+    - [X] Quantize: round X, Y, Z to nearest Nth decimal place
     - [ ] Get/Set field F as text
     - [ ] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
     - [ ] Add offset to X,Y,Z: addx/y/z #

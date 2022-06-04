@@ -29,6 +29,8 @@ void check (const cmd::args &args)
                 std::clog << "\tsubtract-min-xy" << std::endl;
             else if (std::get_if<subtract_min_xyz_command>(&cmd))
                 std::clog << "\tsubtract-min-xyz" << std::endl;
+            else if (std::get_if<quantize_xyz_command>(&cmd))
+                std::clog << "\tquantize-xyz" << std::endl;
             else
                 throw std::runtime_error ("An unknown command was encountered");
         }
@@ -79,24 +81,26 @@ int main (int argc, char **argv)
         }
 
         // The result goes here
-        spoc_file g;
+        spoc_file g (f);
 
         for (const auto cmd : args.commands)
         {
             using namespace spoc::cmd;
             using namespace spoc::transform;
             if (const set_command *p = std::get_if<set_command>(&cmd))
-                g = spoc::transform::set (f, p->f, p->v);
+                g = spoc::transform::set (g, p->f, p->v);
             else if (const replace_command *p = std::get_if<replace_command>(&cmd))
-                g = replace (f, p->f, p->v1, p->v2);
+                g = replace (g, p->f, p->v1, p->v2);
             else if (std::get_if<recenter_xy_command>(&cmd))
-                g = recenter (f);
+                g = recenter (g);
             else if (std::get_if<recenter_xyz_command>(&cmd))
-                g = recenter (f, true);
+                g = recenter (g, true);
             else if (std::get_if<subtract_min_xy_command>(&cmd))
-                g = subtract_min (f);
+                g = subtract_min (g);
             else if (std::get_if<subtract_min_xyz_command>(&cmd))
-                g = subtract_min (f, true);
+                g = subtract_min (g, true);
+            else if (const quantize_xyz_command *p = std::get_if<quantize_xyz_command>(&cmd))
+                g = quantize (g, p->v);
             else
                 throw std::runtime_error ("An unknown command was encountered");
         }

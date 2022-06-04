@@ -42,6 +42,11 @@ Collection of tools to run on a SPOC file
 --subtract-min-xyz
 :   Same as subtract-min-xy, but also subtract min from the Z value
 
+--quantize-xyz=*#*
+:   Quantize X, Y, and Z values to the specified precision by truncating.
+    For example, --quantize=0.1 will quantize X, Y, and Z values by
+    truncating decimal digits past the tenths decimal place.
+
 # SEE ALSO
 
 SPOC_INFO(1)

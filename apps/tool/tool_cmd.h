@@ -18,6 +18,7 @@ struct recenter_xy_command { };
 struct recenter_xyz_command { };
 struct subtract_min_xy_command { };
 struct subtract_min_xyz_command { };
+struct quantize_xyz_command { double v; };
 
 using command = std::variant<
     set_command,
@@ -25,7 +26,8 @@ using command = std::variant<
     recenter_xy_command,
     recenter_xyz_command,
     subtract_min_xy_command,
-    subtract_min_xyz_command
+    subtract_min_xyz_command,
+    quantize_xyz_command
     >;
 
 struct args
@@ -45,6 +47,7 @@ enum command_values
     RECENTER_XYZ, // ...
     SUBTRACT_MIN_XY,
     SUBTRACT_MIN_XYZ,
+    QUANTIZE_XYZ,
 };
 
 const std::set<char> field_chars {'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b'};
@@ -109,6 +112,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"recenter-xyz", no_argument, 0, RECENTER_XYZ},
             {"subtract-min-xy", no_argument, 0, SUBTRACT_MIN_XY},
             {"subtract-min-xyz", no_argument, 0, SUBTRACT_MIN_XYZ},
+            {"quantize-xyz", required_argument, 0, QUANTIZE_XYZ},
             {0, 0, 0, 0}
         };
 
@@ -170,6 +174,13 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case SUBTRACT_MIN_XYZ:
             {
                 args.commands.push_back (subtract_min_xyz_command ());
+                break;
+            }
+            case QUANTIZE_XYZ:
+            {
+                quantize_xyz_command cmd;
+                cmd.v = atof (optarg);
+                args.commands.push_back (cmd);
                 break;
             }
         }

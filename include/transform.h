@@ -162,6 +162,23 @@ spoc_file subtract_min (const spoc_file &f, const bool z_flag = false)
     return g;
 }
 
+spoc_file quantize (const spoc_file &f, const double precision)
+{
+    // Get number of points
+    const size_t n = f.get_header ().total_points;
+
+    // Return value
+    spoc_file g (f);
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        g[i].x = static_cast<int> (g[i].x / precision) * precision;
+        g[i].y = static_cast<int> (g[i].y / precision) * precision;
+        g[i].z = static_cast<int> (g[i].z / precision) * precision;
+    }
+    return g;
+}
+
 } // namespace transform
 
 } // namespace spoc
