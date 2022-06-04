@@ -200,7 +200,7 @@ void process (std::ostream &os,
             os << "minor_version\t" << int (f.get_header ().minor_version) << endl;
             os << "wkt\t" << f.get_header ().wkt << endl;
             os << "total_points\t" << f.get_header ().total_points << endl;
-            os << "compressed\t" << f.get_header ().compressed << endl;
+            os << "compressed\t" << (f.get_header ().compressed ? "true" : "false") << endl;
         }
 
         if (summary_info)

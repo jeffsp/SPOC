@@ -107,9 +107,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
 - [X] spoc diff: diff two point clouds, return error if different
   - [X] Header only
   - [X] Data only
-  - [ ] Exclude extra
   - [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
-  - [ ] Allow string field specifications for extra[0..N]
   - [X] Not - inverse results
   - [X] Unit/integration tests
 - [X] spoc tile: Tile into regular non-overlapping tiles.
@@ -148,7 +146,6 @@ The proposed extension is SPOC, or Simple POint Cloud.
           changed based upon global point cloud properties, e.g.: add a
           preprocess() function
     - [X] Set fields: set f #
-    - [ ] Allow string field specifications for extra[0..N]
     - [X] Replace fields: replace f # #
     - [X] Recenter points about mean
     - [X] Subtract minimum X, Y, and Z from all points: subtract-min
@@ -167,10 +164,10 @@ The proposed extension is SPOC, or Simple POint Cloud.
     - [ ] Add random uniform noise to X,Y,Z
     - [ ] Color by classification
     - [ ] Color by elevation
+    - [ ] Color by segment
     - [ ] Get/set palette
-    - [ ] Allow numeric operations on fields using parallel calls to `bc`
   - [ ] Filtering: Remove points with certain properties
-    - [ ] Remove when field f==, <=, >= value
+    - [ ] Remove when field f==, <=, >=, <, > value
     - [ ] Unique / Subsample: Remove points
       - [ ] Uniform random selection of duplicates
       - [ ] Remove duplicates with same X, Y, Z values
@@ -194,6 +191,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
       - [ ] Compute within voxels
       - [ ] Set the PCA radius
       - [ ] Save in extra[0..11]
+      - [ ] Append to extra[-1]
       - [ ] Save as text
     - [ ] Generate connected component IDs based upon location and, optionally, other fields
       - [ ] Save component ID to extra[n]
@@ -208,7 +206,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
     - [ ] Generate neighbor indexes within a radius
       - [ ] Automatically determine the search radius
       - [ ] Save to a text file
-      - [ ] Save extra[0..n]
+      - [ ] Save in extra[0..n]
       - [ ] Save the nearest K neighbors
       - [ ] Randomly select K neighbors within the radius
   - [ ] Projection: project points onto a plane

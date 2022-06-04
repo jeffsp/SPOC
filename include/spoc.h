@@ -71,6 +71,7 @@ inline std::ostream &operator<< (std::ostream &s, const header &h)
     s << "compressed " << h.compressed << std::endl;
     return s;
 }
+
 // Helper operator
 inline bool operator== (const header &a, const header &b)
 {

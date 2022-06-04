@@ -14,8 +14,8 @@ cppcheck:
 		--suppress='*:laslib/LASlib/inc/*' \
 		apps/*/*.cpp
 
-.PHONY: cmake # Use cmake to generate Makefiles
-cmake:
+# Run cmake when CMakeLists.txt changes
+./build/debug/Makefile: CMakeLists.txt
 	@echo "Running cmake..."
 	@mkdir -p build/debug
 	@mkdir -p build/release
@@ -29,7 +29,7 @@ laslib:
 	$(MAKE) -j -C laslib/LASlib
 
 .PHONY: build # Compile all applications and tests
-build: laslib
+build: ./build/debug/Makefile laslib
 	cd build/debug && make -j 8
 	cd build/release && make -j 8
 	cd build/coverage && make -j 8

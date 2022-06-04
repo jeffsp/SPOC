@@ -76,19 +76,3 @@ endmacro()
 
 add_laslib_test(test_las2spoc)
 add_laslib_test(test_spoc2las)
-
-#macro(add_filter name)
-#    add_executable(spoc_filter_${name} ./filters/${name}.cpp)
-#    target_link_libraries(spoc_filter_${name} gmp z)
-#    include_directories(filters)
-#endmacro()
-
-#add_filter(noop)
-
-#macro(add_transformer name)
-#    add_executable(spoc_transformer_${name} ./transformers/${name}.cpp)
-#    target_link_libraries(spoc_transformer_${name} gmp z)
-#    include_directories(transformers)
-#endmacro()
-
-#add_transformer(noop)
