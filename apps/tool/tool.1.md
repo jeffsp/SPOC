@@ -1,18 +1,18 @@
-% SPOC_TRANSFORM(1) SPOC User's Manual | Version 0.1
+% SPOC_TOOL(1) SPOC User's Manual | Version 0.1
 % spoc@zetamon.xyz
 % December 25, 2021
 
 # NAME
 
-spoc_transform - Transform point records in a spoc file
+spoc_tool - SPOC file tool
 
 # USAGE
 
-spoc_transform [*options*] [*input_filename*] [*output_filename*]
+spoc_tool [*options*] [*input_filename*] [*output_filename*]
 
 # DESCRIPTION
 
-Transform point records in a spoc file.
+Collection of tools to run on a SPOC file
 
 # OPTIONS
 
@@ -44,4 +44,4 @@ Transform point records in a spoc file.
 
 # SEE ALSO
 
-SPOC_FILTER(1)
+SPOC_INFO(1)

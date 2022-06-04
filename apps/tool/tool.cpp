@@ -1,6 +1,6 @@
 #include "spoc.h"
-#include "transform.h"
-#include "transform_cmd.h"
+#include "tool.h"
+#include "tool_cmd.h"
 #include <iostream>
 #include <stdexcept>
 
