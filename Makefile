@@ -1,14 +1,14 @@
 default: build test
 
 .PHONY: prep_merge # Prepare for merging
-prep_merge: cppcheck clean cmake build test memcheck coverage
+prep_merge: cppcheck clean build test examples memcheck coverage
 
 .PHONY: cppcheck # Run cppcheck
 cppcheck:
 	@echo "Running cppcheck..."
 	@cppcheck --std=c++14 --language=c++ --enable=all \
 		-q --error-exitcode=255 \
-		-I include -I apps -I laslib/LASlib/inc -I filters \
+		-I include -I apps -I laslib/LASlib/inc -I examples \
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
 		--suppress='*:laslib/LASlib/inc/*' \
@@ -74,6 +74,10 @@ coverage: build
 	@cd build/coverage/ && gcovr -r ../.. \
 		--filter=../../include . | tee ../../code_analysis/coverage.txt
 	@grep TOTAL code_analysis/coverage.txt
+
+.PHONY: examples # Build examples
+examples:
+	@$(MAKE) -C examples
 
 .PHONY: man_pages # Generate man pages
 man_pages:
