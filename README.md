@@ -75,12 +75,11 @@ The proposed extension is SPOC, or Simple POint Cloud.
 
 # TODO
 
-- [ ] Create header only library with examples
+- [X] Create header only library with examples
 - [X] Read/write uncompressed
 - [X] Create compression utilities read/write compressed files
 - [X] Add NEXTRA field in header
 - [X] Allow arbitrary number of extra fields
-- [ ] Change utilities to use streaming
 - [ ] Revisit compression rules/defaults for reading and writing
 - [X] Create interface to spoc\_file, so header file size and point
       vector size do not get out of line. Same for 'extra_size'
@@ -120,9 +119,10 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Warn if the area of the merged file is too big
   - [X] Quiet (don't warn)
   - [X] Unit/integration tests
-- [ ] spoc: Utilities
+- [ ] spoc\_tool
   - [ ] Show progress
   - [ ] Set random seed
+  - [ ] Rewrite tool so that transformations stream
   - [X] Commands executed in the order in which they appear on command line
   - [ ] Copy: Copy fields in one point cloud to fields in another point cloud
     - [ ] Specify reference point cloud

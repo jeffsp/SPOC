@@ -30,7 +30,7 @@ int main (int argc, char **argv)
         // Write the header
         write_header (cout, h);
 
-        // Preprocess the points
+        // Process the points
         for (size_t i = 0; i < h.total_points; ++i)
         {
             // Read a point
