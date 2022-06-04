@@ -1,4 +1,4 @@
-#include "transform.h"
+#include "tool.h"
 #include "test_utils.h"
 #include <iostream>
 #include <stdexcept>
@@ -6,7 +6,7 @@
 using namespace std;
 using namespace spoc::transform;
 
-void test_transform_set ()
+void test_tool_set ()
 {
     for (auto rgb : {true, false})
     {
@@ -27,7 +27,7 @@ void test_transform_set ()
     }
 }
 
-void test_transform_replace ()
+void test_tool_replace ()
 {
     for (auto rgb : {true, false})
     {
@@ -58,7 +58,7 @@ void test_transform_replace ()
     }
 }
 
-void test_transform_recenter ()
+void test_tool_recenter ()
 {
     for (auto rgb : {true, false})
     {
@@ -95,7 +95,7 @@ void test_transform_recenter ()
     }
 }
 
-void test_transform_subtract_min ()
+void test_tool_subtract_min ()
 {
     // Generate spoc files
     auto f = generate_random_spoc_file (100, 8, true);
@@ -103,15 +103,25 @@ void test_transform_subtract_min ()
     auto h = subtract_min (g, true);
 }
 
+void test_tool_quantize ()
+{
+    // Generate spoc files
+    auto f = generate_random_spoc_file (10, 3, true);
+    auto g = quantize (f, 0.001);
+    g = quantize (g, 0.1);
+    g = quantize (g, 100);
+}
+
 int main (int argc, char **argv)
 {
     using namespace std;
     try
     {
-        test_transform_set ();
-        test_transform_replace ();
-        test_transform_recenter ();
-        test_transform_subtract_min ();
+        test_tool_set ();
+        test_tool_replace ();
+        test_tool_recenter ();
+        test_tool_subtract_min ();
+        test_tool_quantize ();
         return 0;
     }
     catch (const exception &e)
