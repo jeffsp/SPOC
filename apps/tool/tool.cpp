@@ -7,34 +7,62 @@
 using namespace std;
 using namespace spoc;
 
+const std::set<char> field_chars {'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b'};
+
+bool check_field (const char f)
+{
+    if (field_chars.find (f) == field_chars.end ())
+        return false;
+    return true;
+}
+
+char consume_field (std::string &s)
+{
+    // Get the field
+    const char c = s[0];
+    // Check it
+    if (!check_field (c))
+        throw std::runtime_error (std::string ("Invalid field name: ") + s);
+    // Make sure the next char is a ','
+    if (!check_field (c))
+        throw std::runtime_error (std::string ("Invalid field specification: ") + s);
+    s.erase (0, 2);
+    return c;
+}
+
+int consume_int (std::string &s)
+{
+    size_t sz = 0;
+    int v = 0.0;
+    try { v = std::stoi (s, &sz); }
+    catch (const std::invalid_argument &e) {
+        throw std::runtime_error (std::string ("Could not parse field string: ") + s);
+    }
+    s.erase (0, sz + 1);
+    return v;
+}
+
+double consume_double (std::string &s)
+{
+    size_t sz = 0;
+    double v = 0.0;
+    try { v = std::stod (s, &sz); }
+    catch (const std::invalid_argument &e) {
+        throw std::runtime_error (std::string ("Could not parse field string: ") + s);
+    }
+    s.erase (0, sz + 1);
+    return v;
+}
+
 // Check arguments
 void check (const cmd::args &args)
 {
+    if (args.command.name.empty ())
+        throw std::runtime_error ("No command was specified");
+
     // Show args
     if (args.verbose)
-    {
-        std::clog << "commands:" << std::endl;
-        for (const auto cmd : args.commands)
-        {
-            using namespace spoc::cmd;
-            if (const set_command *p = std::get_if<set_command>(&cmd))
-                std::clog << "\tset " << p->f << " " << p->v << std::endl;
-            else if (const replace_command *p = std::get_if<replace_command>(&cmd))
-                std::clog << "\treplace " << p->f << " " << p->v1 << "->" << p->v2 << std::endl;
-            else if (std::get_if<recenter_xy_command>(&cmd))
-                std::clog << "\trecenter-xy" << std::endl;
-            else if (std::get_if<recenter_xyz_command>(&cmd))
-                std::clog << "\trecenter-xyz" << std::endl;
-            else if (std::get_if<subtract_min_xy_command>(&cmd))
-                std::clog << "\tsubtract-min-xy" << std::endl;
-            else if (std::get_if<subtract_min_xyz_command>(&cmd))
-                std::clog << "\tsubtract-min-xyz" << std::endl;
-            else if (std::get_if<quantize_xyz_command>(&cmd))
-                std::clog << "\tquantize-xyz" << std::endl;
-            else
-                throw std::runtime_error ("An unknown command was encountered");
-        }
-    }
+        std::clog << "command: " << args.command.name << args.command.params << std::endl;
 }
 
 int main (int argc, char **argv)
@@ -83,27 +111,39 @@ int main (int argc, char **argv)
         // The result goes here
         spoc_file g (f);
 
-        for (const auto cmd : args.commands)
+        using namespace spoc::transform;
+
+        if (args.command.name == "set")
         {
-            using namespace spoc::cmd;
-            using namespace spoc::transform;
-            if (const set_command *p = std::get_if<set_command>(&cmd))
-                g = spoc::transform::set (g, p->f, p->v);
-            else if (const replace_command *p = std::get_if<replace_command>(&cmd))
-                g = replace (g, p->f, p->v1, p->v2);
-            else if (std::get_if<recenter_xy_command>(&cmd))
-                g = recenter (g);
-            else if (std::get_if<recenter_xyz_command>(&cmd))
-                g = recenter (g, true);
-            else if (std::get_if<subtract_min_xy_command>(&cmd))
-                g = subtract_min (g);
-            else if (std::get_if<subtract_min_xyz_command>(&cmd))
-                g = subtract_min (g, true);
-            else if (const quantize_xyz_command *p = std::get_if<quantize_xyz_command>(&cmd))
-                g = quantize (g, p->v);
-            else
-                throw std::runtime_error ("An unknown command was encountered");
+            std::string s = args.command.params;
+            const auto l = consume_field (s);
+            const auto v = consume_double (s);
+            g = spoc::transform::set (g, l, v);
         }
+        else if (args.command.name == "replace")
+        {
+            std::string s = args.command.params;
+            const auto l = consume_field (s);
+            const auto v1 = consume_int (s);
+            const auto v2 = consume_int (s);
+            g = replace (g, l, v1, v2);
+        }
+        else if (args.command.name == "recenter-xy")
+            g = recenter (g);
+        else if (args.command.name == "recenter-xyz")
+            g = recenter (g, true);
+        else if (args.command.name == "subtract-min-xy")
+            g = subtract_min (g);
+        else if (args.command.name == "subtract-min-xyz")
+            g = subtract_min (g, true);
+        else if (args.command.name == "quantize-xyz")
+        {
+            std::string s = args.command.params;
+            const auto v = consume_double (s);
+            g = quantize (g, v);
+        }
+        else
+            throw std::runtime_error ("An unknown command was encountered");
 
         // Write the output file
         if (args.output_fn.empty ())

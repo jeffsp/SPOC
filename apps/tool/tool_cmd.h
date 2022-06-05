@@ -12,29 +12,17 @@ namespace spoc
 namespace cmd
 {
 
-struct set_command { char f; double v; };
-struct replace_command { char f; int v1; int v2; };
-struct recenter_xy_command { };
-struct recenter_xyz_command { };
-struct subtract_min_xy_command { };
-struct subtract_min_xyz_command { };
-struct quantize_xyz_command { double v; };
-
-using command = std::variant<
-    set_command,
-    replace_command,
-    recenter_xy_command,
-    recenter_xyz_command,
-    subtract_min_xy_command,
-    subtract_min_xyz_command,
-    quantize_xyz_command
-    >;
+struct command
+{
+    std::string name;
+    std::string params;
+};
 
 struct args
 {
     bool help = false;
     bool verbose = false;
-    command command;
+    spoc::cmd::command command;
     std::string input_fn;
     std::string output_fn;
 };
@@ -50,51 +38,18 @@ enum command_values
     QUANTIZE_XYZ,
 };
 
-const std::set<char> field_chars {'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b'};
-
-bool check_field (const char f)
+args set_command (const args &args, const std::string &name, const char *s)
 {
-    if (field_chars.find (f) == field_chars.end ())
-        return false;
-    return true;
-}
-
-char consume_field (std::string &s)
-{
-    // Get the field
-    const char c = s[0];
-    // Check it
-    if (!check_field (c))
-        throw std::runtime_error (std::string ("Invalid field name: ") + s);
-    // Make sure the next char is a ','
-    if (!check_field (c))
-        throw std::runtime_error (std::string ("Invalid field specification: ") + s);
-    s.erase (0, 2);
-    return c;
-}
-
-int consume_int (std::string &s)
-{
-    size_t sz = 0;
-    int v = 0.0;
-    try { v = std::stoi (s, &sz); }
-    catch (const std::invalid_argument &e) {
-        throw std::runtime_error (std::string ("Could not parse field string: ") + s);
-    }
-    s.erase (0, sz + 1);
-    return v;
-}
-
-double consume_double (std::string &s)
-{
-    size_t sz = 0;
-    double v = 0.0;
-    try { v = std::stod (s, &sz); }
-    catch (const std::invalid_argument &e) {
-        throw std::runtime_error (std::string ("Could not parse field string: ") + s);
-    }
-    s.erase (0, sz + 1);
-    return v;
+    std::string params;
+    if (s != nullptr)
+        params = std::string (s);
+    std::clog << "set_command" << std::endl;
+    if (!args.command.name.empty ())
+        throw std::runtime_error ("You can only specify one command at a time");
+    spoc::cmd::args new_args (args);
+    new_args.command.name = name;
+    new_args.command.params = params;
+    return new_args;
 }
 
 inline args get_args (int argc, char **argv, const std::string &usage)
@@ -139,50 +94,37 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             }
             case SET:
             {
-                std::string s (optarg);
-                set_command cmd;
-                cmd.f = consume_field (s);
-                cmd.v = consume_double (s);
-                args.commands.push_back (cmd);
+                args = set_command (args, "set", optarg);
                 break;
             }
             case REPLACE:
             {
-                std::string s (optarg);
-                replace_command cmd;
-                cmd.f = consume_field (s);
-                cmd.v1 = consume_int (s);
-                cmd.v2 = consume_int (s);
-                args.commands.push_back (cmd);
+                args = set_command (args, "replace", optarg);
                 break;
             }
             case RECENTER_XY:
             {
-                args.commands.push_back (recenter_xy_command ());
+                args = set_command (args, "recenter-xy", optarg);
                 break;
             }
             case RECENTER_XYZ:
             {
-                args.commands.push_back (recenter_xyz_command ());
+                args = set_command (args, "recenter-xyz", optarg);
                 break;
             }
             case SUBTRACT_MIN_XY:
             {
-                args.commands.push_back (subtract_min_xy_command ());
+                args = set_command (args, "subtract-min-xy", optarg);
                 break;
             }
             case SUBTRACT_MIN_XYZ:
             {
-                args.commands.push_back (subtract_min_xyz_command ());
+                args = set_command (args, "subtract-min-xyz", optarg);
                 break;
             }
             case QUANTIZE_XYZ:
             {
-                quantize_xyz_command cmd;
-                cmd.v = atof (optarg);
-                if (cmd.v == 0.0)
-                    throw std::runtime_error (std::string ("Invalid quantize-xyz argument: ") + optarg);
-                args.commands.push_back (cmd);
+                args = set_command (args, "quantize-xyz", optarg);
                 break;
             }
         }
