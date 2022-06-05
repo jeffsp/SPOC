@@ -36,25 +36,25 @@ to force overwrites.
 
 # OPTIONS
 
---help, -h
+\-\-help, -h
 :   Get help
 
---verbose, -v
+\-\-verbose, -v
 :   Set verbose mode ON
 
---force, -f
+\-\-force, -f
 :   Force overwrites of existing files.
 
---tiles=*#*, -t *#*
+\-\-tiles=*#*, -t *#*
 :   Number of tiles along the largest dimension
 
---digits=*#*, -d *#*
+\-\-digits=*#*, -d *#*
 :   Number of digits to use when numbering the output filenames.
 
---tile-size=*#*, -s *#*
+\-\-tile-size=*#*, -s *#*
 :   Length of one side of a tile
 
---prefix=*string*, -p *string*
+\-\-prefix=*string*, -p *string*
 :   The prefix to use for the output files
 
 # SEE ALSO

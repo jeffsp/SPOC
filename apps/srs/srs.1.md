@@ -23,13 +23,13 @@ This is the same format used by the ASPRS LAS 1.4 standard.
 
 # OPTIONS
 
---help, -h
+\-\-help, -h
 :   Get help
 
---verbose, -v
+\-\-verbose, -v
 :   Set verbose mode ON
 
---srs=*string*, -s *string*
+\-\-srs=*string*, -s *string*
 :   Set the SRS string
 
 # EXAMPLES

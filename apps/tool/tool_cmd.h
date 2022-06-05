@@ -34,7 +34,7 @@ struct args
 {
     bool help = false;
     bool verbose = false;
-    std::vector<command> commands;
+    command command;
     std::string input_fn;
     std::string output_fn;
 };

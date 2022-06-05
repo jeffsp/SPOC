@@ -16,10 +16,10 @@ Compress a spoc file.
 
 # OPTIONS
 
---help, -h
+\-\-help, -h
 :   Get help
 
---verbose, -v
+\-\-verbose, -v
 :   Set verbose mode ON
 
 # SEE ALSO

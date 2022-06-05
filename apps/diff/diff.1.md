@@ -17,23 +17,23 @@ otherwise return a success code (0);
 
 # OPTIONS
 
---help, -h
+\-\-help, -h
 :   Get help
 
---verbose, -v
+\-\-verbose, -v
 :   Set verbose mode ON
 
---header-only, -e
+\-\-header-only, -e
 : Only compare the headers
 
---data-only, -d
+\-\-data-only, -d
 : Only compare the data fields
 
---field=*F*, -f *F*
+\-\-field=*F*, -f *F*
 : Only compare field F, where F is one of 'x', 'y', 'z', 'c', 'p', 'i',
     'r', 'g', 'b', '0', '1', ..., '7'.
 
---reverse, -r
+\-\-reverse, -r
 : Reverse the meaning of the comparison by returning an error if they
 are equal and success if they are not equal
 

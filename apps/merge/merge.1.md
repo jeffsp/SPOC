@@ -20,16 +20,16 @@ written to stdout.
 
 # OPTIONS
 
---help, -h
+\-\-help, -h
 :   Get help
 
---verbose, -v
+\-\-verbose, -v
 :   Set verbose mode ON
 
---quiet, -q
+\-\-quiet, -q
 :   Don't produce warnings when common mistakes are detected
 
---point-id=#, -p #
+\-\-point-id=#, -p #
 :   Set all point IDs in the merged file to #. By default, the point IDs
     are numbered according to the 0-based index of the input file's
     occurance on the command line.

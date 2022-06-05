@@ -25,10 +25,13 @@ void print_help (std::ostream &os, const std::string &usage, const size_t noptio
         os << "\t--" << long_options[i].name;
         if (long_options[i].has_arg)
             os << "=<ARG>";
-        os << ", ";
-        os << "-" << char (long_options[i].val);
-        if (long_options[i].has_arg)
-            os << " <ARG>";
+        if (long_options[i].val < 256)
+        {
+            os << ", ";
+            os << "-" << char (long_options[i].val);
+            if (long_options[i].has_arg)
+                os << " <ARG>";
+        }
         os << std::endl;
     }
 }

@@ -40,22 +40,22 @@ highest 25% of the values are spread out over the range 89 to 4088.
 
 # OPTIONS
 
---help, -h
+\-\-help, -h
 :   Get help
 
---verbose, -v
+\-\-verbose, -v
 :   Set verbose mode ON
 
---json, -j
+\-\-json, -j
 : Toggle json output switch
 
---header-info, -e
+\-\-header-info, -e
 : Toggle header information switch
 
---summary-info, -s
+\-\-summary-info, -s
 : Toggle summary information switch
 
---compact, -c
+\-\-compact, -c
 : Toggle compact output mode switch
 
 # EXAMPLES
