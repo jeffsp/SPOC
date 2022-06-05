@@ -180,6 +180,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {
                 quantize_xyz_command cmd;
                 cmd.v = atof (optarg);
+                if (cmd.v == 0.0)
+                    throw std::runtime_error (std::string ("Invalid quantize-xyz argument: ") + optarg);
                 args.commands.push_back (cmd);
                 break;
             }
