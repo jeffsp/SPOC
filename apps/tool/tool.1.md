@@ -22,6 +22,8 @@ Collection of tools to run on a SPOC file
 --verbose, -v
 :   Set verbose mode ON
 
+# COMMANDS
+
 --set=*F*,*#*
 :   Set the field *F* to *#*
 
