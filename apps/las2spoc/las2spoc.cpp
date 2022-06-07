@@ -48,7 +48,6 @@ int main (int argc, char **argv)
             p.g = l.lasreader->point.rgb[1];
             p.b = l.lasreader->point.rgb[2];
             point_records.push_back (p);
-            l.lasreader->point.set_point_source_ID(1020);
         }
 
         if (args.verbose)
