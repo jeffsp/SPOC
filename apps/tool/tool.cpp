@@ -65,6 +65,68 @@ void check (const cmd::args &args)
         std::clog << "command: " << args.command.name << args.command.params << std::endl;
 }
 
+// Helper class to read from either cin or an input file
+class input_stream
+{
+    public:
+    input_stream (const bool verbose, const string &fn)
+    {
+        if (fn.empty ())
+        {
+            if (verbose)
+                clog << "Reading from stdin" << endl;
+            is = &cin;
+        }
+        else
+        {
+            if (verbose)
+                clog << "Reading from " << fn << endl;
+            ifs.open (fn);
+            if (!ifs)
+                throw runtime_error ("Could not open file for reading");
+            is = &ifs;
+        }
+    }
+    std::istream &operator() ()
+    {
+        return *is;
+    }
+    private:
+    std::istream *is;
+    std::ifstream ifs;
+};
+
+// Helper class to write to either cout or an output file
+class output_stream
+{
+    public:
+    output_stream (const bool verbose, const string &fn)
+    {
+        if (fn.empty ())
+        {
+            if (verbose)
+                clog << "Writing to stdout" << endl;
+            os = &cout;
+        }
+        else
+        {
+            if (verbose)
+                clog << "Writing to " << fn << endl;
+            ofs.open (fn);
+            if (!ofs)
+                throw runtime_error ("Could not open file for writing");
+            os = &ofs;
+        }
+    }
+    std::ostream &operator() ()
+    {
+        return *os;
+    }
+    private:
+    std::ostream *os;
+    std::ofstream ofs;
+};
+
 int main (int argc, char **argv)
 {
     using namespace std;
@@ -83,90 +145,52 @@ int main (int argc, char **argv)
         // Check the arguments
         check (args);
 
-        // Read the input file
-        spoc_file f;
+        // Get the input stream
+        input_stream is (args.verbose, args.input_fn);
 
-        if (args.input_fn.empty ())
-        {
-            if (args.verbose)
-                clog << "Reading from stdin" << endl;
+        // Read the header
+        const header h = read_header (is ());
 
-            // Read into spoc_file struct
-            f = read_spoc_file_uncompressed (cin);
-        }
-        else
-        {
-            if (args.verbose)
-                clog << "Reading " << args.input_fn << endl;
+        // Check compression flag
+        if (h.compressed)
+            throw std::runtime_error ("Expected an uncompressed file");
 
-            ifstream ifs (args.input_fn);
-
-            if (!ifs)
-                throw runtime_error ("Could not open file for reading");
-
-            // Read into spoc_file struct
-            f = read_spoc_file_uncompressed (ifs);
-        }
-
-        // The result goes here
-        spoc_file g (f);
+        // Get the output stream
+        output_stream os (args.verbose, args.output_fn);
 
         using namespace spoc::transform;
 
-        if (args.command.name == "set")
+        if (args.command.name == "quantize-xyz")
         {
             std::string s = args.command.params;
-            const auto l = consume_field (s);
             const auto v = consume_double (s);
-            g = spoc::transform::set (g, l, v);
+            quantize (is (), os (), h, v);
         }
+        else if (args.command.name == "recenter-xy")
+            recenter (is (), os (), h);
+        else if (args.command.name == "recenter-xyz")
+            recenter (is (), os (), h, true);
         else if (args.command.name == "replace")
         {
             std::string s = args.command.params;
             const auto l = consume_field (s);
             const auto v1 = consume_int (s);
             const auto v2 = consume_int (s);
-            g = replace (g, l, v1, v2);
+            replace (is (), os (), h, l, v1, v2);
         }
-        else if (args.command.name == "recenter-xy")
-            g = recenter (g);
-        else if (args.command.name == "recenter-xyz")
-            g = recenter (g, true);
-        else if (args.command.name == "subtract-min-xy")
-            g = subtract_min (g);
-        else if (args.command.name == "subtract-min-xyz")
-            g = subtract_min (g, true);
-        else if (args.command.name == "quantize-xyz")
+        else if (args.command.name == "set")
         {
             std::string s = args.command.params;
+            const auto l = consume_field (s);
             const auto v = consume_double (s);
-            g = quantize (g, v);
+            spoc::transform::set (is (), os (), h, l, v);
         }
+        else if (args.command.name == "subtract-min-xy")
+            subtract_min (is (), os (), h);
+        else if (args.command.name == "subtract-min-xyz")
+            subtract_min (is (), os (), h, true);
         else
             throw std::runtime_error ("An unknown command was encountered");
-
-        // Write the output file
-        if (args.output_fn.empty ())
-        {
-            if (args.verbose)
-                clog << "Writing to stdout" << endl;
-
-            // Write it out
-            spoc::write_spoc_file_uncompressed (cout, g);
-        }
-        else
-        {
-            if (args.verbose)
-                clog << "Writing " << args.output_fn << endl;
-
-            ofstream ofs (args.output_fn);
-
-            if (!ofs)
-                throw runtime_error ("Could not open file for writing");
-
-            // Write it out
-            spoc::write_spoc_file_uncompressed (ofs, g);
-        }
 
         return 0;
     }

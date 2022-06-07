@@ -13,63 +13,83 @@ namespace spoc
 namespace transform
 {
 
-spoc_file set (const spoc_file &f,
-    const char field_name,
-    const double v)
+void quantize (std::istream &is,
+    std::ostream &os,
+    const spoc::header &h,
+    const double precision)
 {
-    // Get number of points
-    const size_t n = f.get_header ().total_points;
+    // Write the header
+    write_header (os, h);
 
-    // Return value
-    spoc_file g (f);
-
-    // Set the values
-    switch (field_name)
+    // Process the points
+    for (size_t i = 0; i < h.total_points; ++i)
     {
-        default:
-        {
-            std::string s ("Unknown field name '");
-            s += field_name;
-            s += "'";
-            throw std::runtime_error (s);
-        }
-        case 'x': for (size_t i = 0; i < n; ++i) g[i].x = v; break;
-        case 'y': for (size_t i = 0; i < n; ++i) g[i].y = v; break;
-        case 'z': for (size_t i = 0; i < n; ++i) g[i].z = v; break;
-        case 'c': for (size_t i = 0; i < n; ++i) g[i].c = v; break;
-        case 'p': for (size_t i = 0; i < n; ++i) g[i].p = v; break;
-        case 'i': for (size_t i = 0; i < n; ++i) g[i].i = v; break;
-        case 'r': for (size_t i = 0; i < n; ++i) g[i].r = v; break;
-        case 'g': for (size_t i = 0; i < n; ++i) g[i].g = v; break;
-        case 'b': for (size_t i = 0; i < n; ++i) g[i].b = v; break;
-        case '0': case '1': case '2': case '3':
-        case '4': case '5': case '6': case '7':
-        case '8': case '9':
-        {
-              const size_t j = field_name - '0';
-              for (size_t i = 0; i < n; ++i)
-              {
-                  if (j >= g[i].extra.size ())
-                      throw std::runtime_error ("Specified extra index is too large");
-                  g[i].extra[j] = v;
-              }
-              break;
-        }
-    }
+        // Read a point
+        auto p = read_point_record (is, h.extra_size);
 
-    return g;
+        // Quantize the point
+        p.x = static_cast<int> (p.x / precision) * precision;
+        p.y = static_cast<int> (p.y / precision) * precision;
+        p.z = static_cast<int> (p.z / precision) * precision;
+
+        // Write it back out
+        write_point_record (os, p);
+    }
 }
 
-spoc_file replace (const spoc_file &f,
+// Recenter a point cloud about its mean
+void recenter (std::istream &is,
+    std::ostream &os,
+    const spoc::header &h,
+    const bool z_flag = false)
+{
+    // Get number of points
+    const auto n = h.total_points;
+
+    // Read the data
+    point_records p (n);
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i] = read_point_record (is, h.extra_size);
+
+    // Get X, Y, and Z
+    const auto x = get_x (p);
+    const auto y = get_y (p);
+    const auto z = get_z (p);
+
+    // Get average X, Y, and (optionally) Z
+    const double cx = std::accumulate (begin (x), end (x), 0.0) / n;
+    const double cy = std::accumulate (begin (y), end (y), 0.0) / n;
+    const double cz = z_flag ? std::accumulate (begin (z), end (z), 0.0) / n : 0.0;
+
+    // Subtract off mean x, y, z
+    for (size_t i = 0; i < n; ++i)
+    {
+        p[i].x -= cx;
+        p[i].y -= cy;
+        p[i].z -= cz;
+    }
+
+    // Write it back out
+    write_header (os, h);
+    for (size_t i = 0; i < n; ++i)
+        write_point_record (os, p[i]);
+}
+
+// Replace values in one field with values in another
+void replace (std::istream &is,
+    std::ostream &os,
+    const spoc::header &h,
     const char field_name,
     const double v1,
     const double v2)
 {
     // Get number of points
-    const size_t n = f.get_header ().total_points;
+    const size_t n = h.total_points;
 
-    // Return value
-    spoc_file g (f);
+    // Read the data
+    point_records p (n);
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i] = read_point_record (is, h.extra_size);
 
     switch (field_name)
     {
@@ -83,12 +103,12 @@ spoc_file replace (const spoc_file &f,
         case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
         case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
         case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'c': for (size_t i = 0; i < n; ++i) if (g[i].c == v1) g[i].c = v2; break;
-        case 'p': for (size_t i = 0; i < n; ++i) if (g[i].p == v1) g[i].p = v2; break;
-        case 'i': for (size_t i = 0; i < n; ++i) if (g[i].i == v1) g[i].i = v2; break;
-        case 'r': for (size_t i = 0; i < n; ++i) if (g[i].r == v1) g[i].r = v2; break;
-        case 'g': for (size_t i = 0; i < n; ++i) if (g[i].g == v1) g[i].g = v2; break;
-        case 'b': for (size_t i = 0; i < n; ++i) if (g[i].b == v1) g[i].b = v2; break;
+        case 'c': for (size_t i = 0; i < n; ++i) if (p[i].c == v1) p[i].c = v2; break;
+        case 'p': for (size_t i = 0; i < n; ++i) if (p[i].p == v1) p[i].p = v2; break;
+        case 'i': for (size_t i = 0; i < n; ++i) if (p[i].i == v1) p[i].i = v2; break;
+        case 'r': for (size_t i = 0; i < n; ++i) if (p[i].r == v1) p[i].r = v2; break;
+        case 'g': for (size_t i = 0; i < n; ++i) if (p[i].g == v1) p[i].g = v2; break;
+        case 'b': for (size_t i = 0; i < n; ++i) if (p[i].b == v1) p[i].b = v2; break;
         case '0': case '1': case '2': case '3':
         case '4': case '5': case '6': case '7':
         case '8': case '9':
@@ -96,87 +116,112 @@ spoc_file replace (const spoc_file &f,
               const size_t j = field_name - '0';
               for (size_t i = 0; i < n; ++i)
               {
-                  if (j >= g[i].extra.size ())
+                  if (j >= p[i].extra.size ())
                       throw std::runtime_error ("Specified extra index is too large");
-                  if (g[i].extra[j] == v1)
-                      g[i].extra[j] = v2;
+                  if (p[i].extra[j] == v1)
+                      p[i].extra[j] = v2;
               }
               break;
         }
     }
 
-    return g;
+    // Write it back out
+    write_header (os, h);
+    for (size_t i = 0; i < n; ++i)
+        write_point_record (os, p[i]);
 }
 
-// Recenter a point cloud about its mean
-spoc_file recenter (const spoc_file &f, const bool z_flag = false)
+// Set field values
+void set (std::istream &is,
+    std::ostream &os,
+    const spoc::header &h,
+    const char field_name,
+    const double v)
 {
-    // Make a copy
-    spoc::spoc_file g (f);
-    const auto x = get_x (g.get_point_records ());
-    const auto y = get_y (g.get_point_records ());
-    const auto z = get_z (g.get_point_records ());
-    const auto n = f.get_header ().total_points;
+    // Get number of points
+    const size_t n = h.total_points;
 
-    // Get average X, Y, and (optionally) Z
-    const double cx = std::accumulate (begin (x), end (x), 0.0) / n;
-    const double cy = std::accumulate (begin (y), end (y), 0.0) / n;
-    const double cz = z_flag ? std::accumulate (begin (z), end (z), 0.0) / n : 0.0;
+    // Read the data
+    point_records p (n);
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i] = read_point_record (is, h.extra_size);
 
-    // Subtract off mean x, y, z
-    for (size_t i = 0; i < n; ++i)
+    // Set the values
+    switch (field_name)
     {
-        auto p = g[i];
-        p.x -= cx;
-        p.y -= cy;
-        p.z -= cz;
-        g[i] = p;
+        default:
+        {
+            std::string s ("Unknown field name '");
+            s += field_name;
+            s += "'";
+            throw std::runtime_error (s);
+        }
+        case 'x': for (size_t i = 0; i < n; ++i) p[i].x = v; break;
+        case 'y': for (size_t i = 0; i < n; ++i) p[i].y = v; break;
+        case 'z': for (size_t i = 0; i < n; ++i) p[i].z = v; break;
+        case 'c': for (size_t i = 0; i < n; ++i) p[i].c = v; break;
+        case 'p': for (size_t i = 0; i < n; ++i) p[i].p = v; break;
+        case 'i': for (size_t i = 0; i < n; ++i) p[i].i = v; break;
+        case 'r': for (size_t i = 0; i < n; ++i) p[i].r = v; break;
+        case 'g': for (size_t i = 0; i < n; ++i) p[i].g = v; break;
+        case 'b': for (size_t i = 0; i < n; ++i) p[i].b = v; break;
+        case '0': case '1': case '2': case '3':
+        case '4': case '5': case '6': case '7':
+        case '8': case '9':
+        {
+              const size_t j = field_name - '0';
+              for (size_t i = 0; i < n; ++i)
+              {
+                  if (j >= p[i].extra.size ())
+                      throw std::runtime_error ("Specified extra index is too large");
+                  p[i].extra[j] = v;
+              }
+              break;
+        }
     }
-    return g;
+
+    // Write it back out
+    write_header (os, h);
+    for (size_t i = 0; i < n; ++i)
+        write_point_record (os, p[i]);
 }
 
 // Subtract min x/y/z values from all values
-spoc_file subtract_min (const spoc_file &f, const bool z_flag = false)
+void subtract_min (std::istream &is,
+    std::ostream &os,
+    const spoc::header &h,
+    const bool z_flag = false)
 {
-    // Make a copy
-    spoc::spoc_file g (f);
-    const auto x = get_x (g.get_point_records ());
-    const auto y = get_y (g.get_point_records ());
-    const auto z = get_z (g.get_point_records ());
-    const auto n = g.get_header ().total_points;
+    // Get number of points
+    const auto n = h.total_points;
+
+    // Read the data
+    point_records p (n);
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i] = read_point_record (is, h.extra_size);
+
+    // Get X, Y, and Z
+    const auto x = get_x (p);
+    const auto y = get_y (p);
+    const auto z = get_z (p);
 
     // Get min X, Y, and (optionally) Z
     const double minx = *std::min_element (begin (x), end (x));
     const double miny = *std::min_element (begin (y), end (y));
     const double minz = z_flag ? *std::min_element (begin (z), end (z)) : 0.0;
 
-    // Subtract off min x, y, z
+    // Subtract off mean x, y, z
     for (size_t i = 0; i < n; ++i)
     {
-        auto p = g[i];
-        p.x -= minx;
-        p.y -= miny;
-        p.z -= minz;
-        g[i] = p;
+        p[i].x -= minx;
+        p[i].y -= miny;
+        p[i].z -= minz;
     }
-    return g;
-}
 
-spoc_file quantize (const spoc_file &f, const double precision)
-{
-    // Get number of points
-    const size_t n = f.get_header ().total_points;
-
-    // Return value
-    spoc_file g (f);
-
+    // Write it back out
+    write_header (os, h);
     for (size_t i = 0; i < n; ++i)
-    {
-        g[i].x = static_cast<int> (g[i].x / precision) * precision;
-        g[i].y = static_cast<int> (g[i].y / precision) * precision;
-        g[i].z = static_cast<int> (g[i].z / precision) * precision;
-    }
-    return g;
+        write_point_record (os, p[i]);
 }
 
 } // namespace transform

@@ -125,7 +125,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [ ] Set random seed
   - [ ] Rewrite tool so that all I/O streams when possible
   - [X] Commands executed in the order in which they appear on command line
-  - [ ] Only allow one command at a time, multiple commands can be
+  - [X] Only allow one command at a time, multiple commands can be
         executed using pipes
   - [ ] Copy: Copy fields in one point cloud to fields in another point cloud
     - [ ] Specify reference point cloud

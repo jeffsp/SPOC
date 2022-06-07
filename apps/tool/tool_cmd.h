@@ -92,14 +92,9 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 args.verbose = true;
                 break;
             }
-            case SET:
+            case QUANTIZE_XYZ:
             {
-                args = set_command (args, "set", optarg);
-                break;
-            }
-            case REPLACE:
-            {
-                args = set_command (args, "replace", optarg);
+                args = set_command (args, "quantize-xyz", optarg);
                 break;
             }
             case RECENTER_XY:
@@ -112,6 +107,16 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 args = set_command (args, "recenter-xyz", optarg);
                 break;
             }
+            case REPLACE:
+            {
+                args = set_command (args, "replace", optarg);
+                break;
+            }
+            case SET:
+            {
+                args = set_command (args, "set", optarg);
+                break;
+            }
             case SUBTRACT_MIN_XY:
             {
                 args = set_command (args, "subtract-min-xy", optarg);
@@ -120,11 +125,6 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case SUBTRACT_MIN_XYZ:
             {
                 args = set_command (args, "subtract-min-xyz", optarg);
-                break;
-            }
-            case QUANTIZE_XYZ:
-            {
-                args = set_command (args, "quantize-xyz", optarg);
                 break;
             }
         }
