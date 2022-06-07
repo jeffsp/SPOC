@@ -1,3 +1,4 @@
+#include "app_utils.h"
 #include "spoc.h"
 #include "decompress_cmd.h"
 #include <iostream>
@@ -21,56 +22,20 @@ int main (int argc, char **argv)
         if (args.help)
             return 0;
 
+        // Get the input stream
+        app_utils::input_stream is (args.verbose, args.input_fn);
+
         // Read the input file
-        spoc_file f;
+        spoc_file f = read_spoc_file_compressed (is ());
 
-        if (args.input_fn.empty ())
-        {
-            if (args.verbose)
-                clog << "Reading from stdin" << endl;
-
-            // Read into spoc_file struct
-            f = read_spoc_file_compressed (cin);
-        }
-        else
-        {
-            if (args.verbose)
-                clog << "Reading " << args.input_fn << endl;
-
-            ifstream ifs (args.input_fn);
-
-            if (!ifs)
-                throw runtime_error ("Could not open file for reading");
-
-            // Read into spoc_file struct
-            f = read_spoc_file_uncompressed (ifs);
-        }
+        // Get the output stream
+        app_utils::output_stream os (args.verbose, args.output_fn);
 
         // Unset the compression bit
         f.set_compressed (false);
 
-        // Write the output file
-        if (args.output_fn.empty ())
-        {
-            if (args.verbose)
-                clog << "Writing to stdout" << endl;
-
-            // Write it out
-            spoc::write_spoc_file_uncompressed (cout, f);
-        }
-        else
-        {
-            if (args.verbose)
-                clog << "Writing " << args.output_fn << endl;
-
-            ofstream ofs (args.output_fn);
-
-            if (!ofs)
-                throw runtime_error ("Could not open file for writing");
-
-            // Write it out
-            spoc::write_spoc_file_uncompressed (ofs, f);
-        }
+        // Write it out
+        spoc::write_spoc_file_uncompressed (os (), f);
 
         return 0;
     }

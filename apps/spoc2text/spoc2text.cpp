@@ -22,7 +22,7 @@ int main (int argc, char **argv)
 
         // Read spoc file
         if (args.verbose)
-            clog << "reading spoc file" << endl;
+            clog << "Reading spoc file from stdin" << endl;
 
         const auto f = read_spoc_file_uncompressed (cin);
         const auto wkt = f.get_header ().wkt;
@@ -35,7 +35,7 @@ int main (int argc, char **argv)
             clog << "read " << wkt.size () << " byte WKT" << endl;
 
         if (args.verbose)
-            clog << "writing point records to stdout" << endl;
+            clog << "Writing point records to stdout" << endl;
 
         // Write to stdout
         cout << wkt << endl;

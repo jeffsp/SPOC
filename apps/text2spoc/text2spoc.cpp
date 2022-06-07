@@ -26,7 +26,7 @@ int main (int argc, char **argv)
             clog << "read " << wkt.size () << " byte WKT" << endl;
 
         if (args.verbose)
-            clog << "reading point records" << endl;
+            clog << "Reading point records from stdin" << endl;
 
         // Read point records
         vector<point_record> point_records;
@@ -47,7 +47,7 @@ int main (int argc, char **argv)
 
         // Write them to stdout
         if (args.verbose)
-            clog << "writing records to stdout" << endl;
+            clog << "Writing records to stdout" << endl;
 
         write_spoc_file_uncompressed (cout, spoc_file (wkt, point_records));
 
