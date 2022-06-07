@@ -81,6 +81,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
 - [X] Add NEXTRA field in header
 - [X] Allow arbitrary number of extra fields
 - [ ] Revisit compression rules/defaults for reading and writing
+- [ ] Rename 'extra_size' -> 'extra_fields'
 - [X] Create interface to spoc\_file, so header file size and point
       vector size do not get out of line. Same for 'extra_size'
 - [X] Gitlab runner
@@ -123,7 +124,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
 - [ ] spoc\_tool
   - [ ] Show progress
   - [ ] Set random seed
-  - [ ] Rewrite tool so that all I/O streams when possible
+  - [X] Rewrite apps so that all I/O streams when possible
   - [X] Commands executed in the order in which they appear on command line
   - [X] Only allow one command at a time, multiple commands can be
         executed using pipes
@@ -228,6 +229,9 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [ ] Don't divide on z value (create quadtrees)
   - [ ] Create a spoc file from an octree given an extent
   - [ ] Unit/integration tests
+- [ ] Examples
+  - [X] Noop
+  - [X] Very large spoc file with streaming
 
 ## Use Cases
 

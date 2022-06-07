@@ -21,5 +21,6 @@ macro(add_example name)
     target_link_libraries(${name} gmp z)
 endmacro()
 
-
 add_example(noop)
+add_example(generate_infinite_points)
+add_example(stream_averaging)
