@@ -14,18 +14,18 @@ namespace app_utils
 class input_stream
 {
     public:
-    input_stream (const bool verbose, const std::string &fn)
+    input_stream (const bool verbose, const std::string &fn, std::ostream &logstream = std::clog)
     {
         if (fn.empty ())
         {
             if (verbose)
-                std::clog << "Reading from stdin" << std::endl;
+                logstream << "Reading from stdin" << std::endl;
             is = &std::cin;
         }
         else
         {
             if (verbose)
-                std::clog << "Reading from " << fn << std::endl;
+                logstream << "Reading from " << fn << std::endl;
             ifs.open (fn);
             if (!ifs)
                 throw std::runtime_error ("Could not open file for reading");
@@ -45,18 +45,18 @@ class input_stream
 class output_stream
 {
     public:
-    output_stream (const bool verbose, const std::string &fn)
+    output_stream (const bool verbose, const std::string &fn, std::ostream &logstream = std::clog)
     {
         if (fn.empty ())
         {
             if (verbose)
-                std::clog << "Writing to stdout" << std::endl;
+                logstream << "Writing to stdout" << std::endl;
             os = &std::cout;
         }
         else
         {
             if (verbose)
-                std::clog << "Writing to " << fn << std::endl;
+                logstream << "Writing to " << fn << std::endl;
             ofs.open (fn);
             if (!ofs)
                 throw std::runtime_error ("Could not open file for writing");
