@@ -10,7 +10,7 @@ using namespace spoc::transform;
 void test_tool_quantize ()
 {
     // Generate spoc files
-    auto f = generate_random_spoc_file (10, 3, true);
+    auto f = generate_random_spoc_file (10, 3, false);
     stringstream is, os;
     write_spoc_file_uncompressed (is, f);
     header h = read_header (is);
@@ -30,7 +30,7 @@ void test_tool_recenter ()
     for (auto rgb : {true, false})
     {
         // Generate spoc files
-        auto f = generate_random_spoc_file (1000, 8, rgb);
+        auto f = generate_random_spoc_file (1000, 8, false, rgb);
         stringstream is, os;
 
         write_spoc_file_uncompressed (is, f);
@@ -78,7 +78,7 @@ void test_tool_replace ()
         // Generate spoc files
         const size_t total_points = 100;
         const size_t extra_size = 8;
-        auto f = generate_random_spoc_file (total_points, extra_size, rgb);
+        auto f = generate_random_spoc_file (total_points, extra_size, false, rgb);
         for (size_t i = 0; i < total_points; ++i)
             for (size_t j = 0; j < extra_size; ++j)
                 f[i].extra[j] = f[i].extra[j] % 5;
@@ -119,7 +119,7 @@ void test_tool_set ()
     for (auto rgb : {true, false})
     {
         // Generate spoc files
-        auto f = generate_random_spoc_file (100, 8, rgb);
+        auto f = generate_random_spoc_file (100, 8, false, rgb);
 
         for (auto c : { 'x', 'y', 'z',
                 'c', 'p', 'i', 'r', 'g', 'b',
@@ -150,7 +150,7 @@ void test_tool_set ()
 void test_tool_subtract_min ()
 {
     // Generate spoc files
-    auto f = generate_random_spoc_file (100, 8, true);
+    auto f = generate_random_spoc_file (100, 8, false, true);
     stringstream is, os;
     write_spoc_file_uncompressed (is, f);
     header hdr = read_header (is);

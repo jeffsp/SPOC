@@ -68,7 +68,7 @@ inline std::ostream &operator<< (std::ostream &s, const header &h)
     s << h.wkt << std::endl;
     s << "extra_size " << h.extra_size << std::endl;
     s << "total_points " << h.total_points << std::endl;
-    s << "compressed " << h.compressed << std::endl;
+    s << "compressed " << (h.compressed ? "true" : "false")  << std::endl;
     return s;
 }
 
