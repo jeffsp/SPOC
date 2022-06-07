@@ -1,3 +1,4 @@
+#include "app_utils.h"
 #include "spoc.h"
 #include "tool.h"
 #include "tool_cmd.h"
@@ -54,79 +55,6 @@ double consume_double (std::string &s)
     return v;
 }
 
-// Check arguments
-void check (const cmd::args &args)
-{
-    if (args.command.name.empty ())
-        throw std::runtime_error ("No command was specified");
-
-    // Show args
-    if (args.verbose)
-        std::clog << "command: " << args.command.name << args.command.params << std::endl;
-}
-
-// Helper class to read from either cin or an input file
-class input_stream
-{
-    public:
-    input_stream (const bool verbose, const string &fn)
-    {
-        if (fn.empty ())
-        {
-            if (verbose)
-                clog << "Reading from stdin" << endl;
-            is = &cin;
-        }
-        else
-        {
-            if (verbose)
-                clog << "Reading from " << fn << endl;
-            ifs.open (fn);
-            if (!ifs)
-                throw runtime_error ("Could not open file for reading");
-            is = &ifs;
-        }
-    }
-    std::istream &operator() ()
-    {
-        return *is;
-    }
-    private:
-    std::istream *is;
-    std::ifstream ifs;
-};
-
-// Helper class to write to either cout or an output file
-class output_stream
-{
-    public:
-    output_stream (const bool verbose, const string &fn)
-    {
-        if (fn.empty ())
-        {
-            if (verbose)
-                clog << "Writing to stdout" << endl;
-            os = &cout;
-        }
-        else
-        {
-            if (verbose)
-                clog << "Writing to " << fn << endl;
-            ofs.open (fn);
-            if (!ofs)
-                throw runtime_error ("Could not open file for writing");
-            os = &ofs;
-        }
-    }
-    std::ostream &operator() ()
-    {
-        return *os;
-    }
-    private:
-    std::ostream *os;
-    std::ofstream ofs;
-};
-
 int main (int argc, char **argv)
 {
     using namespace std;
@@ -143,10 +71,15 @@ int main (int argc, char **argv)
             return 0;
 
         // Check the arguments
-        check (args);
+        if (args.command.name.empty ())
+            throw std::runtime_error ("No command was specified");
+
+        // Show args
+        if (args.verbose)
+            std::clog << "command: " << args.command.name << args.command.params << std::endl;
 
         // Get the input stream
-        input_stream is (args.verbose, args.input_fn);
+        app_utils::input_stream is (args.verbose, args.input_fn);
 
         // Read the header
         const header h = read_header (is ());
@@ -156,7 +89,7 @@ int main (int argc, char **argv)
             throw std::runtime_error ("Expected an uncompressed file");
 
         // Get the output stream
-        output_stream os (args.verbose, args.output_fn);
+        app_utils::output_stream os (args.verbose, args.output_fn);
 
         using namespace spoc::transform;
 
