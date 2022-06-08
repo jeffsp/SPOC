@@ -46,10 +46,13 @@ highest 25% of the values are spread out over the range 89 to 4088.
 \-\-verbose, -v
 :   Set verbose mode ON
 
+\-\-version, -e
+:   Print version information and exit
+
 \-\-json, -j
 : Toggle json output switch
 
-\-\-header-info, -e
+\-\-header-info, -a
 : Toggle header information switch
 
 \-\-summary-info, -s

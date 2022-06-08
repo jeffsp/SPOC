@@ -15,6 +15,7 @@ struct args
 {
     bool help = false;
     bool verbose = false;
+    bool version = false;
     bool quiet = false;
     int point_id = -1;
     std::vector<std::string> fns;
@@ -29,12 +30,13 @@ inline args get_args (int argc, char **argv, const std::string &usage)
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
+            {"version", no_argument, 0, 'e'},
             {"quiet", no_argument, 0, 'q'},
             {"point-id", required_argument, 0, 'p'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvqp:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hveqp:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -51,6 +53,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 return args;
             }
             case 'v': args.verbose = true; break;
+            case 'e': args.version = true; break;
             case 'q': args.quiet = !args.quiet; break;
             case 'p': args.point_id = std::atoi (optarg); break;
         }

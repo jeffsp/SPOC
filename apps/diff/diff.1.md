@@ -23,7 +23,10 @@ otherwise return a success code (0);
 \-\-verbose, -v
 :   Set verbose mode ON
 
-\-\-header-only, -e
+\-\-version, -e
+:   Print version information and exit
+
+\-\-header-only, -a
 : Only compare the headers
 
 \-\-data-only, -d

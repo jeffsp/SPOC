@@ -95,7 +95,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
 - [X] Cppcheck
 - [X] read/write spoc files
 - [X] read/write las files
-- [ ] Add --version to all apps
+- [X] Add --version option to all apps
 - [X] spoc info
   - [X] Header/summary
   - [X] Unit/integration tests

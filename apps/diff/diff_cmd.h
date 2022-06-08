@@ -15,6 +15,7 @@ struct args
 {
     bool help = false;
     bool verbose = false;
+    bool version = false;
     bool header_only = false;
     bool data_only = false;
     std::vector<int> fields;
@@ -32,14 +33,15 @@ inline args get_args (int argc, char **argv, const std::string &usage)
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
-            {"header-only", no_argument, 0, 'e'},
+            {"version", no_argument, 0, 'e'},
+            {"header-only", no_argument, 0, 'a'},
             {"data-only", no_argument, 0, 'd'},
             {"field", required_argument, 0, 'f'},
             {"reverse", no_argument, 0, 'r'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvedf:r", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hveadf:r", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -56,7 +58,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 return args;
             }
             case 'v': args.verbose = true; break;
-            case 'e': args.header_only = true; break;
+            case 'e': args.version = true; break;
+            case 'a': args.header_only = true; break;
             case 'd': args.data_only = true; break;
             case 'f':
             {

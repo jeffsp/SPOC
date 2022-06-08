@@ -22,6 +22,9 @@ Decompress a spoc file.
 \-\-verbose, -v
 :   Set verbose mode ON
 
+\-\-version, -e
+:   Print version information and exit
+
 # SEE ALSO
 
 SPOC_COMPRESS(1)

@@ -17,6 +17,17 @@ int main (int argc, char **argv)
         const cmd::args args = cmd::get_args (argc, argv,
                 string (argv[0]) + " [options] spocfile lasfile");
 
+        // If version was requested, print it and exit
+        if (args.version)
+        {
+            clog << "Version "
+                << static_cast<int> (MAJOR_VERSION)
+                << "."
+                << static_cast<int> (MINOR_VERSION)
+                << endl;
+            return 0;
+        }
+
         // If you are getting help, exit without an error
         if (args.help)
             return 0;

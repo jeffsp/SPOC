@@ -29,6 +29,9 @@ This is the same format used by the ASPRS LAS 1.4 standard.
 \-\-verbose, -v
 :   Set verbose mode ON
 
+\-\-version, -e
+:   Print version information and exit
+
 \-\-srs=*string*, -s *string*
 :   Set the SRS string
 

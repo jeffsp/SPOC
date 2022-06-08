@@ -15,6 +15,7 @@ struct args
 {
     bool help = false;
     bool verbose = false;
+    bool version = false;
     bool json = false;
     bool header_info = true;
     bool summary_info = true;
@@ -32,15 +33,16 @@ inline args get_args (int argc, char **argv, const std::string &usage)
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
+            {"version", no_argument, 0, 'e'},
             {"json", no_argument, 0, 'j'},
-            {"header-info", no_argument, 0, 'e'},
+            {"header-info", no_argument, 0, 'a'},
             {"summary-info", no_argument, 0, 's'},
             {"classifications", no_argument, 0, 'l'},
             {"compact", no_argument, 0, 'c'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvjeslc", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvejaslc", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -57,8 +59,9 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 return args;
             }
             case 'v': args.verbose = true; break;
+            case 'e': args.version = true; break;
             case 'j': args.json = !args.json; break;
-            case 'e': args.header_info = !args.header_info; break;
+            case 'a': args.header_info = !args.header_info; break;
             case 's': args.summary_info = !args.summary_info; break;
             case 'l': args.classifications = !args.classifications; break;
             case 'c': args.compact = !args.compact; break;

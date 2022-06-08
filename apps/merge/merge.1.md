@@ -26,6 +26,9 @@ written to stdout.
 \-\-verbose, -v
 :   Set verbose mode ON
 
+\-\-version, -e
+:   Print version information and exit
+
 \-\-quiet, -q
 :   Don't produce warnings when common mistakes are detected
 

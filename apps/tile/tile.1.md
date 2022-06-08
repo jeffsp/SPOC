@@ -42,6 +42,9 @@ to force overwrites.
 \-\-verbose, -v
 :   Set verbose mode ON
 
+\-\-version, -e
+:   Print version information and exit
+
 \-\-force, -f
 :   Force overwrites of existing files.
 

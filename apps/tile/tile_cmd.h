@@ -14,6 +14,7 @@ struct args
 {
     bool help = false;
     bool verbose = false;
+    bool version = false;
     bool force = false;
     unsigned tiles = 2;
     unsigned digits = 3;
@@ -31,6 +32,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
+            {"version", no_argument, 0, 'e'},
             {"force", no_argument, 0, 'f'},
             {"tiles", required_argument, 0, 't'},
             {"digits", required_argument, 0, 'd'},
@@ -39,7 +41,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvft:d:s:p:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hveft:d:s:p:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -56,6 +58,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 return args;
             }
             case 'v': args.verbose = true; break;
+            case 'e': args.version = true; break;
             case 'f': args.force = true; break;
             case 't': args.tiles = atoi (optarg); break;
             case 'd': args.digits = atoi (optarg); break;

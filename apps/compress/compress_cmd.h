@@ -14,6 +14,7 @@ struct args
 {
     bool help = false;
     bool verbose = false;
+    bool version = false;
     std::string input_fn;
     std::string output_fn;
 };
@@ -27,10 +28,11 @@ inline args get_args (int argc, char **argv, const std::string &usage)
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
+            {"version", no_argument, 0, 'e'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hv", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hve", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -46,11 +48,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 args.help = true;
                 return args;
             }
-            case 'v':
-            {
-                args.verbose = true;
-                break;
-            }
+            case 'v': { args.verbose = true; break; }
+            case 'e': { args.version = true; break; }
         }
     }
 

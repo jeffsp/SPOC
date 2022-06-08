@@ -22,6 +22,9 @@ Collection of tools to run on a SPOC file
 \-\-verbose, -v
 :   Set verbose mode ON
 
+\-\-version, -e
+:   Print version information and exit
+
 # COMMANDS
 
 \-\-quantize-xyz=*#*
