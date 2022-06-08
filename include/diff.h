@@ -74,11 +74,11 @@ inline int diff (const spoc_file &f1,
             return_code = -1;
         else if (get_b (f1.get_point_records ()) != get_b (f2.get_point_records ()))
             return_code = -1;
-        else if (get_extra_size (f1.get_point_records ()) != get_extra_size (f2.get_point_records ()))
+        else if (get_extra_fields_size (f1.get_point_records ()) != get_extra_fields_size (f2.get_point_records ()))
             return_code = -1;
         else
         {
-            for (size_t k = 0; k < get_extra_size (f1.get_point_records ()); ++k)
+            for (size_t k = 0; k < get_extra_fields_size (f1.get_point_records ()); ++k)
             {
                 if (get_extra (k, f1.get_point_records ()) != get_extra (k, f2.get_point_records ()))
                     return_code = -1;
@@ -153,8 +153,8 @@ inline int diff (const spoc_file &f1,
                 case '8':
                 case '9': {
                               const size_t index = field - '0';
-                              if (index < get_extra_size (f1.get_point_records ())
-                                    && index < get_extra_size (f2.get_point_records ())
+                              if (index < get_extra_fields_size (f1.get_point_records ())
+                                    && index < get_extra_fields_size (f2.get_point_records ())
                                     && (get_extra (index, f1.get_point_records ()) != get_extra (index, f2.get_point_records ())))
                                   return_code = -1;
                               break;

@@ -25,7 +25,7 @@ void quantize (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = read_point_record (is, h.extra_size);
+        auto p = read_point_record (is, h.extra_fields);
 
         // Quantize the point
         p.x = static_cast<int> (p.x / precision) * precision;
@@ -49,7 +49,7 @@ void recenter (std::istream &is,
     // Read the data
     point_records p (n);
     for (size_t i = 0; i < p.size (); ++i)
-        p[i] = read_point_record (is, h.extra_size);
+        p[i] = read_point_record (is, h.extra_fields);
 
     // Get X, Y, and Z
     const auto x = get_x (p);
@@ -89,7 +89,7 @@ void replace (std::istream &is,
     // Read the data
     point_records p (n);
     for (size_t i = 0; i < p.size (); ++i)
-        p[i] = read_point_record (is, h.extra_size);
+        p[i] = read_point_record (is, h.extra_fields);
 
     switch (field_name)
     {
@@ -144,7 +144,7 @@ void set (std::istream &is,
     // Read the data
     point_records p (n);
     for (size_t i = 0; i < p.size (); ++i)
-        p[i] = read_point_record (is, h.extra_size);
+        p[i] = read_point_record (is, h.extra_fields);
 
     // Set the values
     switch (field_name)
@@ -198,7 +198,7 @@ void subtract_min (std::istream &is,
     // Read the data
     point_records p (n);
     for (size_t i = 0; i < p.size (); ++i)
-        p[i] = read_point_record (is, h.extra_size);
+        p[i] = read_point_record (is, h.extra_fields);
 
     // Get X, Y, and Z
     const auto x = get_x (p);

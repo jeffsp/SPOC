@@ -81,7 +81,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
 - [X] Add NEXTRA field in header
 - [X] Allow arbitrary number of extra fields
 - [ ] Revisit compression rules/defaults for reading and writing
-- [ ] Rename 'extra_size' -> 'extra_fields'
+- [X] Rename 'extra_size' -> 'extra_fields'
 - [X] Create interface to spoc\_file, so header file size and point
       vector size do not get out of line. Same for 'extra_size'
 - [X] Gitlab runner

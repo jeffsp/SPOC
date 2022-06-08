@@ -100,10 +100,10 @@ void test_point_record ()
 void test_spoc_file ()
 {
     const size_t total_points = 1000;
-    const size_t extra_size = 3;
-    auto p = generate_random_point_records (total_points, extra_size);
-    p[100].extra.resize (extra_size + 1);
-    spoc::header h ("WKT", extra_size, total_points, false);
+    const size_t extra_fields = 3;
+    auto p = generate_random_point_records (total_points, extra_fields);
+    p[100].extra.resize (extra_fields + 1);
+    spoc::header h ("WKT", extra_fields, total_points, false);
 
     bool failed = false;
     try { spoc_file f (h, p); }
@@ -131,14 +131,14 @@ void test_spoc_file ()
     { failed = true; }
     verify (failed);
 
-    spoc::header h2 ("WKT", extra_size, total_points + 1, false);
+    spoc::header h2 ("WKT", extra_fields, total_points + 1, false);
     failed = false;
     try { spoc_file f (h2, p); }
     catch (...)
     { failed = true; }
     verify (failed);
 
-    spoc::header h3 ("WKT", extra_size + 1, total_points, false);
+    spoc::header h3 ("WKT", extra_fields + 1, total_points, false);
     failed = false;
     try { spoc_file f (h3, p); }
     catch (...)
@@ -147,8 +147,8 @@ void test_spoc_file ()
 
     {
     const size_t total_points = 100;
-    const size_t extra_size = 3;
-    auto p = generate_random_point_records (total_points, extra_size);
+    const size_t extra_fields = 3;
+    auto p = generate_random_point_records (total_points, extra_fields);
     const string wkt = "Test wkt";
     auto f = spoc_file (wkt, p);
     f.set_wkt ("Test WKT 2");
@@ -163,8 +163,8 @@ void test_spoc_file ()
 void test_spoc_file_io ()
 {
     const size_t total_points = 1000;
-    const size_t extra_size = 8;
-    auto p = generate_random_point_records (total_points, extra_size);
+    const size_t extra_fields = 8;
+    auto p = generate_random_point_records (total_points, extra_fields);
 
     {
     stringstream s;
@@ -197,8 +197,8 @@ void test_spoc_file_io ()
 void test_spoc_file_compressed_io ()
 {
     const size_t total_points = 1000;
-    const size_t extra_size = 8;
-    auto p = generate_random_point_records (total_points, extra_size);
+    const size_t extra_fields = 8;
+    auto p = generate_random_point_records (total_points, extra_fields);
 
     {
     stringstream s;

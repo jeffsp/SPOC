@@ -34,7 +34,7 @@ int main (int argc, char **argv)
         for (size_t i = 0; i < h.total_points; ++i)
         {
             // Read a point
-            const auto p = read_point_record (cin, h.extra_size);
+            const auto p = read_point_record (cin, h.extra_fields);
 
             // Do something to the point
 

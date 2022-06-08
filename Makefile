@@ -38,6 +38,7 @@ build: ./build/debug/Makefile laslib
 clean:
 	@echo "Cleaning..."
 	@rm -rf build
+	@$(MAKE) -C examples clean
 
 .PHONY: unit_test
 unit_test: BUILD=debug

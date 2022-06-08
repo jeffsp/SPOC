@@ -20,11 +20,11 @@ namespace spoc
 struct header
 {
     header (const std::string &wkt,
-            const size_t extra_size,
+            const size_t extra_fields,
             const size_t total_points,
             const bool compressed)
         : wkt (wkt)
-        , extra_size (extra_size)
+        , extra_fields (extra_fields)
         , total_points (total_points)
         , compressed (compressed)
     {
@@ -50,7 +50,7 @@ struct header
     uint8_t major_version = MAJOR_VERSION;
     uint8_t minor_version = MINOR_VERSION;
     std::string wkt;
-    size_t extra_size;
+    size_t extra_fields;
     size_t total_points;
     uint8_t compressed;
 };
@@ -66,7 +66,7 @@ inline std::ostream &operator<< (std::ostream &s, const header &h)
         << static_cast<int> (h.minor_version)
         << std::endl;
     s << h.wkt << std::endl;
-    s << "extra_size " << h.extra_size << std::endl;
+    s << "extra_fields " << h.extra_fields << std::endl;
     s << "total_points " << h.total_points << std::endl;
     s << "compressed " << (h.compressed ? "true" : "false")  << std::endl;
     return s;
@@ -81,7 +81,7 @@ inline bool operator== (const header &a, const header &b)
     if (a.major_version != b.major_version) return false;
     if (a.minor_version != b.minor_version) return false;
     if (a.wkt != b.wkt) return false;
-    if (a.extra_size != b.extra_size) return false;
+    if (a.extra_fields != b.extra_fields) return false;
     if (a.total_points != b.total_points) return false;
     if (a.compressed != b.compressed) return false;
     return true;
@@ -98,7 +98,7 @@ inline void write_header (std::ostream &s, const header &h)
     const uint64_t len = h.wkt.size ();
     s.write (reinterpret_cast<const char*>(&len), sizeof(uint64_t));
     s.write (reinterpret_cast<const char*>(&h.wkt[0]), h.wkt.size ());
-    s.write (reinterpret_cast<const char*>(&h.extra_size), sizeof(uint64_t));
+    s.write (reinterpret_cast<const char*>(&h.extra_fields), sizeof(uint64_t));
     s.write (reinterpret_cast<const char*>(&h.total_points), sizeof(uint64_t));
     s.write (reinterpret_cast<const char*>(&h.compressed), sizeof(uint8_t));
     s.flush ();
@@ -117,7 +117,7 @@ inline header read_header (std::istream &s)
     s.read (reinterpret_cast<char*>(&len), sizeof(uint64_t));
     h.wkt.resize (len);
     s.read (reinterpret_cast<char*>(&h.wkt[0]), len);
-    s.read (reinterpret_cast<char*>(&h.extra_size), sizeof(uint64_t));
+    s.read (reinterpret_cast<char*>(&h.extra_fields), sizeof(uint64_t));
     s.read (reinterpret_cast<char*>(&h.total_points), sizeof(uint64_t));
     s.read (reinterpret_cast<char*>(&h.compressed), sizeof(uint8_t));
     return h;
@@ -144,11 +144,11 @@ struct point_record
         , extra (0)
     {
     }
-    explicit point_record (const size_t extra_size)
+    explicit point_record (const size_t extra_fields)
         : x (0.0) , y (0.0) , z (0.0)
         , c (0) , p (0) , i (0)
         , r (0) , g (0) , b (0)
-        , extra (extra_size)
+        , extra (extra_fields)
     {
     }
 };
@@ -182,10 +182,10 @@ inline void write_point_record (std::ostream &s, const point_record &p)
 }
 
 // Record I/O
-inline point_record read_point_record (std::istream &s, const size_t extra_size)
+inline point_record read_point_record (std::istream &s, const size_t extra_fields)
 {
     point_record p;
-    p.extra.resize (extra_size);
+    p.extra.resize (extra_fields);
     s.read (reinterpret_cast<char*>(&p.x), sizeof(double));
     s.read (reinterpret_cast<char*>(&p.y), sizeof(double));
     s.read (reinterpret_cast<char*>(&p.z), sizeof(double));
@@ -233,11 +233,11 @@ bool check_records (const point_records &prs)
         return true;
 
     // Make sure they all have the same number of extra fields
-    const size_t extra_size = prs[0].extra.size ();
+    const size_t extra_fields = prs[0].extra.size ();
 
     if (std::any_of (prs.cbegin(), prs.cend(),
         [&](const point_record &p)
-        { return p.extra.size () != extra_size; }))
+        { return p.extra.size () != extra_fields; }))
         return false;
 
     return true;
@@ -385,7 +385,7 @@ std::vector<uint16_t> get_b (const point_records &p)
     return x;
 }
 
-size_t get_extra_size (const point_records &p)
+size_t get_extra_fields_size (const point_records &p)
 {
     if (p.empty ())
         return 0;
@@ -415,7 +415,7 @@ class spoc_file
         , p (p)
     {
         if (!p.empty ())
-            h.extra_size = p[0].extra.size ();
+            h.extra_fields = p[0].extra.size ();
         if (!check_records (p))
             throw std::runtime_error ("The point records are inconsistent");
     }
@@ -429,8 +429,8 @@ class spoc_file
     {
         if (h.total_points != p.size ())
             throw std::runtime_error ("The header total points does not match the data total points");
-        if (!p.empty () && p[0].extra.size () != h.extra_size)
-            throw std::runtime_error ("The header extra size does not match the point records");
+        if (!p.empty () && p[0].extra.size () != h.extra_fields)
+            throw std::runtime_error ("The header extra fields size does not match the point records");
         if (!check_records (p))
             throw std::runtime_error ("The point records are inconsistent");
     }
@@ -462,7 +462,7 @@ class spoc_file
     {
         for (size_t i = 0; i < p.size (); ++i)
             p[i].extra.resize (new_size);
-        h.extra_size = new_size;
+        h.extra_fields = new_size;
     }
 
     // R/W access
@@ -487,7 +487,7 @@ inline spoc_file read_spoc_file_uncompressed (std::istream &s)
     point_records p;
     p.resize (h.total_points);
     for (size_t i = 0; i < p.size (); ++i)
-        p[i] = read_point_record (s, h.extra_size);
+        p[i] = read_point_record (s, h.extra_fields);
 
     return spoc_file (h, p);
 }
@@ -516,7 +516,7 @@ inline spoc_file read_spoc_file_compressed (std::istream &s)
     std::vector<uint16_t> g = read_compressed<uint16_t> (s, h.total_points);
     std::vector<uint16_t> b = read_compressed<uint16_t> (s, h.total_points);
 
-    std::vector<std::vector<uint64_t>> extra (h.extra_size);
+    std::vector<std::vector<uint64_t>> extra (h.extra_fields);
     for (size_t j = 0; j < extra.size (); ++j)
         extra[j] = read_compressed<uint64_t> (s, h.total_points);
 
@@ -535,7 +535,7 @@ inline spoc_file read_spoc_file_compressed (std::istream &s)
         if (!r.empty ()) prs[n].r = r[n];
         if (!g.empty ()) prs[n].g = g[n];
         if (!b.empty ()) prs[n].b = b[n];
-        prs[n].extra.resize (h.extra_size);
+        prs[n].extra.resize (h.extra_fields);
         for (size_t j = 0; j < prs[n].extra.size (); ++j)
             if (!extra[j].empty ()) prs[n].extra[j] = extra[j][n];
     }
@@ -575,7 +575,7 @@ inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
 
     // Stuff the data into vectors
     const size_t total_points = prs.size ();
-    const size_t extra_size = prs.empty ()
+    const size_t extra_fields = prs.empty ()
         ? 0
         : prs[0].extra.size ();
     std::vector<double> x (total_points);
@@ -587,7 +587,7 @@ inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
     std::vector<uint16_t> r (total_points);
     std::vector<uint16_t> g (total_points);
     std::vector<uint16_t> b (total_points);
-    std::vector<std::vector<uint64_t>> e (extra_size, std::vector<uint64_t>(total_points));
+    std::vector<std::vector<uint64_t>> e (extra_fields, std::vector<uint64_t>(total_points));
 
     for (size_t n = 0; n < total_points; ++n)
     {
@@ -600,7 +600,7 @@ inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
         r[n] = prs[n].r;
         g[n] = prs[n].g;
         b[n] = prs[n].b;
-        for (size_t j = 0; j < extra_size; ++j)
+        for (size_t j = 0; j < extra_fields; ++j)
             e[j][n] = prs[n].extra[j];
     }
 

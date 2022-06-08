@@ -17,10 +17,10 @@ int main (int argc, char **argv)
     {
         // Create a header with effectively infinite points
         const string wkt = "Test WKT";
-        const size_t extra_size = 4;
+        const size_t extra_fields = 4;
         const size_t total_points = numeric_limits<size_t>::max ();
         const bool compressed = false;
-        header h (wkt, extra_size, total_points, compressed);
+        header h (wkt, extra_fields, total_points, compressed);
 
         // Write it
         write_header (cout, h);
@@ -36,7 +36,7 @@ int main (int argc, char **argv)
         for/*ever*/ (;;)
         {
             // Create a point record with a random location
-            point_record p (extra_size);
+            point_record p (extra_fields);
 
             // Assign a random location
             p.x = d (g);

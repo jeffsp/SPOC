@@ -169,7 +169,7 @@ void process (std::ostream &os,
             s["g"] = get_summary_object<uint16_t> (get_g (f.get_point_records ()));
             s["b"] = get_summary_object<uint16_t> (get_b (f.get_point_records ()));
             json::array a;
-            for (size_t k = 0; k < get_extra_size (f.get_point_records ()); ++k)
+            for (size_t k = 0; k < get_extra_fields_size (f.get_point_records ()); ++k)
                 a.push_back (get_summary_object<uint64_t> (get_extra (k, f.get_point_records ())));
             s["extra"] = a;
             j["summary"] = s;
@@ -214,7 +214,7 @@ void process (std::ostream &os,
             os << get_summary_string<uint16_t> ("r\t", get_r (f.get_point_records ()), compact);
             os << get_summary_string<uint16_t> ("g\t", get_g (f.get_point_records ()), compact);
             os << get_summary_string<uint16_t> ("b\t", get_b (f.get_point_records ()), compact);
-            for (size_t k = 0; k < get_extra_size (f.get_point_records ()); ++k)
+            for (size_t k = 0; k < get_extra_fields_size (f.get_point_records ()); ++k)
             {
                 stringstream s;
                 s.precision (3);

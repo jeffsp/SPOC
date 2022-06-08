@@ -77,10 +77,10 @@ void test_tool_replace ()
     {
         // Generate spoc files
         const size_t total_points = 100;
-        const size_t extra_size = 8;
-        auto f = generate_random_spoc_file (total_points, extra_size, false, rgb);
+        const size_t extra_fields = 8;
+        auto f = generate_random_spoc_file (total_points, extra_fields, false, rgb);
         for (size_t i = 0; i < total_points; ++i)
-            for (size_t j = 0; j < extra_size; ++j)
+            for (size_t j = 0; j < extra_fields; ++j)
                 f[i].extra[j] = f[i].extra[j] % 5;
 
         for (auto v1 : { 1.0, 2.0, 3.0, 4.0, 5.0 })
