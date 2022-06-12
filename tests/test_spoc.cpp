@@ -158,6 +158,34 @@ void test_spoc_file ()
         f.set_point_record (i, q);
     }
     }
+
+    {
+    const size_t total_points = 100;
+    const size_t extra_fields = 3;
+    auto p = generate_random_point_records (total_points, extra_fields);
+    const string wkt = "Test wkt";
+    auto f = spoc_file (wkt, p);
+    // Make the size check fail
+    auto q = f.get_point_record (0);
+    q.extra.resize (extra_fields + 1);
+    f.set_point_record (0, q);
+    f.set_compressed (true);
+    bool failed = false;
+    stringstream s;
+    try {
+        f.set_compressed (false);
+        write_spoc_file_uncompressed (s, f);
+    }
+    catch (...) { failed = true; }
+    verify (failed);
+    failed = false;
+    try {
+        f.set_compressed (true);
+        write_spoc_file_compressed (s, f);
+    }
+    catch (...) { failed = true; }
+    verify (failed);
+    }
 }
 
 void test_spoc_file_io ()
@@ -274,6 +302,21 @@ void test_spoc_file_compressed_io ()
     }
 }
 
+void test_field_name ()
+{
+    string s = "e100";
+    auto i = get_extra_index (s);
+    verify (i == 100);
+    i = get_extra_index ("x100");
+    verify (i == -1);
+    i = get_extra_index ("exyz");
+    verify (i == -1);
+    verify (check_field_name ("e10000") == true);
+    verify (check_field_name ("x10000") == false);
+    verify (check_field_name ("e0") == true);
+    verify (check_field_name ("exxx") == false);
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -283,6 +326,7 @@ int main (int argc, char **argv)
         test_spoc_file ();
         test_spoc_file_io ();
         test_spoc_file_compressed_io ();
+        test_field_name ();
         return 0;
     }
     catch (const exception &e)

@@ -98,13 +98,17 @@ void replace (std::istream &is,
 
     switch (field_name[0])
     {
+        // GCOV_EXCL_START
         default:
         {
+            // This a logic error. If you get here, it means that
+            // check_field_name() did not do its job.
             std::string s ("Unknown field name '");
             s += field_name;
             s += "'";
             throw std::runtime_error (s);
         }
+        // GCOV_EXCL_STOP
         case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
         case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
         case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
@@ -157,13 +161,17 @@ void set (std::istream &is,
     // Set the values
     switch (field_name[0])
     {
+        // GCOV_EXCL_START
         default:
         {
+            // This a logic error. If you get here, it means that
+            // check_field_name() did not do its job.
             std::string s ("Unknown field name '");
             s += field_name;
             s += "'";
             throw std::runtime_error (s);
         }
+        // GCOV_EXCL_STOP
         case 'x': for (size_t i = 0; i < n; ++i) p[i].x = v; break;
         case 'y': for (size_t i = 0; i < n; ++i) p[i].y = v; break;
         case 'z': for (size_t i = 0; i < n; ++i) p[i].z = v; break;
