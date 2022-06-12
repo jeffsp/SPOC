@@ -87,23 +87,23 @@ void test_tool_replace ()
         {
             for (auto v2 : { 1.0, 2.0, 3.0, 4.0, 5.0 })
             {
-                for (auto c : { 'c', 'p', 'i', 'r', 'g', 'b',
-                        '0', '1', '2', '3', '4', '5', '6', '7' })
+                for (auto fn : { "c", "p", "i", "r", "g", "b",
+                        "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7" })
                 {
                     stringstream is, os;
                     write_spoc_file_uncompressed (is, f);
                     header h = read_header (is);
-                    replace (is, os, h, c, v1, v2);
+                    replace (is, os, h, fn, v1, v2);
                     const auto g = read_spoc_file_uncompressed (os);
                 }
-                for (auto c : { 'x', 'y', 'z', 'q', 'w', '8'})
+                for (auto fn : { "x", "y", "z", "q", "w", "e8"})
                 {
                     bool failed = false;
                     try {
                         stringstream is, os;
                         write_spoc_file_uncompressed (is, f);
                         header h = read_header (is);
-                        replace (is, os, h, c, v1, v2);
+                        replace (is, os, h, fn, v1, v2);
                         const auto g = read_spoc_file_uncompressed (os);
                     }
                     catch (...) { failed = true; }
@@ -121,9 +121,9 @@ void test_tool_set ()
         // Generate spoc files
         auto f = generate_random_spoc_file (100, 8, false, rgb);
 
-        for (auto c : { 'x', 'y', 'z',
-                'c', 'p', 'i', 'r', 'g', 'b',
-                '0', '1', '2', '3', '4', '5', '6', '7' })
+        for (auto c : { "x", "y", "z",
+                "c", "p", "i", "r", "g", "b",
+                "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7" })
         {
             stringstream is, os;
             write_spoc_file_uncompressed (is, f);
@@ -131,7 +131,7 @@ void test_tool_set ()
             set (is, os, h, c, 123);
             const auto g = read_spoc_file_uncompressed (os);
         }
-        for (auto c : { 'q', 'w', '9'})
+        for (auto c : { "q", "w", "e9"})
         {
             bool failed = false;
             try {

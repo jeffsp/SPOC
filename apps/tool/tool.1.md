@@ -40,10 +40,14 @@ Collection of tools to run on a SPOC file
 :   Same as recenter-xy, but also recenter the Z value
 
 \-\-replace=*F*,*A*,*B*
-:   Replace field *F* whose values are *A* to the value *B*
+:   Replace field *F* whose values are *A* to the value *B*. *F* can be
+    one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or 'e#', where the
+    '#' after the 'e' specifies the extra field number.
 
 \-\-set=*F*,*#*
-:   Set the field *F* to *#*
+:   Set the field *F* to *#*. *F* can be one of 'x', 'y', 'z', 'c', 'p',
+    'i', 'r', 'g', 'b', or 'e#', where the '#' after the 'e' specifies
+    the extra field number.
 
 \-\-subtract-min-xy
 :   Subtract minimum X and Y values from all X and Y values, thereby

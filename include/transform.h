@@ -79,10 +79,15 @@ void recenter (std::istream &is,
 void replace (std::istream &is,
     std::ostream &os,
     const spoc::header &h,
-    const char field_name,
+    const std::string &field_name,
     const double v1,
     const double v2)
 {
+    // Check the arguments
+    if (!check_field_name (field_name))
+        throw std::runtime_error (std::string ("Invalid field name: ")
+            + field_name);
+
     // Get number of points
     const size_t n = h.total_points;
 
@@ -91,7 +96,7 @@ void replace (std::istream &is,
     for (size_t i = 0; i < p.size (); ++i)
         p[i] = read_point_record (is, h.extra_fields);
 
-    switch (field_name)
+    switch (field_name[0])
     {
         default:
         {
@@ -109,19 +114,17 @@ void replace (std::istream &is,
         case 'r': for (size_t i = 0; i < n; ++i) if (p[i].r == v1) p[i].r = v2; break;
         case 'g': for (size_t i = 0; i < n; ++i) if (p[i].g == v1) p[i].g = v2; break;
         case 'b': for (size_t i = 0; i < n; ++i) if (p[i].b == v1) p[i].b = v2; break;
-        case '0': case '1': case '2': case '3':
-        case '4': case '5': case '6': case '7':
-        case '8': case '9':
+        case 'e': // extra
         {
-              const size_t j = field_name - '0';
-              for (size_t i = 0; i < n; ++i)
-              {
-                  if (j >= p[i].extra.size ())
-                      throw std::runtime_error ("Specified extra index is too large");
-                  if (p[i].extra[j] == v1)
-                      p[i].extra[j] = v2;
-              }
-              break;
+            const size_t j = get_extra_index (field_name);
+            for (size_t i = 0; i < n; ++i)
+            {
+                if (j >= p[i].extra.size ())
+                    throw std::runtime_error ("Specified extra index is too large");
+                if (p[i].extra[j] == v1)
+                    p[i].extra[j] = v2;
+            }
+            break;
         }
     }
 
@@ -135,9 +138,14 @@ void replace (std::istream &is,
 void set (std::istream &is,
     std::ostream &os,
     const spoc::header &h,
-    const char field_name,
+    const std::string &field_name,
     const double v)
 {
+    // Check the arguments
+    if (!check_field_name (field_name))
+        throw std::runtime_error (std::string ("Invalid field name: ")
+            + field_name);
+
     // Get number of points
     const size_t n = h.total_points;
 
@@ -147,7 +155,7 @@ void set (std::istream &is,
         p[i] = read_point_record (is, h.extra_fields);
 
     // Set the values
-    switch (field_name)
+    switch (field_name[0])
     {
         default:
         {
@@ -165,18 +173,16 @@ void set (std::istream &is,
         case 'r': for (size_t i = 0; i < n; ++i) p[i].r = v; break;
         case 'g': for (size_t i = 0; i < n; ++i) p[i].g = v; break;
         case 'b': for (size_t i = 0; i < n; ++i) p[i].b = v; break;
-        case '0': case '1': case '2': case '3':
-        case '4': case '5': case '6': case '7':
-        case '8': case '9':
+        case 'e': // extra
         {
-              const size_t j = field_name - '0';
-              for (size_t i = 0; i < n; ++i)
-              {
-                  if (j >= p[i].extra.size ())
-                      throw std::runtime_error ("Specified extra index is too large");
-                  p[i].extra[j] = v;
-              }
-              break;
+            const size_t j = get_extra_index (field_name);
+            for (size_t i = 0; i < n; ++i)
+            {
+                if (j >= p[i].extra.size ())
+                    throw std::runtime_error ("Specified extra index is too large");
+                p[i].extra[j] = v;
+            }
+            break;
         }
     }
 

@@ -2,33 +2,33 @@
 #include "spoc.h"
 #include "tool.h"
 #include "tool_cmd.h"
+#include <cctype>
 #include <iostream>
 #include <stdexcept>
 
 using namespace std;
 using namespace spoc;
 
-const std::set<char> field_chars {'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b'};
-
-bool check_field (const char f)
-{
-    if (field_chars.find (f) == field_chars.end ())
-        return false;
-    return true;
-}
-
-char consume_field (std::string &s)
+string consume_field_name (std::string &s)
 {
     // Get the field
-    const char c = s[0];
-    // Check it
-    if (!check_field (c))
-        throw std::runtime_error (std::string ("Invalid field name: ") + s);
-    // Make sure the next char is a ','
-    if (!check_field (c))
-        throw std::runtime_error (std::string ("Invalid field specification: ") + s);
-    s.erase (0, 2);
-    return c;
+    size_t i = 0;
+    char c = s[i];
+    string field_name;
+    while (isalnum (c))
+    {
+        field_name += c;
+        ++i;
+    }
+
+    // Make sure it's a valid name
+    if (!check_field_name (field_name))
+        throw runtime_error (std::string ("Invalid field name: " + field_name));
+
+    // Skip over the field name
+    s.erase (0, i);
+
+    return field_name;
 }
 
 int consume_int (std::string &s)
@@ -36,9 +36,7 @@ int consume_int (std::string &s)
     size_t sz = 0;
     int v = 0.0;
     try { v = std::stoi (s, &sz); }
-    catch (const std::invalid_argument &e) {
-        throw std::runtime_error (std::string ("Could not parse field string: ") + s);
-    }
+    catch (...) { throw std::runtime_error (std::string ("Could not parse field string: ") + s); }
     s.erase (0, sz + 1);
     return v;
 }
@@ -48,9 +46,7 @@ double consume_double (std::string &s)
     size_t sz = 0;
     double v = 0.0;
     try { v = std::stod (s, &sz); }
-    catch (const std::invalid_argument &e) {
-        throw std::runtime_error (std::string ("Could not parse field string: ") + s);
-    }
+    catch (...) { throw std::runtime_error (std::string ("Could not parse field string: ") + s); }
     s.erase (0, sz + 1);
     return v;
 }
@@ -117,7 +113,7 @@ int main (int argc, char **argv)
         else if (args.command.name == "replace")
         {
             std::string s = args.command.params;
-            const auto l = consume_field (s);
+            const auto l = consume_field_name (s);
             const auto v1 = consume_int (s);
             const auto v2 = consume_int (s);
             replace (is (), os (), h, l, v1, v2);
@@ -125,7 +121,7 @@ int main (int argc, char **argv)
         else if (args.command.name == "set")
         {
             std::string s = args.command.params;
-            const auto l = consume_field (s);
+            const auto l = consume_field_name (s);
             const auto v = consume_double (s);
             spoc::transform::set (is (), os (), h, l, v);
         }

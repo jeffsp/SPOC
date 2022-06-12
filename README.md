@@ -134,7 +134,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
           Note that copying X,Y,Z is useful for unrotating/uncentering
           a point cloud after performing transformations
           The point clouds must have the same number of points
-    - [ ] Allow string field specifications for extra[0..N]
+    - [X] Allow string field specifications for extra[0..N]
     - [ ] Use the voxel indexes in extra[0,1,2] for aligning points when
           the point clouds contain a different number of points.
           1. Generate voxel indexes 2. subsample using those indexes. 3. restore
@@ -145,6 +145,7 @@ The proposed extension is SPOC, or Simple POint Cloud.
         cloud will have the same number of points and the points will be in
         the same order. Transformations occur in the order in which they
         were encounterd on the command line.
+    - [X] Allow string field specifications for extra[0..N]
     - [X] Allow arbitrary operations using a transformer interface
     - [X] Add support for a two pass filter so that points can be
           changed based upon global point cloud properties, e.g.: add a
