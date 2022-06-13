@@ -224,7 +224,7 @@ void subtract_min (std::istream &is,
     const double miny = *std::min_element (begin (y), end (y));
     const double minz = z_flag ? *std::min_element (begin (z), end (z)) : 0.0;
 
-    // Subtract off mean x, y, z
+    // Subtract off min x, y, z
     for (size_t i = 0; i < n; ++i)
     {
         p[i].x -= minx;

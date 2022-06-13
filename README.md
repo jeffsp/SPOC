@@ -121,107 +121,85 @@ The proposed extension is SPOC, or Simple POint Cloud.
   - [X] Warn if the area of the merged file is too big
   - [X] Quiet (don't warn)
   - [X] Unit/integration tests
-- [ ] spoc\_tool
-  - [ ] Show progress
-  - [ ] Set random seed
-  - [X] Rewrite apps so that all I/O streams when possible
-  - [X] Commands executed in the order in which they appear on command line
+
+- [ ] spoc\_transform: These are all capable of streaming. The output
+      has the same number of points as the input
   - [X] Only allow one command at a time, multiple commands can be
         executed using pipes
-  - [ ] Copy: Copy fields in one point cloud to fields in another point cloud
-    - [ ] Specify reference point cloud
-    - [ ] Specify which fields to copy: all,x,y,z,c,p,i,r,g,b,extra
-          Note that copying X,Y,Z is useful for unrotating/uncentering
-          a point cloud after performing transformations
-          The point clouds must have the same number of points
-    - [X] Allow string field specifications for extra[0..N]
-    - [ ] Use the voxel indexes in extra[0,1,2] for aligning points when
-          the point clouds contain a different number of points.
-          1. Generate voxel indexes 2. subsample using those indexes. 3. restore
-          the points using the original voxel indexes
-          Note that this is useful for restoring points to a point cloud
-          that has been subsampled (decimated).
-  - [ ] Transformation: Change fields in a point cloud. The output point
-        cloud will have the same number of points and the points will be in
-        the same order. Transformations occur in the order in which they
-        were encounterd on the command line.
-    - [X] Allow string field specifications for extra[0..N]
-    - [X] Allow arbitrary operations using a transformer interface
-    - [X] Add support for a two pass filter so that points can be
-          changed based upon global point cloud properties, e.g.: add a
-          preprocess() function
-    - [X] Set fields: set f #
-    - [X] Replace fields: replace f # #
-    - [X] Recenter points about mean
-    - [X] Subtract minimum X, Y, and Z from all points: subtract-min
-    - [X] Quantize: round X, Y, Z to nearest Nth decimal place
-    - [ ] Get/Set field F as text
-    - [ ] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
-    - [ ] Add offset to X,Y,Z: addx/y/z #
-    - [ ] Scale by X,Y,Z: scale, scalex/y/z
-    - [ ] 2D/3D field smoothing - does not changes xyz coords
-          smooth f sigma
-    - [ ] Spatial smoothing - 2D/3D spatial filtering, changes 3D structure
-                           - Gaussian filter
-                           - Median filter
-                           - X, Y, Z
-    - [ ] Add random Gaussian noise to X,Y,Z
-    - [ ] Add random uniform noise to X,Y,Z
-    - [ ] Color by classification
-    - [ ] Color by elevation
-    - [ ] Color by segment
-    - [ ] Get/set palette
-  - [ ] Filtering: Remove points with certain properties
-    - [ ] Remove when field f==, <=, >=, <, > value
+  - [X] Allow string field specifications for extra[0..N]
+  - [X] Set fields: set f #
+  - [X] Replace fields: replace f # #
+  - [X] Quantize: round X, Y, Z to nearest Nth decimal place
+  - [ ] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
+  - [ ] Add offset to X,Y,Z: addx/y/z #
+  - [ ] Scale by X,Y,Z: scale, scalex/y/z
+  - [ ] Get/Set XYZ as text, integer or float
+  - [ ] Get/Set XYZ as binary, integer or float
+  - [ ] Get/Set field F as text, integer or float
+  - [ ] Get/Set field F as binary, integer or float
+  - [ ] Set random seed
+  - [ ] Add random Gaussian noise to X,Y,Z
+  - [ ] Add random uniform noise to X,Y,Z
+  - [ ] Color by classification
+  - [ ] Color by elevation
+  - [ ] Color by segment
+  - [ ] Get/set palette
+
+- [ ] spoc\_generate: Generate a value or vector for each point
+  - [ ] All generated values are written to stdout in binary format
+  - [ ] Output can be directed to a named pipe
+  - [ ] Generate grid indexes for each point
+    - [ ] Specify a projection plane, XY, XZ, YZ
+  - [ ] Generate voxel indexes for each point
+  - [ ] Generate connected component IDs based upon location and, optionally, other fields
+    - [ ] Connection radius
+    - [ ] Connection field(s)
+  - [ ] Generate cluster IDs based upon data fields, xyz, cpi, rgb, extra[n]:
+    - [ ] Save component ID to extra[n]
+    - [ ] Set value of K
+    - [ ] Use K means clustering
+    - [ ] Use spectral clustering
+    - [ ] Use Newman clustering
+  - [ ] Generate neighbor indexes within a radius
+    - [ ] Save the nearest K neighbors
+    - [ ] Randomly select K neighbors within the radius
+
+- [ ] spoc\_filter: Remove point records from a spoc file
+  - [ ] Remove when field f==, <=, >=, <, > value
+
+- [ ] spoc\_project: Project points onto a plane
+  - [ ] pixel data type, int/float, 8/16/32/64
+  - [ ] pixel size in m/pixel
+  - [ ] nodata value
+  - [ ] field: z, c, p, i, r, g, b, 0-7
+  - [ ] normalize output
+  - [ ] z-score output
+  - [ ] min/max/%quantile
+  - [ ] randomly select/vote
+  - [ ] geotiff output
+  - [ ] png output
+
+- [ ] spoc\_tool: Common operations that do not stream
+  - [X] Recenter points about mean
+  - [X] Subtract minimum X, Y, and Z from all points: subtract-min
+  - [ ] Use the voxel indexes for aligning points when
+        the point clouds contain a different number of points.
+        1. Generate voxel indexes 2. subsample using those indexes. 3. restore
+        the points using the original voxel indexes
+        Note that this is useful for restoring points to a point cloud
+        that has been subsampled (decimated).
+  - [ ] 2D/3D field smoothing - does not changes xyz coords
+        smooth f sigma
+  - [ ] Spatial smoothing - 2D/3D spatial filtering, changes 3D structure
+                          - Gaussian filter
+                          - Median filter
+                          - X, Y, Z
     - [ ] Unique / Subsample: Remove points
       - [ ] Uniform random selection of duplicates
       - [ ] Remove duplicates with same X, Y, Z values
       - [ ] Remove duplicates with same voxel indexes in extra[0,1,2] fields
       - [ ] Keep N (default=1) duplicates
-    - [X] Allow arbitrary operations using a filter interface and pipes
-    - [X] Add support for point removal in filter interface by adding a
-          function that accepts a vector of point records and returns a
-          filtered vector of point records
-  - [ ] Generation: Generate data for each point
-    - [ ] Generate grid indexes for each point
-      - [ ] Specify a projection plane
-      - [ ] Save in extra[0,1]
-      - [ ] Append to extra[-1]
-      - [ ] Save as text
-    - [ ] Generate voxel indexes for each point
-      - [ ] Save in extra[0..2]
-      - [ ] Append to extra[-1]
-      - [ ] Save as text
-    - [ ] Perform a principal components analysis
-      - [ ] Compute within voxels
-      - [ ] Set the PCA radius
-      - [ ] Save in extra[0..11]
-      - [ ] Append to extra[-1]
-      - [ ] Save as text
-    - [ ] Generate connected component IDs based upon location and, optionally, other fields
-      - [ ] Save component ID to extra[n]
-      - [ ] Connection radius
-      - [ ] Connection field(s)
-    - [ ] Generate cluster IDs based upon data fields, xyz, cpi, rgb, extra[n]:
-      - [ ] Save component ID to extra[n]
-      - [ ] Set value of K
-      - [ ] Use K means clustering
-      - [ ] Use spectral clustering
-      - [ ] Use Newman clustering
-    - [ ] Generate neighbor indexes within a radius
-      - [ ] Automatically determine the search radius
-      - [ ] Save to a text file
-      - [ ] Save in extra[0..n]
-      - [ ] Save the nearest K neighbors
-      - [ ] Randomly select K neighbors within the radius
-  - [ ] Projection: project points onto a plane
-    - [ ] pixel size in m/pixel
-    - [ ] nodata value
-    - [ ] field: norm\_Z, c, p, i, r, g, b, 0-7
-    - [ ] min/max/%quantile
-    - [ ] randomly select/vote
-    - [ ] geotiff output
-    - [ ] png output
+
 - [ ] spoc config: Show configuration values
   - [ ] ~/.config/spoc/config
   - [ ] ~/.config/spoc/palettes
