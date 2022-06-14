@@ -201,6 +201,29 @@ void set (std::istream &is,
 }
 
 // Subtract min x/y/z values from all values
+template<typename T>
+void  subtract_min (T &p, bool z_flag = false)
+{
+    // Get X, Y, and Z
+    const auto x = get_x (p);
+    const auto y = get_y (p);
+    const auto z = get_z (p);
+
+    // Get min X, Y, and (optionally) Z
+    const double minx = *std::min_element (begin (x), end (x));
+    const double miny = *std::min_element (begin (y), end (y));
+    const double minz = z_flag ? *std::min_element (begin (z), end (z)) : 0.0;
+
+    // Subtract off min x, y, z
+    for (size_t i = 0; i < p.size (); ++i)
+    {
+        p[i].x -= minx;
+        p[i].y -= miny;
+        p[i].z -= minz;
+    }
+}
+
+// Subtract min x/y/z values from all values
 void subtract_min (std::istream &is,
     std::ostream &os,
     const spoc::header &h,
@@ -214,23 +237,7 @@ void subtract_min (std::istream &is,
     for (size_t i = 0; i < p.size (); ++i)
         p[i] = read_point_record (is, h.extra_fields);
 
-    // Get X, Y, and Z
-    const auto x = get_x (p);
-    const auto y = get_y (p);
-    const auto z = get_z (p);
-
-    // Get min X, Y, and (optionally) Z
-    const double minx = *std::min_element (begin (x), end (x));
-    const double miny = *std::min_element (begin (y), end (y));
-    const double minz = z_flag ? *std::min_element (begin (z), end (z)) : 0.0;
-
-    // Subtract off min x, y, z
-    for (size_t i = 0; i < n; ++i)
-    {
-        p[i].x -= minx;
-        p[i].y -= miny;
-        p[i].z -= minz;
-    }
+    subtract_min (p, z_flag);
 
     // Write it back out
     write_header (os, h);
