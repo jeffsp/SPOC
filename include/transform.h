@@ -13,6 +13,21 @@ namespace spoc
 namespace transform
 {
 
+// Set X, Y, Z to nearest precision by truncating
+template<typename T>
+void quantize (T &p, const double precision)
+{
+    // Quantize x, y, z
+    for (size_t i = 0; i < p.size (); ++i)
+    {
+        // Quantize the point
+        p[i].x = static_cast<int> (p[i].x / precision) * precision;
+        p[i].y = static_cast<int> (p[i].y / precision) * precision;
+        p[i].z = static_cast<int> (p[i].z / precision) * precision;
+    }
+}
+
+// Set X, Y, Z to nearest precision by truncating
 void quantize (std::istream &is,
     std::ostream &os,
     const spoc::header &h,
@@ -38,6 +53,29 @@ void quantize (std::istream &is,
 }
 
 // Recenter a point cloud about its mean
+template<typename T>
+void recenter (T &p, const bool z_flag = false)
+{
+    // Get X, Y, and Z
+    const auto x = get_x (p);
+    const auto y = get_y (p);
+    const auto z = get_z (p);
+
+    // Get average X, Y, and (optionally) Z
+    const double cx = std::accumulate (begin (x), end (x), 0.0) / p.size ();
+    const double cy = std::accumulate (begin (y), end (y), 0.0) / p.size ();
+    const double cz = z_flag ? std::accumulate (begin (z), end (z), 0.0) / p.size () : 0.0;
+
+    // Subtract off mean x, y, z
+    for (size_t i = 0; i < p.size (); ++i)
+    {
+        p[i].x -= cx;
+        p[i].y -= cy;
+        p[i].z -= cz;
+    }
+}
+
+// Recenter a point cloud about its mean
 void recenter (std::istream &is,
     std::ostream &os,
     const spoc::header &h,
@@ -51,23 +89,7 @@ void recenter (std::istream &is,
     for (size_t i = 0; i < p.size (); ++i)
         p[i] = read_point_record (is, h.extra_fields);
 
-    // Get X, Y, and Z
-    const auto x = get_x (p);
-    const auto y = get_y (p);
-    const auto z = get_z (p);
-
-    // Get average X, Y, and (optionally) Z
-    const double cx = std::accumulate (begin (x), end (x), 0.0) / n;
-    const double cy = std::accumulate (begin (y), end (y), 0.0) / n;
-    const double cz = z_flag ? std::accumulate (begin (z), end (z), 0.0) / n : 0.0;
-
-    // Subtract off mean x, y, z
-    for (size_t i = 0; i < n; ++i)
-    {
-        p[i].x -= cx;
-        p[i].y -= cy;
-        p[i].z -= cz;
-    }
+    recenter (p, z_flag);
 
     // Write it back out
     write_header (os, h);
@@ -88,54 +110,47 @@ void replace (std::istream &is,
         throw std::runtime_error (std::string ("Invalid field name: ")
             + field_name);
 
-    // Get number of points
-    const size_t n = h.total_points;
-
-    // Read the data
-    point_records p (n);
-    for (size_t i = 0; i < p.size (); ++i)
-        p[i] = read_point_record (is, h.extra_fields);
-
+    // Check to make suze x, y, z, is not being used
     switch (field_name[0])
     {
-        // GCOV_EXCL_START
-        default:
-        {
-            // This a logic error. If you get here, it means that
-            // check_field_name() did not do its job.
-            std::string s ("Unknown field name '");
-            s += field_name;
-            s += "'";
-            throw std::runtime_error (s);
-        }
-        // GCOV_EXCL_STOP
         case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
         case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
         case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'c': for (size_t i = 0; i < n; ++i) if (p[i].c == v1) p[i].c = v2; break;
-        case 'p': for (size_t i = 0; i < n; ++i) if (p[i].p == v1) p[i].p = v2; break;
-        case 'i': for (size_t i = 0; i < n; ++i) if (p[i].i == v1) p[i].i = v2; break;
-        case 'r': for (size_t i = 0; i < n; ++i) if (p[i].r == v1) p[i].r = v2; break;
-        case 'g': for (size_t i = 0; i < n; ++i) if (p[i].g == v1) p[i].g = v2; break;
-        case 'b': for (size_t i = 0; i < n; ++i) if (p[i].b == v1) p[i].b = v2; break;
-        case 'e': // extra
-        {
-            const size_t j = get_extra_index (field_name);
-            for (size_t i = 0; i < n; ++i)
-            {
-                if (j >= p[i].extra.size ())
-                    throw std::runtime_error ("Specified extra index is too large");
-                if (p[i].extra[j] == v1)
-                    p[i].extra[j] = v2;
-            }
-            break;
-        }
     }
 
-    // Write it back out
+    // Get the extra index
+    const size_t j = get_extra_index (field_name);
+
+    // Write the header
     write_header (os, h);
-    for (size_t i = 0; i < n; ++i)
-        write_point_record (os, p[i]);
+
+    // Process the points
+    for (size_t i = 0; i < h.total_points; ++i)
+    {
+        // Read a point
+        auto p = read_point_record (is, h.extra_fields);
+
+        // Process the point
+        switch (field_name[0])
+        {
+            case 'c': if (p.c == v1) p.c = v2; break;
+            case 'p': if (p.p == v1) p.p = v2; break;
+            case 'i': if (p.i == v1) p.i = v2; break;
+            case 'r': if (p.r == v1) p.r = v2; break;
+            case 'g': if (p.g == v1) p.g = v2; break;
+            case 'b': if (p.b == v1) p.b = v2; break;
+            case 'e': // extra
+            {
+                if (j >= p.extra.size ())
+                    throw std::runtime_error ("Specified extra index is too large");
+                if (p.extra[j] == v1)
+                    p.extra[j] = v2;
+            }
+        }
+
+        // Write it back out
+        write_point_record (os, p);
+    }
 }
 
 // Set field values
@@ -150,59 +165,46 @@ void set (std::istream &is,
         throw std::runtime_error (std::string ("Invalid field name: ")
             + field_name);
 
-    // Get number of points
-    const size_t n = h.total_points;
+    // Get the extra index
+    const size_t j = get_extra_index (field_name);
 
-    // Read the data
-    point_records p (n);
-    for (size_t i = 0; i < p.size (); ++i)
-        p[i] = read_point_record (is, h.extra_fields);
-
-    // Set the values
-    switch (field_name[0])
-    {
-        // GCOV_EXCL_START
-        default:
-        {
-            // This a logic error. If you get here, it means that
-            // check_field_name() did not do its job.
-            std::string s ("Unknown field name '");
-            s += field_name;
-            s += "'";
-            throw std::runtime_error (s);
-        }
-        // GCOV_EXCL_STOP
-        case 'x': for (size_t i = 0; i < n; ++i) p[i].x = v; break;
-        case 'y': for (size_t i = 0; i < n; ++i) p[i].y = v; break;
-        case 'z': for (size_t i = 0; i < n; ++i) p[i].z = v; break;
-        case 'c': for (size_t i = 0; i < n; ++i) p[i].c = v; break;
-        case 'p': for (size_t i = 0; i < n; ++i) p[i].p = v; break;
-        case 'i': for (size_t i = 0; i < n; ++i) p[i].i = v; break;
-        case 'r': for (size_t i = 0; i < n; ++i) p[i].r = v; break;
-        case 'g': for (size_t i = 0; i < n; ++i) p[i].g = v; break;
-        case 'b': for (size_t i = 0; i < n; ++i) p[i].b = v; break;
-        case 'e': // extra
-        {
-            const size_t j = get_extra_index (field_name);
-            for (size_t i = 0; i < n; ++i)
-            {
-                if (j >= p[i].extra.size ())
-                    throw std::runtime_error ("Specified extra index is too large");
-                p[i].extra[j] = v;
-            }
-            break;
-        }
-    }
-
-    // Write it back out
+    // Write the header
     write_header (os, h);
-    for (size_t i = 0; i < n; ++i)
-        write_point_record (os, p[i]);
+
+    // Process the points
+    for (size_t i = 0; i < h.total_points; ++i)
+    {
+        // Read a point
+        auto p = read_point_record (is, h.extra_fields);
+
+        // Process the point
+        switch (field_name[0])
+        {
+            case 'x': p.x = v; break;
+            case 'y': p.y = v; break;
+            case 'z': p.z = v; break;
+            case 'c': p.c = v; break;
+            case 'p': p.p = v; break;
+            case 'i': p.i = v; break;
+            case 'r': p.r = v; break;
+            case 'g': p.g = v; break;
+            case 'b': p.b = v; break;
+            case 'e': // extra
+            {
+                if (j >= p.extra.size ())
+                    throw std::runtime_error ("Specified extra index is too large");
+                p.extra[j] = v;
+            }
+        }
+
+        // Write it back out
+        write_point_record (os, p);
+    }
 }
 
 // Subtract min x/y/z values from all values
 template<typename T>
-void  subtract_min (T &p, bool z_flag = false)
+void subtract_min (T &p, const bool z_flag = false)
 {
     // Get X, Y, and Z
     const auto x = get_x (p);

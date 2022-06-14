@@ -23,6 +23,12 @@ void test_tool_quantize ()
     write_spoc_file_uncompressed (is, f);
     h = read_header (is);
     quantize (is, os, h, 100);
+
+    clog << fixed;
+    auto q = generate_points (10);
+    quantize (q, 0.001);
+    quantize (q, 0.1);
+    quantize (q, 1.0);
 }
 
 void test_tool_recenter ()
