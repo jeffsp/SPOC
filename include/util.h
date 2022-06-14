@@ -25,6 +25,7 @@ void recenter (T &p, const bool z_flag = false)
     const double cz = z_flag ? std::accumulate (begin (z), end (z), 0.0) / p.size () : 0.0;
 
     // Subtract off mean x, y, z
+#pragma omp parallel for
     for (size_t i = 0; i < p.size (); ++i)
     {
         p[i].x -= cx;
@@ -55,9 +56,9 @@ void recenter (std::istream &is,
         write_point_record (os, p[i]);
 }
 
-// Subtract min x/y/z values from all values
+// Get min x/y/z values from all values
 template<typename T>
-void subtract_min (T &p, const bool z_flag = false)
+spoc::point<double> get_min (const T &p)
 {
     // Get X, Y, and Z
     const auto x = get_x (p);
@@ -67,14 +68,26 @@ void subtract_min (T &p, const bool z_flag = false)
     // Get min X, Y, and (optionally) Z
     const double minx = *std::min_element (begin (x), end (x));
     const double miny = *std::min_element (begin (y), end (y));
-    const double minz = z_flag ? *std::min_element (begin (z), end (z)) : 0.0;
+    const double minz = *std::min_element (begin (z), end (z));
+
+    return spoc::point<double> { minx, miny, minz };
+}
+
+// Subtract min x/y/z values from all values
+template<typename T>
+void subtract_min (T &p, const bool z_flag = true)
+{
+    // Get minimum value
+    const auto minp = get_min (p);
 
     // Subtract off min x, y, z
+#pragma omp parallel for
     for (size_t i = 0; i < p.size (); ++i)
     {
-        p[i].x -= minx;
-        p[i].y -= miny;
-        p[i].z -= minz;
+        p[i].x -= minp.x;
+        p[i].y -= minp.y;
+        if (z_flag)
+            p[i].z -= minp.z;
     }
 }
 
