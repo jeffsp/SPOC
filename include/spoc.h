@@ -1,5 +1,4 @@
 #pragma once
-
 #include "compress.h"
 #include "point.h"
 #include "version.h"

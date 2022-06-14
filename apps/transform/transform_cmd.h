@@ -30,10 +30,9 @@ struct args
 
 enum command_values
 {
-    RECENTER_XY = 1000,
-    RECENTER_XYZ,
-    SUBTRACT_MIN_XY,
-    SUBTRACT_MIN_XYZ
+    SET = 1000,
+    REPLACE, // = 1001
+    QUANTIZE_XYZ,
 };
 
 args set_command (const args &args, const std::string &name, const char *s)
@@ -60,10 +59,9 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
             {"version", no_argument, 0, 'e'},
-            {"recenter-xy", no_argument, 0, RECENTER_XY},
-            {"recenter-xyz", no_argument, 0, RECENTER_XYZ},
-            {"subtract-min-xy", no_argument, 0, SUBTRACT_MIN_XY},
-            {"subtract-min-xyz", no_argument, 0, SUBTRACT_MIN_XYZ},
+            {"set", required_argument, 0, SET},
+            {"replace", required_argument, 0, REPLACE},
+            {"quantize-xyz", required_argument, 0, QUANTIZE_XYZ},
             {0, 0, 0, 0}
         };
 
@@ -85,24 +83,19 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             }
             case 'v': { args.verbose = true; break; }
             case 'e': { args.version = true; break; }
-            case RECENTER_XY:
+            case QUANTIZE_XYZ:
             {
-                args = set_command (args, "recenter-xy", optarg);
+                args = set_command (args, "quantize-xyz", optarg);
                 break;
             }
-            case RECENTER_XYZ:
+            case REPLACE:
             {
-                args = set_command (args, "recenter-xyz", optarg);
+                args = set_command (args, "replace", optarg);
                 break;
             }
-            case SUBTRACT_MIN_XY:
+            case SET:
             {
-                args = set_command (args, "subtract-min-xy", optarg);
-                break;
-            }
-            case SUBTRACT_MIN_XYZ:
-            {
-                args = set_command (args, "subtract-min-xyz", optarg);
+                args = set_command (args, "set", optarg);
                 break;
             }
         }

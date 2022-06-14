@@ -51,6 +51,7 @@ the Windows Linux subsystem.
 
 # TODO
 
+- [ ] Reorganize namespaces and headers
 - [X] Create header only library with examples
 - [X] Read/write uncompressed
 - [X] Create compression utilities read/write compressed files
