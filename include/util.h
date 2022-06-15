@@ -73,13 +73,10 @@ spoc::point<double> get_min (const T &p)
     return spoc::point<double> { minx, miny, minz };
 }
 
-// Subtract min x/y/z values from all values
+// Subtract x/y/z value from all values
 template<typename T>
-void subtract_min (T &p, const bool z_flag = true)
+void subtract (T &p, const spoc::point<double> &minp, const bool z_flag = true)
 {
-    // Get minimum value
-    const auto minp = get_min (p);
-
     // Subtract off min x, y, z
 #pragma omp parallel for
     for (size_t i = 0; i < p.size (); ++i)
@@ -105,7 +102,10 @@ void subtract_min (std::istream &is,
     for (size_t i = 0; i < p.size (); ++i)
         p[i] = read_point_record (is, h.extra_fields);
 
-    subtract_min (p, z_flag);
+    // Get minimum value
+    const auto minp = get_min (p);
+
+    subtract (p, minp, z_flag);
 
     // Write it back out
     write_header (os, h);
