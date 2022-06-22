@@ -37,6 +37,15 @@ Collection of transformations to run on a SPOC file
     one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or 'e#', where the
     '#' after the 'e' specifies the extra field number.
 
+\-\-rotate-x=*#*
+:   Rotate points about the X axis by *#* degrees.
+
+\-\-rotate-y=*#*
+:   Rotate points about the Y axis by *#* degrees.
+
+\-\-rotate-z=*#*
+:   Rotate points about the Z axis by *#* degrees.
+
 \-\-set=*F*,*#*
 :   Set the field *F* to *#*. *F* can be one of 'x', 'y', 'z', 'c', 'p',
     'i', 'r', 'g', 'b', or 'e#', where the '#' after the 'e' specifies

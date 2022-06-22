@@ -31,8 +31,11 @@ struct args
 enum command_values
 {
     SET = 1000,
-    REPLACE, // = 1001
     QUANTIZE_XYZ,
+    REPLACE, // = 1001
+    ROTATE_X,
+    ROTATE_Y,
+    ROTATE_Z,
 };
 
 args set_command (const args &args, const std::string &name, const char *s)
@@ -40,7 +43,6 @@ args set_command (const args &args, const std::string &name, const char *s)
     std::string params;
     if (s != nullptr)
         params = std::string (s);
-    std::clog << "set_command" << std::endl;
     if (!args.command.name.empty ())
         throw std::runtime_error ("You can only specify one command at a time");
     spoc::cmd::args new_args (args);
@@ -59,9 +61,12 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
             {"version", no_argument, 0, 'e'},
-            {"set", required_argument, 0, SET},
-            {"replace", required_argument, 0, REPLACE},
             {"quantize-xyz", required_argument, 0, QUANTIZE_XYZ},
+            {"replace", required_argument, 0, REPLACE},
+            {"rotate-x", required_argument, 0, ROTATE_X},
+            {"rotate-y", required_argument, 0, ROTATE_Y},
+            {"rotate-z", required_argument, 0, ROTATE_Z},
+            {"set", required_argument, 0, SET},
             {0, 0, 0, 0}
         };
 
@@ -91,6 +96,21 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case REPLACE:
             {
                 args = set_command (args, "replace", optarg);
+                break;
+            }
+            case ROTATE_X:
+            {
+                args = set_command (args, "rotate-x", optarg);
+                break;
+            }
+            case ROTATE_Y:
+            {
+                args = set_command (args, "rotate-y", optarg);
+                break;
+            }
+            case ROTATE_Z:
+            {
+                args = set_command (args, "rotate-z", optarg);
                 break;
             }
             case SET:

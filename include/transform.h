@@ -13,6 +13,18 @@ namespace spoc
 namespace transform
 {
 
+const header read_header_uncompressed (std::istream &is)
+{
+    // Read the header
+    const header h = read_header (is);
+
+    // Check compression flag
+    if (h.compressed)
+        throw std::runtime_error ("Expected an uncompressed file");
+
+    return h;
+}
+
 // Set X, Y, Z to nearest precision by truncating
 template<typename T>
 void quantize (T &p, const double precision)
@@ -30,9 +42,11 @@ void quantize (T &p, const double precision)
 // Set X, Y, Z to nearest precision by truncating
 void quantize (std::istream &is,
     std::ostream &os,
-    const spoc::header &h,
     const double precision)
 {
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
+
     // Write the header
     write_header (os, h);
 
@@ -55,7 +69,6 @@ void quantize (std::istream &is,
 // Replace values in one field with values in another
 void replace (std::istream &is,
     std::ostream &os,
-    const spoc::header &h,
     const std::string &field_name,
     const double v1,
     const double v2)
@@ -75,6 +88,9 @@ void replace (std::istream &is,
 
     // Get the extra index
     const size_t j = get_extra_index (field_name);
+
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
 
     // Write the header
     write_header (os, h);
@@ -108,10 +124,135 @@ void replace (std::istream &is,
     }
 }
 
+// Rotate about the X, Y, or Z axis
+template<typename T,typename XOP,typename YOP,typename ZOP>
+void rotate (T &p,
+    const double degrees,
+    XOP xop,
+    YOP yop,
+    ZOP zop)
+{
+    // Process the points
+    for (size_t i = 0; i < p.size (); ++i)
+    {
+        const double x = p[i].x;
+        const double y = p[i].y;
+        const double z = p[i].z;
+
+        // Rotate the point
+        p[i].x = xop (x, y, z);
+        p[i].y = yop (x, y, z);
+        p[i].z = zop (x, y, z);
+    }
+}
+
+template<typename T>
+void rotate_x (T &p, const double degrees)
+{
+    // Convert degrees to radians
+    const double r = degrees * M_PI / 180.0;
+    auto xop = [&r] (const double x, const double y, const double z) -> double { return x; };
+    auto yop = [&r] (const double x, const double y, const double z) -> double { return y * cos (r) - z * sin (r); };
+    auto zop = [&r] (const double x, const double y, const double z) -> double { return y * sin (r) + z * cos (r); };
+    rotate (p, degrees, xop, yop, zop);
+}
+
+template<typename T>
+void rotate_y (T &p, const double degrees)
+{
+    // Convert degrees to radians
+    const double r = degrees * M_PI / 180.0;
+    auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - z * sin (r); };
+    auto yop = [&r] (const double x, const double y, const double z) -> double { return y; };
+    auto zop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + z * cos (r); };
+    rotate (p, degrees, xop, yop, zop);
+}
+
+template<typename T>
+void rotate_z (T &p, const double degrees)
+{
+    // Convert degrees to radians
+    const double r = degrees * M_PI / 180.0;
+    auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - y * sin (r); };
+    auto yop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + y * cos (r); };
+    auto zop = [&r] (const double x, const double y, const double z) -> double { return z; };
+    rotate (p, degrees, xop, yop, zop);
+}
+
+// Rotate about the X, Y, or Z axis
+template<typename XOP,typename YOP,typename ZOP>
+void rotate (std::istream &is,
+    std::ostream &os,
+    const spoc::header &h,
+    const double degrees,
+    XOP xop,
+    YOP yop,
+    ZOP zop)
+{
+    // Write the header
+    write_header (os, h);
+
+    // Process the points
+    for (size_t i = 0; i < h.total_points; ++i)
+    {
+        // Read a point
+        auto p = read_point_record (is, h.extra_fields);
+        const double x = p.x;
+        const double y = p.y;
+        const double z = p.z;
+
+        // Rotate the point
+        p.x = xop (x, y, z);
+        p.y = yop (x, y, z);
+        p.z = zop (x, y, z);
+
+        // Write it back out
+        write_point_record (os, p);
+    }
+}
+
+void rotate_x (std::istream &is, std::ostream &os, const double degrees)
+{
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
+
+    // Convert degrees to radians
+    const double r = degrees * M_PI / 180.0;
+    auto xop = [&r] (const double x, const double y, const double z) -> double { return x; };
+    auto yop = [&r] (const double x, const double y, const double z) -> double { return y * cos (r) - z * sin (r); };
+    auto zop = [&r] (const double x, const double y, const double z) -> double { return y * sin (r) + z * cos (r); };
+    rotate (is, os, h, degrees, xop, yop, zop);
+}
+
+void rotate_y (std::istream &is, std::ostream &os, const double degrees)
+{
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
+
+    // Convert degrees to radians
+    const double r = degrees * M_PI / 180.0;
+    auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - z * sin (r); };
+    auto yop = [&r] (const double x, const double y, const double z) -> double { return y; };
+    auto zop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + z * cos (r); };
+    rotate (is, os, h, degrees, xop, yop, zop);
+}
+
+void rotate_z (std::istream &is, std::ostream &os, const double degrees)
+{
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
+
+    // Convert degrees to radians
+    const double r = degrees * M_PI / 180.0;
+    auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - y * sin (r); };
+    auto yop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + y * cos (r); };
+    auto zop = [&r] (const double x, const double y, const double z) -> double { return z; };
+    rotate (is, os, h, degrees, xop, yop, zop);
+}
+
 // Set field values
 void set (std::istream &is,
     std::ostream &os,
-    const spoc::header &h,
     const std::string &field_name,
     const double v)
 {
@@ -122,6 +263,9 @@ void set (std::istream &is,
 
     // Get the extra index
     const size_t j = get_extra_index (field_name);
+
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
 
     // Write the header
     write_header (os, h);

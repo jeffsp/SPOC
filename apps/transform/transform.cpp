@@ -36,7 +36,7 @@ int consume_int (std::string &s)
     size_t sz = 0;
     int v = 0.0;
     try { v = std::stoi (s, &sz); }
-    catch (...) { throw std::runtime_error (std::string ("Could not parse field string: ") + s); }
+    catch (...) { throw std::runtime_error (std::string ("Could not parse int value string: ") + s); }
     s.erase (0, sz + 1);
     return v;
 }
@@ -46,7 +46,7 @@ double consume_double (std::string &s)
     size_t sz = 0;
     double v = 0.0;
     try { v = std::stod (s, &sz); }
-    catch (...) { throw std::runtime_error (std::string ("Could not parse field string: ") + s); }
+    catch (...) { throw std::runtime_error (std::string ("Could not parse number value string: ") + s); }
     s.erase (0, sz + 1);
     return v;
 }
@@ -88,13 +88,6 @@ int main (int argc, char **argv)
         // Get the input stream
         app_utils::input_stream is (args.verbose, args.input_fn);
 
-        // Read the header
-        const header h = read_header (is ());
-
-        // Check compression flag
-        if (h.compressed)
-            throw std::runtime_error ("Expected an uncompressed file");
-
         // Get the output stream
         app_utils::output_stream os (args.verbose, args.output_fn);
 
@@ -104,7 +97,7 @@ int main (int argc, char **argv)
         {
             std::string s = args.command.params;
             const auto v = consume_double (s);
-            quantize (is (), os (), h, v);
+            quantize (is (), os (), v);
         }
         else if (args.command.name == "replace")
         {
@@ -112,14 +105,32 @@ int main (int argc, char **argv)
             const auto l = consume_field_name (s);
             const auto v1 = consume_int (s);
             const auto v2 = consume_int (s);
-            replace (is (), os (), h, l, v1, v2);
+            replace (is (), os (), l, v1, v2);
+        }
+        else if (args.command.name == "rotate-x")
+        {
+            std::string s = args.command.params;
+            const auto v = consume_double (s);
+            rotate_x (is (), os (), v);
+        }
+        else if (args.command.name == "rotate-y")
+        {
+            std::string s = args.command.params;
+            const auto v = consume_double (s);
+            rotate_y (is (), os (), v);
+        }
+        else if (args.command.name == "rotate-z")
+        {
+            std::string s = args.command.params;
+            const auto v = consume_double (s);
+            rotate_z (is (), os (), v);
         }
         else if (args.command.name == "set")
         {
             std::string s = args.command.params;
             const auto l = consume_field_name (s);
             const auto v = consume_double (s);
-            spoc::transform::set (is (), os (), h, l, v);
+            spoc::transform::set (is (), os (), l, v);
         }
         else
             throw std::runtime_error ("An unknown command was encountered");
