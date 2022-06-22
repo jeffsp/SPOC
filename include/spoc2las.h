@@ -17,13 +17,17 @@ struct las_writer
     {
         laswriteopener.set_file_name(fn.c_str ());
         laswriter = laswriteopener.open(&lasheader);
+        // GCOV_EXCL_START
         if (laswriter == nullptr)
             throw std::runtime_error ("Could not open LASlib laswriter");
+        // GCOV_EXCL_STOP
     }
     ~las_writer ()
     {
+        // GCOV_EXCL_START
         if (laswriter == nullptr)
             return;
+        // GCOV_EXCL_STOP
         laswriter->update_header (&lasheader, true);
         laswriter->close();
         delete laswriter;
