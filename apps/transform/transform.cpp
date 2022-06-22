@@ -11,22 +11,26 @@ using namespace spoc;
 
 string consume_field_name (std::string &s)
 {
-    // Get the field
-    size_t i = 0;
-    char c = s[i];
+    // Check string
+    assert (!s.empty ());
+
+    // Get the char
+    char c = s[0];
     string field_name;
     while (isalnum (c))
     {
         field_name += c;
-        ++i;
+        // Skip over the char
+        s.erase (0, 1);
+        c = s[0];
     }
 
     // Make sure it's a valid name
     if (!check_field_name (field_name))
         throw runtime_error (std::string ("Invalid field name: " + field_name));
 
-    // Skip over the field name
-    s.erase (0, i);
+    // Skip over the char
+    s.erase (0, 1);
 
     return field_name;
 }
@@ -83,7 +87,7 @@ int main (int argc, char **argv)
 
         // Show args
         if (args.verbose)
-            std::clog << "command: " << args.command.name << args.command.params << std::endl;
+            std::clog << "command: " << args.command.name << "\t" << args.command.params << std::endl;
 
         // Get the input stream
         app_utils::input_stream is (args.verbose, args.input_fn);
