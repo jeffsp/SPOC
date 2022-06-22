@@ -23,6 +23,10 @@ void test_input_stream ()
             catch (...) { failed = true; }
             verify (failed);
         }
+        // Use stdin
+        spoc::app_utils::input_stream is (verbose, std::string ());
+        auto &tmp = is ();
+        (void)tmp; // Disable unused variable warning
     }
 }
 
@@ -45,6 +49,10 @@ void test_output_stream ()
             catch (...) { failed = true; }
             verify (failed);
         }
+        // Use stdout
+        spoc::app_utils::output_stream os (verbose, std::string ());
+        auto &tmp = os ();
+        (void)tmp; // Disable unused variable warning
     }
 }
 
