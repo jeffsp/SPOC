@@ -19,7 +19,7 @@ int main (int argc, char **argv)
         // If version was requested, print it and exit
         if (args.version)
         {
-            clog << "Version "
+            cout << "Version "
                 << static_cast<int> (MAJOR_VERSION)
                 << "."
                 << static_cast<int> (MINOR_VERSION)
