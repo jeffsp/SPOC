@@ -56,8 +56,8 @@ test:
 	@echo "Testing..."
 	@$(MAKE) --no-print-directory unit_test BUILD=debug
 	@$(MAKE) --no-print-directory unit_test BUILD=release
-	#@$(MAKE) --no-print-directory integration_test BUILD=debug
-	#@$(MAKE) --no-print-directory integration_test BUILD=release
+	@$(MAKE) --no-print-directory integration_test BUILD=debug
+	@$(MAKE) --no-print-directory integration_test BUILD=release
 
 .PHONY: memcheck # Run memcheck
 memcheck:
