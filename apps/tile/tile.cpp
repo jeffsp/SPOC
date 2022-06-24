@@ -119,7 +119,7 @@ int main (int argc, char **argv)
             for (size_t j = 0; j < v.size (); ++j)
             {
                 // Get the point from the input file
-                const auto p = f.get_point_record (j);
+                const auto p = f.get_point_record (v[j]);
 
                 // Set it in the output file
                 t.set_point_record (j, p);
