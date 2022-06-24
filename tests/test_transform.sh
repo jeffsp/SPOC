@@ -13,35 +13,54 @@ function cleanup {
 trap cleanup EXIT
 
 # Get help
-./build/debug/spoc_transform -h &> /dev/null
-./build/debug/spoc_transform --help &> /dev/null
+spoc_transform -h &> /dev/null
+spoc_transform --help &> /dev/null
 
 # This should fail
-! ./build/debug/spoc_transform --asdf &> /dev/null
+! spoc_transform --asdf &> /dev/null
 
 # Quantize
-./build/debug/spoc_transform --quantize-xyz=0.01 \
+spoc_transform --quantize-xyz=0.01 \
     test_data/lidar/juarez50.spoc \
     ${TMPDIR}/output.spoc
-#./build/debug/spoc_info ${TMPDIR}/juarez50_quantized.spoc
-./build/debug/spoc_transform --quantize-xyz=10 \
+#spoc_info ${TMPDIR}/juarez50_quantized.spoc
+spoc_transform --quantize-xyz=10 \
     < test_data/lidar/juarez50.spoc \
     > ${TMPDIR}/output.spoc
-#./build/debug/spoc_info ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
 
 # Replace
-#./build/debug/spoc_info test_data/lidar/juarez50.spoc
-./build/debug/spoc_transform --replace=c,1,2 \
+#spoc_info test_data/lidar/juarez50.spoc
+spoc_transform --replace=c,1,2 \
     < test_data/lidar/juarez50.spoc \
     > ${TMPDIR}/output.spoc
-#./build/debug/spoc_info ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
 
 # This should fail
-! ./build/debug/spoc_transform --replace=x,1,2 \
+! spoc_transform --replace=x,1,2 \
     < test_data/lidar/juarez50.spoc \
     > ${TMPDIR}/output.spoc &> /dev/null
 
 # This should fail
-! ./build/debug/spoc_transform --replace=q,1,2 \
+! spoc_transform --replace=q,1,2 \
     < test_data/lidar/juarez50.spoc \
     > ${TMPDIR}/output.spoc &> /dev/null
+
+# Rotate
+#spoc_info test_data/lidar/juarez50.spoc
+spoc_transform --rotate-x=90 \
+    < test_data/lidar/juarez50.spoc \
+    > ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
+
+#spoc_info test_data/lidar/juarez50.spoc
+spoc_transform --rotate-y=90 \
+    < test_data/lidar/juarez50.spoc \
+    > ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
+
+#spoc_info test_data/lidar/juarez50.spoc
+spoc_transform --rotate-z=90 \
+    < test_data/lidar/juarez50.spoc \
+    > ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
