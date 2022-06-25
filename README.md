@@ -99,7 +99,7 @@ the Windows Linux subsystem.
   - [X] Quiet (don't warn)
   - [X] Unit/integration tests
 
-- [ ] spoc\_transform: These are all capable of streaming. The output
+- [X] spoc\_transform: These are all capable of streaming. The output
       has the same number of points as the input
   - [X] Only allow one command at a time, multiple commands can be
         executed using pipes
@@ -108,8 +108,8 @@ the Windows Linux subsystem.
   - [X] Replace fields: replace f # #
   - [X] Quantize: round X, Y, Z to nearest Nth decimal place
   - [X] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
-  - [ ] Add offset to X,Y,Z: addx/y/z #
-  - [ ] Scale by X,Y,Z: scale, scalex/y/z
+  - [X] Add offset to X,Y,Z: addx/y/z #
+  - [X] Scale by X,Y,Z: scale, scalex/y/z
 
 - [ ] spoc\_generate: Generate values for each point
   - [ ] Write to stdout in binary format
@@ -197,6 +197,7 @@ the Windows Linux subsystem.
     - [ ] Tile
   - [ ] Decimate/undecimate
   - [ ] Transform with pipes
+  - [X] Stream averaging
 
 - [ ] C++ Examples
   - [X] Noop
