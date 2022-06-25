@@ -46,10 +46,8 @@ int main (int argc, char **argv)
             clog << "digits\t" << args.digits << endl;
             clog << "tile-size\t" << args.tile_size << endl;
             clog << "prefix\t'" << args.prefix << "'" << endl;
-        }
-
-        if (args.verbose)
             clog << "Reading " << args.fn << endl;
+        }
 
         ifstream ifs (args.fn);
 
