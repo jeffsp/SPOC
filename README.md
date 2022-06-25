@@ -107,7 +107,7 @@ the Windows Linux subsystem.
   - [X] Set fields: set f #
   - [X] Replace fields: replace f # #
   - [X] Quantize: round X, Y, Z to nearest Nth decimal place
-  - [ ] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
+  - [X] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
   - [ ] Add offset to X,Y,Z: addx/y/z #
   - [ ] Scale by X,Y,Z: scale, scalex/y/z
 
@@ -196,6 +196,7 @@ the Windows Linux subsystem.
     - [ ] Regularization, add noise
     - [ ] Tile
   - [ ] Decimate/undecimate
+  - [ ] Transform with pipes
 
 - [ ] C++ Examples
   - [X] Noop
