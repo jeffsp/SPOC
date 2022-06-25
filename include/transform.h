@@ -25,11 +25,87 @@ const header read_header_uncompressed (std::istream &is)
     return h;
 }
 
+// Add offset
+template<typename T>
+void add_x (T &p, const double v)
+{
+#pragma omp parallel for
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i].x = p[i].x + v;
+}
+
+// Add offset
+template<typename T>
+void add_y (T &p, const double v)
+{
+#pragma omp parallel for
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i].y = p[i].y + v;
+}
+
+// Add offset
+template<typename T>
+void add_z (T &p, const double v)
+{
+#pragma omp parallel for
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i].z = p[i].z + v;
+}
+
+// Add to X, Y, or Z
+template<typename OP>
+void add (std::istream &is,
+    std::ostream &os,
+    const spoc::header &h,
+    OP op)
+{
+    // Write the header
+    write_header (os, h);
+
+    // Process the points
+    for (size_t i = 0; i < h.total_points; ++i)
+    {
+        // Read a point
+        auto p = read_point_record (is, h.extra_fields);
+
+        // Scale the point
+        op (p);
+
+        // Write it back out
+        write_point_record (os, p);
+    }
+}
+
+void add_x (std::istream &is, std::ostream &os, const double v)
+{
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
+    auto op = [&v] (auto &p) { p.x += v; };
+    add (is, os, h, op);
+}
+
+void add_y (std::istream &is, std::ostream &os, const double v)
+{
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
+    auto op = [&v] (auto &p) { p.y += v; };
+    add (is, os, h, op);
+}
+
+void add_z (std::istream &is, std::ostream &os, const double v)
+{
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
+    auto op = [&v] (auto &p) { p.z += v; };
+    add (is, os, h, op);
+}
+
 // Set X, Y, Z to nearest precision by truncating
 template<typename T>
 void quantize (T &p, const double precision)
 {
     // Quantize x, y, z
+#pragma omp parallel for
     for (size_t i = 0; i < p.size (); ++i)
     {
         // Quantize the point
@@ -126,13 +202,10 @@ void replace (std::istream &is,
 
 // Rotate about the X, Y, or Z axis
 template<typename T,typename XOP,typename YOP,typename ZOP>
-void rotate (T &p,
-    const double degrees,
-    XOP xop,
-    YOP yop,
-    ZOP zop)
+void rotate (T &p, XOP xop, YOP yop, ZOP zop)
 {
     // Process the points
+#pragma omp parallel for
     for (size_t i = 0; i < p.size (); ++i)
     {
         const double x = p[i].x;
@@ -154,7 +227,7 @@ void rotate_x (T &p, const double degrees)
     auto xop = [&r] (const double x, const double y, const double z) -> double { return x; };
     auto yop = [&r] (const double x, const double y, const double z) -> double { return y * cos (r) - z * sin (r); };
     auto zop = [&r] (const double x, const double y, const double z) -> double { return y * sin (r) + z * cos (r); };
-    rotate (p, degrees, xop, yop, zop);
+    rotate (p, xop, yop, zop);
 }
 
 template<typename T>
@@ -165,7 +238,7 @@ void rotate_y (T &p, const double degrees)
     auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - z * sin (r); };
     auto yop = [&r] (const double x, const double y, const double z) -> double { return y; };
     auto zop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + z * cos (r); };
-    rotate (p, degrees, xop, yop, zop);
+    rotate (p, xop, yop, zop);
 }
 
 template<typename T>
@@ -176,7 +249,7 @@ void rotate_z (T &p, const double degrees)
     auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - y * sin (r); };
     auto yop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + y * cos (r); };
     auto zop = [&r] (const double x, const double y, const double z) -> double { return z; };
-    rotate (p, degrees, xop, yop, zop);
+    rotate (p, xop, yop, zop);
 }
 
 // Rotate about the X, Y, or Z axis
@@ -184,7 +257,6 @@ template<typename XOP,typename YOP,typename ZOP>
 void rotate (std::istream &is,
     std::ostream &os,
     const spoc::header &h,
-    const double degrees,
     XOP xop,
     YOP yop,
     ZOP zop)
@@ -221,7 +293,7 @@ void rotate_x (std::istream &is, std::ostream &os, const double degrees)
     auto xop = [&r] (const double x, const double y, const double z) -> double { return x; };
     auto yop = [&r] (const double x, const double y, const double z) -> double { return y * cos (r) - z * sin (r); };
     auto zop = [&r] (const double x, const double y, const double z) -> double { return y * sin (r) + z * cos (r); };
-    rotate (is, os, h, degrees, xop, yop, zop);
+    rotate (is, os, h, xop, yop, zop);
 }
 
 void rotate_y (std::istream &is, std::ostream &os, const double degrees)
@@ -234,7 +306,7 @@ void rotate_y (std::istream &is, std::ostream &os, const double degrees)
     auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - z * sin (r); };
     auto yop = [&r] (const double x, const double y, const double z) -> double { return y; };
     auto zop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + z * cos (r); };
-    rotate (is, os, h, degrees, xop, yop, zop);
+    rotate (is, os, h, xop, yop, zop);
 }
 
 void rotate_z (std::istream &is, std::ostream &os, const double degrees)
@@ -247,7 +319,82 @@ void rotate_z (std::istream &is, std::ostream &os, const double degrees)
     auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - y * sin (r); };
     auto yop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + y * cos (r); };
     auto zop = [&r] (const double x, const double y, const double z) -> double { return z; };
-    rotate (is, os, h, degrees, xop, yop, zop);
+    rotate (is, os, h, xop, yop, zop);
+}
+
+// Scale
+template<typename T>
+void scale_x (T &p, const double v)
+{
+#pragma omp parallel for
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i].x = p[i].x * v;
+}
+
+// Scale
+template<typename T>
+void scale_y (T &p, const double v)
+{
+#pragma omp parallel for
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i].y = p[i].y * v;
+}
+
+// Scale
+template<typename T>
+void scale_z (T &p, const double v)
+{
+#pragma omp parallel for
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i].z = p[i].z * v;
+}
+
+// Scale X, Y, or Z
+template<typename OP>
+void scale (std::istream &is,
+    std::ostream &os,
+    const spoc::header &h,
+    OP op)
+{
+    // Write the header
+    write_header (os, h);
+
+    // Process the points
+    for (size_t i = 0; i < h.total_points; ++i)
+    {
+        // Read a point
+        auto p = read_point_record (is, h.extra_fields);
+
+        // Scale the point
+        op (p);
+
+        // Write it back out
+        write_point_record (os, p);
+    }
+}
+
+void scale_x (std::istream &is, std::ostream &os, const double v)
+{
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
+    auto op = [&v] (auto &p) { p.x *= v; };
+    scale (is, os, h, op);
+}
+
+void scale_y (std::istream &is, std::ostream &os, const double v)
+{
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
+    auto op = [&v] (auto &p) { p.y *= v; };
+    scale (is, os, h, op);
+}
+
+void scale_z (std::istream &is, std::ostream &os, const double v)
+{
+    // Read the header and make sure it's uncompressed
+    const header h = read_header_uncompressed (is);
+    auto op = [&v] (auto &p) { p.z *= v; };
+    scale (is, os, h, op);
 }
 
 // Set field values

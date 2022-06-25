@@ -27,6 +27,15 @@ Collection of transformations to run on a SPOC file
 
 # COMMANDS
 
+\-\-add-x=*#*
+:   Add an offset to the X location of all points
+
+\-\-add-y=*#*
+:   Add an offset to the Y location of all points
+
+\-\-add-z=*#*
+:   Add an offset to the Z location of all points
+
 \-\-quantize-xyz=*#*
 :   Quantize X, Y, and Z values to the specified precision by truncating.
     For example, --quantize=0.1 will quantize X, Y, and Z values by
@@ -45,6 +54,15 @@ Collection of transformations to run on a SPOC file
 
 \-\-rotate-z=*#*
 :   Rotate points about the Z axis by *#* degrees.
+
+\-\-scale-x=*#*
+:   Scale the X value of all points by a constant factor
+
+\-\-scale-y=*#*
+:   Scale the Y value of all points by a constant factor
+
+\-\-scale-z=*#*
+:   Scale the Z value of all points by a constant factor
 
 \-\-set=*F*,*#*
 :   Set the field *F* to *#*. *F* can be one of 'x', 'y', 'z', 'c', 'p',

@@ -97,7 +97,25 @@ int main (int argc, char **argv)
 
         using namespace spoc::transform;
 
-        if (args.command.name == "quantize-xyz")
+        if (args.command.name == "add-x")
+        {
+            std::string s = args.command.params;
+            const auto v = consume_double (s);
+            add_x (is (), os (), v);
+        }
+        else if (args.command.name == "add-y")
+        {
+            std::string s = args.command.params;
+            const auto v = consume_double (s);
+            add_y (is (), os (), v);
+        }
+        else if (args.command.name == "add-z")
+        {
+            std::string s = args.command.params;
+            const auto v = consume_double (s);
+            add_z (is (), os (), v);
+        }
+        else if (args.command.name == "quantize-xyz")
         {
             std::string s = args.command.params;
             const auto v = consume_double (s);
@@ -128,6 +146,24 @@ int main (int argc, char **argv)
             std::string s = args.command.params;
             const auto v = consume_double (s);
             rotate_z (is (), os (), v);
+        }
+        else if (args.command.name == "scale-x")
+        {
+            std::string s = args.command.params;
+            const auto v = consume_double (s);
+            scale_x (is (), os (), v);
+        }
+        else if (args.command.name == "scale-y")
+        {
+            std::string s = args.command.params;
+            const auto v = consume_double (s);
+            scale_y (is (), os (), v);
+        }
+        else if (args.command.name == "scale-z")
+        {
+            std::string s = args.command.params;
+            const auto v = consume_double (s);
+            scale_z (is (), os (), v);
         }
         else if (args.command.name == "set")
         {

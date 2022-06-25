@@ -7,6 +7,72 @@ using namespace std;
 using namespace spoc;
 using namespace spoc::transform;
 
+void test_transform_add ()
+{
+    // Generate random reference
+    const auto p = generate_random_point_records (100);
+
+    default_random_engine g;
+    uniform_real_distribution<double> d (-100, 100);
+
+    for (auto i : { 0, 1, 2, 3, 4})
+    {
+        (void)i; // disable not used warning
+        const double offset = d (g);
+
+        // Copy it
+        auto qx (p);
+        auto qy (p);
+        auto qz (p);
+
+        // Test in-place functions
+        add_x (qx, offset);
+        add_y (qy, offset);
+        add_z (qz, offset);
+
+        // Verify that the correct axis was used
+        verify (about_equal (p[3].x + offset, qx[3].x));
+        verify (p[3].y == qx[3].y);
+        verify (p[3].z == qx[3].z);
+        verify (p[3].x == qy[3].x);
+        verify (about_equal (p[3].y + offset, qy[3].y));
+        verify (p[3].z == qy[3].z);
+        verify (p[3].x == qz[3].x);
+        verify (p[3].y == qz[3].y);
+        verify (about_equal (p[3].z + offset, qz[3].z));
+
+        // Test streaming functions
+        stringstream is, os;
+        const string wkt ("Test WKT");
+        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
+
+        add_x (is, os, offset);
+        auto r = read_spoc_file_uncompressed (os);
+        qx = r.get_point_records ();
+
+        add_y (is, os, offset);
+        r = read_spoc_file_uncompressed (os);
+        qy = r.get_point_records ();
+
+        add_z (is, os, offset);
+        r = read_spoc_file_uncompressed (os);
+        qz = r.get_point_records ();
+
+        // Verify that the correct axis was used
+        verify (about_equal (p[3].x + offset, qx[3].x));
+        verify (p[3].y == qx[3].y);
+        verify (p[3].z == qx[3].z);
+        verify (p[3].x == qy[3].x);
+        verify (about_equal (p[3].y + offset, qy[3].y));
+        verify (p[3].z == qy[3].z);
+        verify (p[3].x == qz[3].x);
+        verify (p[3].y == qz[3].y);
+        verify (about_equal (p[3].z + offset, qz[3].z));
+    }
+}
+
 void test_transform_quantize ()
 {
     // Generate spoc files
@@ -238,6 +304,72 @@ void test_transform_replace ()
     }
 }
 
+void test_transform_scale ()
+{
+    // Generate random reference
+    const auto p = generate_random_point_records (100);
+
+    default_random_engine g;
+    uniform_real_distribution<double> d (-100, 100);
+
+    for (auto i : { 0, 1, 2, 3, 4})
+    {
+        (void)i; // disable not used warning
+        const double s = d (g);
+
+        // Copy it
+        auto qx (p);
+        auto qy (p);
+        auto qz (p);
+
+        // Test in-place functions
+        scale_x (qx, s);
+        scale_y (qy, s);
+        scale_z (qz, s);
+
+        // Verify that the correct axis was used
+        verify (about_equal (p[3].x * s, qx[3].x));
+        verify (p[3].y == qx[3].y);
+        verify (p[3].z == qx[3].z);
+        verify (p[3].x == qy[3].x);
+        verify (about_equal (p[3].y * s, qy[3].y));
+        verify (p[3].z == qy[3].z);
+        verify (p[3].x == qz[3].x);
+        verify (p[3].y == qz[3].y);
+        verify (about_equal (p[3].z * s, qz[3].z));
+
+        // Test streaming functions
+        stringstream is, os;
+        const string wkt ("Test WKT");
+        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
+
+        scale_x (is, os, s);
+        auto r = read_spoc_file_uncompressed (os);
+        qx = r.get_point_records ();
+
+        scale_y (is, os, s);
+        r = read_spoc_file_uncompressed (os);
+        qy = r.get_point_records ();
+
+        scale_z (is, os, s);
+        r = read_spoc_file_uncompressed (os);
+        qz = r.get_point_records ();
+
+        // Verify that the correct axis was used
+        verify (about_equal (p[3].x * s, qx[3].x));
+        verify (p[3].y == qx[3].y);
+        verify (p[3].z == qx[3].z);
+        verify (p[3].x == qy[3].x);
+        verify (about_equal (p[3].y * s, qy[3].y));
+        verify (p[3].z == qy[3].z);
+        verify (p[3].x == qz[3].x);
+        verify (p[3].y == qz[3].y);
+        verify (about_equal (p[3].z * s, qz[3].z));
+    }
+}
+
 void test_transform_set ()
 {
     for (auto rgb : {true, false})
@@ -274,10 +406,12 @@ int main (int argc, char **argv)
     using namespace std;
     try
     {
+        test_transform_add ();
         test_transform_quantize ();
         test_transform_rotate1 ();
         test_transform_rotate2 ();
         test_transform_replace ();
+        test_transform_scale ();
         test_transform_set ();
         return 0;
     }

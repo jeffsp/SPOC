@@ -30,12 +30,18 @@ struct args
 
 enum command_values
 {
-    SET = 1000,
+    ADD_X = 1000,
+    ADD_Y, // = 1001
+    ADD_Z, // = 1002, ..., etc.
     QUANTIZE_XYZ,
-    REPLACE, // = 1001
+    REPLACE,
     ROTATE_X,
     ROTATE_Y,
     ROTATE_Z,
+    SCALE_X,
+    SCALE_Y,
+    SCALE_Z,
+    SET,
 };
 
 args set_command (const args &args, const std::string &name, const char *s)
@@ -61,11 +67,17 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
             {"version", no_argument, 0, 'e'},
+            {"add-x", required_argument, 0, ADD_X},
+            {"add-y", required_argument, 0, ADD_Y},
+            {"add-z", required_argument, 0, ADD_Z},
             {"quantize-xyz", required_argument, 0, QUANTIZE_XYZ},
             {"replace", required_argument, 0, REPLACE},
             {"rotate-x", required_argument, 0, ROTATE_X},
             {"rotate-y", required_argument, 0, ROTATE_Y},
             {"rotate-z", required_argument, 0, ROTATE_Z},
+            {"scale-x", required_argument, 0, SCALE_X},
+            {"scale-y", required_argument, 0, SCALE_Y},
+            {"scale-z", required_argument, 0, SCALE_Z},
             {"set", required_argument, 0, SET},
             {0, 0, 0, 0}
         };
@@ -88,6 +100,21 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             }
             case 'v': { args.verbose = true; break; }
             case 'e': { args.version = true; break; }
+            case ADD_X:
+            {
+                args = set_command (args, "add-x", optarg);
+                break;
+            }
+            case ADD_Y:
+            {
+                args = set_command (args, "add-y", optarg);
+                break;
+            }
+            case ADD_Z:
+            {
+                args = set_command (args, "add-z", optarg);
+                break;
+            }
             case QUANTIZE_XYZ:
             {
                 args = set_command (args, "quantize-xyz", optarg);
@@ -111,6 +138,21 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case ROTATE_Z:
             {
                 args = set_command (args, "rotate-z", optarg);
+                break;
+            }
+            case SCALE_X:
+            {
+                args = set_command (args, "scale-x", optarg);
+                break;
+            }
+            case SCALE_Y:
+            {
+                args = set_command (args, "scale-y", optarg);
+                break;
+            }
+            case SCALE_Z:
+            {
+                args = set_command (args, "scale-z", optarg);
                 break;
             }
             case SET:

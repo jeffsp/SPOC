@@ -19,11 +19,26 @@ spoc_transform --help &> /dev/null
 # This should fail
 ! spoc_transform --asdf &> /dev/null
 
+# Add
+#spoc_info test_data/lidar/juarez50.spoc
+spoc_transform --add-x=100 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
+spoc_transform --add-y=100 \
+    < test_data/lidar/juarez50.spoc \
+    > ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
+spoc_transform --add-z=100 \
+    < test_data/lidar/juarez50.spoc \
+    > ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
+
 # Quantize
 spoc_transform --quantize-xyz=0.01 \
     test_data/lidar/juarez50.spoc \
     ${TMPDIR}/output.spoc
-#spoc_info ${TMPDIR}/juarez50_quantized.spoc
+#spoc_info ${TMPDIR}/output.spoc
 spoc_transform --quantize-xyz=10 \
     < test_data/lidar/juarez50.spoc \
     > ${TMPDIR}/output.spoc
@@ -61,6 +76,21 @@ spoc_transform --rotate-y=90 \
 
 #spoc_info test_data/lidar/juarez50.spoc
 spoc_transform --rotate-z=90 \
+    < test_data/lidar/juarez50.spoc \
+    > ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
+
+# Scale
+#spoc_info test_data/lidar/juarez50.spoc
+spoc_transform --scale-x=10 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
+spoc_transform --scale-y=10 \
+    < test_data/lidar/juarez50.spoc \
+    > ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
+spoc_transform --scale-z=10 \
     < test_data/lidar/juarez50.spoc \
     > ${TMPDIR}/output.spoc
 #spoc_info ${TMPDIR}/output.spoc
