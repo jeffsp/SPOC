@@ -111,24 +111,31 @@ the Windows Linux subsystem.
   - [X] Add offset to X,Y,Z: addx/y/z #
   - [X] Scale by X,Y,Z: scale, scalex/y/z
 
-- [ ] spoc\_generate: Generate values for each point
-  - [ ] Write to stdout in binary format
-  - [ ] Write to extra[0..N]
-  - [ ] Generate grid indexes for each point
-    - [ ] Specify a projection plane, XY, XZ, YZ
-  - [ ] Generate voxel indexes for each point
-    - [ ] Voxel size in X, Y, Z
-
 - [ ] spoc\_filter: Remove point records from a spoc file
   - [ ] Remove when field f==, <=, >=, <, > value
+  - [ ] Keep when field f==, <=, >=, <, > value
   - [ ] Unique: Remove duplicates with same X, Y, Z values
   - [ ] Subsample: Remove duplicates with same voxel indexes in extra[0,1,2]
         fields, subsample=K: keep N duplicates
 
+- [ ] spoc\_generate: Generate values for each point
+  - [ ] Write to stdout in text format
+  - [ ] Write to extra[0..N]
+  - [ ] Generate 2D grid indexes for each point
+    - [ ] Grid size (resolution)
+    - [ ] Grid size in X, Y
+    - [ ] Specify a projection plane, XY, XZ, YZ
+  - [ ] Generate 3D voxel indexes for each point
+    - [ ] Voxel size (resolution)
+    - [ ] Voxel size in X, Y, Z
+
 - [ ] spoc\_project: Project points onto a plane
-  - [ ] grid indexes are stored in extra[0,1]
+  - [ ] grid indexes are stored in extra[0..N]
   - [ ] pixel data type, int/float, 8/16/32/64
   - [ ] pixel size in m/pixel
+  - [ ] Specify a projection plane, XY, XZ, YZ
+  - [ ] Specify a projection plane, normal=x,y,z
+  - [ ] Direction of projection, normal=x,y,z
   - [ ] nodata value
   - [ ] field: z, c, p, i, r, g, b, 0-7
   - [ ] normalize output
@@ -152,7 +159,7 @@ the Windows Linux subsystem.
         the points using the original voxel indexes
         Note that this is useful for restoring points to a point cloud
         that has been subsampled (decimated).
-  - [ ] 2D/3D field smoothing - does not changes xyz coords
+  - [ ] 2D/3D field smoothing - does not change xyz coords
         smooth f sigma
   - [ ] Spatial smoothing - 2D/3D spatial filtering, changes 3D structure
                           - Gaussian filter
