@@ -28,7 +28,11 @@ std::map<std::string,size_t> get_class_map (const T &c)
     std::map<std::string,size_t> a;
 
     for (auto i : m)
-        a[std::to_string (i.first)] = i.second;
+    {
+        std::stringstream s;
+        s << std::setfill('0') << std::setw(3) << std::to_string (i.first);
+        a[s.str ()] = i.second;
+    }
 
     return a;
 }
