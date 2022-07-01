@@ -54,7 +54,6 @@ the Windows Linux subsystem.
 - [ ] Reorganize namespaces and headers
 - [X] Create header only library with examples
 - [X] Read/write uncompressed
-- [X] Create compression utilities read/write compressed files
 - [X] Add NEXTRA field in header
 - [X] Allow arbitrary number of extra fields
 - [X] Rename 'extra\_size' -> 'extra\_fields'
@@ -78,6 +77,9 @@ the Windows Linux subsystem.
   - [X] Unit/integration tests
 - [X] spoc spoc2text/text2spoc
   - [X] Unit/integration tests
+- [X] spoc compress/decompress
+  - [ ] Add --precision argument to compress to improve compression?
+  - [ ] Revisit command line input/output file specifications, support pipes?
 - [X] spoc spoc2las/las2spoc
   - [X] Unit/integration tests
 - [X] spoc srs: Get/set SRS
