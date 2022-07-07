@@ -132,7 +132,7 @@ standard.
                      point cloud, then project.
   - [ ] Grid size (resolution)
   - [ ] Field: z, c, p, i, r, g, b, extra[0..N]
-  - [ ] Z elevation = min/max/mode/avg/%quantile
+  - [ ] Z elevation = min/max/median/mode/avg/%centile
   - [ ] normalize output
   - [ ] z-score output
   - [ ] pixel data type, int/uint/float, 8/16/32/64

@@ -474,6 +474,19 @@ class spoc_file
 };
 
 // Spoc File I/O
+inline point_records read_uncompressed_points (std::istream &s,
+    const size_t total_points,
+    const size_t extra_fields)
+{
+    // Read the data
+    point_records p;
+    p.resize (total_points);
+    for (size_t i = 0; i < p.size (); ++i)
+        p[i] = read_point_record (s, extra_fields);
+
+    return p;
+}
+
 inline spoc_file read_spoc_file_uncompressed (std::istream &s)
 {
     // Read the header
@@ -484,44 +497,36 @@ inline spoc_file read_spoc_file_uncompressed (std::istream &s)
         throw std::runtime_error ("Uncompressed reader can't read a compressed file");
 
     // Read the data
-    point_records p;
-    p.resize (h.total_points);
-    for (size_t i = 0; i < p.size (); ++i)
-        p[i] = read_point_record (s, h.extra_fields);
+    point_records p = read_uncompressed_points (s, h.total_points, h.extra_fields);
 
     return spoc_file (h, p);
 }
 
-inline spoc_file read_spoc_file_compressed (std::istream &s)
+inline point_records read_compressed_points (std::istream &s,
+    const size_t total_points,
+    const size_t extra_fields)
 {
-    // Read the header
-    header h = read_header (s);
-
-    // Check compression flag
-    if (!h.compressed)
-        throw std::runtime_error ("Compressed reader can't read an uncompressed file");
-
     // Read the data
     point_records prs;
-    prs.resize (h.total_points);
+    prs.resize (total_points);
 
     // Read data
-    std::vector<double> x = read_compressed<double> (s, h.total_points);
-    std::vector<double> y = read_compressed<double> (s, h.total_points);
-    std::vector<double> z = read_compressed<double> (s, h.total_points);
-    std::vector<uint32_t> c = read_compressed<uint32_t> (s, h.total_points);
-    std::vector<uint32_t> p = read_compressed<uint32_t> (s, h.total_points);
-    std::vector<uint16_t> i = read_compressed<uint16_t> (s, h.total_points);
-    std::vector<uint16_t> r = read_compressed<uint16_t> (s, h.total_points);
-    std::vector<uint16_t> g = read_compressed<uint16_t> (s, h.total_points);
-    std::vector<uint16_t> b = read_compressed<uint16_t> (s, h.total_points);
+    std::vector<double> x = read_compressed<double> (s, total_points);
+    std::vector<double> y = read_compressed<double> (s, total_points);
+    std::vector<double> z = read_compressed<double> (s, total_points);
+    std::vector<uint32_t> c = read_compressed<uint32_t> (s, total_points);
+    std::vector<uint32_t> p = read_compressed<uint32_t> (s, total_points);
+    std::vector<uint16_t> i = read_compressed<uint16_t> (s, total_points);
+    std::vector<uint16_t> r = read_compressed<uint16_t> (s, total_points);
+    std::vector<uint16_t> g = read_compressed<uint16_t> (s, total_points);
+    std::vector<uint16_t> b = read_compressed<uint16_t> (s, total_points);
 
-    std::vector<std::vector<uint64_t>> extra (h.extra_fields);
+    std::vector<std::vector<uint64_t>> extra (extra_fields);
     for (size_t j = 0; j < extra.size (); ++j)
-        extra[j] = read_compressed<uint64_t> (s, h.total_points);
+        extra[j] = read_compressed<uint64_t> (s, total_points);
 
     // Copy them into the point records
-    prs.resize (h.total_points);
+    prs.resize (total_points);
 
     #pragma omp parallel for
     for (size_t n = 0; n < prs.size (); ++n)
@@ -535,12 +540,44 @@ inline spoc_file read_spoc_file_compressed (std::istream &s)
         if (!r.empty ()) prs[n].r = r[n];
         if (!g.empty ()) prs[n].g = g[n];
         if (!b.empty ()) prs[n].b = b[n];
-        prs[n].extra.resize (h.extra_fields);
+        prs[n].extra.resize (extra_fields);
         for (size_t j = 0; j < prs[n].extra.size (); ++j)
             if (!extra[j].empty ()) prs[n].extra[j] = extra[j][n];
     }
 
+    return prs;
+}
+
+inline spoc_file read_spoc_file_compressed (std::istream &s)
+{
+    // Read the header
+    header h = read_header (s);
+
+    // Check compression flag
+    if (!h.compressed)
+        throw std::runtime_error ("Compressed reader can't read an uncompressed file");
+
+    // Read the data
+    point_records prs = read_compressed_points (s, h.total_points, h.extra_fields);
+
     return spoc_file (h, prs);
+}
+
+inline spoc_file read_spoc_file (std::istream &s)
+{
+    // Read the header
+    header h = read_header (s);
+
+    // The points
+    point_records p;
+
+    // Check compression flag
+    if (h.compressed)
+        p = read_compressed_points (s, h.total_points, h.extra_fields);
+    else
+        p = read_uncompressed_points (s, h.total_points, h.extra_fields);
+
+    return spoc_file (h, p);
 }
 
 inline void write_spoc_file_uncompressed (std::ostream &s, const spoc_file &f)

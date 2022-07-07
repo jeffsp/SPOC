@@ -204,6 +204,26 @@ void test_spoc_file_io ()
     verify (p == f.get_point_records ());
     }
 
+    {
+    stringstream s;
+    const string wkt = "Test wkt";
+    write_spoc_file_uncompressed (s, spoc_file (wkt, p));
+    const auto f = read_spoc_file (s);
+
+    verify (f.get_header ().wkt == wkt);
+    verify (p == f.get_point_records ());
+    }
+
+    {
+    stringstream s;
+    const string wkt = "Test wkt";
+    write_spoc_file_compressed (s, spoc_file (wkt, true, p));
+    const auto f = read_spoc_file (s);
+
+    verify (f.get_header ().wkt == wkt);
+    verify (p == f.get_point_records ());
+    }
+
     // Fail when reading signature
     {
     stringstream s;
