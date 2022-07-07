@@ -1,34 +1,41 @@
 # Introduction
 
-SPOC is the Simple POint Cloud format used to store 3D geospatial data.
+SPOC is a Simple POint Cloud format used to store 3D geospatial data.
+
+# File format
 
 A SPOC file consists of a **HEADER** followed by **POINT RECORDS**.
 
-The **HEADER** contains a SPOC file identifier, the spoc format version
-numbers, the number of points records contained in the file, and an
-arbitrary length data string that can be used to store spatial reference
-system data.
+The **HEADER** contains the following information:
 
-Each **POINT RECORD** in a SPOC file contains an X, Y, and Z coordinate
-stored as 64-bit precision floating point numbers, as well as other
-associated data fields, like red, green, and blue color information,
-classification information, point identifier, intensity information, or
-arbitrary integer values.
+    * SPOC file identifier
+    * SPOC format major and minor version numbers
+    * An arbitrary length character string that can be used to store
+      spatial reference system data
+    * The number of 64-bit extra fields associated with each point record
+    * The number of points records contained in the file
+    * A flag indicating whether or not the contents are compressed
 
-# Description of SPOC Format
+Each **POINT RECORD** in a SPOC file contains:
 
-The proposed extension is SPOC, or Simple POint Cloud.
+    * X, Y, and Z coordinates stored as 64-bit precision floating point numbers
+    * 32-bit classification
+    * 32-bit point ID
+    * 16-bit intensity/NIR information
+    * 16-bit red channel information
+    * 16-bit green channel information
+    * 16-bit blue channel information
+    * Zero or more 64-bit extra fields
 
-* Points are stored as a vector of point records
-* The order of the point records is preserved
-* Point locations are stored as 64-bit double precision numbers, so
-  about 16 decimal digits of precision is preserved, assuming an IEEE
-  754 standard.
-* Each point has associated 16- and 32-bit fields that are common to 3D
-  point collections, like red, green, blue, intensity, collection ID,
-  classification, and arbitrary 64-bit unsigned integer side data.
+Points are stored in SPOC file as a vector of point records.
 
-# Requirements
+The order of point records is preserved.
+
+Point coordinates are stored as 64-bit double precision numbers, so
+about 16 decimal digits of precision is preserved, assuming an IEEE 754
+standard.
+
+# Design
 
 * 64-bit double precision
 * Linear complexity algorithms
@@ -43,11 +50,8 @@ The proposed extension is SPOC, or Simple POint Cloud.
     * laslib for las/spoc translation utilities
 * SPOC makes assumptions about the byte ordering, and is therefore not
   portable
-
-## OS Support
-
-This project is defined for Linux-based systems, including MAC OS and
-the Windows Linux subsystem.
+* This project is defined for Linux-based systems, including MAC OS and
+  the Windows Linux subsystem.
 
 # TODO
 
@@ -117,42 +121,28 @@ the Windows Linux subsystem.
   - [ ] Remove when field f==, <=, >=, <, > value
   - [ ] Keep when field f==, <=, >=, <, > value
   - [ ] Unique: Remove duplicates with same X, Y, Z values
-  - [ ] Subsample: Remove duplicates with same voxel indexes in extra[0,1,2]
-        fields, subsample=K: keep N duplicates
-
-- [ ] spoc\_generate: Generate values for each point
-  - [ ] Write to stdout in text format
-  - [ ] Write to extra[0..N]
-  - [ ] Generate 2D grid indexes for each point
-    - [ ] Grid size (resolution)
-    - [ ] Grid size in X, Y
-    - [ ] Specify a projection plane, XY, XZ, YZ
-  - [ ] Generate 3D voxel indexes for each point
+  - [ ] Subsample: Remove duplicates with same voxel indexes
+    - [ ] Use voxel indexes in extra[0,1,2] fields
     - [ ] Voxel size (resolution)
     - [ ] Voxel size in X, Y, Z
+    - [ ] subsample=K: keep K duplicates
 
-- [ ] spoc\_project: Project points onto a plane
-  - [ ] grid indexes are stored in extra[0..N]
-  - [ ] pixel data type, int/float, 8/16/32/64
-  - [ ] pixel size in m/pixel
-  - [ ] Specify a projection plane, XY, XZ, YZ
-  - [ ] Specify a projection plane, normal=x,y,z
-  - [ ] Direction of projection, normal=x,y,z
-  - [ ] nodata value
-  - [ ] field: z, c, p, i, r, g, b, 0-7
+- [ ] spoc\_project: Project points onto a 2D plane. In order to project
+                     onto XZ or YZ or an arbitrary plane, first rotate the
+                     point cloud, then project.
+  - [ ] Grid size (resolution)
+  - [ ] Field: z, c, p, i, r, g, b, extra[0..N]
+  - [ ] Z elevation = min/max/mode/avg/%quantile
   - [ ] normalize output
   - [ ] z-score output
-  - [ ] min/max/%quantile
-  - [ ] randomly select/vote
+  - [ ] pixel data type, int/uint/float, 8/16/32/64
   - [ ] geotiff output
+    - [ ] nodata value
   - [ ] png output
 
 - [ ] spoc\_tool: Common operations that do not stream
-  - [ ] Get/Set XYZ
-    - [ ] text/binary
-  - [ ] Get/Set field F
-    - [ ] text/binary
-    - [ ] integer/float
+  - [ ] Get/Set XYZ as text
+  - [ ] Get/Set field F as text
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
   - [ ] Use the voxel indexes for aligning points when
