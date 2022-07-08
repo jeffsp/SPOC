@@ -58,6 +58,9 @@ highest 25% of the values are spread out over the range 89 to 4088.
 \-\-summary-info, -s
 : Toggle summary information switch
 
+\-\-classifications, -l
+: Toggle classification information switch
+
 \-\-compact, -c
 : Toggle compact output mode switch
 
