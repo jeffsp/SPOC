@@ -167,17 +167,16 @@ inline std::ostream &operator<< (std::ostream &s, const point_record &p)
 // Record I/O
 inline void write_point_record (std::ostream &s, const point_record &p)
 {
-    s.write (reinterpret_cast<const char*>(&p.x), sizeof(double));
-    s.write (reinterpret_cast<const char*>(&p.y), sizeof(double));
-    s.write (reinterpret_cast<const char*>(&p.z), sizeof(double));
-    s.write (reinterpret_cast<const char*>(&p.c), sizeof(uint32_t));
-    s.write (reinterpret_cast<const char*>(&p.p), sizeof(uint32_t));
-    s.write (reinterpret_cast<const char*>(&p.i), sizeof(uint16_t));
-    s.write (reinterpret_cast<const char*>(&p.r), sizeof(uint16_t));
-    s.write (reinterpret_cast<const char*>(&p.g), sizeof(uint16_t));
-    s.write (reinterpret_cast<const char*>(&p.b), sizeof(uint16_t));
-    for (size_t j = 0; j < p.extra.size (); ++j)
-        s.write (reinterpret_cast<const char*>(&p.extra[j]), sizeof(uint64_t));
+    s.write (reinterpret_cast<const char*>(&p.x), sizeof(double)
+        + sizeof(double)
+        + sizeof(double)
+        + sizeof(uint32_t)
+        + sizeof(uint32_t)
+        + sizeof(uint16_t)
+        + sizeof(uint16_t)
+        + sizeof(uint16_t)
+        + sizeof(uint16_t));
+    s.write (reinterpret_cast<const char*>(&p.extra[0]), p.extra.size () * sizeof(uint64_t));
     s.flush ();
 }
 
@@ -185,18 +184,17 @@ inline void write_point_record (std::ostream &s, const point_record &p)
 inline point_record read_point_record (std::istream &s, const size_t extra_fields)
 {
     point_record p;
+    s.read (reinterpret_cast<char*>(&p.x), sizeof(double)
+        + sizeof(double)
+        + sizeof(double)
+        + sizeof(uint32_t)
+        + sizeof(uint32_t)
+        + sizeof(uint16_t)
+        + sizeof(uint16_t)
+        + sizeof(uint16_t)
+        + sizeof(uint16_t));
     p.extra.resize (extra_fields);
-    s.read (reinterpret_cast<char*>(&p.x), sizeof(double));
-    s.read (reinterpret_cast<char*>(&p.y), sizeof(double));
-    s.read (reinterpret_cast<char*>(&p.z), sizeof(double));
-    s.read (reinterpret_cast<char*>(&p.c), sizeof(uint32_t));
-    s.read (reinterpret_cast<char*>(&p.p), sizeof(uint32_t));
-    s.read (reinterpret_cast<char*>(&p.i), sizeof(uint16_t));
-    s.read (reinterpret_cast<char*>(&p.r), sizeof(uint16_t));
-    s.read (reinterpret_cast<char*>(&p.g), sizeof(uint16_t));
-    s.read (reinterpret_cast<char*>(&p.b), sizeof(uint16_t));
-    for (size_t j = 0; j < p.extra.size (); ++j)
-        s.read (reinterpret_cast<char*>(&p.extra[j]), sizeof(uint64_t));
+    s.read (reinterpret_cast<char*>(&p.extra[0]), p.extra.size () * sizeof(uint64_t));
     return p;
 }
 
