@@ -55,6 +55,9 @@ standard.
 
 # TODO
 
+- [ ] Generate documentation
+  - [ ] Manual
+  - [ ] SDK
 - [ ] Reorganize namespaces and headers
 - [X] Create header only library with examples
 - [X] Read/write uncompressed
@@ -96,8 +99,10 @@ standard.
   - [X] Unit/integration tests
 - [X] spoc tile: Tile into regular non-overlapping tiles.
   - [X] Number of tiles on largest size
+  - [X] Size of tile on one side
   - [ ] Multi-pass tiling for large files
   - [X] Unit/integration tests
+  - [ ] Tile in one direction only to get a transect slice
 - [X] spoc merge: Combine several point clouds into one
   - [X] Set point id
   - [X] Warn if the SRS info strings differ
@@ -191,7 +196,9 @@ standard.
 
 - [ ] Script Examples
   - [ ] Machine learning
-    - [ ] Rotate, project, etc.
+    - [ ] Rotate by 5 degrees off nadir, then project to XY plane
+    - [ ] Slice a 1 meter transect, rotate by 90 degrees, project to get
+          a transect
     - [ ] Regularization, add noise
     - [ ] Tile
   - [ ] Decimate/undecimate
