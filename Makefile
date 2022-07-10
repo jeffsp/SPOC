@@ -80,6 +80,10 @@ coverage: build
 examples:
 	@$(MAKE) -C examples
 
+.PHONY: doxygen # Generate documentation
+doxygen:
+	SPOC_PROJECT_NUMBER=$(git rev-parse --short HEAD) doxygen Doxyfile
+
 .PHONY: man_pages # Generate man pages
 man_pages:
 	@mkdir -p build/man
