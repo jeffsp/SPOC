@@ -53,8 +53,10 @@ standard.
 * This project is defined for Linux-based systems, including MAC OS and
   the Windows Linux subsystem.
 
-# TODO
+# Project Roadmap
 
+- [X] Add Doxygen support
+- [ ] Add Design by Contract functionality
 - [ ] Generate documentation
   - [ ] Manual
   - [ ] SDK
