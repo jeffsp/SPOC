@@ -9,7 +9,7 @@
 namespace spoc
 {
 
-// A point in 3D space
+/// A point in 3D space
 template<typename T>
 struct point
 {
@@ -18,8 +18,10 @@ struct point
     T z = 0;
 };
 
-// Point operators
-
+/// Compare two points for equality
+///
+/// @param a First point
+/// @param b Second point
 inline bool operator== (const point<double> &a, const point<double> &b)
 {
     if (a.x != b.x) return false;
@@ -28,11 +30,19 @@ inline bool operator== (const point<double> &a, const point<double> &b)
     return true;
 }
 
+/// Compare two points for inequality
+///
+/// @param a First point
+/// @param b Second point
 inline bool operator!= (const point<double> &a, const point<double> &b)
 {
     return !(a == b);
 }
 
+/// Subtract one point from another
+///
+/// @param a First point
+/// @param b Second point
 inline point<double> operator-= (point<double> &a, const point<double> &b)
 {
     a.x -= b.x;
@@ -41,12 +51,20 @@ inline point<double> operator-= (point<double> &a, const point<double> &b)
     return a;
 }
 
+/// Subtract one point from another
+///
+/// @param a First point
+/// @param b Second point
 inline point<double> operator- (const point<double> &a, const point<double> &b)
 {
     auto c (a);
     return c -= b;
 }
 
+/// Add one point to another
+///
+/// @param a First point
+/// @param b Second point
 inline point<double> operator+= (point<double> &a, const point<double> &b)
 {
     a.x += b.x;
@@ -55,12 +73,20 @@ inline point<double> operator+= (point<double> &a, const point<double> &b)
     return a;
 }
 
+/// Add one point to another
+///
+/// @param a First point
+/// @param b Second point
 inline point<double> operator+ (const point<double> &a, const point<double> &b)
 {
     auto c (a);
     return c += b;
 }
 
+/// Helper function for printing a point
+///
+/// @param s Output stream
+/// @param p Point to print
 inline std::ostream &operator<< (std::ostream &s, const point<double> &p)
 {
     s << ' ' << p.x;
@@ -69,6 +95,10 @@ inline std::ostream &operator<< (std::ostream &s, const point<double> &p)
     return s;
 }
 
+/// Point less than operator
+///
+/// @param a First point
+/// @param b Second point
 inline bool operator< (const point<double> &a, const point<double> &b)
 {
     if (a.x < b.x) return true;
@@ -137,6 +167,11 @@ inline std::vector<point<T>> decode_points (const std::vector<uint8_t> &bytes)
     return points;
 }
 
+/// double equality test with precision
+///
+/// @param a First value
+/// @param b Second value
+/// @param precision Precision
 inline bool about_equal (const double &a,
     const double &b,
     const unsigned precision)
@@ -147,6 +182,11 @@ inline bool about_equal (const double &a,
     return true;
 }
 
+/// Point equality test with precision
+///
+/// @param a First point
+/// @param b Second point
+/// @param precision Precision
 inline bool about_equal (const point<double> &a,
     const point<double> &b,
     const unsigned precision)
@@ -160,6 +200,11 @@ inline bool about_equal (const point<double> &a,
     return true;
 }
 
+/// Vector of points equality test with precision
+///
+/// @param a First vector
+/// @param b Second vector
+/// @param precision Precision
 inline bool about_equal (const std::vector<point<double>> &a,
     const std::vector<point<double>> &b,
     unsigned precision = 12)
@@ -171,4 +216,4 @@ inline bool about_equal (const std::vector<point<double>> &a,
     return true;
 }
 
-}
+} // namespace spoc

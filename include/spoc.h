@@ -13,12 +13,20 @@
 #include <unordered_set>
 #include <vector>
 
+/// Top level namespace for all SPOC definitions
 namespace spoc
 {
 
-// File format
+///
+/// POD struct for SPOC file header
+///
 struct header
 {
+    /// Constructor
+    /// @param wkt Well known text string
+    /// @param extra_fields Number of extra fields in each point record
+    /// @param total_points Total points in the SPOC file
+    /// @param compressed Compression flag
     header (const std::string &wkt,
             const size_t extra_fields,
             const size_t total_points,
