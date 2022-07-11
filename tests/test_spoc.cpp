@@ -1,3 +1,4 @@
+#include "app_utils.h"
 #include "compress.h"
 #include "spoc.h"
 #include "test_utils.h"
@@ -324,9 +325,13 @@ void test_spoc_file_compressed_io ()
 
 void test_field_name ()
 {
+    using namespace spoc::app_utils;
     string s = "e100";
+    verify (is_extra_field (s));
     auto i = get_extra_index (s);
     verify (i == 100);
+    verify (!is_extra_field ("x100"));
+    verify (is_extra_field ("e1000001"));
     i = get_extra_index ("x100");
     verify (i == -1);
     i = get_extra_index ("exyz");

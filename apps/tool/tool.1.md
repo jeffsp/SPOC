@@ -27,12 +27,27 @@ Collection of tools to run on a SPOC file
 
 # COMMANDS
 
+\-\-get-field=*F*
+:   Get point field *F* and write it either to stdout or to a file as
+    text. *F* can be one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or
+    'e#', where the '#' after the 'e' specifies the extra field number.
+
 \-\-recenter-xy
 :   Recenter the point cloud by subtracting the mean X and Y value from
     each point's X and Y value
 
 \-\-recenter-xyz
 :   Same as recenter-xy, but also recenter the Z value
+
+\-\-set-field=*F*
+:   Set point field *F* by reading it from a file or from stdin as text.
+    *F* can be one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or 'e#',
+    where the '#' after the 'e' specifies the extra field number.
+
+\-\-field-filename=*FN*
+:   Set the filename of the text file used with the *set-field* command.
+    This file (or named pipe) will contain newline separated values for
+    the field being set.
 
 \-\-subtract-min-xy
 :   Subtract minimum X and Y values from all X and Y values, thereby

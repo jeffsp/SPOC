@@ -9,52 +9,6 @@
 using namespace std;
 using namespace spoc;
 
-string consume_field_name (std::string &s)
-{
-    // Check string
-    assert (!s.empty ());
-
-    // Get the char
-    char c = s[0];
-    string field_name;
-    while (isalnum (c))
-    {
-        field_name += c;
-        // Skip over the char
-        s.erase (0, 1);
-        c = s[0];
-    }
-
-    // Make sure it's a valid name
-    if (!check_field_name (field_name))
-        throw runtime_error (std::string ("Invalid field name: " + field_name));
-
-    // Skip over the char
-    s.erase (0, 1);
-
-    return field_name;
-}
-
-int consume_int (std::string &s)
-{
-    size_t sz = 0;
-    int v = 0.0;
-    try { v = std::stoi (s, &sz); }
-    catch (...) { throw std::runtime_error (std::string ("Could not parse int value string: ") + s); }
-    s.erase (0, sz + 1);
-    return v;
-}
-
-double consume_double (std::string &s)
-{
-    size_t sz = 0;
-    double v = 0.0;
-    try { v = std::stod (s, &sz); }
-    catch (...) { throw std::runtime_error (std::string ("Could not parse number value string: ") + s); }
-    s.erase (0, sz + 1);
-    return v;
-}
-
 int main (int argc, char **argv)
 {
     using namespace std;
@@ -95,6 +49,7 @@ int main (int argc, char **argv)
         // Get the output stream
         app_utils::output_stream os (args.verbose, args.output_fn);
 
+        using namespace spoc::app_utils;
         using namespace spoc::transform;
 
         if (args.command.name == "add-x")

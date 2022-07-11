@@ -1,13 +1,13 @@
-#include "util.h"
+#include "tool.h"
 #include "test_utils.h"
 #include <iostream>
 #include <stdexcept>
 
 using namespace std;
 using namespace spoc;
-using namespace spoc::util;
+using namespace spoc::tool;
 
-void test_tool_recenter ()
+void test_recenter ()
 {
     for (auto rgb : {true, false})
     {
@@ -53,7 +53,7 @@ void test_tool_recenter ()
     }
 }
 
-void test_tool_subtract_min ()
+void test_subtract_min ()
 {
     // Generate spoc files
     auto f = generate_random_spoc_file (100, 8, false, true);
@@ -69,13 +69,25 @@ void test_tool_subtract_min ()
     const auto h = read_spoc_file_uncompressed (os);
 }
 
+void test_get_field ()
+{
+    verify (false);
+}
+
+void test_set_field ()
+{
+    verify (false);
+}
+
 int main (int argc, char **argv)
 {
     using namespace std;
     try
     {
-        test_tool_recenter ();
-        test_tool_subtract_min ();
+        test_recenter ();
+        test_subtract_min ();
+        test_get_field ();
+        test_set_field ();
         return 0;
     }
     catch (const exception &e)

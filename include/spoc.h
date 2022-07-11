@@ -689,43 +689,4 @@ inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
         write_compressed (s, extras[j]);
 }
 
-const std::unordered_set<std::string> field_strings {"x", "y", "z", "c", "p", "i", "r", "g", "b"};
-
-int get_extra_index (const std::string &f)
-{
-    // The field name should look like 'e#'
-    if (f[0] != 'e')
-        return -1;
-
-    // Copy the field name
-    std::string e (f);
-
-    // Skip over the 'e'
-    e.erase (0, 1);
-
-    // Convert to int
-    int n;
-    try { n = stoi (e); }
-    catch (...) { return -1; }
-    return n;
-}
-
-bool check_field_name (const std::string &f)
-{
-    // Does it match a string?
-    if (field_strings.find (f) != field_strings.end ())
-        return true;
-    // Is it an 'e' followed by a number?
-    if (f.size () <= 1)
-        return false;
-    if (f[0] != 'e')
-        return false;
-    // Get the index
-    const int n = get_extra_index (f);
-    // Is it a positive integer?
-    if (n >= 0)
-        return true;
-    return false;
-}
-
 } // namespace spoc

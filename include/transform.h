@@ -1,5 +1,6 @@
 #pragma once
 
+#include "app_utils.h"
 #include "spoc.h"
 #include <cassert>
 #include <iostream>
@@ -149,6 +150,8 @@ void replace (std::istream &is,
     const double v1,
     const double v2)
 {
+    using namespace spoc::app_utils;
+
     // Check the arguments
     if (!check_field_name (field_name))
         throw std::runtime_error (std::string ("Invalid field name: ")
@@ -162,11 +165,13 @@ void replace (std::istream &is,
         case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
     }
 
-    // Get the extra index
-    const size_t j = get_extra_index (field_name);
-
     // Read the header and make sure it's uncompressed
     const header h = read_header_uncompressed (is);
+
+    // Get the extra index
+    const size_t j = is_extra_field (field_name)
+        ? get_extra_index (field_name)
+        : h.extra_fields + 1;
 
     // Write the header
     write_header (os, h);
@@ -188,11 +193,13 @@ void replace (std::istream &is,
             case 'b': if (p.b == v1) p.b = v2; break;
             case 'e': // extra
             {
+                assert (is_extra_field (field_name));
                 if (j >= p.extra.size ())
-                    throw std::runtime_error ("Specified extra index is too large");
+                    throw std::runtime_error ("Invalid extra field specification");
                 if (p.extra[j] == v1)
                     p.extra[j] = v2;
             }
+            break;
         }
 
         // Write it back out
@@ -403,16 +410,20 @@ void set (std::istream &is,
     const std::string &field_name,
     const double v)
 {
+    using namespace spoc::app_utils;
+
     // Check the arguments
     if (!check_field_name (field_name))
         throw std::runtime_error (std::string ("Invalid field name: ")
             + field_name);
 
-    // Get the extra index
-    const size_t j = get_extra_index (field_name);
-
     // Read the header and make sure it's uncompressed
     const header h = read_header_uncompressed (is);
+
+    // Get the extra index
+    const size_t j = is_extra_field (field_name)
+        ? get_extra_index (field_name)
+        : h.extra_fields + 1;
 
     // Write the header
     write_header (os, h);
@@ -437,10 +448,12 @@ void set (std::istream &is,
             case 'b': p.b = v; break;
             case 'e': // extra
             {
+                assert (is_extra_field (field_name));
                 if (j >= p.extra.size ())
-                    throw std::runtime_error ("Specified extra index is too large");
+                    throw std::runtime_error ("Invalid extra field specification");
                 p.extra[j] = v;
             }
+            break;
         }
 
         // Write it back out

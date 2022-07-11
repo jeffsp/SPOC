@@ -1,6 +1,6 @@
 #include "app_utils.h"
 #include "spoc.h"
-#include "util.h"
+#include "tool.h"
 #include "tool_cmd.h"
 #include <cctype>
 #include <iostream>
@@ -56,12 +56,32 @@ int main (int argc, char **argv)
         // Get the output stream
         app_utils::output_stream os (args.verbose, args.output_fn);
 
-        using namespace spoc::util;
+        using namespace spoc::app_utils;
+        using namespace spoc::tool;
 
-        if (args.command.name == "recenter-xy")
+        if (args.command.name == "get-field")
+        {
+            std::string s = args.command.params;
+            const auto l = consume_field_name (s);
+            get_field (is (), os (), h, l);
+        }
+        else if (args.command.name == "recenter-xy")
             recenter (is (), os (), h);
         else if (args.command.name == "recenter-xyz")
             recenter (is (), os (), h, true);
+        else if (args.command.name == "set-field")
+        {
+            if (args.field_fn.empty ())
+                throw std::runtime_error ("You must set the 'field-filename' option when using the 'set-field' command");
+            if (args.verbose)
+                std::clog << "Opening " << args.field_fn << " for reading" << std::endl;
+            ifstream field_ifs (args.field_fn);
+            if (!field_ifs)
+                throw std::runtime_error ("Could not open file for reading");
+            std::string s = args.command.params;
+            const auto l = consume_field_name (s);
+            set_field (is (), os (), field_ifs, h, l);
+        }
         else if (args.command.name == "subtract-min-xy")
             subtract_min (is (), os (), h);
         else if (args.command.name == "subtract-min-xyz")

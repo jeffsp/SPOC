@@ -24,14 +24,18 @@ struct args
     bool verbose = false;
     bool version = false;
     spoc::cmd::command command;
+    std::string field_fn;
     std::string input_fn;
     std::string output_fn;
 };
 
 enum command_values
 {
-    RECENTER_XY = 1000,
+    GET_FIELD = 1000,
+    RECENTER_XY,
     RECENTER_XYZ,
+    SET_FIELD,
+    FIELD_FILENAME,
     SUBTRACT_MIN_XY,
     SUBTRACT_MIN_XYZ
 };
@@ -60,8 +64,11 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
             {"version", no_argument, 0, 'e'},
+            {"get-field", no_argument, 0, GET_FIELD},
             {"recenter-xy", no_argument, 0, RECENTER_XY},
             {"recenter-xyz", no_argument, 0, RECENTER_XYZ},
+            {"set-field", no_argument, 0, SET_FIELD},
+            {"field-filename", required_argument, 0, FIELD_FILENAME},
             {"subtract-min-xy", no_argument, 0, SUBTRACT_MIN_XY},
             {"subtract-min-xyz", no_argument, 0, SUBTRACT_MIN_XYZ},
             {0, 0, 0, 0}
@@ -85,6 +92,11 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             }
             case 'v': { args.verbose = true; break; }
             case 'e': { args.version = true; break; }
+            case GET_FIELD:
+            {
+                args = set_command (args, "get-field", optarg);
+                break;
+            }
             case RECENTER_XY:
             {
                 args = set_command (args, "recenter-xy", optarg);
@@ -93,6 +105,16 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case RECENTER_XYZ:
             {
                 args = set_command (args, "recenter-xyz", optarg);
+                break;
+            }
+            case SET_FIELD:
+            {
+                args = set_command (args, "set-field", optarg);
+                break;
+            }
+            case FIELD_FILENAME:
+            {
+                args.field_fn = optarg;
                 break;
             }
             case SUBTRACT_MIN_XY:
