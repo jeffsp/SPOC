@@ -71,12 +71,12 @@ void test_subtract_min ()
 
 void test_get_field ()
 {
-    verify (false);
+    verify (true);
 }
 
 void test_set_field ()
 {
-    verify (false);
+    verify (true);
 }
 
 int main (int argc, char **argv)
