@@ -30,10 +30,10 @@ inline std::string zlib_error_string (int ret)
 }
 // GCOV_EXCL_STOP
 
-struct Deflator
+struct zlib_deflator
 {
     z_stream s;
-    explicit Deflator (const int level)
+    explicit zlib_deflator (const int level)
     {
         s.zalloc = Z_NULL;
         s.zfree = Z_NULL;
@@ -46,16 +46,16 @@ struct Deflator
             throw std::runtime_error (zlib_error_string (ret));
         // GCOV_EXCL_STOP
     }
-    ~Deflator ()
+    ~zlib_deflator ()
     {
         deflateEnd (&s);
     }
 };
 
-struct Inflator
+struct zlib_inflator
 {
     z_stream s;
-    Inflator ()
+    zlib_inflator ()
     {
         s.zalloc = Z_NULL;
         s.zfree = Z_NULL;
@@ -68,7 +68,7 @@ struct Inflator
             throw std::runtime_error (zlib_error_string (ret));
         // GCOV_EXCL_STOP
     }
-    ~Inflator ()
+    ~zlib_inflator ()
     {
         inflateEnd (&s);
     }
@@ -83,7 +83,7 @@ inline std::vector<uint8_t> compress (const uint8_t *p, const size_t nbytes, con
     std::vector<uint8_t> output_buffer (BUFFER_SIZE);
     std::vector<uint8_t> output;
 
-    Deflator deflator (level);
+    zlib_deflator deflator (level);
 
     // Get bytes directly from the input vector
     deflator.s.avail_in = nbytes;
@@ -117,7 +117,7 @@ inline void compress (std::istream &is, std::ostream &os, const int level)
     std::vector<uint8_t> input_buffer (BUFFER_SIZE);
     std::vector<uint8_t> output_buffer (BUFFER_SIZE);
 
-    Deflator deflator (level);
+    zlib_deflator deflator (level);
 
     do {
         // Read into buffer from stream
@@ -148,7 +148,7 @@ inline std::vector<uint8_t> decompress (const std::vector<uint8_t> &input)
     std::vector<uint8_t> output_buffer (BUFFER_SIZE);
     std::vector<uint8_t> output;
 
-    Inflator inflator;
+    zlib_inflator inflator;
 
     // Get bytes directory from input vector
     inflator.s.avail_in = input.size ();
@@ -195,7 +195,7 @@ inline void decompress (std::istream &is, std::ostream &os)
     std::vector<uint8_t> input_buffer (BUFFER_SIZE);
     std::vector<uint8_t> output_buffer (BUFFER_SIZE);
 
-    Inflator inflator;
+    zlib_inflator inflator;
 
     bool done = false;
     do {
