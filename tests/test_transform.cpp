@@ -297,7 +297,10 @@ void test_transform_replace ()
                         const auto g = read_spoc_file_uncompressed (os);
                     }
                     catch (...) { failed = true; }
-                    verify (failed);
+                    // The preconditions are only checked in debug mode,
+                    // so use assert() instead of verify()
+                    assert (failed);
+                    (void) failed; // Turn off 'set but not used' error
                 }
             }
         }
@@ -396,7 +399,10 @@ void test_transform_set ()
                 const auto g = read_spoc_file_uncompressed (os);
             }
             catch (...) { failed = true; }
-            verify (failed);
+            // The preconditions are only checked in debug mode, so use
+            // assert() instead of verify()
+            assert (failed);
+            (void) failed; // Turn off 'set but not used' error
         }
     }
 }
