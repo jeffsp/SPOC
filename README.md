@@ -148,7 +148,7 @@ standard.
   - [ ] png output
 
 - [ ] spoc\_tool: Common operations that do not stream
-  - [ ] Get/Set field F as text + integration test
+  - [X] Get/Set field F as text
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
   - [ ] Use the voxel indexes for aligning points when
@@ -163,6 +163,8 @@ standard.
                           - Gaussian filter
                           - Median filter
                           - X, Y, Z
+  - [ ] Interpolate: Interpolate missing voxels in a point cloud. Can
+        this be used to interpolate ground points for creating DTMs?
 
 - [ ] spoc config: Show configuration values
   - [ ] ~/.config/spoc/config
