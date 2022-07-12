@@ -41,7 +41,7 @@ int main (int argc, char **argv)
 
         // Show args
         if (args.verbose)
-            std::clog << "command: " << args.command.name << args.command.params << std::endl;
+            std::clog << "command: " << args.command.name << "=" << args.command.params << std::endl;
 
         // Get the input stream
         app_utils::input_stream is (args.verbose, args.input_fn);
