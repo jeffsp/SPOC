@@ -56,10 +56,10 @@ standard.
 # Project Roadmap
 
 - [X] Add Doxygen support
-- [ ] Add Design by Contract functionality
-- [ ] Generate documentation
+- [X] Add Design by Contract functionality
+- [X] Generate documentation
   - [ ] Manual
-  - [ ] SDK
+  - [X] SDK
 - [ ] Reorganize namespaces and headers
 - [X] Create header only library with examples
 - [X] Read/write uncompressed
@@ -148,8 +148,7 @@ standard.
   - [ ] png output
 
 - [ ] spoc\_tool: Common operations that do not stream
-  - [ ] Get/Set XYZ as text
-  - [ ] Get/Set field F as text
+  - [ ] Get/Set field F as text + integration test
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
   - [ ] Use the voxel indexes for aligning points when
