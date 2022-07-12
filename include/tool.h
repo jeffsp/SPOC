@@ -1,6 +1,7 @@
 #pragma once
 
 #include "app_utils.h"
+#include "contracts.h"
 #include "spoc.h"
 #include <cassert>
 #include <iostream>
@@ -16,10 +17,11 @@ void get_field (std::istream &is,
     const spoc::header &h,
     const std::string &field_name)
 {
-    // Check the arguments
-    if (!app_utils::check_field_name (field_name))
-        throw std::runtime_error (std::string ("Invalid field name: ")
-            + field_name);
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (h.is_valid ());
+    REQUIRE (app_utils::check_field_name (field_name));
 
     // Set the output precision for doubles
     switch (field_name[0])
@@ -99,6 +101,11 @@ void recenter (std::istream &is,
     const spoc::header &h,
     const bool z_flag = false)
 {
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (h.is_valid ());
+
     // Get number of points
     const auto n = h.total_points;
 
@@ -121,10 +128,11 @@ void set_field (std::istream &is,
     const spoc::header &h,
     const std::string &field_name)
 {
-    // Check the arguments
-    if (!app_utils::check_field_name (field_name))
-        throw std::runtime_error (std::string ("Invalid field name: ")
-            + field_name);
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (h.is_valid ());
+    REQUIRE (app_utils::check_field_name (field_name));
 
     // Read in the fields that you are going to set
     std::vector<double> f_double;
@@ -235,6 +243,11 @@ void subtract_min (std::istream &is,
     const spoc::header &h,
     const bool z_flag = false)
 {
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (h.is_valid ());
+
     // Get number of points
     const auto n = h.total_points;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "voxel.h"
+#include <algorithm>
 #include <iostream>
 #include <unordered_map>
 #include <vector>

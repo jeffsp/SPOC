@@ -1,5 +1,7 @@
 #pragma once
 
+#include "contracts.h"
+
 #include <getopt.h>
 #include <iostream>
 
@@ -11,6 +13,10 @@ namespace cmd
 
 void print_help (std::ostream &os, const std::string &usage, const size_t noptions, option long_options[])
 {
+    // Check preconditions
+    REQUIRE (os.good ());
+    REQUIRE (!usage.empty ());
+
     // Print usage string
     os << "Usage:" << std::endl << '\t' << usage << std::endl << std::endl;
 

@@ -71,12 +71,44 @@ void test_subtract_min ()
 
 void test_get_field ()
 {
-    verify (true);
+    for (auto rgb : {true, false})
+    {
+        // Generate spoc files
+        auto f = generate_random_spoc_file (100, 8, false, rgb);
+
+        for (auto c : { "x", "y", "z",
+                "c", "p", "i", "r", "g", "b",
+                "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7" })
+        {
+            stringstream is, os;
+            write_spoc_file_uncompressed (is, f);
+            const auto h = read_header (is);
+            get_field (is, os, h, c);
+        }
+    }
 }
 
 void test_set_field ()
 {
-    verify (true);
+    for (auto rgb : {true, false})
+    {
+        // Generate spoc files
+        const size_t n = 100;
+        auto f = generate_random_spoc_file (n, 8, false, rgb);
+
+        for (auto c : { "x", "y", "z",
+                "c", "p", "i", "r", "g", "b",
+                "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7" })
+        {
+            stringstream is, os, field_ifs;
+            write_spoc_file_uncompressed (is, f);
+            // Write field values
+            for (size_t i = 0; i < n; ++i)
+                field_ifs << i << endl;
+            const auto h = read_header (is);
+            set_field (is, os, field_ifs, h, c);
+        }
+    }
 }
 
 int main (int argc, char **argv)

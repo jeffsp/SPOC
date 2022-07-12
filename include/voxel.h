@@ -95,7 +95,6 @@ voxel_index_map get_voxel_index_map (const T &voxel_indexes)
     return vim;
 }
 
-
 } // namespace voxel
 
 } // namespace spoc

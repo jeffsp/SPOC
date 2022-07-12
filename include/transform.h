@@ -1,6 +1,7 @@
 #pragma once
 
 #include "app_utils.h"
+#include "contracts.h"
 #include "spoc.h"
 #include <cassert>
 #include <iostream>
@@ -16,12 +17,18 @@ namespace transform
 
 const header read_header_uncompressed (std::istream &is)
 {
+    // Check preconditions
+    REQUIRE (is.good ());
+
     // Read the header
     const header h = read_header (is);
 
     // Check compression flag
     if (h.compressed)
         throw std::runtime_error ("Expected an uncompressed file");
+
+    // Check post-conditions
+    ENSURE (h.is_valid ());
 
     return h;
 }
@@ -60,6 +67,11 @@ void add (std::istream &is,
     const spoc::header &h,
     OP op)
 {
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (h.is_valid ());
+
     // Write the header
     write_header (os, h);
 
@@ -105,6 +117,9 @@ void add_z (std::istream &is, std::ostream &os, const double v)
 template<typename T>
 void quantize (T &p, const double precision)
 {
+    // Check preconditions
+    REQUIRE (precision != 0.0);
+
     // Quantize x, y, z
 #pragma omp parallel for
     for (size_t i = 0; i < p.size (); ++i)
@@ -121,6 +136,11 @@ void quantize (std::istream &is,
     std::ostream &os,
     const double precision)
 {
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (precision != 0.0);
+
     // Read the header and make sure it's uncompressed
     const header h = read_header_uncompressed (is);
 
@@ -152,10 +172,10 @@ void replace (std::istream &is,
 {
     using namespace spoc::app_utils;
 
-    // Check the arguments
-    if (!check_field_name (field_name))
-        throw std::runtime_error (std::string ("Invalid field name: ")
-            + field_name);
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (check_field_name (field_name));
 
     // Check to make suze x, y, z, is not being used
     switch (field_name[0])
@@ -268,6 +288,11 @@ void rotate (std::istream &is,
     YOP yop,
     ZOP zop)
 {
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (h.is_valid ());
+
     // Write the header
     write_header (os, h);
 
@@ -363,6 +388,11 @@ void scale (std::istream &is,
     const spoc::header &h,
     OP op)
 {
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (h.is_valid ());
+
     // Write the header
     write_header (os, h);
 
@@ -412,10 +442,10 @@ void set (std::istream &is,
 {
     using namespace spoc::app_utils;
 
-    // Check the arguments
-    if (!check_field_name (field_name))
-        throw std::runtime_error (std::string ("Invalid field name: ")
-            + field_name);
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (check_field_name (field_name));
 
     // Read the header and make sure it's uncompressed
     const header h = read_header_uncompressed (is);

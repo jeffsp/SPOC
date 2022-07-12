@@ -1,5 +1,6 @@
 #pragma once
 
+#include "contracts.h"
 #include "laswriter.hpp"
 #include <iostream>
 
@@ -15,6 +16,9 @@ struct las_writer
         : laswriter (nullptr)
         , lasheader (lasheader)
     {
+        // Check preconditions
+        REQUIRE (!fn.empty ());
+
         laswriteopener.set_file_name(fn.c_str ());
         laswriter = laswriteopener.open(&lasheader);
         // GCOV_EXCL_START

@@ -4,6 +4,8 @@
 #include <sstream>
 #include <stdexcept>
 
+using namespace spoc::app_utils;
+
 void test_input_stream ()
 {
     for (auto verbose : {true, false})
@@ -12,19 +14,19 @@ void test_input_stream ()
         {
             auto fn = std::string ();
             std::stringstream log;
-            spoc::app_utils::input_stream is (verbose, fn, log);
+            input_stream is (verbose, fn, log);
         }
         // Invalid filename
         {
             auto fn = std::string ("////INVALID!!!////");
             std::stringstream log;
             bool failed = false;
-            try { spoc::app_utils::input_stream is (verbose, fn, log); }
+            try { input_stream is (verbose, fn, log); }
             catch (...) { failed = true; }
             verify (failed);
         }
         // Use stdin
-        spoc::app_utils::input_stream is (verbose, std::string ());
+        input_stream is (verbose, std::string ());
         auto &tmp = is ();
         (void)tmp; // Disable unused variable warning
     }
@@ -38,22 +40,30 @@ void test_output_stream ()
         {
             auto fn = std::string ();
             std::stringstream log;
-            spoc::app_utils::output_stream os (verbose, fn, log);
+            output_stream os (verbose, fn, log);
         }
         // Invalid filename
         {
             auto fn = std::string ("////INVALID!!!////");
             std::stringstream log;
             bool failed = false;
-            try { spoc::app_utils::output_stream os (verbose, fn, log); }
+            try { output_stream os (verbose, fn, log); }
             catch (...) { failed = true; }
             verify (failed);
         }
         // Use stdout
-        spoc::app_utils::output_stream os (verbose, std::string ());
+        output_stream os (verbose, std::string ());
         auto &tmp = os ();
         (void)tmp; // Disable unused variable warning
     }
+}
+
+void test_consume ()
+{
+    std::string f ("x");
+    auto g = consume_field_name (f);
+    verify (f.empty ());
+    verify (g == "x");
 }
 
 int main (int argc, char **argv)
@@ -63,6 +73,7 @@ int main (int argc, char **argv)
     {
         test_input_stream ();
         test_output_stream ();
+        test_consume ();
         return 0;
     }
     catch (const exception &e)

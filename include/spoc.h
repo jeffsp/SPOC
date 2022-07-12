@@ -53,6 +53,12 @@ struct header
         if (signature[3] != 'C') return false;
         return true;
     }
+    bool is_valid () const
+    {
+        if (!check_signature ())
+            return false;
+        return true;
+    }
 
     char signature[5];
     uint8_t major_version = MAJOR_VERSION;
