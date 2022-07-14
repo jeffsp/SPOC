@@ -68,6 +68,8 @@ standard.
 - [ ] Reorganize namespaces and headers
   - [ ] Separate application headers from API headers
   - [ ] Create separate application namespace
+- [ ] Reorganize tests
+  - [ ] Separate app tests from unit tests
 - [X] Create header only library with examples
 - [X] Read/write uncompressed
 - [X] Add NEXTRA field in header
