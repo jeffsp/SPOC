@@ -42,9 +42,11 @@ struct header
         signature[3] = 'C'; // Cloud
         signature[4] = '\0'; // Terminate
     }
+    /// Constructor
     header () : header (std::string (), 0, 0, false)
     {
     }
+    /// Check to make sure the header contains a valid signature
     bool check_signature () const
     {
         if (signature[0] != 'S') return false;
@@ -53,6 +55,7 @@ struct header
         if (signature[3] != 'C') return false;
         return true;
     }
+    /// Check to make sure the header structure is valid
     bool is_valid () const
     {
         if (!check_signature ())
@@ -60,16 +63,25 @@ struct header
         return true;
     }
 
+    /// Signature characters
     char signature[5];
+    /// Version information
     uint8_t major_version = MAJOR_VERSION;
+    /// Version information
     uint8_t minor_version = MINOR_VERSION;
+    /// Well-known-text string
     std::string wkt;
+    /// The number of extra fields in each point record
     size_t extra_fields;
+    /// The total number of points in the file
     size_t total_points;
+    /// A flag that indicates if the records are compressed or not
     uint8_t compressed;
 };
 
-// Helper I/O function
+/// Helper I/O function
+/// @param s Output stream
+/// @param h Header struct
 inline std::ostream &operator<< (std::ostream &s, const header &h)
 {
     for (auto i : {0, 1, 2 ,3})
@@ -86,7 +98,9 @@ inline std::ostream &operator<< (std::ostream &s, const header &h)
     return s;
 }
 
-// Helper operator
+/// Helper equals operator
+/// @param a First header
+/// @param b Second header
 inline bool operator== (const header &a, const header &b)
 {
     for (auto i : {0, 1, 2, 3})
@@ -101,7 +115,9 @@ inline bool operator== (const header &a, const header &b)
     return true;
 }
 
-// Header I/O
+/// Helper I/O function
+/// @param s Output stream
+/// @param h Header struct
 inline void write_header (std::ostream &s, const header &h)
 {
     if (!h.check_signature ())
@@ -118,7 +134,8 @@ inline void write_header (std::ostream &s, const header &h)
     s.flush ();
 }
 
-// Header I/O
+/// Helper I/O function
+/// @param s Input stream
 inline header read_header (std::istream &s)
 {
     header h;
@@ -485,7 +502,10 @@ class spoc_file
     }
 };
 
-// Spoc File I/O
+/// Helper I/O function
+/// @param s Input stream
+/// @param total_points Number of records to read
+/// @param extra_fields Number of extra fields in each record
 inline point_records read_uncompressed_points (std::istream &s,
     const size_t total_points,
     const size_t extra_fields)
@@ -499,6 +519,8 @@ inline point_records read_uncompressed_points (std::istream &s,
     return p;
 }
 
+/// Helper I/O function
+/// @param s Input stream
 inline spoc_file read_spoc_file_uncompressed (std::istream &s)
 {
     // Read the header
@@ -514,6 +536,10 @@ inline spoc_file read_spoc_file_uncompressed (std::istream &s)
     return spoc_file (h, p);
 }
 
+/// Helper I/O function
+/// @param s Input stream
+/// @param total_points Number of records to read
+/// @param extra_fields Number of extra fields in each record
 inline point_records read_compressed_points (std::istream &s,
     const size_t total_points,
     const size_t extra_fields)
@@ -560,6 +586,8 @@ inline point_records read_compressed_points (std::istream &s,
     return prs;
 }
 
+/// Helper I/O function
+/// @param s Input stream
 inline spoc_file read_spoc_file_compressed (std::istream &s)
 {
     // Read the header
@@ -575,6 +603,8 @@ inline spoc_file read_spoc_file_compressed (std::istream &s)
     return spoc_file (h, prs);
 }
 
+/// Helper I/O function
+/// @param s Input stream
 inline spoc_file read_spoc_file (std::istream &s)
 {
     // Read the header
@@ -592,6 +622,9 @@ inline spoc_file read_spoc_file (std::istream &s)
     return spoc_file (h, p);
 }
 
+/// Helper I/O function
+/// @param s Output stream
+/// @param f File structure to write
 inline void write_spoc_file_uncompressed (std::ostream &s, const spoc_file &f)
 {
     // Check compression flag
@@ -610,6 +643,9 @@ inline void write_spoc_file_uncompressed (std::ostream &s, const spoc_file &f)
         write_point_record (s, p);
 }
 
+/// Helper I/O function
+/// @param s Output stream
+/// @param f File structure to write
 inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
 {
     // Check compression flag
