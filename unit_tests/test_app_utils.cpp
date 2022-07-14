@@ -60,10 +60,47 @@ void test_output_stream ()
 
 void test_consume ()
 {
+    {
     std::string f ("x");
     auto g = consume_field_name (f);
     verify (f.empty ());
     verify (g == "x");
+
+    bool failed = false;
+    try {
+        std::string f ("q");
+        consume_field_name (f); }
+    catch (...) { failed = true; }
+    verify (failed);
+    }
+
+    {
+    std::string f ("123");
+    auto g = consume_int (f);
+    verify (f.empty ());
+    verify (g == 123);
+
+    bool failed = false;
+    try {
+        std::string f ("q");
+        consume_int (f); }
+    catch (...) { failed = true; }
+    verify (failed);
+    }
+
+    {
+    std::string f ("1.23");
+    auto g = consume_double (f);
+    verify (f.empty ());
+    verify (int(g) == 1);
+
+    bool failed = false;
+    try {
+        std::string f ("q");
+        consume_double (f); }
+    catch (...) { failed = true; }
+    verify (failed);
+    }
 }
 
 int main (int argc, char **argv)
