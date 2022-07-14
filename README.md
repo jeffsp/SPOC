@@ -18,14 +18,14 @@ The **HEADER** contains the following information:
 
 Each **POINT RECORD** in a SPOC file contains:
 
-    * X, Y, and Z coordinates stored as 64-bit precision floating point numbers
-    * 32-bit classification
-    * 32-bit point ID
-    * 16-bit intensity/NIR information
-    * 16-bit red channel information
-    * 16-bit green channel information
-    * 16-bit blue channel information
-    * Zero or more 64-bit extra fields
+* X, Y, and Z coordinates stored as 64-bit precision floating point numbers
+* 32-bit classification
+* 32-bit point ID
+* 16-bit intensity/NIR information
+* 16-bit red channel information
+* 16-bit green channel information
+* 16-bit blue channel information
+* Zero or more 64-bit extra fields
 
 Points are stored in SPOC file as a vector of point records.
 
