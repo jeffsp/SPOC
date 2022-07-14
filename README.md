@@ -66,6 +66,8 @@ standard.
   - [ ] Manual
   - [X] SDK
 - [ ] Reorganize namespaces and headers
+  - [ ] Separate application headers from API headers
+  - [ ] Create separate application namespace
 - [X] Create header only library with examples
 - [X] Read/write uncompressed
 - [X] Add NEXTRA field in header
@@ -78,7 +80,11 @@ standard.
 - [X] Version number in header
 - [X] Test data files
 - [X] Unit test suite
+- [ ] Application test suite
+  - [ ] Separate from unit test suite
+  - [ ] Include in coverage and memcheck
 - [X] Integration test suite
+  - [X] Shell commands that manipulate PATH variable
 - [X] Man page generation
 - [X] Coverage
 - [X] Cppcheck
