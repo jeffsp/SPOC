@@ -49,7 +49,7 @@ unit_test:
 integration_test: BUILD=debug
 integration_test:
 	@parallel --jobs 24 --halt now,fail=1 \
-		"echo $(BUILD): {} && PATH=./build/$(BUILD)/:$$PATH {}" ::: tests/test_*.sh
+		"echo $(BUILD): {} && PATH=./build/$(BUILD)/:$$PATH {}" ::: integration_tests/test_*.sh
 
 .PHONY: test # Run tests
 test:
