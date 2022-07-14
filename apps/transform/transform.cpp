@@ -6,18 +6,16 @@
 #include <iostream>
 #include <stdexcept>
 
-using namespace std;
-using namespace spoc;
-
 int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
+    using namespace transform_cmd;
 
     try
     {
         // Parse command line
-        const cmd::args args = cmd::get_args (argc, argv,
+        const args args = get_args (argc, argv,
                 string (argv[0]) + " [options] [input] [output]");
 
         // If version was requested, print it and exit
@@ -37,11 +35,11 @@ int main (int argc, char **argv)
 
         // Check the arguments
         if (args.command.name.empty ())
-            throw std::runtime_error ("No command was specified");
+            throw runtime_error ("No command was specified");
 
         // Show args
         if (args.verbose)
-            std::clog << "command: " << args.command.name << "\t" << args.command.params << std::endl;
+            clog << "command: " << args.command.name << "\t" << args.command.params << endl;
 
         // Get the input stream
         app_utils::input_stream is (args.verbose, args.input_fn);
@@ -50,35 +48,35 @@ int main (int argc, char **argv)
         app_utils::output_stream os (args.verbose, args.output_fn);
 
         using namespace spoc::app_utils;
-        using namespace spoc::transform;
+        using namespace spoc::transform_app;
 
         if (args.command.name == "add-x")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto v = consume_double (s);
             add_x (is (), os (), v);
         }
         else if (args.command.name == "add-y")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto v = consume_double (s);
             add_y (is (), os (), v);
         }
         else if (args.command.name == "add-z")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto v = consume_double (s);
             add_z (is (), os (), v);
         }
         else if (args.command.name == "quantize-xyz")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto v = consume_double (s);
             quantize (is (), os (), v);
         }
         else if (args.command.name == "replace")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto l = consume_field_name (s);
             const auto v1 = consume_int (s);
             const auto v2 = consume_int (s);
@@ -86,49 +84,49 @@ int main (int argc, char **argv)
         }
         else if (args.command.name == "rotate-x")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto v = consume_double (s);
             rotate_x (is (), os (), v);
         }
         else if (args.command.name == "rotate-y")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto v = consume_double (s);
             rotate_y (is (), os (), v);
         }
         else if (args.command.name == "rotate-z")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto v = consume_double (s);
             rotate_z (is (), os (), v);
         }
         else if (args.command.name == "scale-x")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto v = consume_double (s);
             scale_x (is (), os (), v);
         }
         else if (args.command.name == "scale-y")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto v = consume_double (s);
             scale_y (is (), os (), v);
         }
         else if (args.command.name == "scale-z")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto v = consume_double (s);
             scale_z (is (), os (), v);
         }
         else if (args.command.name == "set")
         {
-            std::string s = args.command.params;
+            string s = args.command.params;
             const auto l = consume_field_name (s);
             const auto v = consume_double (s);
-            spoc::transform::set (is (), os (), l, v);
+            spoc::transform_app::set (is (), os (), l, v);
         }
         else
-            throw std::runtime_error ("An unknown command was encountered");
+            throw runtime_error ("An unknown command was encountered");
 
         return 0;
     }

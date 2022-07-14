@@ -9,7 +9,7 @@
 namespace spoc
 {
 
-namespace cmd
+namespace transform_cmd
 {
 
 struct command
@@ -23,7 +23,7 @@ struct args
     bool help = false;
     bool verbose = false;
     bool version = false;
-    spoc::cmd::command command;
+    spoc::transform_cmd::command command;
     std::string input_fn;
     std::string output_fn;
 };
@@ -51,7 +51,7 @@ args set_command (const args &args, const std::string &name, const char *s)
         params = std::string (s);
     if (!args.command.name.empty ())
         throw std::runtime_error ("You can only specify one command at a time");
-    spoc::cmd::args new_args (args);
+    spoc::transform_cmd::args new_args (args);
     new_args.command.name = name;
     new_args.command.params = params;
     return new_args;
@@ -92,7 +92,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 'h':
             {
                 const size_t noptions = sizeof (long_options) / sizeof (struct option);
-                print_help (std::clog, usage, noptions, long_options);
+                spoc::cmd::print_help (std::clog, usage, noptions, long_options);
                 if (c != 'h')
                     throw std::runtime_error ("Invalid option");
                 args.help = true;
@@ -178,6 +178,6 @@ inline args get_args (int argc, char **argv, const std::string &usage)
     return args;
 }
 
-} // namespace cmd
+} // namespace transform_cmd
 
 } // namespace spoc

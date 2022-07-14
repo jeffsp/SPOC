@@ -9,9 +9,11 @@
 #include <random>
 #include <string>
 #include <vector>
-#include "compress.h"
+#include "compression.h"
 #include "extent.h"
 #include "test_utils.h"
+
+using namespace spoc::compression;
 
 template<typename T>
 void test_extent (const T &points)
@@ -27,8 +29,8 @@ void test_extent (const T &points)
 
     const auto x = rescale (points, e);
     const auto y = restore (x, e);
-    std::vector<point<double>> d (points.size ());
-    std::vector<point<double>> z (points.size ());
+    std::vector<spoc::point::point<double>> d (points.size ());
+    std::vector<spoc::point::point<double>> z (points.size ());
 
     for (size_t i = 0; i < points.size (); ++i)
         d[i] = points[i] - y[i];

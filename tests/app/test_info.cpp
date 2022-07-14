@@ -3,6 +3,9 @@
 #include <iostream>
 #include <stdexcept>
 
+using namespace std;
+using namespace spoc::info_app;
+
 void test_info_empty ()
 {
     using namespace std;
@@ -22,10 +25,10 @@ void test_info_empty ()
                     for (auto compact : {true, false})
                     {
                         stringstream t;
-                        spoc::info::process (t, f1, json,
+                        process (t, f1, json,
                             header_info, summary_info,
                             classifications, compact);
-                        spoc::info::process (t, f2, json,
+                        process (t, f2, json,
                             header_info, summary_info,
                             classifications, compact);
                     }
@@ -36,8 +39,6 @@ void test_info_empty ()
 }
 void test_info ()
 {
-    using namespace std;
-
     // Generate spoc files
     auto f1 = generate_random_spoc_file (100, 5, true);
     auto f2 = generate_random_spoc_file (100, 5, false);
@@ -53,10 +54,10 @@ void test_info ()
                     for (auto compact : {true, false})
                     {
                         stringstream t;
-                        spoc::info::process (t, f1, json,
+                        process (t, f1, json,
                             header_info, summary_info,
                             classifications, compact);
-                        spoc::info::process (t, f2, json,
+                        process (t, f2, json,
                             header_info, summary_info,
                             classifications, compact);
                     }

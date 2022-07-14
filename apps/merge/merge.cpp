@@ -9,11 +9,13 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
+    using namespace merge_app;
+    using namespace merge_cmd;
 
     try
     {
         // Parse command line
-        const cmd::args args = cmd::get_args (argc, argv,
+        const args args = get_args (argc, argv,
                 string (argv[0]) + " [options] spocfile1 spocfile2 [...]");
 
         // If version was requested, print it and exit
@@ -42,7 +44,7 @@ int main (int argc, char **argv)
 
         // Check args
         if (args.fns.size () < 2)
-            throw std::runtime_error ("At least two input files are required to merge");
+            throw runtime_error ("At least two input files are required to merge");
 
         // The result goes here
         spoc_file g;
@@ -86,7 +88,7 @@ int main (int argc, char **argv)
             const auto id = args.point_id < 0 ? i : args.point_id;
 
             // Add it to the result
-            merge::append (f, g, id, args.quiet);
+            append (f, g, id, args.quiet);
         }
 
         // Check the area ratios
@@ -107,9 +109,9 @@ int main (int argc, char **argv)
 
             // If the area grew by too much, give a warning
             if (r > 100)
-                std::clog
+                clog
                     << "WARNING: 99% of the final merged area does not contain any points"
-                    << std::endl;
+                    << endl;
         }
 
         if (args.verbose)

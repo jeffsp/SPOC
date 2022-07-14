@@ -9,6 +9,9 @@
 namespace spoc
 {
 
+namespace point
+{
+
 /// A point in 3D space
 template<typename T>
 struct point
@@ -215,5 +218,7 @@ inline bool about_equal (const std::vector<point<double>> &a,
             return false;
     return true;
 }
+
+} // namespace point
 
 } // namespace spoc

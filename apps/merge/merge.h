@@ -7,7 +7,7 @@
 namespace spoc
 {
 
-namespace merge
+namespace merge_app
 {
 
 void append (
@@ -41,6 +41,6 @@ void append (
     }
 }
 
-} // namespace merge
+} // namespace merge_app
 
 } // namespace spoc

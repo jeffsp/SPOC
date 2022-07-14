@@ -1,4 +1,4 @@
-#include "compress.h"
+#include "compression.h"
 #include "test_utils.h"
 #include <cassert>
 #include <fstream>
@@ -8,6 +8,9 @@
 #include <stdexcept>
 #include <vector>
 #include <zlib.h>
+
+using namespace spoc;
+using namespace spoc::compression;
 
 void test_compress (const char *fn)
 {
@@ -53,8 +56,8 @@ void test_compress (const char *fn)
         {
             // Vector interface
             {
-            const auto y = spoc::compress (x, l);
-            const auto z = spoc::decompress (y);
+            const auto y = compress (x, l);
+            const auto z = decompress (y);
             verify (x == z);
             }
 
@@ -62,10 +65,10 @@ void test_compress (const char *fn)
             {
             stringstream is1 (string (x.begin (), x.end ()));
             stringstream os1;
-            spoc::compress (is1, os1, l);
+            compress (is1, os1, l);
             stringstream is2 (os1.str ());
             stringstream os2;
-            spoc::decompress (is2, os2);
+            decompress (is2, os2);
             const auto s = os2.str ();
             vector<uint8_t> z (s.begin (), s.end ());
             verify (x == z);

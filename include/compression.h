@@ -10,6 +10,9 @@
 namespace spoc
 {
 
+namespace compression
+{
+
 // GCOV_EXCL_START
 inline std::string zlib_error_string (int ret)
 {
@@ -237,5 +240,7 @@ inline void decompress (std::istream &is, std::ostream &os)
         } while (inflator.s.avail_out == 0);
     } while (!done);
 }
+
+} // namespace compression
 
 } // namespace spoc

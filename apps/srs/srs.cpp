@@ -7,11 +7,12 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
+    using namespace spoc::srs_cmd;
 
     try
     {
         // Parse command line
-        const cmd::args args = cmd::get_args (argc, argv,
+        const args args = get_args (argc, argv,
                 string (argv[0]) + " [options] [spocfile] [spocfile] [...]");
 
         // If version was requested, print it and exit
@@ -63,7 +64,7 @@ int main (int argc, char **argv)
         else if (args.set_srs)
         {
             if (args.fns.size () != 2)
-                throw std::runtime_error (
+                throw runtime_error (
                     "When setting the SRS, you need to specify one input file and one output file");
 
             if (args.verbose)

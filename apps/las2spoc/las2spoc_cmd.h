@@ -7,7 +7,7 @@
 namespace spoc
 {
 
-namespace cmd
+namespace las2spoc_cmd
 {
 
 struct args
@@ -42,7 +42,7 @@ args get_args (int argc, char **argv, const std::string &usage)
             case 'h':
             {
                 const size_t noptions = sizeof (long_options) / sizeof (struct option);
-                print_help (std::clog, usage, noptions, long_options);
+                spoc::cmd::print_help (std::clog, usage, noptions, long_options);
                 if (c != 'h')
                     throw std::runtime_error ("Invalid option");
                 args.help = true;
@@ -70,6 +70,6 @@ args get_args (int argc, char **argv, const std::string &usage)
     return args;
 }
 
-} // namespace cmd
+} // namespace las2spoc_cmd
 
 } // namespace spoc

@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 using namespace std;
-using namespace spoc::merge;
+using namespace spoc::merge_app;
 
 void test_merge ()
 {

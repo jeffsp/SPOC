@@ -10,7 +10,7 @@
 namespace spoc
 {
 
-namespace info
+namespace info_app
 {
 
 template<typename T>
@@ -283,6 +283,6 @@ void process (std::ostream &os,
     }
 }
 
-} // namespace info
+} // namespace info_app
 
 } // namespace spoc

@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 using namespace std;
-using namespace spoc::tile;
+using namespace spoc::tile_app;
 
 void test_get_tile_size ()
 {

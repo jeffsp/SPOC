@@ -7,11 +7,13 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
+    using namespace info_cmd;
+    using namespace info_app;
 
     try
     {
         // Parse command line
-        const cmd::args args = cmd::get_args (argc, argv,
+        const args args = get_args (argc, argv,
                 string (argv[0]) + " [options] [spocfile] [spocfile] [...]");
 
         // If version was requested, print it and exit
@@ -49,7 +51,7 @@ int main (int argc, char **argv)
             // Read the file
             spoc_file f = read_spoc_file_uncompressed (cin);
 
-            info::process (cout, f,
+            process (cout, f,
                 args.json, args.header_info, args.summary_info,
                 args.classifications, args.compact);
         }
@@ -68,7 +70,7 @@ int main (int argc, char **argv)
                 // Read into spoc_file struct
                 spoc_file f = read_spoc_file_uncompressed (ifs);
 
-                info::process (cout, f,
+                process (cout, f,
                     args.json, args.header_info, args.summary_info,
                     args.classifications, args.compact);
             }

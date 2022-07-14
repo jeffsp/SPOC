@@ -7,11 +7,13 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
+    using namespace diff_app;
+    using namespace diff_cmd;
 
     try
     {
         // Parse command line
-        const cmd::args args = cmd::get_args (argc, argv,
+        const args args = get_args (argc, argv,
                 string (argv[0]) + " [options] spocfile1 spocfile2");
 
         // If version was requested, print it and exit
@@ -42,7 +44,7 @@ int main (int argc, char **argv)
         }
 
         if (args.header_only + args.data_only + !args.fields.empty () > 2)
-            throw std::runtime_error ("Can't specify more than 1 of 'header-only', 'data-only', and specific fields");
+            throw runtime_error ("Can't specify more than 1 of 'header-only', 'data-only', and specific fields");
 
         if (args.verbose)
             clog << "Reading " << args.fn1 << endl;
@@ -65,7 +67,7 @@ int main (int argc, char **argv)
         spoc_file f2 = read_spoc_file_uncompressed (ifs2);
 
         const int return_code =
-            spoc::diff::diff (f1, f2,
+            diff (f1, f2,
                 args.header_only, args.data_only, args.fields, args.reverse);
 
         if (args.verbose)

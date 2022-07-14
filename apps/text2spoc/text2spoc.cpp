@@ -7,11 +7,12 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
+    using namespace text2spoc_cmd;
 
     try
     {
         // Parse command line
-        const cmd::args args = cmd::get_args (argc, argv,
+        const args args = get_args (argc, argv,
             string (argv[0]) + " [options] < textfile > spocfile");
 
         // If version was requested, print it and exit
@@ -34,10 +35,10 @@ int main (int argc, char **argv)
         getline (cin, wkt);
 
         if (args.verbose)
+        {
             clog << "read " << wkt.size () << " byte WKT" << endl;
-
-        if (args.verbose)
             clog << "Reading point records from stdin" << endl;
+        }
 
         // Read point records
         vector<point_record> point_records;
@@ -54,11 +55,10 @@ int main (int argc, char **argv)
         }
 
         if (args.verbose)
+        {
             clog << point_records.size () << " point records read" << endl;
-
-        // Write them to stdout
-        if (args.verbose)
             clog << "Writing records to stdout" << endl;
+        }
 
         write_spoc_file_uncompressed (cout, spoc_file (wkt, point_records));
 

@@ -5,7 +5,7 @@
 
 using namespace std;
 using namespace spoc;
-using namespace spoc::tool;
+using namespace spoc::tool_app;
 
 void test_recenter ()
 {

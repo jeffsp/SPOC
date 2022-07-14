@@ -9,11 +9,12 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
+    using namespace las2spoc_cmd;
 
     try
     {
         // Parse command line
-        const cmd::args args = cmd::get_args (argc, argv,
+        const args args = get_args (argc, argv,
                 string (argv[0]) + " [options] lasfile spocfile");
 
         // If version was requested, print it and exit

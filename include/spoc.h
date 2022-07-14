@@ -1,5 +1,5 @@
 #pragma once
-#include "compress.h"
+#include "compression.h"
 #include "point.h"
 #include "version.h"
 #include <algorithm>
@@ -277,7 +277,7 @@ inline std::vector<uint8_t> compress_field (const std::vector<T> &x)
     //   1 = fastest compression
     //   9 = smallest compression
     const int compression_level = -1;
-    const auto c = spoc::compress (reinterpret_cast<const uint8_t *> (&x[0]), x.size () * sizeof(T), compression_level);
+    const auto c = spoc::compression::compress (reinterpret_cast<const uint8_t *> (&x[0]), x.size () * sizeof(T), compression_level);
 
     return c;
 }
@@ -319,7 +319,7 @@ inline std::vector<T> read_compressed (std::istream &s, const size_t size)
 
     // Decompress
     std::vector<T> x (size);
-    spoc::decompress (c, reinterpret_cast<uint8_t *> (&x[0]), x.size () * sizeof(T));
+    spoc::compression::decompress (c, reinterpret_cast<uint8_t *> (&x[0]), x.size () * sizeof(T));
 
     return x;
 }

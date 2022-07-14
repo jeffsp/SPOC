@@ -7,7 +7,7 @@
 namespace spoc
 {
 
-namespace diff
+namespace diff_app
 {
 
 inline int diff (const spoc_file &f1,
@@ -173,6 +173,6 @@ inline int diff (const spoc_file &f1,
         return return_code;
 }
 
-} // namespace diff
+} // namespace diff_app
 
 } // namespace spoc

@@ -10,11 +10,13 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
+    using namespace spoc2las_cmd;
+    using namespace spoc2las_app;
 
     try
     {
         // Parse command line
-        const cmd::args args = cmd::get_args (argc, argv,
+        const args args = get_args (argc, argv,
                 string (argv[0]) + " [options] spocfile lasfile");
 
         // If version was requested, print it and exit
@@ -91,7 +93,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "writing records to " << args.output_fn << endl;
 
-        spoc2las::las_writer l (args.output_fn, lasheader);
+        las_writer l (args.output_fn, lasheader);
 
         for (size_t i = 0; i < f.get_point_records ().size (); ++i)
         {

@@ -7,7 +7,7 @@ using namespace std;
 using namespace spoc;
 using namespace spoc::voxel;
 
-using P = std::vector<point<double>>;
+using P = std::vector<spoc::point::point<double>>;
 
 void test_empty ()
 {

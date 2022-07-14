@@ -10,7 +10,7 @@
 namespace spoc
 {
 
-namespace tile
+namespace tile_app
 {
 
 template<typename T>
@@ -101,6 +101,6 @@ tile_map get_tile_map (const T &indexes)
     return m;
 }
 
-} // namespace tile
+} // namespace tile_app
 
 } // namespace spoc

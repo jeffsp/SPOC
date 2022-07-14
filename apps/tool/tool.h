@@ -9,7 +9,7 @@
 namespace spoc
 {
 
-namespace tool
+namespace tool_app
 {
 
 void get_field (std::istream &is,
@@ -207,7 +207,7 @@ void set_field (std::istream &is,
 
 // Get min x/y/z values from all values
 template<typename T>
-spoc::point<double> get_min (const T &p)
+spoc::point::point<double> get_min (const T &p)
 {
     // Get X, Y, and Z
     const auto x = get_x (p);
@@ -219,12 +219,12 @@ spoc::point<double> get_min (const T &p)
     const double miny = *std::min_element (begin (y), end (y));
     const double minz = *std::min_element (begin (z), end (z));
 
-    return spoc::point<double> { minx, miny, minz };
+    return spoc::point::point<double> { minx, miny, minz };
 }
 
 // Subtract x/y/z value from all values
 template<typename T>
-void subtract (T &p, const spoc::point<double> &minp, const bool z_flag = true)
+void subtract (T &p, const spoc::point::point<double> &minp, const bool z_flag = true)
 {
     // Subtract off min x, y, z
 #pragma omp parallel for
@@ -267,6 +267,6 @@ void subtract_min (std::istream &is,
         write_point_record (os, p[i]);
 }
 
-} // namespace tool
+} // namespace tool_app
 
 } // namespace spoc

@@ -9,11 +9,12 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
+    using namespace spoc2text_cmd;
 
     try
     {
         // Parse command line
-        const cmd::args args = cmd::get_args (argc, argv,
+        const args args = get_args (argc, argv,
             string (argv[0]) + " [options] < spocfile > textfile");
 
         // If version was requested, print it and exit
@@ -40,13 +41,13 @@ int main (int argc, char **argv)
         const auto &point_records = f.get_point_records ();
 
         if (args.verbose)
+        {
             clog << f.get_point_records ().size () << " point records read" << endl;
 
-        if (args.verbose)
             clog << "read " << wkt.size () << " byte WKT" << endl;
 
-        if (args.verbose)
             clog << "Writing point records to stdout" << endl;
+        }
 
         // Write to stdout
         cout << wkt << endl;

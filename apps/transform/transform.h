@@ -12,7 +12,7 @@
 namespace spoc
 {
 
-namespace transform
+namespace transform_app
 {
 
 const header read_header_uncompressed (std::istream &is)
@@ -491,6 +491,6 @@ void set (std::istream &is,
     }
 }
 
-} // namespace transform
+} // namespace transform_app
 
 } // namespace spoc

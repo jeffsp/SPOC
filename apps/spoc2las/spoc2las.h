@@ -7,7 +7,7 @@
 namespace spoc
 {
 
-namespace spoc2las
+namespace spoc2las_app
 {
 
 struct las_writer
@@ -42,6 +42,6 @@ struct las_writer
 
 };
 
-} // namespace spoc2las
+} // namespace spoc2las_app
 
 } // namespace spoc

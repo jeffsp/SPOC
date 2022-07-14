@@ -8,18 +8,17 @@
 #include <sstream>
 #include <stdexcept>
 
-using namespace std;
-using namespace spoc;
-
 int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
+    using namespace tile_cmd;
+    using namespace tile_app;
 
     try
     {
         // Parse command line
-        const cmd::args args = cmd::get_args (argc, argv,
+        const args args = get_args (argc, argv,
                 string (argv[0]) + " [options] < spocfile");
 
         // If version was requested, print it and exit
@@ -65,16 +64,16 @@ int main (int argc, char **argv)
         const auto y = get_y (f.get_point_records ());
         const double tile_size = args.tile_size > 0.0
             ? args.tile_size
-            : spoc::tile::get_tile_size (x, y, args.tiles);
+            : get_tile_size (x, y, args.tiles);
 
         if (args.verbose)
             clog << "Tiles are " << tile_size << " X " << tile_size << endl;
 
         // Get the tile index of each point in the point cloud
-        const auto indexes = spoc::tile::get_tile_indexes (x, y, tile_size);
+        const auto indexes = get_tile_indexes (x, y, tile_size);
 
         // Map each tile index to a vector of point cloud indexes
-        const auto tile_map = spoc::tile::get_tile_map (indexes);
+        const auto tile_map = get_tile_map (indexes);
 
         // Write each tile
         if (args.verbose)
@@ -124,12 +123,12 @@ int main (int argc, char **argv)
             }
 
             // Get the filename extension
-            const string ext = std::filesystem::path (args.fn).extension();
+            const string ext = filesystem::path (args.fn).extension();
 
             // Generate the filename
-            std::stringstream sfn;
+            stringstream sfn;
             sfn << prefix;
-            sfn << std::setw(args.digits) << std::setfill('0') << tile;
+            sfn << setw(args.digits) << setfill('0') << tile;
             sfn << ext;
 
             // Check if file already exists
@@ -139,7 +138,7 @@ int main (int argc, char **argv)
                     clog << "Checking if '" << sfn.str () << "' exists" << endl;
                 ifstream tmp_ifs (sfn.str ());
                 if (tmp_ifs.good())
-                    throw std::runtime_error ("File already exists. "
+                    throw runtime_error ("File already exists. "
                         "Use the force option to overwrite. "
                         "Aborting.");
             }
@@ -147,10 +146,10 @@ int main (int argc, char **argv)
             if (args.verbose)
                 clog << "Writing " << sfn.str () << endl;
 
-            std::ofstream ofs (sfn.str ());
+            ofstream ofs (sfn.str ());
 
             if (!ofs)
-                throw std::runtime_error ("Could not open file for writing");
+                throw runtime_error ("Could not open file for writing");
 
             // Write it out
             spoc::write_spoc_file_uncompressed (ofs, t);
