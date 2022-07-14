@@ -68,8 +68,8 @@ standard.
 - [ ] Reorganize namespaces and headers
   - [ ] Separate application headers from API headers
   - [ ] Create separate application namespace
-- [ ] Reorganize tests
-  - [ ] Separate app tests from unit tests
+- [X] Reorganize tests
+  - [X] Separate app tests from unit tests
 - [X] Create header only library with examples
 - [X] Read/write uncompressed
 - [X] Add NEXTRA field in header
@@ -183,35 +183,39 @@ standard.
 - [ ] spoc restore: Restore points from one point cloud to another with
       the same voxel indexes
 
-## C++ Utility Header Functions
+## API Functionality
 
-  - [ ] Set random seed
-  - [ ] Generate voxel indexes
-  - [ ] Generate grid indexes
-  - [ ] Generate connected component IDs based upon location and, optionally, other fields
-    - [ ] Connection radius
+This is a list of functions and capabilities that could potentially be
+added. Some of these are place-holders that obviously don't belong and
+should be moved to a separate API, like VIPER.
+
+### Undecided
+
+These may are may not be included in the API
+
+  - [ ] Generate neighbor indexes within a radius
+    - [ ] Save the nearest K neighbors
+    - [ ] Randomly select K neighbors within the radius
+  - [ ] Generate connected component IDs
+    - [ ] Connection radius for connecting by proximity
     - [ ] Connection field(s)
+    - [ ] Combine proximity and other field(s) (for example, TEXPERT
+          calls this 'regioning')
   - [ ] Generate cluster IDs based upon data fields, xyz, cpi, rgb, extra[n]:
     - [ ] Save component ID to extra[n]
     - [ ] Set value of K
     - [ ] Use K means clustering
     - [ ] Use spectral clustering
     - [ ] Use Newman clustering
-  - [ ] Generate neighbor indexes within a radius
-    - [ ] Save the nearest K neighbors
-    - [ ] Randomly select K neighbors within the radius
-  - [ ] 2D/3D field smoothing - does not change xyz coords
-        smooth f sigma
+  - [ ] 2D/3D field smoothing - filter fields like classification, but
+        does not affect 3D structure of point cloud
+    - [ ] Classifications (voting, random)
+    - [ ] RGB (voting, average)
+    - [ ] Intensity (voting, average)
   - [ ] Spatial smoothing - 2D/3D spatial filtering, changes 3D structure
-                          - Gaussian filter
-                          - Median filter
-                          - X, Y, Z
-
-## Problems
-
-How do we handle projection? This is a raster operation, not a point
-cloud operation.
-
+    - [ ] Square filter
+    - [ ] Gaussian filter (deconcolve)
+    - [ ] Median filter
   - [ ] Projection: Project points onto a 2D plane. In order to project
                     onto XZ or YZ or an arbitrary plane, first rotate the
                     point cloud, then project.
@@ -228,6 +232,30 @@ cloud operation.
       - [ ] Nodata value
     - [ ] Png output
       - [ ] Grayscale/RGB
+
+### SPOC
+
+These should be included in the SPOC API
+
+  - [ ] Set random seed
+  - [ ] Generate voxel indexes
+  - [ ] Generate grid indexes
+  - [ ] Raster class
+
+### VIPER
+
+These should be included in the VIPER API
+
+  - [ ] Geotiff I/O
+  - [ ] Shapefile I/O
+  - [ ] Raster class
+  - [ ] Raster interpolation
+  - [ ] DTM creation
+  - [ ] Semantic segmentation
+    - [ ] CNN-based
+    - [ ] PCT-based
+    - [ ] Training
+    - [ ] Inference
 
 # Script Examples
 
