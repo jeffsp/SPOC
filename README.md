@@ -58,6 +58,8 @@ standard.
 
 # Project Roadmap
 
+## Framework
+
 - [X] Add Doxygen support
 - [X] Add Design by Contract functionality
 - [X] Generate documentation
@@ -83,6 +85,8 @@ standard.
 - [X] read/write spoc files
 - [X] read/write las files
 - [X] Add --version option to all apps
+
+## Applications
 
 - [X] spoc info
   - [X] Header/summary
@@ -124,9 +128,10 @@ standard.
   - [X] Quiet (don't warn)
   - [X] Unit/integration tests
 
-- [X] spoc transform: These are all capable of streaming. The output
-      has the same number of points as the input. The ordering of the
-      points does not change.
+- [X] spoc transform: Transform each point record into a different point
+      record. These are all capable of streaming. The output has the
+      same number of points as the input. The ordering of the points
+      does not change.
   - [X] Only allow one command at a time, multiple commands can be
         executed using pipes
   - [X] Allow string field specifications for extra[0..N]
@@ -136,80 +141,45 @@ standard.
   - [X] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
   - [X] Add offset to X,Y,Z: addx/y/z #
   - [X] Scale by X,Y,Z: scale, scalex/y/z
+  - [ ] Add Gaussian noise to XYZ
+    - [ ] Set seed
+  - [ ] Add Uniform noise to XYZ
+    - [ ] Set seed
 
-- [X] spoc generate: These are all capable of streaming. The output
-      has the same number of points as the input
-  - [ ] Resize extra fields
-  - [ ] Mark/unmark e0 when field f==, <=, >=, <, > value
-    - [ ] Don't allow == on doubles
-  - [ ] Generate voxel indexes in e1,e2,e3
-    - [ ] Voxel size (resolution)
-    - [ ] Voxel size in X, Y, Z
-  - [ ] Generate grid indexes in e1,e2
-    - [ ] Grid size (resolution)
-    - [ ] Grid size in X, Y
-  - [ ] Generate colors by classification in e1,e2,e3
-  - [ ] Generate colors by elevation in e1,e2,e3
-  - [ ] Generate colors by segment in e1,e2,e3
+- [ ] spoc color: Set RGB values
+  - [ ] Transform classification to RGB
+  - [ ] Transform elevation to RGB
+  - [ ] Transform e# to RGB
+  - [ ] Read palette
+  - [ ] Random palette=size
+  - [ ] Random seed
 
-- [ ] spoc tool: Common operations that do not stream
+- [ ] spoc tool: Common operations
   - [X] Get/Set field F as text
     - [ ] Check to make sure text file has the correct number of points
           when setting a field
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
-  - [ ] Remove marked points
-  - [ ] Downsample: Remove duplicates with same voxel indexes
-    - [ ] samples=K: keep K samples from each voxel
-  - [ ] Upsample: Use the voxel indexes for aligning points when
-        the point clouds contain a different number of points.
-        1. Generate voxel indexes 2. subsample using those indexes. 3. restore
-        the points using the original voxel indexes
-        Note that this is useful for restoring points to a point cloud
-        that has been subsampled (decimated).
-  - [ ] 2D/3D field smoothing - does not change xyz coords
-        smooth f sigma
-  - [ ] Spatial smoothing - 2D/3D spatial filtering, changes 3D structure
-                          - Gaussian filter
-                          - Median filter
-                          - X, Y, Z
+  - [ ] Resize extra
+  - [ ] Copy field --src=F --dest=F
+
+- [ ] spoc filter: Remove points with certain properties
+  - [ ] Remove points when field f==, !=, <=, >=, <, > value
+    - [ ] Don't allow == on doubles
   - [ ] Unique: Remove duplicates with same X, Y, Z values
+  - [ ] Downsample: Remove duplicates with same voxel indexes
+    - [ ] voxel resolution
+    - [ ] voxel resolution X, Y, Z
+    - [ ] samples=K: keep K samples from each voxel
 
-- [ ] spoc project: Project points onto a 2D plane. In order to project
-                     onto XZ or YZ or an arbitrary plane, first rotate the
-                     point cloud, then project.
-  - [ ] Grid size (resolution)
-  - [ ] Field: z, c, p, i, r, g, b, extra[0..N]
-  - [ ] Z elevation = min/max/median/mode/avg/%centile
-  - [ ] Normalize output
-  - [ ] Z-score output
-  - [ ] Pixel data type, int/uint/float, 8/16/32/64
-  - [ ] Interpolate results: Use after filtering ground points to
-        create DTMs
-    - [ ] Extrapolate edges on/off
-  - [ ] Geotiff output
-    - [ ] Nodata value
-  - [ ] Png output
-    - [ ] Grayscale/RGB
+- [ ] spoc restore: Restore points from one point cloud to another with
+      the same voxel indexes
 
-- [ ] spoc config: Show configuration values
-  - [ ] ~/.config/spoc/config
-  - [ ] ~/.config/spoc/palettes
+## C++ Utility Header Functions
 
-- [ ] spoc octree: break into files arranged as an octree, access/create spoc files
-  - [ ] Given a bunch of spoc files, create a quadtree structure
-  - [ ] Don't divide on z value (create quadtrees)
-  - [ ] Create a spoc file from an octree given an extent
-  - [ ] Unit/integration tests
-
-- [ ] C++ SPOC Utility Header Functions
   - [ ] Set random seed
-  - [ ] Add random Gaussian noise to X,Y,Z
-  - [ ] Add random uniform noise to X,Y,Z
-  - [ ] Color by classification
-  - [ ] Color by elevation
-  - [ ] Color by segment
-  - [ ] Get/set palette
+  - [ ] Generate voxel indexes
+  - [ ] Generate grid indexes
   - [ ] Generate connected component IDs based upon location and, optionally, other fields
     - [ ] Connection radius
     - [ ] Connection field(s)
@@ -222,19 +192,62 @@ standard.
   - [ ] Generate neighbor indexes within a radius
     - [ ] Save the nearest K neighbors
     - [ ] Randomly select K neighbors within the radius
+  - [ ] 2D/3D field smoothing - does not change xyz coords
+        smooth f sigma
+  - [ ] Spatial smoothing - 2D/3D spatial filtering, changes 3D structure
+                          - Gaussian filter
+                          - Median filter
+                          - X, Y, Z
 
-- [ ] Script Examples
-  - [ ] Machine learning
-    - [ ] Rotate by 5 degrees off nadir, then project to XY plane
-    - [ ] Slice a 1 meter transect, rotate by 90 degrees, project to get
-          a transect
-    - [ ] Regularization, add noise
-    - [ ] Tile
-  - [ ] Decimate/undecimate
-  - [ ] Transform with pipes
-  - [X] Stream averaging
+## Problems
 
-- [ ] C++ Examples
-  - [X] Noop
-  - [X] Very large spoc file with streaming
-  - [ ] Nearest neighbor processing
+How do we handle projection? This is a raster operation, not a point
+cloud operation.
+
+  - [ ] Projection: Project points onto a 2D plane. In order to project
+                    onto XZ or YZ or an arbitrary plane, first rotate the
+                    point cloud, then project.
+    - [ ] Grid size (resolution)
+    - [ ] Field: z, c, p, i, r, g, b, extra[0..N]
+    - [ ] Z elevation = min/max/median/mode/avg/%centile
+    - [ ] Normalize output
+    - [ ] Z-score output
+    - [ ] Pixel data type, int/uint/float, 8/16/32/64
+    - [ ] Interpolate results: Use after filtering ground points to
+          create DTMs
+      - [ ] Extrapolate edges on/off
+    - [ ] Geotiff output
+      - [ ] Nodata value
+    - [ ] Png output
+      - [ ] Grayscale/RGB
+
+# Script Examples
+
+Examples of how to use the command line applications
+
+- [ ] Machine learning
+  - [ ] Rotate by 5 degrees off nadir, then project to XY plane
+  - [ ] Slice a 1 meter transect, rotate by 90 degrees, project to get
+        a transect
+  - [ ] Regularization, add noise
+  - [ ] Tile
+- [ ] Decimate/undecimate
+- [ ] Transform with pipes
+- [X] Stream averaging
+
+# C++ Programming Examples
+
+Examples of how to use the C++ API with compiled examples
+
+- [X] Noop a with streams
+- [X] Very large spoc file with streaming
+- [ ] Nearest neighbor processing
+
+# Proposed Functionality
+
+* spoc octree: break into files arranged as an octree, access/create spoc files
+  * Given a bunch of spoc files, create a quadtree structure
+  * Don't divide on z value (create quadtrees)
+  * Create a spoc file from an octree given an extent
+  * Unit/integration tests
+
