@@ -8,13 +8,13 @@ A SPOC file consists of a **HEADER** followed by **POINT RECORDS**.
 
 The **HEADER** contains the following information:
 
-    * SPOC file identifier
-    * SPOC format major and minor version numbers
-    * An arbitrary length character string that can be used to store
-      spatial reference system data
-    * The number of 64-bit extra fields associated with each point record
-    * The number of points records contained in the file
-    * A flag indicating whether or not the contents are compressed
+* SPOC file identifier
+* SPOC format major and minor version numbers
+* An arbitrary length character string that can be used to store
+  spatial reference system data
+* The number of 64-bit extra fields associated with each point record
+* The number of points records contained in the file
+* A flag indicating whether or not the contents are compressed
 
 Each **POINT RECORD** in a SPOC file contains:
 
