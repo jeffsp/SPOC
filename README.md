@@ -189,10 +189,29 @@ This is a list of functions and capabilities that could potentially be
 added. Some of these are place-holders that obviously don't belong and
 should be moved to a separate API, like VIPER.
 
-### Undecided
+### SPOC
 
-These may are may not be included in the API
+These should be included in the SPOC API
 
+  - [ ] Set random seed
+  - [ ] Generate voxel indexes
+  - [ ] Generate grid indexes
+  - [ ] Raster class
+
+### VIPER
+
+These should be included in the VIPER API
+
+  - [ ] Geotiff I/O
+  - [ ] Shapefile I/O
+  - [ ] Raster class
+  - [ ] Raster interpolation
+  - [ ] DTM creation
+  - [ ] Semantic segmentation
+    - [ ] CNN-based
+    - [ ] PCT-based
+    - [ ] Training
+    - [ ] Inference
   - [ ] Generate neighbor indexes within a radius
     - [ ] Save the nearest K neighbors
     - [ ] Randomly select K neighbors within the radius
@@ -233,29 +252,6 @@ These may are may not be included in the API
     - [ ] Png output
       - [ ] Grayscale/RGB
 
-### SPOC
-
-These should be included in the SPOC API
-
-  - [ ] Set random seed
-  - [ ] Generate voxel indexes
-  - [ ] Generate grid indexes
-  - [ ] Raster class
-
-### VIPER
-
-These should be included in the VIPER API
-
-  - [ ] Geotiff I/O
-  - [ ] Shapefile I/O
-  - [ ] Raster class
-  - [ ] Raster interpolation
-  - [ ] DTM creation
-  - [ ] Semantic segmentation
-    - [ ] CNN-based
-    - [ ] PCT-based
-    - [ ] Training
-    - [ ] Inference
 
 # Script Examples
 
