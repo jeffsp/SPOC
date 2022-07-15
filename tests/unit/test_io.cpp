@@ -114,6 +114,8 @@ void test_spoc_file ()
     auto p = generate_random_point_records (total_points, extra_fields);
     const string wkt = "Test wkt";
     auto f = spoc_file (wkt, p);
+    auto g = f.get_wkt ();
+    verify (g == wkt);
     f.set_wkt ("Test WKT 2");
     for (size_t i = 0; i < f.get_point_records ().size (); ++i)
     {
@@ -133,6 +135,8 @@ void test_spoc_file ()
     q.extra.resize (extra_fields + 1);
     f.set_point_record (0, q);
     f.set_compressed (true);
+    const auto g = f.get_compressed ();
+    verify (g);
     bool failed = false;
     stringstream s;
     try {
