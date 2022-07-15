@@ -13,7 +13,7 @@ namespace info_app
 {
 
 template<typename T>
-std::map<std::string,size_t> get_class_map (const T &c)
+std::map<std::string,size_t> get_class_count_map (const T &c)
 {
     std::unordered_map<int,size_t> m;
 
@@ -34,39 +34,6 @@ std::map<std::string,size_t> get_class_map (const T &c)
     }
 
     return a;
-}
-
-std::unordered_map<int,std::string> get_label_map ()
-{
-    std::unordered_map<int,std::string> m;
-    m[0] = "unclassified";
-    m[1] = "unknown";
-    m[2] = "ground";
-    m[3] = "low_veg";
-    m[4] = "med_veg";
-    m[5] = "high_veg";
-    m[6] = "building";
-    m[7] = "low_noise";
-    m[8] = "reserved";
-    m[9] = "water";
-    m[10] = "rail";
-    m[11] = "road";
-    m[12] = "reserved";
-    m[13] = "wire_guard";
-    m[14] = "wire_conductor";
-    m[15] = "transmission_tower";
-    m[16] = "wire_connector";
-    m[17] = "bridge_deck";
-    m[18] = "high_noise";
-    m[19] = "overhead_structure";
-    m[20] = "ignored";
-    m[21] = "snow";
-    m[22] = "exclusion";
-    for (int i = 23; i < 64; ++i)
-        m[i] = "reserved";
-    for (int i = 64; i < 256; ++i)
-        m[i] = "user_defined";
-    return m;
 }
 
 template<typename T,typename U>
@@ -172,6 +139,7 @@ void process (std::ostream &os,
 {
     using namespace std;
     using namespace spoc;
+    using namespace spoc::io;
 
     os.precision (15);
     os << fixed;
@@ -215,9 +183,9 @@ void process (std::ostream &os,
         {
             json::object c;
 
-            const auto cls_map = get_class_map (get_c (f.get_point_records ()));
+            const auto class_count_map = get_class_count_map (get_c (f.get_point_records ()));
 
-            for (auto i : cls_map)
+            for (auto i : class_count_map)
                 c[i.first] = i.second;
 
             j["classifications"] = c;
@@ -262,15 +230,15 @@ void process (std::ostream &os,
 
         if (classifications)
         {
-            const auto cls_map = get_class_map (get_c (f.get_point_records ()));
-            const auto label_map = get_label_map ();
+            const auto class_count_map = get_class_count_map (get_c (f.get_point_records ()));
+            const auto class_map = spoc::asprs::get_asprs_class_map ();
 
-            for (auto i : cls_map)
+            for (auto i : class_count_map)
             {
                 const auto j = std::stoi (i.first);
-                const auto l = label_map.find (j) == label_map.end ()
+                const auto l = class_map.find (j) == class_map.end ()
                     ? "undefined"
-                    : label_map.at (j);
+                    : class_map.at (j);
                 os << "cls_" << i.first
                     << "\t"
                     << i.second

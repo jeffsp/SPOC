@@ -60,7 +60,7 @@ void add (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = spoc::io::read_point_record (is, h.extra_fields);
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
 
         // Scale the point
         op (p);
@@ -155,7 +155,7 @@ void quantize (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = spoc::io::read_point_record (is, h.extra_fields);
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
 
         // Quantize the point
         p.x = static_cast<int> (p.x / precision) * precision;
@@ -204,7 +204,7 @@ void replace (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = spoc::io::read_point_record (is, h.extra_fields);
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
 
         // Process the point
         switch (field_name[0])
@@ -304,7 +304,7 @@ void rotate (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = spoc::io::read_point_record (is, h.extra_fields);
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
         const double x = p.x;
         const double y = p.y;
         const double z = p.z;
@@ -404,7 +404,7 @@ void scale (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = spoc::io::read_point_record (is, h.extra_fields);
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
 
         // Scale the point
         op (p);
@@ -466,7 +466,7 @@ void set (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = spoc::io::read_point_record (is, h.extra_fields);
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
 
         // Process the point
         switch (field_name[0])

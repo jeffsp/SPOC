@@ -6,6 +6,7 @@
 using namespace std;
 using namespace spoc::diff_app;
 using namespace spoc::io;
+using namespace spoc::point_record;
 
 void test_diff ()
 {

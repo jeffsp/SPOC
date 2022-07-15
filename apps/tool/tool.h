@@ -44,7 +44,7 @@ void get_field (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = spoc::io::read_point_record (is, h.extra_fields);
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
 
         // Process the point
         switch (field_name[0])
@@ -74,6 +74,8 @@ void get_field (std::istream &is,
 template<typename T>
 void recenter (T &p, const bool z_flag = false)
 {
+    using namespace spoc::io;
+
     // Get X, Y, and Z
     const auto x = get_x (p);
     const auto y = get_y (p);
@@ -109,9 +111,9 @@ void recenter (std::istream &is,
     const auto n = h.total_points;
 
     // Read the data
-    spoc::io::point_records p (n);
+    spoc::point_record::point_records p (n);
     for (size_t i = 0; i < p.size (); ++i)
-        p[i] = spoc::io::read_point_record (is, h.extra_fields);
+        p[i] = spoc::point_record::read_point_record (is, h.extra_fields);
 
     recenter (p, z_flag);
 
@@ -175,7 +177,7 @@ void set_field (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = spoc::io::read_point_record (is, h.extra_fields);
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
 
         // Process the point
         switch (field_name[0])
@@ -208,6 +210,8 @@ void set_field (std::istream &is,
 template<typename T>
 spoc::point::point<double> get_min (const T &p)
 {
+    using namespace spoc::io;
+
     // Get X, Y, and Z
     const auto x = get_x (p);
     const auto y = get_y (p);
@@ -251,9 +255,9 @@ void subtract_min (std::istream &is,
     const auto n = h.total_points;
 
     // Read the data
-    spoc::io::point_records p (n);
+    spoc::point_record::point_records p (n);
     for (size_t i = 0; i < p.size (); ++i)
-        p[i] = spoc::io::read_point_record (is, h.extra_fields);
+        p[i] = spoc::point_record::read_point_record (is, h.extra_fields);
 
     // Get minimum value
     const auto minp = get_min (p);

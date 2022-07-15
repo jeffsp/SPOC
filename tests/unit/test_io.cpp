@@ -60,45 +60,6 @@ void test_header ()
     }
 }
 
-void test_point_record ()
-{
-    const auto p = generate_random_point_records (10, 8);
-
-    for (const auto &i : p)
-    {
-        verify (i.x != 0);
-        verify (i.y != 0);
-        verify (i.z != 0);
-        verify (i.c != 0);
-        verify (i.p != 0);
-        verify (i.i != 0);
-        verify (i.r != 0);
-        verify (i.g != 0);
-        verify (i.b != 0);
-    }
-
-    const auto q (p);
-    verify (p == q);
-
-    auto a = p[0];
-    auto b = a;
-    auto c = p[1];
-    verify (a == b); a.x = c.x; verify (a != b); a.x = b.x;
-    verify (a == b); a.y = c.y; verify (a != b); a.y = b.y;
-    verify (a == b); a.z = c.z; verify (a != b); a.z = b.z;
-    verify (a == b); a.c = c.c; verify (a != b); a.c = b.c;
-    verify (a == b); a.p = c.p; verify (a != b); a.p = b.p;
-    verify (a == b); a.i = c.i; verify (a != b); a.i = b.i;
-    verify (a == b); a.r = c.r; verify (a != b); a.r = b.r;
-    verify (a == b); a.g = c.g; verify (a != b); a.g = b.g;
-    verify (a == b); a.b = c.b; verify (a != b); a.b = b.b;
-    for (size_t i = 0; i < a.extra.size (); ++i)
-    {
-        verify (a == b); a.extra[i] = c.extra[i];
-        verify (a != b); a.extra[i] = b.extra[i];
-    }
-}
-
 void test_spoc_file ()
 {
     const size_t total_points = 1000;
@@ -347,7 +308,6 @@ int main (int argc, char **argv)
     try
     {
         test_header ();
-        test_point_record ();
         test_spoc_file ();
         test_spoc_file_io ();
         test_spoc_file_compressed_io ();

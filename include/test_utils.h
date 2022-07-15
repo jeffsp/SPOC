@@ -46,7 +46,7 @@ inline std::vector<spoc::point::point<double>> generate_points (
     return points;
 }
 
-std::vector<spoc::io::point_record> generate_random_point_records (
+std::vector<spoc::point_record::point_record> generate_random_point_records (
     const size_t total_points,
     const size_t extra_fields = 0,
     const bool rgb = true,
@@ -56,7 +56,7 @@ std::vector<spoc::io::point_record> generate_random_point_records (
     std::uniform_int_distribution<int> di (0, 1 << 15);
     std::uniform_real_distribution<double> dr (-1.0, 1.0);
 
-    std::vector<spoc::io::point_record> p (total_points, spoc::io::point_record (extra_fields));
+    std::vector<spoc::point_record::point_record> p (total_points, spoc::point_record::point_record (extra_fields));
 
     for (auto &i : p)
     {

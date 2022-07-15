@@ -17,6 +17,8 @@ inline int diff (const spoc::io::spoc_file &f1,
     const std::vector<int> &fields = std::vector<int> (),
     const bool reverse = false)
 {
+    using namespace spoc::io;
+
     // Assume it's a success
     int return_code = 0;
 

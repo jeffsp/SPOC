@@ -8,6 +8,7 @@ int main (int argc, char **argv)
     using namespace std;
     using namespace spoc;
     using namespace spoc::io;
+    using namespace spoc::point_record;
     using namespace spoc::text2spoc_cmd;
 
     try
@@ -42,13 +43,13 @@ int main (int argc, char **argv)
         }
 
         // Read point records
-        vector<point_record> point_records;
+        vector<point_record::point_record> point_records;
 
         for (string line; getline (cin, line ); )
         {
             // Parse the line
             stringstream ss (line);
-            point_record p;
+            point_record::point_record p;
             ss >> p.x; ss >> p.y; ss >> p.z;
             ss >> p.c; ss >> p.p; ss >> p.i;
             ss >> p.r; ss >> p.g; ss >> p.b;

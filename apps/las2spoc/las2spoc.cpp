@@ -11,6 +11,7 @@ int main (int argc, char **argv)
     using namespace spoc::io;
     using namespace spoc::las2spoc_app;
     using namespace spoc::las2spoc_cmd;
+    using namespace spoc::point_record;
 
     try
     {

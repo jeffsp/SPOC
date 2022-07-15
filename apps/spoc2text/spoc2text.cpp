@@ -53,7 +53,7 @@ int main (int argc, char **argv)
         cout << wkt << endl;
         for (size_t i = 0; i < point_records.size (); ++i)
         {
-            const point_record &p = point_records[i];
+            const spoc::point_record::point_record &p = point_records[i];
             cout << setprecision(numeric_limits<double>::digits10);
             cout << p.x;
             cout << '\t' << p.y;

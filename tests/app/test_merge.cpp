@@ -5,6 +5,7 @@
 
 using namespace std;
 using namespace spoc::io;
+using namespace spoc::point_record;
 using namespace spoc::merge_app;
 
 void test_merge ()
