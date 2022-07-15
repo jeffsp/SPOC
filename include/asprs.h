@@ -2,16 +2,7 @@
 #include "compression.h"
 #include "point.h"
 #include "version.h"
-#include <algorithm>
-#include <cmath>
-#include <cstdint>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <string>
-#include <unordered_set>
-#include <vector>
+#include <unordered_map>
 
 namespace spoc
 {
