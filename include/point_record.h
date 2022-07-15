@@ -1,5 +1,6 @@
 #pragma once
 #include "point.h"
+#include <algorithm>
 
 namespace spoc
 {
