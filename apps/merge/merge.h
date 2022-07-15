@@ -11,8 +11,8 @@ namespace merge_app
 {
 
 void append (
-    const spoc_file &f1,
-    spoc_file &f2,
+    const spoc::io::spoc_file &f1,
+    spoc::io::spoc_file &f2,
     const unsigned id,
     const bool quiet,
     std::ostream &s = std::clog)

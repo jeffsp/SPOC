@@ -3,13 +3,14 @@
 #include <iostream>
 #include <stdexcept>
 
+using namespace std;
+
 void test_text2spoc ()
 {
 }
 
 int main (int argc, char **argv)
 {
-    using namespace std;
     try
     {
         test_text2spoc ();

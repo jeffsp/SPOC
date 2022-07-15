@@ -4,19 +4,20 @@
 #include <stdexcept>
 
 using namespace std;
+using namespace spoc::io;
 using namespace spoc::merge_app;
 
 void test_merge ()
 {
-    spoc::header h1 ("A", 0, 0, false);
-    spoc::header h2 ("B", 0, 0, false);
-    spoc::spoc_file f1 (h1, spoc::point_records ());
-    spoc::spoc_file f2 (h2, spoc::point_records ());
+    header h1 ("A", 0, 0, false);
+    header h2 ("B", 0, 0, false);
+    spoc_file f1 (h1, point_records ());
+    spoc_file f2 (h2, point_records ());
 
-    spoc::spoc_file f;
+    spoc_file f;
     const auto id = -1;
     const auto quiet = false;
-    std::stringstream ss;
+    stringstream ss;
     append (f1, f, id, quiet, ss);
     append (f2, f, id, quiet, ss);
 }
@@ -27,7 +28,7 @@ void test_merge_quiet ()
     auto f1 = generate_random_spoc_file (100, 8, true);
     auto f2 = generate_random_spoc_file (100, 8, false);
 
-    spoc::spoc_file f;
+    spoc_file f;
     const auto id = -1;
     const auto quiet = true;
     append (f1, f, id, quiet);

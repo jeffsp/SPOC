@@ -6,9 +6,9 @@
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spoc;
-    using namespace diff_app;
-    using namespace diff_cmd;
+    using namespace spoc::diff_app;
+    using namespace spoc::diff_cmd;
+    using namespace spoc::io;
 
     try
     {
@@ -20,9 +20,9 @@ int main (int argc, char **argv)
         if (args.version)
         {
             cout << "Version "
-                << static_cast<int> (MAJOR_VERSION)
+                << static_cast<int> (spoc::MAJOR_VERSION)
                 << "."
-                << static_cast<int> (MINOR_VERSION)
+                << static_cast<int> (spoc::MINOR_VERSION)
                 << endl;
             return 0;
         }

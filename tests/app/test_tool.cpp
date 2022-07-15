@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 using namespace std;
-using namespace spoc;
+using namespace spoc::io;
 using namespace spoc::tool_app;
 
 void test_recenter ()
@@ -113,7 +113,6 @@ void test_set_field ()
 
 int main (int argc, char **argv)
 {
-    using namespace std;
     try
     {
         test_recenter ();

@@ -4,8 +4,8 @@
 #include <stdexcept>
 
 using namespace std;
-using namespace spoc;
-using namespace diff_app;
+using namespace spoc::diff_app;
+using namespace spoc::io;
 
 void test_diff ()
 {

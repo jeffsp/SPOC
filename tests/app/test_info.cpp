@@ -8,8 +8,6 @@ using namespace spoc::info_app;
 
 void test_info_empty ()
 {
-    using namespace std;
-
     // Generate spoc files
     auto f1 = generate_random_spoc_file (0, 0, true);
     auto f2 = generate_random_spoc_file (0, 0, false);
@@ -69,7 +67,6 @@ void test_info ()
 
 int main (int argc, char **argv)
 {
-    using namespace std;
     try
     {
         test_info_empty ();

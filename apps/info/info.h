@@ -1,6 +1,5 @@
 #pragma once
 
-#include "json.h"
 #include "spoc.h"
 #include <iostream>
 #include <map>
@@ -164,7 +163,7 @@ inline std::string get_summary_string (const std::string &label, const U &x, con
 
 // Process a spoc file and write to 'os'
 void process (std::ostream &os,
-    const spoc::spoc_file &f,
+    const spoc::io::spoc_file &f,
     const bool json,
     const bool header_info,
     const bool summary_info,

@@ -1,14 +1,15 @@
 #include "app_utils.h"
-#include "spoc.h"
 #include "decompress_cmd.h"
+#include "spoc.h"
 #include <iostream>
 #include <stdexcept>
 
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spoc;
+    using namespace spoc::app_utils;
     using namespace spoc::decompress_cmd;
+    using namespace spoc::io;
 
     try
     {
@@ -20,9 +21,9 @@ int main (int argc, char **argv)
         if (args.version)
         {
             cout << "Version "
-                << static_cast<int> (MAJOR_VERSION)
+                << static_cast<int> (spoc::MAJOR_VERSION)
                 << "."
-                << static_cast<int> (MINOR_VERSION)
+                << static_cast<int> (spoc::MINOR_VERSION)
                 << endl;
             return 0;
         }
@@ -32,19 +33,19 @@ int main (int argc, char **argv)
             return 0;
 
         // Get the input stream
-        app_utils::input_stream is (args.verbose, args.input_fn);
+        input_stream is (args.verbose, args.input_fn);
 
         // Read the input file
         spoc_file f = read_spoc_file_compressed (is ());
 
         // Get the output stream
-        app_utils::output_stream os (args.verbose, args.output_fn);
+        output_stream os (args.verbose, args.output_fn);
 
         // Unset the compression bit
         f.set_compressed (false);
 
         // Write it out
-        spoc::write_spoc_file_uncompressed (os (), f);
+        write_spoc_file_uncompressed (os (), f);
 
         return 0;
     }

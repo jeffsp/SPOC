@@ -7,7 +7,8 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc;
-    using namespace text2spoc_cmd;
+    using namespace spoc::io;
+    using namespace spoc::text2spoc_cmd;
 
     try
     {

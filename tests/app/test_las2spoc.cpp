@@ -3,14 +3,16 @@
 #include <iostream>
 #include <stdexcept>
 
+using namespace std;
+using namespace spoc::las2spoc_app;
+
 void test_las2spoc ()
 {
-    spoc::las2spoc::las_reader l ("./test_data/lidar/juarez50.las");
+    las_reader l ("./test_data/lidar/juarez50.las");
 }
 
 int main (int argc, char **argv)
 {
-    using namespace std;
     try
     {
         test_las2spoc ();

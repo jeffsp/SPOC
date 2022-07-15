@@ -1,10 +1,10 @@
 #pragma once
 
+#include "cmd.h"
 #include <set>
 #include <stdexcept>
 #include <string>
 #include <variant>
-#include "cmd.h"
 
 namespace spoc
 {

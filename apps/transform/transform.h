@@ -1,7 +1,6 @@
 #pragma once
 
 #include "app_utils.h"
-#include "contracts.h"
 #include "spoc.h"
 #include <cassert>
 #include <iostream>
@@ -14,24 +13,6 @@ namespace spoc
 
 namespace transform_app
 {
-
-const header read_header_uncompressed (std::istream &is)
-{
-    // Check preconditions
-    REQUIRE (is.good ());
-
-    // Read the header
-    const header h = read_header (is);
-
-    // Check compression flag
-    if (h.compressed)
-        throw std::runtime_error ("Expected an uncompressed file");
-
-    // Check post-conditions
-    ENSURE (h.is_valid ());
-
-    return h;
-}
 
 // Add offset
 template<typename T>
@@ -64,7 +45,7 @@ void add_z (T &p, const double v)
 template<typename OP>
 void add (std::istream &is,
     std::ostream &os,
-    const spoc::header &h,
+    const spoc::io::header &h,
     OP op)
 {
     // Check preconditions
@@ -79,7 +60,7 @@ void add (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = read_point_record (is, h.extra_fields);
+        auto p = spoc::io::read_point_record (is, h.extra_fields);
 
         // Scale the point
         op (p);
@@ -89,10 +70,33 @@ void add (std::istream &is,
     }
 }
 
+namespace detail
+{
+
+const spoc::io::header read_header_uncompressed (std::istream &is)
+{
+    // Check preconditions
+    REQUIRE (is.good ());
+
+    // Read the header
+    const spoc::io::header h = spoc::io::read_header (is);
+
+    // Check compression flag
+    if (h.compressed)
+        throw std::runtime_error ("Expected an uncompressed file");
+
+    // Check post-conditions
+    ENSURE (h.is_valid ());
+
+    return h;
+}
+
+}
+
 void add_x (std::istream &is, std::ostream &os, const double v)
 {
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
     auto op = [&v] (auto &p) { p.x += v; };
     add (is, os, h, op);
 }
@@ -100,7 +104,7 @@ void add_x (std::istream &is, std::ostream &os, const double v)
 void add_y (std::istream &is, std::ostream &os, const double v)
 {
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
     auto op = [&v] (auto &p) { p.y += v; };
     add (is, os, h, op);
 }
@@ -108,7 +112,7 @@ void add_y (std::istream &is, std::ostream &os, const double v)
 void add_z (std::istream &is, std::ostream &os, const double v)
 {
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
     auto op = [&v] (auto &p) { p.z += v; };
     add (is, os, h, op);
 }
@@ -142,7 +146,7 @@ void quantize (std::istream &is,
     REQUIRE (precision != 0.0);
 
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
 
     // Write the header
     write_header (os, h);
@@ -151,7 +155,7 @@ void quantize (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = read_point_record (is, h.extra_fields);
+        auto p = spoc::io::read_point_record (is, h.extra_fields);
 
         // Quantize the point
         p.x = static_cast<int> (p.x / precision) * precision;
@@ -186,7 +190,7 @@ void replace (std::istream &is,
     }
 
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
 
     // Get the extra index
     const size_t j = is_extra_field (field_name)
@@ -200,7 +204,7 @@ void replace (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = read_point_record (is, h.extra_fields);
+        auto p = spoc::io::read_point_record (is, h.extra_fields);
 
         // Process the point
         switch (field_name[0])
@@ -283,7 +287,7 @@ void rotate_z (T &p, const double degrees)
 template<typename XOP,typename YOP,typename ZOP>
 void rotate (std::istream &is,
     std::ostream &os,
-    const spoc::header &h,
+    const spoc::io::header &h,
     XOP xop,
     YOP yop,
     ZOP zop)
@@ -300,7 +304,7 @@ void rotate (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = read_point_record (is, h.extra_fields);
+        auto p = spoc::io::read_point_record (is, h.extra_fields);
         const double x = p.x;
         const double y = p.y;
         const double z = p.z;
@@ -318,7 +322,7 @@ void rotate (std::istream &is,
 void rotate_x (std::istream &is, std::ostream &os, const double degrees)
 {
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
 
     // Convert degrees to radians
     const double r = degrees * M_PI / 180.0;
@@ -331,7 +335,7 @@ void rotate_x (std::istream &is, std::ostream &os, const double degrees)
 void rotate_y (std::istream &is, std::ostream &os, const double degrees)
 {
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
 
     // Convert degrees to radians
     const double r = degrees * M_PI / 180.0;
@@ -344,7 +348,7 @@ void rotate_y (std::istream &is, std::ostream &os, const double degrees)
 void rotate_z (std::istream &is, std::ostream &os, const double degrees)
 {
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
 
     // Convert degrees to radians
     const double r = degrees * M_PI / 180.0;
@@ -385,7 +389,7 @@ void scale_z (T &p, const double v)
 template<typename OP>
 void scale (std::istream &is,
     std::ostream &os,
-    const spoc::header &h,
+    const spoc::io::header &h,
     OP op)
 {
     // Check preconditions
@@ -400,7 +404,7 @@ void scale (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = read_point_record (is, h.extra_fields);
+        auto p = spoc::io::read_point_record (is, h.extra_fields);
 
         // Scale the point
         op (p);
@@ -413,7 +417,7 @@ void scale (std::istream &is,
 void scale_x (std::istream &is, std::ostream &os, const double v)
 {
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
     auto op = [&v] (auto &p) { p.x *= v; };
     scale (is, os, h, op);
 }
@@ -421,7 +425,7 @@ void scale_x (std::istream &is, std::ostream &os, const double v)
 void scale_y (std::istream &is, std::ostream &os, const double v)
 {
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
     auto op = [&v] (auto &p) { p.y *= v; };
     scale (is, os, h, op);
 }
@@ -429,7 +433,7 @@ void scale_y (std::istream &is, std::ostream &os, const double v)
 void scale_z (std::istream &is, std::ostream &os, const double v)
 {
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
     auto op = [&v] (auto &p) { p.z *= v; };
     scale (is, os, h, op);
 }
@@ -448,7 +452,7 @@ void set (std::istream &is,
     REQUIRE (check_field_name (field_name));
 
     // Read the header and make sure it's uncompressed
-    const header h = read_header_uncompressed (is);
+    const auto h = detail::read_header_uncompressed (is);
 
     // Get the extra index
     const size_t j = is_extra_field (field_name)
@@ -462,7 +466,7 @@ void set (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = read_point_record (is, h.extra_fields);
+        auto p = spoc::io::read_point_record (is, h.extra_fields);
 
         // Process the point
         switch (field_name[0])

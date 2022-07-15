@@ -8,8 +8,9 @@
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spoc;
-    using namespace las2spoc_cmd;
+    using namespace spoc::io;
+    using namespace spoc::las2spoc_app;
+    using namespace spoc::las2spoc_cmd;
 
     try
     {
@@ -21,9 +22,9 @@ int main (int argc, char **argv)
         if (args.version)
         {
             cout << "Version "
-                << static_cast<int> (MAJOR_VERSION)
+                << static_cast<int> (spoc::MAJOR_VERSION)
                 << "."
-                << static_cast<int> (MINOR_VERSION)
+                << static_cast<int> (spoc::MINOR_VERSION)
                 << endl;
             return 0;
         }
@@ -35,7 +36,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "reading " << args.input_fn << endl;
 
-        las2spoc::las_reader l (args.input_fn);
+        las_reader l (args.input_fn);
 
         // Check the coordinate system
         if (l.lasreader->header.vlr_geo_ogc_wkt == nullptr)

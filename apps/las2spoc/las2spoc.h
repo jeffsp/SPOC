@@ -6,7 +6,7 @@
 namespace spoc
 {
 
-namespace las2spoc
+namespace las2spoc_app
 {
 
 struct las_reader
@@ -34,6 +34,6 @@ struct las_reader
     LASreader *lasreader;
 };
 
-} // namespace las2spoc
+} // namespace las2spoc_app
 
 } // namespace spoc

@@ -46,7 +46,7 @@ inline std::vector<spoc::point::point<double>> generate_points (
     return points;
 }
 
-std::vector<spoc::point_record> generate_random_point_records (
+std::vector<spoc::io::point_record> generate_random_point_records (
     const size_t total_points,
     const size_t extra_fields = 0,
     const bool rgb = true,
@@ -56,7 +56,7 @@ std::vector<spoc::point_record> generate_random_point_records (
     std::uniform_int_distribution<int> di (0, 1 << 15);
     std::uniform_real_distribution<double> dr (-1.0, 1.0);
 
-    std::vector<spoc::point_record> p (total_points, spoc::point_record (extra_fields));
+    std::vector<spoc::io::point_record> p (total_points, spoc::io::point_record (extra_fields));
 
     for (auto &i : p)
     {
@@ -75,15 +75,15 @@ std::vector<spoc::point_record> generate_random_point_records (
     return p;
 }
 
-spoc::spoc_file generate_random_spoc_file (
+spoc::io::spoc_file generate_random_spoc_file (
     const size_t total_points,
     const size_t extra_fields = 0,
     const bool compressed = false,
     const bool rgb = true,
     const size_t seed = 123)
 {
-    spoc::header h ("WKT", extra_fields, total_points, compressed);
-    spoc::spoc_file f (h, generate_random_point_records (total_points, extra_fields, rgb, seed));
+    spoc::io::header h ("WKT", extra_fields, total_points, compressed);
+    spoc::io::spoc_file f (h, generate_random_point_records (total_points, extra_fields, rgb, seed));
     return f;
 }
 

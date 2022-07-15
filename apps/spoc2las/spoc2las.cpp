@@ -9,9 +9,9 @@
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spoc;
-    using namespace spoc2las_cmd;
-    using namespace spoc2las_app;
+    using namespace spoc::io;
+    using namespace spoc::spoc2las_app;
+    using namespace spoc::spoc2las_cmd;
 
     try
     {
@@ -23,9 +23,9 @@ int main (int argc, char **argv)
         if (args.version)
         {
             cout << "Version "
-                << static_cast<int> (MAJOR_VERSION)
+                << static_cast<int> (spoc::MAJOR_VERSION)
                 << "."
-                << static_cast<int> (MINOR_VERSION)
+                << static_cast<int> (spoc::MINOR_VERSION)
                 << endl;
             return 0;
         }
@@ -57,17 +57,17 @@ int main (int argc, char **argv)
         double min_z = numeric_limits<double>::max ();
         for (auto &p : f.get_point_records ())
         {
-            min_x = std::min (min_x, p.x);
-            min_y = std::min (min_y, p.y);
-            min_z = std::min (min_z, p.z);
+            min_x = min (min_x, p.x);
+            min_y = min (min_y, p.y);
+            min_z = min (min_z, p.z);
         }
 
         // Create the header
         LASheader lasheader;
         strcpy (lasheader.system_identifier, "SPOC by Zetamon XYZ");
         strcpy (lasheader.generating_software, "spoc2las");
-        const auto now = std::chrono::system_clock::now ();
-        time_t tt = std::chrono::system_clock::to_time_t(now);
+        const auto now = chrono::system_clock::now ();
+        time_t tt = chrono::system_clock::to_time_t(now);
         tm local_tm = *localtime(&tt);
         lasheader.file_creation_day = local_tm.tm_yday;
         lasheader.file_creation_year = local_tm.tm_year + 1900;

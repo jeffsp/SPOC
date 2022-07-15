@@ -4,10 +4,10 @@
 #include <stdexcept>
 
 using namespace std;
-using namespace spoc;
+using namespace spoc::point;
 using namespace spoc::voxel;
 
-using P = std::vector<spoc::point::point<double>>;
+using P = vector<point<double>>;
 
 void test_empty ()
 {

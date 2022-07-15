@@ -8,8 +8,8 @@
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spoc;
-    using namespace spoc2text_cmd;
+    using namespace spoc::io;
+    using namespace spoc::spoc2text_cmd;
 
     try
     {
@@ -21,9 +21,9 @@ int main (int argc, char **argv)
         if (args.version)
         {
             cout << "Version "
-                << static_cast<int> (MAJOR_VERSION)
+                << static_cast<int> (spoc::MAJOR_VERSION)
                 << "."
-                << static_cast<int> (MINOR_VERSION)
+                << static_cast<int> (spoc::MINOR_VERSION)
                 << endl;
             return 0;
         }
@@ -54,7 +54,7 @@ int main (int argc, char **argv)
         for (size_t i = 0; i < point_records.size (); ++i)
         {
             const point_record &p = point_records[i];
-            cout << setprecision(std::numeric_limits<double>::digits10);
+            cout << setprecision(numeric_limits<double>::digits10);
             cout << p.x;
             cout << '\t' << p.y;
             cout << '\t' << p.z;

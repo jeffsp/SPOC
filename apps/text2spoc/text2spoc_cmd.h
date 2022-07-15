@@ -1,8 +1,8 @@
 #pragma once
 
+#include "cmd.h"
 #include <stdexcept>
 #include <string>
-#include "cmd.h"
 
 namespace spoc
 {

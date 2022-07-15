@@ -3,6 +3,9 @@
 #include <iostream>
 #include <stdexcept>
 
+using namespace std;
+using namespace spoc::cmd;
+
 void test_cmd ()
 {
     static struct option long_options[] = {
@@ -12,16 +15,15 @@ void test_cmd ()
         {0,      0,           0,  0 }
     };
 
-    std::stringstream ss;
+    stringstream ss;
     const size_t noptions = sizeof (long_options) / sizeof (struct option);
-    const std::string usage ("usage");
-    spoc::cmd::print_help (ss, usage, noptions, long_options);
-    spoc::cmd::print_help (ss, usage, 0, long_options);
+    const string usage ("usage");
+    print_help (ss, usage, noptions, long_options);
+    print_help (ss, usage, 0, long_options);
 }
 
 int main (int argc, char **argv)
 {
-    using namespace std;
     try
     {
         test_cmd ();

@@ -10,8 +10,8 @@ namespace spoc
 namespace diff_app
 {
 
-inline int diff (const spoc_file &f1,
-    const spoc_file &f2,
+inline int diff (const spoc::io::spoc_file &f1,
+    const spoc::io::spoc_file &f2,
     const bool header_only = false,
     const bool data_only = false,
     const std::vector<int> &fields = std::vector<int> (),

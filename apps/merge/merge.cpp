@@ -1,4 +1,3 @@
-#include "extent.h"
 #include "merge.h"
 #include "merge_cmd.h"
 #include "spoc.h"
@@ -8,9 +7,10 @@
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spoc;
-    using namespace merge_app;
-    using namespace merge_cmd;
+    using namespace spoc::extent;
+    using namespace spoc::io;
+    using namespace spoc::merge_app;
+    using namespace spoc::merge_cmd;
 
     try
     {
@@ -22,9 +22,9 @@ int main (int argc, char **argv)
         if (args.version)
         {
             cout << "Version "
-                << static_cast<int> (MAJOR_VERSION)
+                << static_cast<int> (spoc::MAJOR_VERSION)
                 << "."
-                << static_cast<int> (MINOR_VERSION)
+                << static_cast<int> (spoc::MINOR_VERSION)
                 << endl;
             return 0;
         }
@@ -76,7 +76,7 @@ int main (int argc, char **argv)
             const auto p = f.get_point_records ();
 
             // Get the extent
-            const auto e = spoc::extent::get_extent (p);
+            const auto e = get_extent (p);
 
             // Get the area
             const auto a = (e.maxp.x - e.minp.x) * (e.maxp.y - e.minp.y);
@@ -98,7 +98,7 @@ int main (int argc, char **argv)
             const auto p = g.get_point_records ();
 
             // Get the extent
-            const auto e = spoc::extent::get_extent (p);
+            const auto e = get_extent (p);
 
             // Get the area
             const auto a = (e.maxp.x - e.minp.x) * (e.maxp.y - e.minp.y);
@@ -118,7 +118,7 @@ int main (int argc, char **argv)
             clog << "Writing to stdout" << endl;
 
         // Write it out
-        spoc::write_spoc_file_uncompressed (cout, g);
+        write_spoc_file_uncompressed (cout, g);
 
         return 0;
     }

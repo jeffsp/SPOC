@@ -1,9 +1,9 @@
 #pragma once
 
+#include "cmd.h"
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include "cmd.h"
 
 namespace spoc
 {

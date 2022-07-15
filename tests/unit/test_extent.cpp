@@ -13,14 +13,14 @@
 #include "extent.h"
 #include "test_utils.h"
 
+using namespace std;
 using namespace spoc::compression;
+using namespace spoc::extent;
+using namespace spoc::point;
 
 template<typename T>
 void test_extent (const T &points)
 {
-    using namespace std;
-    using namespace spoc;
-    using namespace spoc::extent;
     const auto e = get_extent (points);
 
     const auto e_e = encode_extent (e);
@@ -29,8 +29,8 @@ void test_extent (const T &points)
 
     const auto x = rescale (points, e);
     const auto y = restore (x, e);
-    std::vector<spoc::point::point<double>> d (points.size ());
-    std::vector<spoc::point::point<double>> z (points.size ());
+    vector<point<double>> d (points.size ());
+    vector<point<double>> z (points.size ());
 
     for (size_t i = 0; i < points.size (); ++i)
         d[i] = points[i] - y[i];
@@ -46,12 +46,9 @@ void test_extent (const T &points)
 }
 
 void test (const size_t N,
-    const int min_exponent = std::numeric_limits<double>::min_exponent / 2,
-    const int max_exponent = std::numeric_limits<double>::max_exponent / 2)
+    const int min_exponent = numeric_limits<double>::min_exponent / 2,
+    const int max_exponent = numeric_limits<double>::max_exponent / 2)
 {
-    using namespace std;
-    using namespace spoc;
-
     const auto points = generate_points (N, min_exponent, max_exponent);
 
     test_extent (points);
@@ -59,9 +56,6 @@ void test (const size_t N,
 
 int main (int argc, char **argv)
 {
-    using namespace std;
-    using namespace spoc;
-
     try
     {
         test (3, 0, 0);

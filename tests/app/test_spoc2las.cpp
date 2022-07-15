@@ -3,9 +3,11 @@
 #include <iostream>
 #include <stdexcept>
 
+using namespace std;
+
 void test_spoc2las ()
 {
-    const std::string fn = std::tmpnam (nullptr);
+    const string fn = tmpnam (nullptr);
 
     LASheader lasheader;
     spoc::spoc2las_app::las_writer w (fn, lasheader);
@@ -13,7 +15,6 @@ void test_spoc2las ()
 
 int main (int argc, char **argv)
 {
-    using namespace std;
     try
     {
         test_spoc2las ();

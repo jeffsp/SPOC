@@ -11,9 +11,9 @@
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spoc;
-    using namespace tile_cmd;
-    using namespace tile_app;
+    using namespace spoc::io;
+    using namespace spoc::tile_app;
+    using namespace spoc::tile_cmd;
 
     try
     {
@@ -25,9 +25,9 @@ int main (int argc, char **argv)
         if (args.version)
         {
             cout << "Version "
-                << static_cast<int> (MAJOR_VERSION)
+                << static_cast<int> (spoc::MAJOR_VERSION)
                 << "."
-                << static_cast<int> (MINOR_VERSION)
+                << static_cast<int> (spoc::MINOR_VERSION)
                 << endl;
             return 0;
         }
@@ -152,7 +152,7 @@ int main (int argc, char **argv)
                 throw runtime_error ("Could not open file for writing");
 
             // Write it out
-            spoc::write_spoc_file_uncompressed (ofs, t);
+            write_spoc_file_uncompressed (ofs, t);
         }
 
         return 0;

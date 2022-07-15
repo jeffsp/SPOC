@@ -57,11 +57,11 @@ void test_get_tile_indexes ()
     verify (ind == answer);
     // 2X2 tiling
     ind = get_tile_indexes (x, y, 2);
-    verify (*std::max_element (ind.begin (), ind.end ()) == 3);
+    verify (*max_element (ind.begin (), ind.end ()) == 3);
     ind = get_tile_indexes (x, y, 0.1);
     verify (ind.size () == x.size ());
     // Lots of tiny tiles
-    verify (*std::max_element (ind.begin (), ind.end ()) > 400);
+    verify (*max_element (ind.begin (), ind.end ()) > 400);
     }
 
     {

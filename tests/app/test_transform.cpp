@@ -4,7 +4,8 @@
 #include <stdexcept>
 
 using namespace std;
-using namespace spoc;
+using namespace spoc::io;
+using namespace spoc::point;
 using namespace spoc::transform_app;
 
 void test_transform_add ()
@@ -173,7 +174,7 @@ void test_transform_rotate2 ()
         const double z = i * d (g);
 
         // Point cloud with a single point that lies on X axis
-        const vector<spoc::point::point<double>> p { { x, y, z } };
+        const vector<point<double>> p { { x, y, z } };
 
         // Copy it
         auto q (p);

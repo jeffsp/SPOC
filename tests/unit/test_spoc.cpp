@@ -8,7 +8,8 @@
 #include <stdexcept>
 
 using namespace std;
-using namespace spoc;
+using namespace spoc::app_utils;
+using namespace spoc::io;
 
 void test_header ()
 {
@@ -104,7 +105,7 @@ void test_spoc_file ()
     const size_t extra_fields = 3;
     auto p = generate_random_point_records (total_points, extra_fields);
     p[100].extra.resize (extra_fields + 1);
-    spoc::header h ("WKT", extra_fields, total_points, false);
+    header h ("WKT", extra_fields, total_points, false);
 
     bool failed = false;
     try { spoc_file f (h, p); }
@@ -132,14 +133,14 @@ void test_spoc_file ()
     { failed = true; }
     verify (failed);
 
-    spoc::header h2 ("WKT", extra_fields, total_points + 1, false);
+    header h2 ("WKT", extra_fields, total_points + 1, false);
     failed = false;
     try { spoc_file f (h2, p); }
     catch (...)
     { failed = true; }
     verify (failed);
 
-    spoc::header h3 ("WKT", extra_fields + 1, total_points, false);
+    header h3 ("WKT", extra_fields + 1, total_points, false);
     failed = false;
     try { spoc_file f (h3, p); }
     catch (...)
@@ -325,7 +326,6 @@ void test_spoc_file_compressed_io ()
 
 void test_field_name ()
 {
-    using namespace spoc::app_utils;
     string s = "e100";
     verify (is_extra_field (s));
     auto i = get_extra_index (s);

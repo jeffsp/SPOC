@@ -4,6 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 
+using namespace std;
 using namespace spoc::app_utils;
 
 void test_input_stream ()
@@ -12,21 +13,21 @@ void test_input_stream ()
     {
         // Empty filename
         {
-            auto fn = std::string ();
-            std::stringstream log;
+            auto fn = string ();
+            stringstream log;
             input_stream is (verbose, fn, log);
         }
         // Invalid filename
         {
-            auto fn = std::string ("////INVALID!!!////");
-            std::stringstream log;
+            auto fn = string ("////INVALID!!!////");
+            stringstream log;
             bool failed = false;
             try { input_stream is (verbose, fn, log); }
             catch (...) { failed = true; }
             verify (failed);
         }
         // Use stdin
-        input_stream is (verbose, std::string ());
+        input_stream is (verbose, string ());
         auto &tmp = is ();
         (void)tmp; // Disable unused variable warning
     }
@@ -38,21 +39,21 @@ void test_output_stream ()
     {
         // Empty filename
         {
-            auto fn = std::string ();
-            std::stringstream log;
+            auto fn = string ();
+            stringstream log;
             output_stream os (verbose, fn, log);
         }
         // Invalid filename
         {
-            auto fn = std::string ("////INVALID!!!////");
-            std::stringstream log;
+            auto fn = string ("////INVALID!!!////");
+            stringstream log;
             bool failed = false;
             try { output_stream os (verbose, fn, log); }
             catch (...) { failed = true; }
             verify (failed);
         }
         // Use stdout
-        output_stream os (verbose, std::string ());
+        output_stream os (verbose, string ());
         auto &tmp = os ();
         (void)tmp; // Disable unused variable warning
     }
@@ -61,43 +62,43 @@ void test_output_stream ()
 void test_consume ()
 {
     {
-    std::string f ("x");
+    string f ("x");
     auto g = consume_field_name (f);
     verify (f.empty ());
     verify (g == "x");
 
     bool failed = false;
     try {
-        std::string f ("q");
-        consume_field_name (f); }
+        string h ("q");
+        consume_field_name (h); }
     catch (...) { failed = true; }
     verify (failed);
     }
 
     {
-    std::string f ("123");
+    string f ("123");
     auto g = consume_int (f);
     verify (f.empty ());
     verify (g == 123);
 
     bool failed = false;
     try {
-        std::string f ("q");
-        consume_int (f); }
+        string h ("q");
+        consume_int (h); }
     catch (...) { failed = true; }
     verify (failed);
     }
 
     {
-    std::string f ("1.23");
+    string f ("1.23");
     auto g = consume_double (f);
     verify (f.empty ());
     verify (int(g) == 1);
 
     bool failed = false;
     try {
-        std::string f ("q");
-        consume_double (f); }
+        string h ("q");
+        consume_double (h); }
     catch (...) { failed = true; }
     verify (failed);
     }
@@ -105,7 +106,6 @@ void test_consume ()
 
 int main (int argc, char **argv)
 {
-    using namespace std;
     try
     {
         test_input_stream ();

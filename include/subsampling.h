@@ -52,13 +52,13 @@ template<typename T>
 T undecimate (const T &original_pc, const T &decimated_pc, const double resolution, const bool all_fields)
 {
     // Get a voxel index for each point in the original point cloud
-    auto original_indexes = ::voxel::get_voxel_indexes (original_pc, resolution);
+    auto original_indexes = spoc::voxel::get_voxel_indexes (original_pc, resolution);
 
     // Get a voxel index for each point in the decimated point cloud
-    auto decimated_indexes = ::voxel::get_voxel_indexes (decimated_pc, original_pc, resolution);
+    auto decimated_indexes = spoc::voxel::get_voxel_indexes (decimated_pc, original_pc, resolution);
 
     // Get a map from a voxel in the decimated pc to its index
-    std::unordered_map<::voxel::voxel_index,size_t,::voxel::voxel_index_hash> vmap;
+    std::unordered_map<spoc::voxel::voxel_index,size_t,spoc::voxel::voxel_index_hash> vmap;
     for (size_t i = 0; i < decimated_pc.size (); ++i)
         vmap[decimated_indexes[i]] = i;
 

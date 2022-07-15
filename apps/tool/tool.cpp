@@ -9,8 +9,10 @@
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spoc;
-    using namespace tool_cmd;
+    using namespace spoc::app_utils;
+    using namespace spoc::io;
+    using namespace spoc::tool_app;
+    using namespace spoc::tool_cmd;
 
     try
     {
@@ -22,9 +24,9 @@ int main (int argc, char **argv)
         if (args.version)
         {
             cout << "Version "
-                << static_cast<int> (MAJOR_VERSION)
+                << static_cast<int> (spoc::MAJOR_VERSION)
                 << "."
-                << static_cast<int> (MINOR_VERSION)
+                << static_cast<int> (spoc::MINOR_VERSION)
                 << endl;
             return 0;
         }
@@ -42,7 +44,7 @@ int main (int argc, char **argv)
             clog << "command: " << args.command.name << "=" << args.command.params << endl;
 
         // Get the input stream
-        app_utils::input_stream is (args.verbose, args.input_fn);
+        input_stream is (args.verbose, args.input_fn);
 
         // Read the header
         const header h = read_header (is ());
@@ -52,10 +54,7 @@ int main (int argc, char **argv)
             throw runtime_error ("Expected an uncompressed file");
 
         // Get the output stream
-        app_utils::output_stream os (args.verbose, args.output_fn);
-
-        using namespace spoc::app_utils;
-        using namespace spoc::tool_app;
+        output_stream os (args.verbose, args.output_fn);
 
         if (args.command.name == "get-field")
         {

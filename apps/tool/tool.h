@@ -1,7 +1,6 @@
 #pragma once
 
 #include "app_utils.h"
-#include "contracts.h"
 #include "spoc.h"
 #include <cassert>
 #include <iostream>
@@ -14,7 +13,7 @@ namespace tool_app
 
 void get_field (std::istream &is,
     std::ostream &os,
-    const spoc::header &h,
+    const spoc::io::header &h,
     const std::string &field_name)
 {
     // Check preconditions
@@ -45,7 +44,7 @@ void get_field (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = read_point_record (is, h.extra_fields);
+        auto p = spoc::io::read_point_record (is, h.extra_fields);
 
         // Process the point
         switch (field_name[0])
@@ -98,7 +97,7 @@ void recenter (T &p, const bool z_flag = false)
 // Recenter a point cloud about its mean
 void recenter (std::istream &is,
     std::ostream &os,
-    const spoc::header &h,
+    const spoc::io::header &h,
     const bool z_flag = false)
 {
     // Check preconditions
@@ -110,9 +109,9 @@ void recenter (std::istream &is,
     const auto n = h.total_points;
 
     // Read the data
-    point_records p (n);
+    spoc::io::point_records p (n);
     for (size_t i = 0; i < p.size (); ++i)
-        p[i] = read_point_record (is, h.extra_fields);
+        p[i] = spoc::io::read_point_record (is, h.extra_fields);
 
     recenter (p, z_flag);
 
@@ -125,7 +124,7 @@ void recenter (std::istream &is,
 void set_field (std::istream &is,
     std::ostream &os,
     std::istream &field_ifs,
-    const spoc::header &h,
+    const spoc::io::header &h,
     const std::string &field_name)
 {
     // Check preconditions
@@ -176,7 +175,7 @@ void set_field (std::istream &is,
     for (size_t i = 0; i < h.total_points; ++i)
     {
         // Read a point
-        auto p = read_point_record (is, h.extra_fields);
+        auto p = spoc::io::read_point_record (is, h.extra_fields);
 
         // Process the point
         switch (field_name[0])
@@ -240,7 +239,7 @@ void subtract (T &p, const spoc::point::point<double> &minp, const bool z_flag =
 // Subtract min x/y/z values from all values
 void subtract_min (std::istream &is,
     std::ostream &os,
-    const spoc::header &h,
+    const spoc::io::header &h,
     const bool z_flag = false)
 {
     // Check preconditions
@@ -252,9 +251,9 @@ void subtract_min (std::istream &is,
     const auto n = h.total_points;
 
     // Read the data
-    point_records p (n);
+    spoc::io::point_records p (n);
     for (size_t i = 0; i < p.size (); ++i)
-        p[i] = read_point_record (is, h.extra_fields);
+        p[i] = spoc::io::read_point_record (is, h.extra_fields);
 
     // Get minimum value
     const auto minp = get_min (p);

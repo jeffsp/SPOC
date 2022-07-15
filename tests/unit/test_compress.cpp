@@ -9,13 +9,11 @@
 #include <vector>
 #include <zlib.h>
 
-using namespace spoc;
+using namespace std;
 using namespace spoc::compression;
 
 void test_compress (const char *fn)
 {
-    using namespace std;
-
     const auto levels = {
         Z_DEFAULT_COMPRESSION,
         Z_NO_COMPRESSION,
@@ -44,8 +42,8 @@ void test_compress (const char *fn)
     ifstream ifs (fn);
     if (!ifs)
         throw runtime_error ("Could not open file for reading");
-    string s ((std::istreambuf_iterator<char>(ifs)),
-              std::istreambuf_iterator<char>());
+    string s ((istreambuf_iterator<char>(ifs)),
+              istreambuf_iterator<char>());
 
     datasets.push_back (vector<uint8_t> (s.begin (), s.end ()));
 
@@ -79,8 +77,6 @@ void test_compress (const char *fn)
 
 int main (int argc, char **argv)
 {
-    using namespace std;
-
     try
     {
         test_compress (argv[0]);

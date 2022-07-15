@@ -9,8 +9,9 @@
 int main (int argc, char **argv)
 {
     using namespace std;
-    using namespace spoc;
-    using namespace transform_cmd;
+    using namespace spoc::app_utils;
+    using namespace spoc::transform_app;
+    using namespace spoc::transform_cmd;
 
     try
     {
@@ -22,9 +23,9 @@ int main (int argc, char **argv)
         if (args.version)
         {
             cout << "Version "
-                << static_cast<int> (MAJOR_VERSION)
+                << static_cast<int> (spoc::MAJOR_VERSION)
                 << "."
-                << static_cast<int> (MINOR_VERSION)
+                << static_cast<int> (spoc::MINOR_VERSION)
                 << endl;
             return 0;
         }
@@ -42,13 +43,10 @@ int main (int argc, char **argv)
             clog << "command: " << args.command.name << "\t" << args.command.params << endl;
 
         // Get the input stream
-        app_utils::input_stream is (args.verbose, args.input_fn);
+        input_stream is (args.verbose, args.input_fn);
 
         // Get the output stream
-        app_utils::output_stream os (args.verbose, args.output_fn);
-
-        using namespace spoc::app_utils;
-        using namespace spoc::transform_app;
+        output_stream os (args.verbose, args.output_fn);
 
         if (args.command.name == "add-x")
         {
