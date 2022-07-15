@@ -70,7 +70,7 @@ int main (int argc, char **argv)
 
             // Set the wkt to the first file's wkt
             if (i == 0)
-                g.set_wkt (f.get_header ().wkt);
+                g.set_wkt (f.get_wkt ());
 
             // Get the xyz's
             const auto p = f.get_point_records ();

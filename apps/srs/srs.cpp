@@ -58,7 +58,7 @@ int main (int argc, char **argv)
             }
             else
             {
-                cout << f.get_header ().wkt << endl;
+                cout << f.get_wkt () << endl;
             }
         }
         else if (args.set_srs)
@@ -106,7 +106,7 @@ int main (int argc, char **argv)
                 // Read into spoc_file struct
                 spoc_file f = read_spoc_file_uncompressed (ifs);
 
-                cout << f.get_header ().wkt << endl;
+                cout << f.get_wkt () << endl;
             }
         }
 

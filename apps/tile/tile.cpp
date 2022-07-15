@@ -107,7 +107,7 @@ int main (int argc, char **argv)
             spoc_file t;
 
             // Set the SRS
-            t.set_wkt (f.get_header ().wkt);
+            t.set_wkt (f.get_wkt ());
 
             // Set the number of points in the file
             t.resize (v.size ());

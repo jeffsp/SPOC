@@ -469,6 +469,14 @@ class spoc_file
     const point_record &get_point_record (const size_t n) const { return p[n]; }
 
     // R/W access
+    std::string get_wkt () const
+    {
+        return h.wkt;
+    }
+    bool get_compressed () const
+    {
+        return h.compressed;
+    }
     void set_wkt (const std::string &s)
     {
         h.wkt = s;
