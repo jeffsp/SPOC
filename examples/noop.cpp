@@ -10,6 +10,7 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc::io;
+    using namespace spoc::point_record;
 
     try
     {
