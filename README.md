@@ -65,9 +65,9 @@ standard.
 - [X] Generate documentation
   - [ ] Manual
   - [X] SDK
-- [ ] Reorganize namespaces and headers
-  - [ ] Separate application headers from API headers
-  - [ ] Create separate application namespace
+- [X] Reorganize namespaces and headers
+  - [X] Separate application headers from API headers
+  - [X] Create separate application namespace
 - [X] Reorganize tests
   - [X] Separate app tests from unit tests
 - [X] Create header only library with examples
@@ -82,9 +82,9 @@ standard.
 - [X] Version number in header
 - [X] Test data files
 - [X] Unit test suite
-- [ ] Application test suite
-  - [ ] Separate from unit test suite
-  - [ ] Include in coverage and memcheck
+- [X] Application test suite
+  - [X] Separate from unit test suite
+  - [X] Include in coverage and memcheck
 - [X] Integration test suite
   - [X] Shell commands that manipulate PATH variable
 - [X] Man page generation
