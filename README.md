@@ -274,6 +274,11 @@ Examples of how to use the C++ API with compiled examples
 - [X] Noop a with streams
 - [X] Very large spoc file with streaming
 - [ ] Nearest neighbor processing
+- [ ] DSM creation
+  - [ ] Get voxel indexes
+  - [ ] Project to XY plane
+  - [ ] Write raw raster to disk
+  - [ ] Convert raw to png using imagemagick
 
 # Proposed Functionality
 
