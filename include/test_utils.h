@@ -3,6 +3,7 @@
 #include "point.h"
 #include "spoc.h"
 #include <cassert>
+#include <chrono>
 #include <cmath>
 #include <random>
 #include <sstream>
@@ -46,7 +47,7 @@ inline std::vector<spoc::point::point<double>> generate_points (
     return points;
 }
 
-std::vector<spoc::point_record::point_record> generate_random_point_records (
+inline std::vector<spoc::point_record::point_record> generate_random_point_records (
     const size_t total_points,
     const size_t extra_fields = 0,
     const bool rgb = true,
@@ -75,7 +76,7 @@ std::vector<spoc::point_record::point_record> generate_random_point_records (
     return p;
 }
 
-spoc::io::spoc_file generate_random_spoc_file (
+inline spoc::io::spoc_file generate_random_spoc_file (
     const size_t total_points,
     const size_t extra_fields = 0,
     const bool compressed = false,
@@ -88,10 +89,37 @@ spoc::io::spoc_file generate_random_spoc_file (
 }
 
 /// @brief Ensure that two values are equal up to 'precision' decimal places
-bool about_equal (double a, double b, unsigned precision = 3)
+inline bool about_equal (double a, double b, unsigned precision = 3)
 {
     int c = static_cast<int> (std::round (a * std::pow (10.0, precision)));
     int d = static_cast<int> (std::round (b * std::pow (10.0, precision)));
     return c == d;
 }
 
+/// Generate a unique filename without using std::tmpnam()
+inline std::string generate_random_filename (const size_t total_chars = 32)
+{
+    using namespace std;
+
+    // In test code, this is one of the few times you want to produce a
+    // non-deterministic random number. In most cases, you will instead
+    // want your pseudo-random numbers to be deterministic. For example,
+    // you will use the default random generator and seed it with value.
+    // The two most important reasons for this are:
+    //
+    //     1. If your test fails, you might not be able to reproduce the
+    //        failure if the test changes on every run.
+    //     2. It is common practice when developing multi-threaded code
+    //        to check for race conditions by running the same test
+    //        twice and making sure the output is the same on both runs.
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    default_random_engine e (seed);
+    uniform_int_distribution<int> d (0, 25);
+
+    string fn;
+
+    for (size_t i = 0; i < total_chars; ++i)
+        fn += ('a' + d (e));
+
+    return fn;
+}

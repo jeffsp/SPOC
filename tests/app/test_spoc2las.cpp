@@ -1,5 +1,6 @@
 #include "spoc2las.h"
 #include "test_utils.h"
+#include <filesystem>
 #include <iostream>
 #include <stdexcept>
 
@@ -7,10 +8,18 @@ using namespace std;
 
 void test_spoc2las ()
 {
-    const string fn = tmpnam (nullptr);
-
     LASheader lasheader;
-    spoc::spoc2las_app::las_writer w (fn, lasheader);
+
+    // LASlib will add the extension ".txt" if you don't include one
+    const string fn = generate_random_filename () + ".las";
+    using namespace filesystem;
+    const path p = temp_directory_path () / fn;
+
+    // Open the las file for writing
+    spoc::spoc2las_app::las_writer w (p.string (), lasheader);
+
+    // Cleanup
+    remove (p);
 }
 
 int main (int argc, char **argv)
