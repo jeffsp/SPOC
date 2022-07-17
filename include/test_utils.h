@@ -5,6 +5,7 @@
 #include <cassert>
 #include <chrono>
 #include <cmath>
+#include <filesystem>
 #include <random>
 #include <sstream>
 #include <tuple>
@@ -129,7 +130,7 @@ inline bool about_equal (double a, double b, unsigned precision = 3)
 }
 
 /// Generate a unique filename without using std::tmpnam()
-inline std::string generate_random_filename (const size_t total_chars = 32)
+inline std::string generate_tmp_filename (const size_t total_chars = 16)
 {
     using namespace std;
 
@@ -153,5 +154,8 @@ inline std::string generate_random_filename (const size_t total_chars = 32)
     for (size_t i = 0; i < total_chars; ++i)
         fn += ('a' + d (e));
 
-    return fn;
+    using namespace std::filesystem;
+    const path p = temp_directory_path () / fn;
+
+    return p.string ();
 }
