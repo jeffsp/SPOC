@@ -27,9 +27,12 @@ void test_input_stream ()
             verify (failed);
         }
         // Use stdin
-        input_stream is (verbose, string ());
-        auto &tmp = is ();
-        (void)tmp; // Disable unused variable warning
+        {
+            stringstream log;
+            input_stream is (verbose, string (), log);
+            auto &tmp = is ();
+            (void)tmp; // Disable unused variable warning
+        }
     }
 }
 
@@ -53,9 +56,12 @@ void test_output_stream ()
             verify (failed);
         }
         // Use stdout
-        output_stream os (verbose, string ());
-        auto &tmp = os ();
-        (void)tmp; // Disable unused variable warning
+        {
+            stringstream log;
+            output_stream os (verbose, string (), log);
+            auto &tmp = os ();
+            (void)tmp; // Disable unused variable warning
+        }
     }
 }
 
