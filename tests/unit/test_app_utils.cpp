@@ -1,5 +1,6 @@
 #include "app_utils.h"
 #include "test_utils.h"
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -11,24 +12,40 @@ void test_input_stream ()
 {
     for (auto verbose : {true, false})
     {
+        // Send log output here
+        stringstream log;
+
         // Empty filename
         {
             auto fn = string ();
-            stringstream log;
             input_stream is (verbose, fn, log);
         }
         // Invalid filename
         {
             auto fn = string ("////INVALID!!!////");
-            stringstream log;
             VERIFY_THROWS (input_stream is (verbose, fn, log);)
         }
         // Use stdin
         {
-            stringstream log;
             input_stream is (verbose, string (), log);
             auto &tmp = is ();
             (void)tmp; // Disable unused variable warning
+        }
+        // Filename
+        {
+            // Get a temp filename
+            const string fn = generate_tmp_filename ();
+
+            // Create the file
+            ofstream ofs (fn);
+            VERIFY (ofs.good ());
+            ofs.close ();
+
+            // Use it
+            input_stream is (verbose, fn, log);
+
+            // Cleanup
+            std::filesystem::remove (fn);
         }
     }
 }
@@ -37,24 +54,35 @@ void test_output_stream ()
 {
     for (auto verbose : {true, false})
     {
+        // Send log output here
+        stringstream log;
+
         // Empty filename
         {
             auto fn = string ();
-            stringstream log;
             output_stream os (verbose, fn, log);
         }
         // Invalid filename
         {
             auto fn = string ("////INVALID!!!////");
-            stringstream log;
             VERIFY_THROWS (output_stream os (verbose, fn, log);)
         }
         // Use stdout
         {
-            stringstream log;
             output_stream os (verbose, string (), log);
             auto &tmp = os ();
             (void)tmp; // Disable unused variable warning
+        }
+        // Filename
+        {
+            // Get a temp filename
+            const string fn = generate_tmp_filename ();
+
+            // Use it
+            output_stream os (verbose, fn, log);
+
+            // Cleanup
+            std::filesystem::remove (fn);
         }
     }
 }

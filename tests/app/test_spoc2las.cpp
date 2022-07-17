@@ -11,15 +11,13 @@ void test_spoc2las ()
     LASheader lasheader;
 
     // LASlib will add the extension ".txt" if you don't include one
-    const string fn = generate_random_filename () + ".las";
-    using namespace filesystem;
-    const path p = temp_directory_path () / fn;
+    const string fn = generate_tmp_filename () + ".las";
 
     // Open the las file for writing
-    spoc::spoc2las_app::las_writer w (p.string (), lasheader);
+    spoc::spoc2las_app::las_writer w (fn, lasheader);
 
     // Cleanup
-    remove (p);
+    std::filesystem::remove (fn);
 }
 
 int main (int argc, char **argv)
