@@ -44,12 +44,12 @@ void test_recenter ()
         const auto chx = accumulate (begin (hx), end (hx), 0.0) / n;
         const auto chy = accumulate (begin (hy), end (hy), 0.0) / n;
         const auto chz = accumulate (begin (hz), end (hz), 0.0) / n;
-        verify (cfx != cgx);
-        verify (cfy != cgy);
-        verify (cfz == cgz);
-        verify (cfx != chx);
-        verify (cfy != chy);
-        verify (cfz != chz);
+        VERIFY (cfx != cgx);
+        VERIFY (cfy != cgy);
+        VERIFY (cfz == cgz);
+        VERIFY (cfx != chx);
+        VERIFY (cfy != chy);
+        VERIFY (cfz != chz);
     }
 }
 

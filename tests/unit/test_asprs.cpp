@@ -7,7 +7,7 @@ using namespace spoc::asprs;
 void test_classes ()
 {
     const auto c = get_asprs_class_map ();
-    verify (c.at (static_cast<int> (point_class::building)) == string ("building"));
+    VERIFY (c.at (static_cast<int> (point_class::building)) == string ("building"));
 }
 
 int main (int argc, char **argv)

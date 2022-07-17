@@ -34,8 +34,8 @@ void test_merge_quiet ()
     const auto quiet = true;
     append (f1, f, id, quiet);
     append (f2, f, id, quiet);
-    verify (f.get_header ().total_points == 200);
-    verify (f.get_point_records ().size () == 200);
+    VERIFY (f.get_header ().total_points == 200);
+    VERIFY (f.get_point_records ().size () == 200);
 }
 
 int main (int argc, char **argv)

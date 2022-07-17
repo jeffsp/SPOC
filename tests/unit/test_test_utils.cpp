@@ -11,13 +11,13 @@ void test_verify ()
     bool failed = false;
     try
     {
-        verify (false);
+        VERIFY (false);
     }
     catch (...)
     {
         failed = true;
     }
-    verify (failed);
+    VERIFY (failed);
 }
 
 void test_verify_throws ()

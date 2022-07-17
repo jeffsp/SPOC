@@ -56,7 +56,7 @@ void test_compress (const char *fn)
             {
             const auto y = compress (x, l);
             const auto z = decompress (y);
-            verify (x == z);
+            VERIFY (x == z);
             }
 
             // Stream interface
@@ -69,7 +69,7 @@ void test_compress (const char *fn)
             decompress (is2, os2);
             const auto s = os2.str ();
             vector<uint8_t> z (s.begin (), s.end ());
-            verify (x == z);
+            VERIFY (x == z);
             }
         }
     }

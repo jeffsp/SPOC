@@ -36,7 +36,7 @@ void test_verification (const bool flag,
 
 } // namespace spoc
 
-#define verify(e) spoc::detail::test_verification (e, #e, __FILE__, __LINE__);
+#define VERIFY(e) spoc::detail::test_verification (e, #e, __FILE__, __LINE__);
 
 #define VERIFY_THROWS(e) {\
         bool failed = false;\
@@ -48,7 +48,7 @@ void test_verification (const bool flag,
         {\
             failed = true;\
         }\
-        verify (failed);\
+        VERIFY (failed);\
     }
 
 inline std::vector<spoc::point::point<double>> generate_points (

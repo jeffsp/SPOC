@@ -15,7 +15,7 @@ void test_header ()
 {
     {
     header h;
-    verify (h.is_valid ());
+    VERIFY (h.is_valid ());
     }
 
     {
@@ -23,20 +23,20 @@ void test_header ()
     {
         header h;
         h.signature[i] = '!';
-        verify (!h.is_valid ());
+        VERIFY (!h.is_valid ());
     }
     }
 
     {
     header h;
     h.wkt = "Test WKT";
-    verify (h.check_signature ());
+    VERIFY (h.check_signature ());
     stringstream s;
     write_header (s, h);
 
     const auto g = read_header (s);
 
-    verify (h == g);
+    VERIFY (h == g);
     }
 
     // Fail when reading signature
@@ -90,7 +90,7 @@ void test_spoc_file ()
     const string wkt = "Test wkt";
     auto f = spoc_file (wkt, p);
     auto g = f.get_wkt ();
-    verify (g == wkt);
+    VERIFY (g == wkt);
     f.set_wkt ("Test WKT 2");
     for (size_t i = 0; i < f.get_point_records ().size (); ++i)
     {
@@ -111,7 +111,7 @@ void test_spoc_file ()
     f.set_point_record (0, q);
     f.set_compressed (true);
     const auto g = f.get_compressed ();
-    verify (g);
+    VERIFY (g);
 
     // Throw because size check fails
     VERIFY_THROWS ({
@@ -141,8 +141,8 @@ void test_spoc_file_io ()
     write_spoc_file_uncompressed (s, spoc_file (wkt, p));
     const auto f = read_spoc_file_uncompressed (s);
 
-    verify (f.get_header ().wkt == wkt);
-    verify (p == f.get_point_records ());
+    VERIFY (f.get_header ().wkt == wkt);
+    VERIFY (p == f.get_point_records ());
     }
 
     {
@@ -151,8 +151,8 @@ void test_spoc_file_io ()
     write_spoc_file_uncompressed (s, spoc_file (wkt, p));
     const auto f = read_spoc_file (s);
 
-    verify (f.get_header ().wkt == wkt);
-    verify (p == f.get_point_records ());
+    VERIFY (f.get_header ().wkt == wkt);
+    VERIFY (p == f.get_point_records ());
     }
 
     {
@@ -161,8 +161,8 @@ void test_spoc_file_io ()
     write_spoc_file_compressed (s, spoc_file (wkt, true, p));
     const auto f = read_spoc_file (s);
 
-    verify (f.get_header ().wkt == wkt);
-    verify (p == f.get_point_records ());
+    VERIFY (f.get_header ().wkt == wkt);
+    VERIFY (p == f.get_point_records ());
     }
 
     // Fail when reading signature
@@ -186,8 +186,8 @@ void test_spoc_file_compressed_io ()
     write_spoc_file_compressed (s, spoc_file (wkt, true, p));
     const auto f = read_spoc_file_compressed (s);
 
-    verify (wkt == f.get_header ().wkt);
-    verify (p == f.get_point_records ());
+    VERIFY (wkt == f.get_header ().wkt);
+    VERIFY (p == f.get_point_records ());
     }
 
     // Compare sizes
@@ -210,9 +210,9 @@ void test_spoc_file_compressed_io ()
     const auto f2 = read_spoc_file_compressed (s2);
     const auto f3 = read_spoc_file_compressed (s3);
     // Compressed file should be smaller
-    verify (s1.str ().size () > s2.str ().size ());
+    VERIFY (s1.str ().size () > s2.str ().size ());
     // File with zero fields should be smaller
-    verify (s2.str ().size () > s3.str ().size ());
+    VERIFY (s2.str ().size () > s3.str ().size ());
     }
 
     // Write compressed with uncompressed writer
@@ -245,19 +245,19 @@ void test_spoc_file_compressed_io ()
 void test_field_name ()
 {
     string s = "e100";
-    verify (is_extra_field (s));
+    VERIFY (is_extra_field (s));
     auto i = get_extra_index (s);
-    verify (i == 100);
-    verify (!is_extra_field ("x100"));
-    verify (is_extra_field ("e1000001"));
+    VERIFY (i == 100);
+    VERIFY (!is_extra_field ("x100"));
+    VERIFY (is_extra_field ("e1000001"));
     i = get_extra_index ("x100");
-    verify (i == -1);
+    VERIFY (i == -1);
     i = get_extra_index ("exyz");
-    verify (i == -1);
-    verify (check_field_name ("e10000") == true);
-    verify (check_field_name ("x10000") == false);
-    verify (check_field_name ("e0") == true);
-    verify (check_field_name ("exxx") == false);
+    VERIFY (i == -1);
+    VERIFY (check_field_name ("e10000") == true);
+    VERIFY (check_field_name ("x10000") == false);
+    VERIFY (check_field_name ("e0") == true);
+    VERIFY (check_field_name ("exxx") == false);
 }
 
 int main (int argc, char **argv)

@@ -25,7 +25,7 @@ void test_extent (const T &points)
 
     const auto e_e = encode_extent (e);
     const auto e_d = decode_extent (e_e);
-    verify (e_d == e);
+    VERIFY (e_d == e);
 
     const auto x = rescale (points, e);
     const auto y = restore (x, e);
@@ -38,7 +38,7 @@ void test_extent (const T &points)
     for (size_t i = 0; i < points.size (); ++i)
         z[i] = y[i] + d[i];
 
-    verify (points == z);
+    VERIFY (points == z);
 
     const auto z1 = compress (encode_points (x));
     const auto z2 = compress (encode_points (d));

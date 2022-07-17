@@ -64,8 +64,8 @@ void test_consume ()
     {
     string f ("x");
     auto g = consume_field_name (f);
-    verify (f.empty ());
-    verify (g == "x");
+    VERIFY (f.empty ());
+    VERIFY (g == "x");
 
     VERIFY_THROWS ( string h ("q"); consume_field_name (h); )
     }
@@ -73,8 +73,8 @@ void test_consume ()
     {
     string f ("123");
     auto g = consume_int (f);
-    verify (f.empty ());
-    verify (g == 123);
+    VERIFY (f.empty ());
+    VERIFY (g == 123);
 
     VERIFY_THROWS ( string h ("q"); consume_int (h); )
     }
@@ -82,8 +82,8 @@ void test_consume ()
     {
     string f ("1.23");
     auto g = consume_double (f);
-    verify (f.empty ());
-    verify (int(g) == 1);
+    VERIFY (f.empty ());
+    VERIFY (int(g) == 1);
 
     VERIFY_THROWS ( string h ("q"); consume_double (h); )
     }

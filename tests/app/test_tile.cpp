@@ -19,25 +19,25 @@ void test_get_tile_size ()
     {
     const vector<double> x { 1, 2, 3 };
     const vector<double> y { 4, 5, 6 };
-    verify (about_equal (get_tile_size (x, y, 1), 2.0));
-    verify (about_equal (get_tile_size (x, y, 2), 1.0));
-    verify (about_equal (get_tile_size (x, y, 3), 0.66667));
+    VERIFY (about_equal (get_tile_size (x, y, 1), 2.0));
+    VERIFY (about_equal (get_tile_size (x, y, 2), 1.0));
+    VERIFY (about_equal (get_tile_size (x, y, 3), 0.66667));
     }
 
     {
     const vector<double> x { 1, 2, 2.9999 };
     const vector<double> y { 4, 5, 5.9999 };
-    verify (about_equal (get_tile_size (x, y, 1), 2.0));
-    verify (about_equal (get_tile_size (x, y, 2), 1.0));
-    verify (about_equal (get_tile_size (x, y, 3), 0.66667));
+    VERIFY (about_equal (get_tile_size (x, y, 1), 2.0));
+    VERIFY (about_equal (get_tile_size (x, y, 2), 1.0));
+    VERIFY (about_equal (get_tile_size (x, y, 3), 0.66667));
     }
 
     {
     const vector<double> x { 1, 2, 3 };
     const vector<double> y { 4, 5, 5 };
-    verify (about_equal (get_tile_size (x, y, 1), 2.0));
-    verify (about_equal (get_tile_size (x, y, 2), 1.0));
-    verify (about_equal (get_tile_size (x, y, 3), 0.66667));
+    VERIFY (about_equal (get_tile_size (x, y, 1), 2.0));
+    VERIFY (about_equal (get_tile_size (x, y, 2), 1.0));
+    VERIFY (about_equal (get_tile_size (x, y, 3), 0.66667));
     }
 }
 
@@ -48,14 +48,14 @@ void test_get_tile_indexes ()
     const vector<double> y { 4, 4, 4, 5, 5, 5, 6, 6, 6 };
     auto ind = get_tile_indexes (x, y, 1);
     vector<size_t> answer { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-    verify (ind == answer);
+    VERIFY (ind == answer);
     // 2X2 tiling
     ind = get_tile_indexes (x, y, 2);
-    verify (*max_element (ind.begin (), ind.end ()) == 3);
+    VERIFY (*max_element (ind.begin (), ind.end ()) == 3);
     ind = get_tile_indexes (x, y, 0.1);
-    verify (ind.size () == x.size ());
+    VERIFY (ind.size () == x.size ());
     // Lots of tiny tiles
-    verify (*max_element (ind.begin (), ind.end ()) > 400);
+    VERIFY (*max_element (ind.begin (), ind.end ()) > 400);
     }
 
     {
@@ -63,7 +63,7 @@ void test_get_tile_indexes ()
     const vector<double> y { 4, 4, 4, 5, 5, 5, 4.5, 4.5, 5 };
     auto ind = get_tile_indexes (x, y, 1);
     vector<size_t> answer { 0, 1, 1, 2, 3, 3, 0, 1, 3 };
-    verify (ind == answer);
+    VERIFY (ind == answer);
     }
 }
 
@@ -77,23 +77,23 @@ void test_get_tile_map ()
     // Each point goes to its own tile
     for (size_t i = 0; i < 9; ++i)
     {
-        verify (m[i].size () == 1);
-        verify (m[i][0] == i);
+        VERIFY (m[i].size () == 1);
+        VERIFY (m[i][0] == i);
     }
 
     // 2X2 tiling
     ind = get_tile_indexes (x, y, 2);
     m = get_tile_map (ind);
-    verify (m[0].size () == 4);
-    verify (m[1].size () == 2);
-    verify (m[2].size () == 2);
-    verify (m[3].size () == 1);
+    VERIFY (m[0].size () == 4);
+    VERIFY (m[1].size () == 2);
+    VERIFY (m[2].size () == 2);
+    VERIFY (m[3].size () == 1);
 
     // Lots of little tiles
     ind = get_tile_indexes (x, y, 0.1);
     m = get_tile_map (ind);
     for (auto i : m)
-        verify (i.second.size () == 1);
+        VERIFY (i.second.size () == 1);
 }
 
 int main (int argc, char **argv)

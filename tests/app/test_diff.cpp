@@ -38,13 +38,13 @@ void test_diff_header ()
     {
     spoc_file f1;
     spoc_file f2;
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
     f1.resize (2);
     f2.resize (3);
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     f1.resize (3);
     f2.resize (3);
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
     }
 
     {
@@ -54,7 +54,7 @@ void test_diff_header ()
     h2.major_version = 2;
     spoc_file f1 (h1, point_records ());
     spoc_file f2 (h2, point_records ());
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     }
 
     {
@@ -64,7 +64,7 @@ void test_diff_header ()
     h2.minor_version = 2;
     spoc_file f1 (h1, point_records ());
     spoc_file f2 (h2, point_records ());
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     }
 
     {
@@ -72,7 +72,7 @@ void test_diff_header ()
     header h2 ("B", 0, 0, false);
     spoc_file f1 (h1, point_records ());
     spoc_file f2 (h2, point_records ());
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     }
 }
 
@@ -82,66 +82,66 @@ void test_diff_fields ()
     auto f1 = generate_random_spoc_file (100, 5, true);
     auto f2 (f1);
 
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     f1[0].x = f1[0].x + 1;
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     f2[0].x = f1[0].x;
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     f1[0].y = f1[0].y + 1;
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     f2[0].y = f1[0].y;
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     f1[0].z = f1[0].z + 1;
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     f2[0].z = f1[0].z;
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     f1[0].c = f1[0].c + 1;
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     f2[0].c = f1[0].c;
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     f1[0].p = f1[0].p + 1;
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     f2[0].p = f1[0].p;
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     f1[0].i = f1[0].i + 1;
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     f2[0].i = f1[0].i;
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     f1[0].r = f1[0].r + 1;
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     f2[0].r = f1[0].r;
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     f1[0].g = f1[0].g + 1;
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     f2[0].g = f1[0].g;
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     f1[0].b = f1[0].b + 1;
-    verify (diff (f1, f2) != 0);
+    VERIFY (diff (f1, f2) != 0);
     f2[0].b = f1[0].b;
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     for (size_t i = 0; i < f1[0].extra.size (); ++i)
     {
         f1[0].extra[i] = f1[0].extra[i] + 1;
-        verify (diff (f1, f2) != 0);
+        VERIFY (diff (f1, f2) != 0);
         f2[0].extra[i] = f1[0].extra[i];
-        verify (diff (f1, f2) == 0);
+        VERIFY (diff (f1, f2) == 0);
     }
 
     // Generate spoc files
     auto f3 = generate_random_spoc_file (100, 5, true);
     auto f4 (f3);
     f4.resize_extra (6);
-    verify (diff (f3, f4) != 0);
+    VERIFY (diff (f3, f4) != 0);
 }
 
 void test_diff_individual_fields ()
@@ -150,19 +150,19 @@ void test_diff_individual_fields ()
     auto f1 = generate_random_spoc_file (100, 5, true);
     auto f2 (f1);
 
-    verify (diff (f1, f2) == 0);
+    VERIFY (diff (f1, f2) == 0);
 
     vector<int> fields { 'x' };
-    verify (diff (f1, f2, false, false, fields) == 0);
+    VERIFY (diff (f1, f2, false, false, fields) == 0);
 
     f1[0].x = f1[0].x + 1;
-    verify (diff (f1, f2, false, false, fields) != 0);
+    VERIFY (diff (f1, f2, false, false, fields) != 0);
     // Reverse meaning
-    verify (diff (f1, f2, false, false, fields, true) == 0);
+    VERIFY (diff (f1, f2, false, false, fields, true) == 0);
     f2[0].x = f1[0].x;
-    verify (diff (f1, f2, false, false, fields) == 0);
+    VERIFY (diff (f1, f2, false, false, fields) == 0);
     // Reverse meaning
-    verify (diff (f1, f2, false, false, fields, true) != 0);
+    VERIFY (diff (f1, f2, false, false, fields, true) != 0);
 
     // Different field
     f2 = generate_random_spoc_file (100, 5, true, false, 456);
@@ -170,7 +170,7 @@ void test_diff_individual_fields ()
     {
         fields[0] = f;
         f1[0].x = f1[0].x + 1;
-        verify (diff (f1, f2, false, false, fields) != 0);
+        VERIFY (diff (f1, f2, false, false, fields) != 0);
     }
 
     // Bad field name
