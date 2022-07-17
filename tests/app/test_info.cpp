@@ -22,13 +22,16 @@ void test_info_empty ()
                 {
                     for (auto compact : {true, false})
                     {
-                        stringstream t;
-                        process (t, f1, json,
-                            header_info, summary_info,
-                            classifications, compact);
-                        process (t, f2, json,
-                            header_info, summary_info,
-                            classifications, compact);
+                        for (auto quartiles : {true, false})
+                        {
+                            stringstream t;
+                            process (t, f1, json,
+                                header_info, summary_info,
+                                classifications, compact, quartiles);
+                            process (t, f2, json,
+                                header_info, summary_info,
+                                classifications, compact, quartiles);
+                        }
                     }
                 }
             }
@@ -51,13 +54,16 @@ void test_info ()
                 {
                     for (auto compact : {true, false})
                     {
-                        stringstream t;
-                        process (t, f1, json,
-                            header_info, summary_info,
-                            classifications, compact);
-                        process (t, f2, json,
-                            header_info, summary_info,
-                            classifications, compact);
+                        for (auto quartiles : {true, false})
+                        {
+                            stringstream t;
+                            process (t, f1, json,
+                                header_info, summary_info,
+                                classifications, compact, quartiles);
+                            process (t, f2, json,
+                                header_info, summary_info,
+                                classifications, compact, quartiles);
+                        }
                     }
                 }
             }

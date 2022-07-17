@@ -37,7 +37,7 @@ std::map<std::string,size_t> get_class_count_map (const T &c)
 }
 
 template<typename T,typename U>
-inline spoc::json::object get_summary_object (const U &x)
+inline spoc::json::object get_summary_object (const U &x, const bool quartiles)
 {
     // Return value
     spoc::json::object s;
@@ -51,23 +51,38 @@ inline spoc::json::object get_summary_object (const U &x)
         return s;
     }
 
-    // Copy
-    auto y (x);
+    if (quartiles)
+    {
+        // Copy
+        auto y (x);
 
-    // Get Quantiles
-    const size_t n = y.size ();
-    std::sort (begin (y), end (y));
-    s["range"] = y.back() - y.front();
-    s["q0"] = y.front();
-    s["q1"] = y[n / 4];
-    s["q2"] = y[n / 2];
-    s["q3"] = y[3 * n / 4];
-    s["q4"] = y.back();
+        // Get Quartiles
+        const size_t n = y.size ();
+        std::sort (begin (y), end (y));
+        s["range"] = y.back() - y.front();
+        s["q0"] = y.front();
+        s["q1"] = y[n / 4];
+        s["q2"] = y[n / 2];
+        s["q3"] = y[3 * n / 4];
+        s["q4"] = y.back();
+    }
+    else
+    {
+        // Get min and max
+        const auto min = *std::min_element (begin (x), end (x));
+        const auto max = *std::max_element (begin (x), end (x));
+        s["range"] = max - min;
+        s["min"] = min;
+        s["max"] = max;
+    }
     return s;
 }
 
 template<typename T,typename U>
-inline std::string get_summary_string (const std::string &label, const U &x, const bool compact)
+inline std::string get_summary_string (const std::string &label,
+    const U &x,
+    const bool compact,
+    const bool quartiles)
 {
     // Return value
     std::stringstream s;
@@ -91,40 +106,65 @@ inline std::string get_summary_string (const std::string &label, const U &x, con
         }
     }
 
-    // Copy
-    auto y (x);
+    const size_t n = x.size ();
 
-    // Get Quantiles
-    const size_t n = y.size ();
-    std::sort (begin (y), end (y));
-    if (compact)
+    if (quartiles)
     {
-        s << label;
-        // Range
-        s << "range=" << y.back() - y.front();
-        // q0
-        s << ", " << y.front();
-        // Step to q1
-        s << " +" << y[n / 4] - y.front ();
-        // Step to q2
-        s << " +" << y[n / 2] - y[n / 4];
-        // Step to q3
-        s << " +" << y[3 * n / 4] - y[n / 2];
-        // Step to q4
-        s << " +" << y.back () - y[3 * n / 4];
-        // Q4
-        s << " = " << y.back() << std::endl;
+        // Copy
+        auto y (x);
+
+        // Get Quartiles
+        std::sort (begin (y), end (y));
+        if (compact)
+        {
+            s << label;
+            // Range
+            s << "range=" << y.back() - y.front();
+            // q0
+            s << ", " << y.front();
+            // Step to q1
+            s << " + " << y[n / 4] - y.front ();
+            // Step to q2
+            s << " + " << y[n / 2] - y[n / 4];
+            // Step to q3
+            s << " + " << y[3 * n / 4] - y[n / 2];
+            // Step to q4
+            s << " + " << y.back () - y[3 * n / 4];
+            // Q4
+            s << " = " << y.back() << std::endl;
+        }
+        else
+        {
+            s << label << n << std::endl;
+            s << "range\t" << y.back() - y.front() << std::endl;
+            s << "q0\t" << y.front() << std::endl;
+            s << "q1\t" << y[n / 4] << std::endl;
+            s << "q2\t" << y[n / 2] << std::endl;
+            s << "q3\t" << y[3 * n / 4] << std::endl;
+            s << "q4\t" << y.back() << std::endl;
+        }
     }
     else
     {
-        s << label << n << std::endl;
-        s << "range\t" << y.back() - y.front() << std::endl;
-        s << "q0\t" << y.front() << std::endl;
-        s << "q1\t" << y[n / 4] << std::endl;
-        s << "q2\t" << y[n / 2] << std::endl;
-        s << "q3\t" << y[3 * n / 4] << std::endl;
-        s << "q4\t" << y.back() << std::endl;
+        // Get min and max
+        const auto min = *std::min_element (begin (x), end (x));
+        const auto max = *std::max_element (begin (x), end (x));
+        if (compact)
+        {
+            s << label;
+            s << "range=" << max - min;
+            s << ", min=" << min;
+            s << ", max=" << max << std::endl;
+        }
+        else
+        {
+            s << label << n << std::endl;
+            s << "range\t" << max - min << std::endl;
+            s << "min\t" << min << std::endl;
+            s << "max\t" << max << std::endl;
+        }
     }
+
     return s.str ();
 }
 
@@ -135,7 +175,8 @@ void process (std::ostream &os,
     const bool header_info,
     const bool summary_info,
     const bool classifications,
-    const bool compact)
+    const bool compact,
+    const bool quartiles)
 {
     using namespace std;
     using namespace spoc;
@@ -163,18 +204,18 @@ void process (std::ostream &os,
         {
             json::object s;
 
-            s["x"] = get_summary_object<double> (get_x (f.get_point_records ()));
-            s["y"] = get_summary_object<double> (get_y (f.get_point_records ()));
-            s["z"] = get_summary_object<double> (get_z (f.get_point_records ()));
-            s["c"] = get_summary_object<uint32_t> (get_c (f.get_point_records ()));
-            s["p"] = get_summary_object<uint32_t> (get_p (f.get_point_records ()));
-            s["i"] = get_summary_object<uint16_t> (get_i (f.get_point_records ()));
-            s["r"] = get_summary_object<uint16_t> (get_r (f.get_point_records ()));
-            s["g"] = get_summary_object<uint16_t> (get_g (f.get_point_records ()));
-            s["b"] = get_summary_object<uint16_t> (get_b (f.get_point_records ()));
+            s["x"] = get_summary_object<double> (get_x (f.get_point_records ()), quartiles);
+            s["y"] = get_summary_object<double> (get_y (f.get_point_records ()), quartiles);
+            s["z"] = get_summary_object<double> (get_z (f.get_point_records ()), quartiles);
+            s["c"] = get_summary_object<uint32_t> (get_c (f.get_point_records ()), quartiles);
+            s["p"] = get_summary_object<uint32_t> (get_p (f.get_point_records ()), quartiles);
+            s["i"] = get_summary_object<uint16_t> (get_i (f.get_point_records ()), quartiles);
+            s["r"] = get_summary_object<uint16_t> (get_r (f.get_point_records ()), quartiles);
+            s["g"] = get_summary_object<uint16_t> (get_g (f.get_point_records ()), quartiles);
+            s["b"] = get_summary_object<uint16_t> (get_b (f.get_point_records ()), quartiles);
             json::array a;
             for (size_t k = 0; k < get_extra_fields_size (f.get_point_records ()); ++k)
-                a.push_back (get_summary_object<uint64_t> (get_extra (k, f.get_point_records ())));
+                a.push_back (get_summary_object<uint64_t> (get_extra (k, f.get_point_records ()), quartiles));
             s["extra"] = a;
             j["summary"] = s;
         }
@@ -209,22 +250,22 @@ void process (std::ostream &os,
 
         if (summary_info)
         {
-            os << get_summary_string<double> ("x\t", get_x (f.get_point_records ()), compact);
-            os << get_summary_string<double> ("y\t", get_y (f.get_point_records ()), compact);
-            os << get_summary_string<double> ("z\t", get_z (f.get_point_records ()), compact);
-            os << get_summary_string<uint32_t> ("c\t", get_c (f.get_point_records ()), compact);
-            os << get_summary_string<uint32_t> ("p\t", get_p (f.get_point_records ()), compact);
-            os << get_summary_string<uint16_t> ("i\t", get_i (f.get_point_records ()), compact);
-            os << get_summary_string<uint16_t> ("r\t", get_r (f.get_point_records ()), compact);
-            os << get_summary_string<uint16_t> ("g\t", get_g (f.get_point_records ()), compact);
-            os << get_summary_string<uint16_t> ("b\t", get_b (f.get_point_records ()), compact);
+            os << get_summary_string<double> ("x\t", get_x (f.get_point_records ()), compact, quartiles);
+            os << get_summary_string<double> ("y\t", get_y (f.get_point_records ()), compact, quartiles);
+            os << get_summary_string<double> ("z\t", get_z (f.get_point_records ()), compact, quartiles);
+            os << get_summary_string<uint32_t> ("c\t", get_c (f.get_point_records ()), compact, quartiles);
+            os << get_summary_string<uint32_t> ("p\t", get_p (f.get_point_records ()), compact, quartiles);
+            os << get_summary_string<uint16_t> ("i\t", get_i (f.get_point_records ()), compact, quartiles);
+            os << get_summary_string<uint16_t> ("r\t", get_r (f.get_point_records ()), compact, quartiles);
+            os << get_summary_string<uint16_t> ("g\t", get_g (f.get_point_records ()), compact, quartiles);
+            os << get_summary_string<uint16_t> ("b\t", get_b (f.get_point_records ()), compact, quartiles);
             for (size_t k = 0; k < get_extra_fields_size (f.get_point_records ()); ++k)
             {
                 stringstream s;
                 s.precision (3);
                 s << fixed;
                 s << "extra " << k << "\t";
-                os << get_summary_string<uint64_t> (s.str (), get_extra (k, f.get_point_records ()), compact);
+                os << get_summary_string<uint64_t> (s.str (), get_extra (k, f.get_point_records ()), compact, quartiles);
             }
         }
 

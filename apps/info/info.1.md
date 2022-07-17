@@ -23,7 +23,15 @@ minimum value is 356631.450, and each quartile's size is shown following
 the minimum value, and the last value is the field's maximum,
 356881.400.
 
-    x       range=249.950, 356631.450 +87.350 +45.920 +39.090 +77.590 = 356881.400
+    x       range=249.950, 356631.450 + 87.350 + 45.920 + 39.090 + 77.590 = 356881.400
+
+If quartile printing is turned off, then the output might look something
+like the example below where only the minimum and maximum values are
+shown. Each field has to be sorted in order to compute quartile
+boundaries, so turning off quartile printing makes generating output a
+little faster.
+
+    y       range=178.000, min=356053.720, max=356231.720
 
 Below, the 'i' (intensity) field is shown to have a range of 4087. The
 minimum value is 1, and each quartile's size is shown following the
@@ -57,6 +65,9 @@ highest 25% of the values are spread out over the range 89 to 4088.
 
 \-\-summary-info, -s
 : Toggle summary information switch
+
+\-\-quartiles, -q
+: Toggle quartile printing
 
 \-\-classifications, -l
 : Toggle classification information switch

@@ -21,6 +21,7 @@ struct args
     bool summary_info = true;
     bool compact = true;
     bool classifications = true;
+    bool quartiles = false;
     std::vector<std::string> fns;
 };
 
@@ -39,10 +40,11 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"summary-info", no_argument, 0, 's'},
             {"classifications", no_argument, 0, 'l'},
             {"compact", no_argument, 0, 'c'},
+            {"quartiles", no_argument, 0, 'q'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvejaslc", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvejaslcq", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -65,6 +67,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 's': args.summary_info = !args.summary_info; break;
             case 'l': args.classifications = !args.classifications; break;
             case 'c': args.compact = !args.compact; break;
+            case 'q': args.quartiles = !args.quartiles; break;
         }
     }
 

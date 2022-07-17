@@ -99,8 +99,8 @@ standard.
 - [X] spoc info
   - [X] Header/summary
   - [X] Unit/integration tests
-  - [ ] By default, don't show quantiles to avoid sorting
-  - [ ] Flag to turn on quantile summary, just show min/max instead
+  - [X] By default, don't show quantiles to avoid sorting
+  - [X] Flag to turn on quantile summary, just show min/max instead
 
 - [X] spoc spoc2text/text2spoc
   - [X] Unit/integration tests
