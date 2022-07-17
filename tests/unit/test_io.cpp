@@ -15,6 +15,20 @@ void test_header ()
 {
     {
     header h;
+    verify (h.is_valid ());
+    }
+
+    {
+    for (size_t i = 0; i < 4; ++i)
+    {
+        header h;
+        h.signature[i] = '!';
+        verify (!h.is_valid ());
+    }
+    }
+
+    {
+    header h;
     h.wkt = "Test WKT";
     verify (h.check_signature ());
     stringstream s;
@@ -30,16 +44,7 @@ void test_header ()
     stringstream s;
     // Write an invalid signature
     s << "SPOX" << endl;
-    bool failed = false;
-    try
-    {
-        const auto q = read_header (s);
-    }
-    catch (...)
-    {
-        failed = true;
-    }
-    verify (failed);
+    VERIFY_THROWS (read_header (s);)
     }
 
     // Fail when writing
@@ -47,16 +52,7 @@ void test_header ()
     stringstream s;
     header h;
     h.signature[3] = 'X';
-    bool failed = false;
-    try
-    {
-        write_header (s, h);
-    }
-    catch (...)
-    {
-        failed = true;
-    }
-    verify (failed);
+    VERIFY_THROWS (write_header (s, h);)
     }
 }
 
@@ -68,45 +64,24 @@ void test_spoc_file ()
     p[100].extra.resize (extra_fields + 1);
     header h ("WKT", extra_fields, total_points, false);
 
-    bool failed = false;
-    try { spoc_file f (h, p); }
-    catch (...)
-    { failed = true; }
-    verify (failed);
-
-    failed = false;
-    try {
+    VERIFY_THROWS (spoc_file f (h, p);)
+    VERIFY_THROWS ({
         stringstream s;
         const string wkt = "Test wkt";
         write_spoc_file_uncompressed (s, spoc_file (wkt, p));
-    }
-    catch (...)
-    { failed = true; }
-    verify (failed);
+    })
 
-    failed = false;
-    try {
+    VERIFY_THROWS ({
         stringstream s;
         const string wkt = "Test wkt";
         write_spoc_file_compressed (s, spoc_file (wkt, p));
-    }
-    catch (...)
-    { failed = true; }
-    verify (failed);
+    })
 
     header h2 ("WKT", extra_fields, total_points + 1, false);
-    failed = false;
-    try { spoc_file f (h2, p); }
-    catch (...)
-    { failed = true; }
-    verify (failed);
+    VERIFY_THROWS (spoc_file f (h2, p);)
 
     header h3 ("WKT", extra_fields + 1, total_points, false);
-    failed = false;
-    try { spoc_file f (h3, p); }
-    catch (...)
-    { failed = true; }
-    verify (failed);
+    VERIFY_THROWS (spoc_file f (h3, p);)
 
     {
     const size_t total_points = 100;
@@ -137,21 +112,20 @@ void test_spoc_file ()
     f.set_compressed (true);
     const auto g = f.get_compressed ();
     verify (g);
-    bool failed = false;
-    stringstream s;
-    try {
-        f.set_compressed (false);
-        write_spoc_file_uncompressed (s, f);
-    }
-    catch (...) { failed = true; }
-    verify (failed);
-    failed = false;
-    try {
+
+    // Throw because size check fails
+    VERIFY_THROWS ({
+        stringstream s;
         f.set_compressed (true);
         write_spoc_file_compressed (s, f);
-    }
-    catch (...) { failed = true; }
-    verify (failed);
+    })
+
+    // Throw because size check fails
+    VERIFY_THROWS ({
+        stringstream s;
+        f.set_compressed (false);
+        write_spoc_file_uncompressed (s, f);
+    })
     }
 }
 
@@ -196,16 +170,7 @@ void test_spoc_file_io ()
     stringstream s;
     // Write an invalid signature
     s << "SPOX" << endl;
-    bool failed = false;
-    try
-    {
-        const auto f = read_spoc_file_uncompressed (s);
-    }
-    catch (...)
-    {
-        failed = true;
-    }
-    verify (failed);
+    VERIFY_THROWS (const auto f = read_spoc_file_uncompressed (s);)
     }
 }
 
@@ -253,39 +218,27 @@ void test_spoc_file_compressed_io ()
     // Write compressed with uncompressed writer
     {
     stringstream s;
-    bool failed = false;
-    try { write_spoc_file_uncompressed (s, spoc_file ("WKT", true, p)); }
-    catch (...) { failed = true; }
-    verify (failed);
+    VERIFY_THROWS (write_spoc_file_uncompressed (s, spoc_file ("WKT", true, p));)
     }
 
     // Write uncompressed with compressed writer
     {
     stringstream s;
-    bool failed = false;
-    try { write_spoc_file_compressed (s, spoc_file ("WKT", false, p)); }
-    catch (...) { failed = true; }
-    verify (failed);
+    VERIFY_THROWS (write_spoc_file_compressed (s, spoc_file ("WKT", false, p));)
     }
 
     // Read uncompressed with compressed reader
     {
     stringstream s;
-    bool failed = false;
     write_spoc_file_uncompressed (s, spoc_file ("WKT", false, p));
-    try { const auto f = read_spoc_file_compressed (s); }
-    catch (...) { failed = true; }
-    verify (failed);
+    VERIFY_THROWS (const auto f = read_spoc_file_compressed (s);)
     }
 
     // Read compressed with uncompressed reader
     {
     stringstream s;
-    bool failed = false;
     write_spoc_file_compressed (s, spoc_file ("WKT", true, p));
-    try { const auto f = read_spoc_file_uncompressed (s); }
-    catch (...) { failed = true; }
-    verify (failed);
+    VERIFY_THROWS (const auto f = read_spoc_file_uncompressed (s);)
     }
 }
 

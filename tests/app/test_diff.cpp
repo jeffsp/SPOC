@@ -175,10 +175,7 @@ void test_diff_individual_fields ()
 
     // Bad field name
     fields[0] = 'q';
-    bool failed = false;
-    try { diff (f1, f2, false, false, fields); }
-    catch (...) { failed = true; }
-    verify (failed);
+    VERIFY_THROWS ({ diff (f1, f2, false, false, fields); })
 }
 
 int main (int argc, char **argv)

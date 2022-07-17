@@ -21,10 +21,7 @@ void test_input_stream ()
         {
             auto fn = string ("////INVALID!!!////");
             stringstream log;
-            bool failed = false;
-            try { input_stream is (verbose, fn, log); }
-            catch (...) { failed = true; }
-            verify (failed);
+            VERIFY_THROWS (input_stream is (verbose, fn, log);)
         }
         // Use stdin
         {
@@ -50,10 +47,7 @@ void test_output_stream ()
         {
             auto fn = string ("////INVALID!!!////");
             stringstream log;
-            bool failed = false;
-            try { output_stream os (verbose, fn, log); }
-            catch (...) { failed = true; }
-            verify (failed);
+            VERIFY_THROWS (output_stream os (verbose, fn, log);)
         }
         // Use stdout
         {
@@ -73,12 +67,7 @@ void test_consume ()
     verify (f.empty ());
     verify (g == "x");
 
-    bool failed = false;
-    try {
-        string h ("q");
-        consume_field_name (h); }
-    catch (...) { failed = true; }
-    verify (failed);
+    VERIFY_THROWS ( string h ("q"); consume_field_name (h); )
     }
 
     {
@@ -87,12 +76,7 @@ void test_consume ()
     verify (f.empty ());
     verify (g == 123);
 
-    bool failed = false;
-    try {
-        string h ("q");
-        consume_int (h); }
-    catch (...) { failed = true; }
-    verify (failed);
+    VERIFY_THROWS ( string h ("q"); consume_int (h); )
     }
 
     {
@@ -101,12 +85,7 @@ void test_consume ()
     verify (f.empty ());
     verify (int(g) == 1);
 
-    bool failed = false;
-    try {
-        string h ("q");
-        consume_double (h); }
-    catch (...) { failed = true; }
-    verify (failed);
+    VERIFY_THROWS ( string h ("q"); consume_double (h); )
     }
 }
 

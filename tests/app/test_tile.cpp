@@ -12,14 +12,8 @@ void test_get_tile_size ()
         const vector<double> empty { };
         const vector<double> x { 1, 2, 3 };
         const vector<double> y { 4, 5, 6 };
-        bool failed = false;
-        try { get_tile_size (empty, y, 1); }
-        catch (...) { failed = true; }
-        verify (failed);
-        failed = false;
-        try { get_tile_size (x, empty, 1); }
-        catch (...) { failed = true; }
-        verify (failed);
+        VERIFY_THROWS (get_tile_size (empty, y, 1);)
+        VERIFY_THROWS (get_tile_size (x, empty, 1);)
     }
 
     {

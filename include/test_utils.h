@@ -10,14 +10,46 @@
 #include <tuple>
 #include <vector>
 
-inline void Verify (const char *e, const char *file, const unsigned line)
+namespace spoc
+{
+
+namespace detail
+{
+
+inline void VerificationFailed (const char *e, const char *file, const unsigned line)
 {
     std::stringstream s;
-    s << "verification failed in " << file << ", line " << line << ": " << e;
+    s << "Verification failed in " << file << ", line " << line << ": " << e;
     throw std::runtime_error (s.str ());
 }
 
-#define verify(e) (void)((e) || (Verify (#e, __FILE__, __LINE__), 0))
+void test_verification (const bool flag,
+    const char *e,
+    const char *file,
+    const unsigned line)
+{
+    if (!flag)
+        detail::VerificationFailed (e, file, line);
+}
+
+} // namespace detail
+
+} // namespace spoc
+
+#define verify(e) spoc::detail::test_verification (e, #e, __FILE__, __LINE__);
+
+#define VERIFY_THROWS(e) {\
+        bool failed = false;\
+        try\
+        {\
+            e\
+        }\
+        catch (...)\
+        {\
+            failed = true;\
+        }\
+        verify (failed);\
+    }
 
 inline std::vector<spoc::point::point<double>> generate_points (
     const size_t N,
