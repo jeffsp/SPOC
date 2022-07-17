@@ -170,18 +170,17 @@ standard.
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
   - [ ] Resize extra
   - [ ] Copy field --src=F --dest=F
+  - [ ] Restore: Restore points from one point cloud to another with
+        the same voxel indexes. Undoes subsampling.
 
 - [ ] spoc filter: Remove points with certain properties
   - [ ] Remove points when field f==, !=, <=, >=, <, > value
     - [ ] Don't allow == on doubles
   - [ ] Unique: Remove duplicates with same X, Y, Z values
-  - [ ] Downsample: Remove duplicates with same voxel indexes
+  - [ ] Subsample: Remove duplicates with same voxel indexes
     - [ ] voxel resolution
     - [ ] voxel resolution X, Y, Z
     - [ ] samples=K: keep K samples from each voxel
-
-- [ ] spoc restore: Restore points from one point cloud to another with
-      the same voxel indexes
 
 ## API Functionality
 
@@ -193,9 +192,11 @@ should be moved to a separate API, like VIPER.
 
 These should be included in the SPOC API
 
-  - [ ] Set random seed
   - [ ] Generate voxel indexes
   - [ ] Generate grid indexes
+  - [ ] Subsampling function with lambda support
+  - [ ] Subsampling function with default for K=1 subsamples/voxel
+  - [ ] Nearest neighbor operations with lambda support
   - [ ] Raster class
 
 ### VIPER
