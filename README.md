@@ -60,6 +60,8 @@ standard.
 
 ## Framework
 
+- [ ] Update warning for OGC WKT to be more explicit
+- [ ] Research more about how to extract SRS from VLR and/or EVLR
 - [X] Add Doxygen support
 - [X] Add Design by Contract functionality
 - [X] Generate documentation
