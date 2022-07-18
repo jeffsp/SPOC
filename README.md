@@ -107,6 +107,7 @@ standard.
 
 - [X] spoc spoc2text/text2spoc
   - [X] Unit/integration tests
+  - [ ] Read/write compressed files
 
 - [X] spoc compress/decompress
   - [ ] Add --xprecision, --yprecision, --zprecision arguments to
@@ -124,6 +125,7 @@ standard.
   - [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
   - [X] Not - inverse results
   - [X] Unit/integration tests
+  - [ ] Read/write compressed files
 
 - [X] spoc tile: Tile into regular non-overlapping tiles.
   - [X] Number of tiles on largest size
@@ -131,6 +133,7 @@ standard.
   - [ ] Multi-pass tiling for large files
   - [X] Unit/integration tests
   - [ ] Tile along a single axis in order to get transect slices
+  - [ ] Read/write compressed files
 
 - [X] spoc merge: Combine several point clouds into one
   - [X] Set point id
@@ -166,6 +169,7 @@ standard.
   - [ ] Random seed
   - [ ] Copy to RGB
   - [ ] By default, copy to e0,1,2
+  - [ ] Read/write compressed files
 
 - [X] spoc tool: Common operations
   - [X] Get/Set field F as text
