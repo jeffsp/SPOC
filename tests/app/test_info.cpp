@@ -38,6 +38,7 @@ void test_info_empty ()
         }
     }
 }
+
 void test_info ()
 {
     // Generate spoc files
