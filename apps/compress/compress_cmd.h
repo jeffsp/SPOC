@@ -15,6 +15,7 @@ struct args
     bool help = false;
     bool verbose = false;
     bool version = false;
+    unsigned precision = 0;
     std::string input_fn;
     std::string output_fn;
 };
@@ -29,10 +30,11 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
             {"version", no_argument, 0, 'e'},
+            {"precision", required_argument, 0, 'p'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hve", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvep:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -50,6 +52,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             }
             case 'v': { args.verbose = true; break; }
             case 'e': { args.version = true; break; }
+            case 'p': { args.precision = std::atol (optarg); break; }
         }
     }
 
