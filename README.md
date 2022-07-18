@@ -109,7 +109,6 @@ standard.
 
 - [X] spoc compress/decompress
   - [ ] Add --precision argument to compress to improve compression?
-  - [ ] Revisit command line input/output file specifications, support pipes?
 
 - [X] spoc spoc2las/las2spoc
   - [X] Unit/integration tests
