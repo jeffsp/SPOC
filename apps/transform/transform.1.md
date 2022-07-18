@@ -4,7 +4,7 @@
 
 # NAME
 
-spoc\_transform - SPOC file tranform
+spoc\_transform - SPOC file transform
 
 # USAGE
 
