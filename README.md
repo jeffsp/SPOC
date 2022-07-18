@@ -103,12 +103,14 @@ standard.
   - [X] Unit/integration tests
   - [X] By default, don't show quantiles to avoid sorting
   - [X] Flag to turn on quantile summary, just show min/max instead
+  - [ ] Read compressed files
 
 - [X] spoc spoc2text/text2spoc
   - [X] Unit/integration tests
 
 - [X] spoc compress/decompress
-  - [ ] Add --precision argument to compress to improve compression?
+  - [ ] Add --xprecision, --yprecision, --zprecision arguments to
+        compress in order to improve compression?
 
 - [X] spoc spoc2las/las2spoc
   - [X] Unit/integration tests
@@ -155,15 +157,17 @@ standard.
   - [ ] Add Uniform noise to XYZ
     - [ ] Set seed
 
-- [ ] spoc color: Set RGB values
+- [X] spoc color: Set RGB values
   - [ ] Transform classification to RGB
   - [ ] Transform elevation to RGB
   - [ ] Transform e# to RGB
   - [ ] Read palette
   - [ ] Random palette=size
   - [ ] Random seed
+  - [ ] Copy to RGB
+  - [ ] By default, copy to e0,1,2
 
-- [ ] spoc tool: Common operations
+- [X] spoc tool: Common operations
   - [X] Get/Set field F as text
     - [ ] Check to make sure text file has the correct number of points
           when setting a field
@@ -174,7 +178,7 @@ standard.
   - [ ] Restore: Restore points from one point cloud to another with
         the same voxel indexes. Undoes subsampling.
 
-- [ ] spoc filter: Remove points with certain properties
+- [X] spoc filter: Remove points with certain properties
   - [ ] Remove points when field f==, !=, <=, >=, <, > value
     - [ ] Don't allow == on doubles
   - [ ] Unique: Remove duplicates with same X, Y, Z values
