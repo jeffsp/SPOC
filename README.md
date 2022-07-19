@@ -110,8 +110,6 @@ standard.
   - [ ] Read/write compressed files
 
 - [X] spoc compress/decompress
-  - [ ] Add --xprecision, --yprecision, --zprecision arguments to
-        compress in order to improve compression?
 
 - [X] spoc spoc2las/las2spoc
   - [X] Unit/integration tests
@@ -157,8 +155,14 @@ standard.
   - [X] Scale by X,Y,Z: scale, scalex/y/z
   - [ ] Add Gaussian noise to XYZ
     - [ ] Set seed
+    - [ ] Sigma=#
+    - [ ] Sigma-xyz=#,#,#
   - [ ] Add Uniform noise to XYZ
     - [ ] Set seed
+    - [ ] Size=#
+    - [ ] Size-xyz=#,#,#
+  - [ ] Add --xprecision, --yprecision, --zprecision arguments to
+        compress in order to improve compression?
 
 - [X] spoc color: Set RGB values
   - [ ] Transform classification to RGB
@@ -183,13 +187,12 @@ standard.
         the same voxel indexes. Undoes subsampling.
 
 - [X] spoc filter: Remove points with certain properties
-  - [ ] Remove points when field f==, !=, <=, >=, <, > value
-    - [ ] Don't allow == on doubles
+  - [ ] Keep classes
+  - [ ] Remove classes
   - [ ] Unique: Remove duplicates with same X, Y, Z values
   - [ ] Subsample: Remove duplicates with same voxel indexes
     - [ ] voxel resolution
-    - [ ] voxel resolution X, Y, Z
-    - [ ] samples=K: keep K samples from each voxel
+  - [ ] Read/write compressed files
 
 ## API Functionality
 
