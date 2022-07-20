@@ -103,11 +103,11 @@ standard.
   - [X] Unit/integration tests
   - [X] By default, don't show quantiles to avoid sorting
   - [X] Flag to turn on quantile summary, just show min/max instead
-  - [ ] Read compressed files
+  - [X] Read compressed files
 
 - [X] spoc spoc2text/text2spoc
   - [X] Unit/integration tests
-  - [ ] Read/write compressed files
+  - [X] Read compressed files
 
 - [X] spoc compress/decompress
 
@@ -123,7 +123,7 @@ standard.
   - [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
   - [X] Not - inverse results
   - [X] Unit/integration tests
-  - [ ] Read/write compressed files
+  - [X] Read compressed files
 
 - [X] spoc tile: Tile into regular non-overlapping tiles.
   - [X] Number of tiles on largest size
@@ -131,7 +131,7 @@ standard.
   - [ ] Multi-pass tiling for large files
   - [X] Unit/integration tests
   - [ ] Tile along a single axis in order to get transect slices
-  - [ ] Read/write compressed files
+  - [X] Read/write compressed files
 
 - [X] spoc merge: Combine several point clouds into one
   - [X] Set point id
@@ -139,7 +139,7 @@ standard.
   - [X] Warn if the area of the merged file is too big
   - [X] Quiet (don't warn)
   - [X] Unit/integration tests
-  - [ ] Read/write compressed files
+  - [X] Read/write compressed files
 
 - [X] spoc transform: Transform each point record into a different point
       record. These are all capable of streaming. The output has the
@@ -198,7 +198,7 @@ standard.
   - [X] Subsample: Remove duplicates with same voxel indexes
     - [X] voxel resolution
   - [X] Unit/app tests
-  - [ ] Read/write compressed files
+  - [X] Read/write compressed files
 
 ## API Functionality
 
