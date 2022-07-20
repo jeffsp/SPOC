@@ -23,4 +23,3 @@ diff \
 
 spoc_tile -p ${TMPDIR}/spoc_tile ./test_data/lidar/juarez50.zpoc
 spoc_merge ${TMPDIR}/spoc_tile*.zpoc > ${TMPDIR}/spoc_merged.zpoc
-ls -l ${TMPDIR}
