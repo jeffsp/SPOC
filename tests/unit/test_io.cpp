@@ -258,6 +258,14 @@ void test_spoc_file_compressed_io ()
     write_spoc_file_compressed (s, spoc_file ("WKT", true, p));
     VERIFY_THROWS (const auto f = read_spoc_file_uncompressed (s);)
     }
+
+    {
+    stringstream s;
+    write_spoc_file (s, spoc_file ("WKT", false, p));
+    auto f = read_spoc_file (s);
+    write_spoc_file (s, spoc_file ("WKT", true, p));
+    f = read_spoc_file (s);
+    }
 }
 
 void test_field_name ()
