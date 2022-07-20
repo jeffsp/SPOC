@@ -353,10 +353,10 @@ class spoc_file
         h0.total_points = 0;
 
         // Get empty point records vector
-        point_record::point_records p;
+        point_record::point_records pr;
 
         // Create the empty clone
-        return spoc_file (h0, p);
+        return spoc_file (h0, pr);
     }
 
     // Contract support
