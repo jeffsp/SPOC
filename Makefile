@@ -74,7 +74,11 @@ coverage: build
 	@mkdir -p ./code_analysis
 	@echo "Running gcovr..."
 	@cd build/coverage/ && gcovr -r ../.. \
-		--filter=../../include . | tee ../../code_analysis/coverage.txt
+		--filter=../../include/ \
+		--filter=../../apps/ \
+		--exclude='(.+)?_cmd.h$$' \
+		--exclude='../../apps/(.+)?.cpp$$' \
+		. | tee ../../code_analysis/coverage.txt
 	@grep TOTAL code_analysis/coverage.txt
 
 .PHONY: examples # Build examples
