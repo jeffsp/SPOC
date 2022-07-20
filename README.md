@@ -60,7 +60,7 @@ standard.
 
 ## Framework
 
-- [ ] Update warning for OGC WKT to be more explicit
+- [X] Update warning for OGC WKT to be more explicit
 - [ ] Research more about how to extract SRS from VLR and/or EVLR
 - [X] Add Doxygen support
 - [X] Add Design by Contract functionality
@@ -139,6 +139,7 @@ standard.
   - [X] Warn if the area of the merged file is too big
   - [X] Quiet (don't warn)
   - [X] Unit/integration tests
+  - [ ] Read/write compressed files
 
 - [X] spoc transform: Transform each point record into a different point
       record. These are all capable of streaming. The output has the
@@ -188,6 +189,7 @@ standard.
   - [ ] Copy field --src=F --dest=F
   - [ ] Restore: Restore points from one point cloud to another with
         the same voxel indexes. Undoes subsampling.
+  - [ ] Read/write compressed files
 
 - [X] spoc filter: Remove points with certain properties
   - [X] Keep classes
@@ -195,8 +197,8 @@ standard.
   - [X] Unique: Remove duplicates with same X, Y, Z values
   - [X] Subsample: Remove duplicates with same voxel indexes
     - [X] voxel resolution
+  - [X] Unit/app tests
   - [ ] Read/write compressed files
-  - [ ] Unit/app tests
 
 ## API Functionality
 
@@ -208,8 +210,8 @@ should be moved to a separate API, like VIPER.
 
 These should be included in the SPOC API
 
-  - [ ] Generate voxel indexes
-  - [ ] Generate grid indexes
+  - [X] Generate voxel indexes
+  - [X] Generate grid indexes (use i, j from voxel index)
   - [ ] Subsampling function with lambda support
   - [ ] Subsampling function with default for K=1 subsamples/voxel
   - [ ] Nearest neighbor operations with lambda support

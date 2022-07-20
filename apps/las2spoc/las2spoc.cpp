@@ -42,8 +42,15 @@ int main (int argc, char **argv)
         // Check the coordinate system
         if (l.lasreader->header.vlr_geo_ogc_wkt == nullptr)
         {
-            clog << "WARNING: No spatial coordinate system was found." << endl;
-            clog << "The coordinate system should be specified in OGC WKT format" << endl;
+            clog << "WARNING: The LAS file's spatial coordinate system is either missing, ";
+            clog << "or it is not specified in OGC WKT format." << endl;
+            clog << "This application can only process spatial coordinate systems if they are specified in OGC WKT format." << endl;
+            clog << "To convert the LAS file's spatial coordinate system to OGC WKT format, you can use LAStools." << endl;
+            clog << "For example, you can use the LAStools 'las2las' command:" << endl;
+            clog << endl;
+            clog << "    las2las -set_ogc_wkt -i input.las -o output.las" << endl;
+            clog << endl;
+            clog << "The output SPOC file's header will not contain a WKT string in the header." << endl;;
         }
 
         // Read points and put them into point records
