@@ -58,6 +58,24 @@ void test_header ()
 
 void test_spoc_file ()
 {
+    // Test spoc_file::is_valid()
+    {
+    spoc_file f;
+    header &h = const_cast<header &> (f.get_header ());
+    VERIFY (f.is_valid ());
+    h.total_points = 1;
+    VERIFY (!f.is_valid ());
+    }
+    {
+    spoc_file f;
+    f.add (spoc::point_record::point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
+    header &h = const_cast<header &> (f.get_header ());
+    VERIFY (f.is_valid ());
+    h.extra_fields = 1;
+    VERIFY (!f.is_valid ());
+    }
+
+    // Test CTORs
     const size_t total_points = 1000;
     const size_t extra_fields = 3;
     auto p = generate_random_point_records (total_points, extra_fields);

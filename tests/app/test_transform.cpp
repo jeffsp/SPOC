@@ -8,6 +8,15 @@ using namespace spoc::io;
 using namespace spoc::point;
 using namespace spoc::transform_app;
 
+void test_transform_detail ()
+{
+    // Generate spoc files
+    auto f = generate_random_spoc_file (10, 3, true);
+    stringstream is, os;
+    write_spoc_file_compressed (is, f);
+    VERIFY_THROWS (const auto h = detail::read_header_uncompressed (is); )
+}
+
 void test_transform_add ()
 {
     // Generate random reference
@@ -412,6 +421,7 @@ int main (int argc, char **argv)
 {
     try
     {
+        test_transform_detail ();
         test_transform_add ();
         test_transform_quantize ();
         test_transform_rotate1 ();

@@ -61,8 +61,7 @@ void get_field (std::istream &is,
             case 'e': // extra
             {
                 assert (app_utils::is_extra_field (field_name));
-                if (j >= p.extra.size ())
-                    throw std::runtime_error ("Invalid extra field specification");
+                assert (j < p.extra.size ());
                 os << p.extra[j] << std::endl;
             }
             break;
@@ -194,8 +193,7 @@ void set_field (std::istream &is,
             case 'e': // extra
             {
                 assert (app_utils::is_extra_field (field_name));
-                if (j >= p.extra.size ())
-                    throw std::runtime_error ("Invalid extra field specification");
+                assert (j < p.extra.size ());
                 p.extra[j] = f_size_t[i];
             }
             break;

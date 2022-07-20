@@ -12,7 +12,6 @@ using namespace spoc::point_record;
 void test_keep_classes ()
 {
     spoc_file f;
-    point_record p;
     f.add (point_record (0.0, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
     f.add (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
     f.add (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
@@ -39,7 +38,6 @@ void test_keep_classes ()
 void test_remove_classes ()
 {
     spoc_file f;
-    point_record p;
     f.add (point_record (0.0, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
     f.add (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
     f.add (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
@@ -67,7 +65,6 @@ void test_remove_classes ()
 void test_unique_xyz ()
 {
     spoc_file f;
-    point_record p;
     f.add (point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
     f.add (point_record (0.1, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
     f.add (point_record (0.0, 0.2, 0.0, 2, 0, 0, 0, 0, 0));
@@ -84,7 +81,6 @@ void test_unique_xyz ()
 void test_subsample ()
 {
     spoc_file f;
-    point_record p;
     f.add (point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
     f.add (point_record (1.1, 1.1, 1.1, 1, 0, 0, 0, 0, 0));
     f.add (point_record (2.1, 2.1, 2.1, 2, 0, 0, 0, 0, 0));
