@@ -49,6 +49,11 @@ int main (int argc, char **argv)
         // The result goes here
         spoc_file g;
 
+        // Set the compression bit
+        //
+        // Assume that all of the inputs are compressed
+        g.set_compressed (true);
+
         double area_sum = 0.0;
 
         for (size_t i = 0; i < args.fns.size (); ++i)
@@ -66,7 +71,15 @@ int main (int argc, char **argv)
                 throw runtime_error ("Could not open file for reading");
 
             // Read into spoc_file struct
-            spoc_file f = read_spoc_file_uncompressed (ifs);
+            spoc_file f = read_spoc_file (ifs);
+
+            // Set the compression bit
+            //
+            // If any of the inputs are uncompressed, the output will be
+            // uncompressed. Otherwise, if all inputs are compressed,
+            // the output will be compressed.
+            if (f.get_compressed () == false)
+                g.set_compressed (false);
 
             // Set the wkt to the first file's wkt
             if (i == 0)
@@ -118,7 +131,7 @@ int main (int argc, char **argv)
             clog << "Writing to stdout" << endl;
 
         // Write it out
-        write_spoc_file_uncompressed (cout, g);
+        write_spoc_file (cout, g);
 
         return 0;
     }

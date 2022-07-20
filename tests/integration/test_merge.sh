@@ -20,3 +20,7 @@ spoc_info -s ${TMPDIR}/spoc_merged.spoc > ${TMPDIR}/spoc_merge_header2.txt
 diff \
     ${TMPDIR}/spoc_merge_header1.txt \
     ${TMPDIR}/spoc_merge_header2.txt
+
+spoc_tile -p ${TMPDIR}/spoc_tile ./test_data/lidar/juarez50.zpoc
+spoc_merge ${TMPDIR}/spoc_tile*.zpoc > ${TMPDIR}/spoc_merged.zpoc
+ls -l ${TMPDIR}

@@ -54,7 +54,7 @@ int main (int argc, char **argv)
             throw runtime_error ("Could not open file for reading");
 
         // Read into spoc_file struct
-        spoc_file f = read_spoc_file_uncompressed (ifs);
+        spoc_file f = read_spoc_file (ifs);
 
         if (args.verbose)
             clog << "Total points " << f.get_point_records ().size () << endl;
@@ -109,6 +109,9 @@ int main (int argc, char **argv)
             // Set the SRS
             t.set_wkt (f.get_wkt ());
 
+            // Set the compression bit
+            t.set_compressed (f.get_compressed ());
+
             // Set the number of points in the file
             t.resize (v.size ());
 
@@ -152,7 +155,7 @@ int main (int argc, char **argv)
                 throw runtime_error ("Could not open file for writing");
 
             // Write it out
-            write_spoc_file_uncompressed (ofs, t);
+            write_spoc_file (ofs, t);
         }
 
         return 0;

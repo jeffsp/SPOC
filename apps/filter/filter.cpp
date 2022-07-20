@@ -55,7 +55,7 @@ int main (int argc, char **argv)
         input_stream is (args.verbose, args.input_fn);
 
         // Read the input file
-        spoc_file f = read_spoc_file_uncompressed (is ());
+        spoc_file f = read_spoc_file (is ());
 
         // Process it
         if (!args.keep_classes.empty ())
@@ -71,7 +71,7 @@ int main (int argc, char **argv)
         output_stream os (args.verbose, args.output_fn);
 
         // Write it out
-        write_spoc_file_uncompressed (os (), f);
+        write_spoc_file (os (), f);
 
         return 0;
     }

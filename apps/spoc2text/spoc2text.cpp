@@ -36,7 +36,7 @@ int main (int argc, char **argv)
         if (args.verbose)
             clog << "Reading spoc file from stdin" << endl;
 
-        const auto f = read_spoc_file_uncompressed (cin);
+        const auto f = read_spoc_file (cin);
         const auto wkt = f.get_header ().wkt;
         const auto &point_records = f.get_point_records ();
 

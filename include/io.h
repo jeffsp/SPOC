@@ -652,6 +652,18 @@ inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
         write_compressed (s, extras[j]);
 }
 
+/// Helper I/O function
+/// @param s Output stream
+/// @param f File structure to write
+inline void write_spoc_file (std::ostream &s, const spoc_file &f)
+{
+    // Check compression flag
+    if (f.get_header ().compressed)
+        write_spoc_file_compressed (s, f);
+    else
+        write_spoc_file_uncompressed (s, f);
+}
+
 } // namespace io
 
 } // namespace spoc

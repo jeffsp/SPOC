@@ -63,8 +63,8 @@ int main (int argc, char **argv)
             throw runtime_error ("Could not open file for reading");
 
         // Read into spoc_file structs
-        spoc_file f1 = read_spoc_file_uncompressed (ifs1);
-        spoc_file f2 = read_spoc_file_uncompressed (ifs2);
+        spoc_file f1 = read_spoc_file (ifs1);
+        spoc_file f2 = read_spoc_file (ifs2);
 
         const int return_code =
             diff (f1, f2,
