@@ -43,6 +43,15 @@ struct point_record
         , extra (extra_fields)
     {
     }
+    explicit point_record (const double x, const double y, const double z,
+        const uint32_t c, const uint32_t p, const uint16_t i,
+        const uint16_t r, const uint16_t g, const uint16_t b)
+        : x (x), y (y), z (z)
+        , c (c) , p (p) , i (i)
+        , r (r) , g (g) , b (b)
+        , extra (0)
+    {
+    }
 };
 
 // Helper I/O function

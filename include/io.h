@@ -391,14 +391,14 @@ class spoc_file
     {
         h.compressed = flag;
     }
-    void add_point_record (const point_record::point_record &pr)
+    void add (const point_record::point_record &pr)
     {
         REQUIRE (pr.extra.size () == h.extra_fields);
         p.push_back (pr);
         ++h.total_points;
         ENSURE (is_valid ());
     }
-    void set_point_record (const size_t n, const point_record::point_record &r)
+    void set (const size_t n, const point_record::point_record &r)
     {
         assert (n < p.size ());
         p[n] = r;

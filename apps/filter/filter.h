@@ -28,7 +28,7 @@ inline T keep_classes (const T &f, const U &c)
     for (const auto &p : prs)
         // If it's in the set, keep it
         if (c.find (p.c) != c.end ())
-            g.add_point_record (p);
+            g.add (p);
 
     return g;
 }
@@ -46,7 +46,7 @@ inline T remove_classes (const T &f, const U &c)
     for (const auto &p : prs)
         // If it's not in the set, keep it
         if (c.find (p.c) == c.end ())
-            g.add_point_record (p);
+            g.add (p);
 
     return g;
 }
@@ -105,7 +105,7 @@ inline T unique_xyz (const T &f)
         if (xyzs.find (l) != xyzs.end ())
             continue; // Yes, skip it
 
-        g.add_point_record (p); // No, save the point
+        g.add (p); // No, save the point
 
         // Remember its location
         xyzs.insert (l);
@@ -141,7 +141,7 @@ inline T subsample (const T &f, const double res)
         if (s.find (v[i]) != s.end ())
             continue; // Yes, skip it
         // No, save the point
-        g.add_point_record (prs[i]);
+        g.add (prs[i]);
 
         // Remember its voxel index
         s.insert (v[i]);

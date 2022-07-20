@@ -119,7 +119,7 @@ int main (int argc, char **argv)
                 const auto p = f.get_point_record (v[j]);
 
                 // Set it in the output file
-                t.set_point_record (j, p);
+                t.set (j, p);
             }
 
             // Get the filename extension

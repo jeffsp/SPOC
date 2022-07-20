@@ -95,7 +95,7 @@ void test_spoc_file ()
     for (size_t i = 0; i < f.get_point_records ().size (); ++i)
     {
         const auto q = f.get_point_record (i);
-        f.set_point_record (i, q);
+        f.set (i, q);
     }
     }
 
@@ -108,7 +108,7 @@ void test_spoc_file ()
     // Make the size check fail
     auto q = f.get_point_record (0);
     q.extra.resize (extra_fields + 1);
-    f.set_point_record (0, q);
+    f.set (0, q);
     f.set_compressed (true);
     const auto g = f.get_compressed ();
     VERIFY (g);
