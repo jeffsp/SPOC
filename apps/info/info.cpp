@@ -50,7 +50,7 @@ int main (int argc, char **argv)
                 clog << "Reading from stdin" << endl;
 
             // Read the file
-            spoc_file f = read_spoc_file_uncompressed (cin);
+            spoc_file f = read_spoc_file (cin);
 
             process (cout, f,
                 args.json, args.header_info, args.summary_info,
@@ -69,7 +69,7 @@ int main (int argc, char **argv)
                     throw runtime_error ("Could not open file for reading");
 
                 // Read into spoc_file struct
-                spoc_file f = read_spoc_file_uncompressed (ifs);
+                spoc_file f = read_spoc_file (ifs);
 
                 process (cout, f,
                     args.json, args.header_info, args.summary_info,
