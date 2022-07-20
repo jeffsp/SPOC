@@ -181,18 +181,22 @@ standard.
           when setting a field
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
+  - [ ] Randomize the order of the points. This is useful when
+        quantizing or subsampling to ensure that there is no bias in how
+        the points are filtered out.
   - [ ] Resize extra
   - [ ] Copy field --src=F --dest=F
   - [ ] Restore: Restore points from one point cloud to another with
         the same voxel indexes. Undoes subsampling.
 
 - [X] spoc filter: Remove points with certain properties
-  - [ ] Keep classes
-  - [ ] Remove classes
-  - [ ] Unique: Remove duplicates with same X, Y, Z values
-  - [ ] Subsample: Remove duplicates with same voxel indexes
-    - [ ] voxel resolution
+  - [X] Keep classes
+  - [X] Remove classes
+  - [X] Unique: Remove duplicates with same X, Y, Z values
+  - [X] Subsample: Remove duplicates with same voxel indexes
+    - [X] voxel resolution
   - [ ] Read/write compressed files
+  - [ ] Unit/app tests
 
 ## API Functionality
 

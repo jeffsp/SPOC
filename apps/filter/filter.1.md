@@ -12,7 +12,7 @@ spoc\_filter [*options*] [*input_filename*] [*output_filename*]
 
 # DESCRIPTION
 
-Filter out points from a SPOC file
+Remove point records from a SPOC file that satisfy certain properties
 
 # OPTIONS
 
@@ -35,17 +35,20 @@ Filter out points from a SPOC file
     All other points are kept. This option may be specified multiple
     times.
 
-\-\-unique-xyz
+\-\-unique-xyz, -u
 :   Remove duplicates with the same X, Y, Z values. This is useful for
     removing points whose X, Y, and Z values have been quantized with the
     spoc_transform application. This will prevent any two points from
-    occupying the same exact location in space. Duplicates are randomly
-    chosen for removal.
+    occupying the same exact location in space. The first occurrance of
+    a point record with a non-unique X, Y, Z location is the one that
+    gets saved. All subsequent occurances are removed.
 
-\-\-subsample=*#*
+\-\-subsample=*#*, -s *#*
 :   Subsample a point cloud by selecting a single random point record
-    from each voxel of size *#*. This is useful for decimating a point cloud
-    while still preserving the local structure.
+    from each voxel of size *#*. This is useful for decimating a point
+    cloud while still preserving the local structure. The first
+    occurrance of a point record within a voxel is the one that gets
+    saved. All subsequent occurances are removed.
 
 # SEE ALSO
 

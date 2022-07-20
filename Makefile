@@ -41,9 +41,9 @@ clean:
 	@rm -rf doc
 	@$(MAKE) -C examples clean
 
-.PHONY: unit_test
-unit_test: BUILD=debug
-unit_test:
+.PHONY: unit_and_app_test
+unit_and_app_test: BUILD=debug
+unit_and_app_test:
 	@parallel --jobs 24 --halt now,fail=1 "echo {} && {}" ::: build/$(BUILD)/test_*
 
 .PHONY: integration_test
@@ -55,8 +55,8 @@ integration_test:
 .PHONY: test # Run tests
 test:
 	@echo "Testing..."
-	@$(MAKE) --no-print-directory unit_test BUILD=debug
-	@$(MAKE) --no-print-directory unit_test BUILD=release
+	@$(MAKE) --no-print-directory unit_and_app_test BUILD=debug
+	@$(MAKE) --no-print-directory unit_and_app_test BUILD=release
 	@$(MAKE) --no-print-directory integration_test BUILD=debug
 	@$(MAKE) --no-print-directory integration_test BUILD=release
 
@@ -70,7 +70,7 @@ memcheck:
 
 .PHONY: coverage # Generate a coverage report
 coverage: build
-	@$(MAKE) --no-print-directory unit_test BUILD=coverage
+	@$(MAKE) --no-print-directory unit_and_app_test BUILD=coverage
 	@mkdir -p ./code_analysis
 	@echo "Running gcovr..."
 	@cd build/coverage/ && gcovr -r ../.. \

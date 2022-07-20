@@ -1,4 +1,5 @@
 #pragma once
+#include "contracts.h"
 #include "compression.h"
 #include "point_record.h"
 #include "version.h"
@@ -345,6 +346,29 @@ class spoc_file
         if (!check_records (p))
             throw std::runtime_error ("The point records are inconsistent");
     }
+    spoc_file clone_empty () const
+    {
+        // Copy the header and set its points to 0
+        header h0 = h;
+        h0.total_points = 0;
+
+        // Get empty point records vector
+        point_record::point_records p;
+
+        // Create the empty clone
+        return spoc_file (h0, p);
+    }
+
+    // Contract support
+    bool is_valid () const
+    {
+        if (p.size () != h.total_points)
+            return false;
+        if (!p.empty () && p[0].extra.size () != h.extra_fields)
+            return false;
+        return true;
+    }
+
     // Readonly access
     const header &get_header () const { return h; }
     const point_record::point_records &get_point_records () const { return p; }
@@ -366,6 +390,13 @@ class spoc_file
     void set_compressed (const bool flag)
     {
         h.compressed = flag;
+    }
+    void add_point_record (const point_record::point_record &pr)
+    {
+        REQUIRE (pr.extra.size () == h.extra_fields);
+        p.push_back (pr);
+        ++h.total_points;
+        ENSURE (is_valid ());
     }
     void set_point_record (const size_t n, const point_record::point_record &r)
     {

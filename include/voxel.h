@@ -36,8 +36,8 @@ struct voxel_index
 };
 
 // Get a 3D index given a point in xyz space
-template<typename T>
-voxel_index get_voxel_index (const T &p, const T &minp, const double res)
+template<typename T,typename U>
+voxel_index get_voxel_index (const T &p, const U &minp, const double res)
 {
     voxel_index v;
     v.i = (p.x - minp.x) / res;

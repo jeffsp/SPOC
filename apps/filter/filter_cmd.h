@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 #include <variant>
+#include <unordered_set>
 
 namespace spoc
 {
@@ -17,6 +18,10 @@ struct args
     bool help = false;
     bool verbose = false;
     bool version = false;
+    std::unordered_set<int> keep_classes;
+    std::unordered_set<int> remove_classes;
+    bool unique_xyz = false;
+    double subsample = 0.0;
     std::string input_fn;
     std::string output_fn;
 };
@@ -31,10 +36,14 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
             {"version", no_argument, 0, 'e'},
+            {"keep-class", required_argument, 0, 'k'},
+            {"remove-class", required_argument, 0, 'r'},
+            {"unique-xyz", no_argument, 0, 'u'},
+            {"subsample", required_argument, 0, 's'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hve", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvek:r:us:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -52,6 +61,10 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             }
             case 'v': { args.verbose = true; break; }
             case 'e': { args.version = true; break; }
+            case 'k': { args.keep_classes.insert (std::atoi (optarg)); break; }
+            case 'r': { args.remove_classes.insert (std::atoi (optarg)); break; }
+            case 'u': { args.unique_xyz = true; break; }
+            case 's': { args.subsample = std::atof (optarg); break; }
         }
     }
 
