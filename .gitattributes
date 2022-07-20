@@ -1,5 +1,6 @@
 test_data/lidar/juarez50.las filter=lfs diff=lfs merge=lfs -text
 test_data/lidar/juarez50.spoc filter=lfs diff=lfs merge=lfs -text
+test_data/lidar/juarez50.zpoc filter=lfs diff=lfs merge=lfs -text
 test_data/lidar/rome012.spoc filter=lfs diff=lfs merge=lfs -text
 test_data/lidar/rome012.las filter=lfs diff=lfs merge=lfs -text
 test_data/eo/romeo007.las filter=lfs diff=lfs merge=lfs -text
