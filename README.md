@@ -190,8 +190,8 @@ standard.
   - [ ] Copy field --src=F --dest=F
   - [ ] Restore: Restore points from one point cloud to another with
         the same voxel indexes. Undoes subsampling.
-  - [ ] Refactor: this application does not need to stream
-  - [ ] Read/write compressed files
+  - [X] Refactor: This application does not need to stream
+  - [X] Read/write compressed files
 
 - [X] spoc filter: Remove points with certain properties
   - [X] Keep classes

@@ -11,15 +11,11 @@ namespace spoc
 namespace tool_app
 {
 
-void get_field (std::istream &is,
-    std::ostream &os,
-    const spoc::io::header &h,
-    const std::string &field_name)
+template<typename T>
+inline void get_field (const T &f, std::ostream &os, const std::string &field_name)
 {
     // Check preconditions
-    REQUIRE (is.good ());
     REQUIRE (os.good ());
-    REQUIRE (h.is_valid ());
     REQUIRE (app_utils::check_field_name (field_name));
 
     // Set the output precision for doubles
@@ -38,14 +34,11 @@ void get_field (std::istream &is,
     // Get the extra index
     const size_t j = app_utils::is_extra_field (field_name)
         ? app_utils::get_extra_index (field_name)
-        : h.extra_fields + 1;
+        : f.get_header ().extra_fields + 1;
 
     // Write out the fields
-    for (size_t i = 0; i < h.total_points; ++i)
+    for (const auto &p : f.get_point_records ())
     {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-
         // Process the point
         switch (field_name[0])
         {
@@ -71,68 +64,51 @@ void get_field (std::istream &is,
 
 // Recenter a point cloud about its mean
 template<typename T>
-void recenter (T &p, const bool z_flag = false)
+inline T recenter (const T &f, const bool z_flag = false)
 {
-    using namespace spoc::io;
+    // Check preconditions
+    REQUIRE (f.is_valid ());
 
-    // Get X, Y, and Z
-    const auto x = get_x (p);
-    const auto y = get_y (p);
-    const auto z = get_z (p);
-
-    // Get average X, Y, and (optionally) Z
-    const double cx = std::accumulate (begin (x), end (x), 0.0) / p.size ();
-    const double cy = std::accumulate (begin (y), end (y), 0.0) / p.size ();
-    const double cz = z_flag ? std::accumulate (begin (z), end (z), 0.0) / p.size () : 0.0;
-
-    // Subtract off mean x, y, z
-#pragma omp parallel for
-    for (size_t i = 0; i < p.size (); ++i)
+    // Sum x, y, and z
+    double sx = 0.0;
+    double sy = 0.0;
+    double sz = 0.0;
+    for (const auto &p : f.get_point_records ())
     {
-        p[i].x -= cx;
-        p[i].y -= cy;
-        p[i].z -= cz;
+        sx += p.x;
+        sy += p.y;
+        if (z_flag)
+            sz += p.z;
     }
-}
 
-// Recenter a point cloud about its mean
-void recenter (std::istream &is,
-    std::ostream &os,
-    const spoc::io::header &h,
-    const bool z_flag = false)
-{
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (h.is_valid ());
+    // Get mean x, y, and z
+    const size_t n = f.get_point_records ().size ();
+    double cx = n ? sx / n : 0.0;
+    double cy = n ? sy / n : 0.0;
+    double cz = n ? sz / n : 0.0;
 
-    // Get number of points
-    const auto n = h.total_points;
+    // Copy file
+    T g (f);
 
-    // Read the data
-    spoc::point_record::point_records p (n);
-    for (size_t i = 0; i < p.size (); ++i)
-        p[i] = spoc::point_record::read_point_record (is, h.extra_fields);
-
-    recenter (p, z_flag);
-
-    // Write it back out
-    write_header (os, h);
+    // Recenter its points
     for (size_t i = 0; i < n; ++i)
-        write_point_record (os, p[i]);
+    {
+        g[i].x -= cx;
+        g[i].y -= cy;
+        if (z_flag)
+            g[i].z -= cz;
+    }
+
+    // Return the copy
+    return g;
 }
 
-void set_field (std::istream &is,
-    std::ostream &os,
-    std::istream &field_ifs,
-    const spoc::io::header &h,
-    const std::string &field_name)
+template<typename T>
+inline T set_field (const T &f, std::istream &field_ifs, const std::string &field_name)
 {
     // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
+    REQUIRE (f.is_valid ());
     REQUIRE (field_ifs.good ());
-    REQUIRE (h.is_valid ());
     REQUIRE (app_utils::check_field_name (field_name));
 
     // Read in the fields that you are going to set
@@ -150,14 +126,17 @@ void set_field (std::istream &is,
         float_flag = true;
     }
 
+    // Get the number of points
+    const size_t n = f.get_point_records ().size ();
+
     // Allocate the memory
     if (float_flag)
-        f_double.resize (h.total_points);
+        f_double.resize (n);
     else
-        f_size_t.resize (h.total_points);
+        f_size_t.resize (n);
 
     // Read the values
-    for (size_t i = 0; i < h.total_points; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
         // Read the field value
         if (float_flag)
@@ -173,105 +152,64 @@ void set_field (std::istream &is,
     // Get the extra index
     const size_t j = app_utils::is_extra_field (field_name)
         ? app_utils::get_extra_index (field_name)
-        : h.extra_fields + 1;
+        : f.get_header ().extra_fields + 1;
 
-    // Write the header back out
-    write_header (os, h);
+    // Copy the file
+    T g (f);
 
     // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-
         // Process the point
         switch (field_name[0])
         {
-            case 'x': p.x = f_double[i]; break;
-            case 'y': p.y = f_double[i]; break;
-            case 'z': p.z = f_double[i]; break;
-            case 'c': p.c = f_size_t[i]; break;
-            case 'p': p.p = f_size_t[i]; break;
-            case 'i': p.i = f_size_t[i]; break;
-            case 'r': p.r = f_size_t[i]; break;
-            case 'g': p.g = f_size_t[i]; break;
-            case 'b': p.b = f_size_t[i]; break;
+            case 'x': g[i].x = f_double[i]; break;
+            case 'y': g[i].y = f_double[i]; break;
+            case 'z': g[i].z = f_double[i]; break;
+            case 'c': g[i].c = f_size_t[i]; break;
+            case 'p': g[i].p = f_size_t[i]; break;
+            case 'i': g[i].i = f_size_t[i]; break;
+            case 'r': g[i].r = f_size_t[i]; break;
+            case 'g': g[i].g = f_size_t[i]; break;
+            case 'b': g[i].b = f_size_t[i]; break;
             case 'e': // extra
             {
                 assert (app_utils::is_extra_field (field_name));
-                assert (j < p.extra.size ());
-                p.extra[j] = f_size_t[i];
+                assert (j < g[i].extra.size ());
+                g[i].extra[j] = f_size_t[i];
             }
             break;
         }
-
-        // Write it back out
-        write_point_record (os, p);
     }
-}
 
-// Get min x/y/z values from all values
-template<typename T>
-spoc::point::point<double> get_min (const T &p)
-{
-    using namespace spoc::io;
-
-    // Get X, Y, and Z
-    const auto x = get_x (p);
-    const auto y = get_y (p);
-    const auto z = get_z (p);
-
-    // Get min X, Y, and (optionally) Z
-    const double minx = *std::min_element (begin (x), end (x));
-    const double miny = *std::min_element (begin (y), end (y));
-    const double minz = *std::min_element (begin (z), end (z));
-
-    return spoc::point::point<double> { minx, miny, minz };
-}
-
-// Subtract x/y/z value from all values
-template<typename T>
-void subtract (T &p, const spoc::point::point<double> &minp, const bool z_flag = true)
-{
-    // Subtract off min x, y, z
-#pragma omp parallel for
-    for (size_t i = 0; i < p.size (); ++i)
-    {
-        p[i].x -= minp.x;
-        p[i].y -= minp.y;
-        if (z_flag)
-            p[i].z -= minp.z;
-    }
+    // Return copy
+    return g;
 }
 
 // Subtract min x/y/z values from all values
-void subtract_min (std::istream &is,
-    std::ostream &os,
-    const spoc::io::header &h,
-    const bool z_flag = false)
+template<typename T>
+inline T subtract_min (T &f, const bool z_flag = false)
 {
     // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (h.is_valid ());
-
-    // Get number of points
-    const auto n = h.total_points;
-
-    // Read the data
-    spoc::point_record::point_records p (n);
-    for (size_t i = 0; i < p.size (); ++i)
-        p[i] = spoc::point_record::read_point_record (is, h.extra_fields);
+    REQUIRE (f.is_valid ());
 
     // Get minimum value
-    const auto minp = get_min (p);
+    const auto e = extent::get_extent (f.get_point_records ());
 
-    subtract (p, minp, z_flag);
+    // Copy it
+    T g (f);
 
-    // Write it back out
-    write_header (os, h);
-    for (size_t i = 0; i < n; ++i)
-        write_point_record (os, p[i]);
+    // Recenter its points
+    for (size_t i = 0; i < g.get_point_records ().size (); ++i)
+    {
+        g[i].x -= e.minp.x;
+        g[i].y -= e.minp.y;
+        if (z_flag)
+            g[i].z -= e.minp.z;
+    }
+
+    // Return copy
+    return g;
 }
 
 } // namespace tool_app

@@ -46,12 +46,8 @@ int main (int argc, char **argv)
         // Get the input stream
         input_stream is (args.verbose, args.input_fn);
 
-        // Read the header
-        const header h = read_header (is ());
-
-        // Check compression flag
-        if (h.compressed)
-            throw runtime_error ("Expected an uncompressed file");
+        // Read the input file
+        spoc_file f = read_spoc_file (is ());
 
         // Get the output stream
         output_stream os (args.verbose, args.output_fn);
@@ -60,12 +56,12 @@ int main (int argc, char **argv)
         {
             string s = args.command.params;
             const auto l = consume_field_name (s);
-            get_field (is (), os (), h, l);
+            get_field (f, os (), l);
         }
         else if (args.command.name == "recenter-xy")
-            recenter (is (), os (), h);
+            f = recenter (f);
         else if (args.command.name == "recenter-xyz")
-            recenter (is (), os (), h, true);
+            f = recenter (f, true);
         else if (args.command.name == "set-field")
         {
             if (args.field_fn.empty ())
@@ -77,14 +73,17 @@ int main (int argc, char **argv)
                 throw runtime_error ("Could not open file for reading");
             string s = args.command.params;
             const auto l = consume_field_name (s);
-            set_field (is (), os (), field_ifs, h, l);
+            f = set_field (f, field_ifs, l);
         }
         else if (args.command.name == "subtract-min-xy")
-            subtract_min (is (), os (), h);
+            f = subtract_min (f);
         else if (args.command.name == "subtract-min-xyz")
-            subtract_min (is (), os (), h, true);
+            f = subtract_min (f, true);
         else
             throw runtime_error ("An unknown command was encountered");
+
+        // Write it out
+        write_spoc_file (os (), f);
 
         return 0;
     }

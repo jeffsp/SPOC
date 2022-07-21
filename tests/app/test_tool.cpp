@@ -13,17 +13,8 @@ void test_recenter ()
     {
         // Generate spoc files
         auto f = generate_random_spoc_file (1000, 8, false, rgb);
-        stringstream is, os;
-
-        write_spoc_file_uncompressed (is, f);
-        header hdr = read_header (is);
-        recenter (is, os, hdr);
-        const auto g = read_spoc_file_uncompressed (os);
-
-        write_spoc_file_uncompressed (is, f);
-        hdr = read_header (is);
-        recenter (is, os, hdr, true);
-        const auto h = read_spoc_file_uncompressed (os);
+        auto g = recenter (f);
+        auto h = recenter (f, true);
 
         const auto fx = get_x (f.get_point_records ());
         const auto fy = get_y (f.get_point_records ());
@@ -57,16 +48,7 @@ void test_subtract_min ()
 {
     // Generate spoc files
     auto f = generate_random_spoc_file (100, 8, false, true);
-    stringstream is, os;
-    write_spoc_file_uncompressed (is, f);
-    header hdr = read_header (is);
-    subtract_min (is, os, hdr);
-    const auto g = read_spoc_file_uncompressed (os);
-
-    write_spoc_file_uncompressed (is, f);
-    hdr = read_header (is);
-    subtract_min (is, os, hdr);
-    const auto h = read_spoc_file_uncompressed (os);
+    auto g = subtract_min (f);
 }
 
 void test_get_field ()
@@ -80,10 +62,8 @@ void test_get_field ()
                 "c", "p", "i", "r", "g", "b",
                 "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7" })
         {
-            stringstream is, os;
-            write_spoc_file_uncompressed (is, f);
-            const auto h = read_header (is);
-            get_field (is, os, h, c);
+            stringstream ss;
+            get_field (f, ss, c);
         }
     }
 }
@@ -100,26 +80,22 @@ void test_set_field ()
                 "c", "p", "i", "r", "g", "b",
                 "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7" })
         {
-            stringstream is, os, field_ifs;
-            write_spoc_file_uncompressed (is, f);
+            stringstream field_ifs;
             // Write field values
             for (size_t i = 0; i < n; ++i)
                 field_ifs << i << endl;
-            const auto h = read_header (is);
-            set_field (is, os, field_ifs, h, c);
+            set_field (f, field_ifs, c);
         }
     }
 
     // Throw an error if there are not enough values
     const size_t n = 100;
     auto f = generate_random_spoc_file (n, 8, false);
-    stringstream is, os, field_ifs;
-    write_spoc_file (is, f);
+    stringstream field_ifs;
     // Write field values with one missing
     for (size_t i = 0; i < n - 1; ++i)
         field_ifs << i << endl;
-    const auto h = read_header (is);
-    VERIFY_THROWS (set_field (is, os, field_ifs, h, "x");)
+    VERIFY_THROWS (set_field (f, field_ifs, "x");)
 }
 
 int main (int argc, char **argv)
