@@ -322,6 +322,11 @@ class spoc_file
     point_record::point_records p;
     public:
     spoc_file () { }
+    spoc_file (const spoc_file &f)
+        : h (f.h)
+        , p (f.p)
+    {
+    }
     spoc_file (const std::string &wkt, const bool compressed, const point_record::point_records &p)
         : h (header (wkt, 0, p.size (), compressed))
         , p (p)
