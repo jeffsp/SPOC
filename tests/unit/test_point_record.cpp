@@ -45,6 +45,11 @@ void test_point_record_ctors ()
     VERIFY (r.g == 0);
     VERIFY (r.b == 0);
     VERIFY (r.extra.size () == 10);
+    const auto s = point_record {1.0, 2.0, 3.0, 4};
+    VERIFY (about_equal (s.x, 1.0));
+    VERIFY (about_equal (s.y, 2.0));
+    VERIFY (about_equal (s.z, 3.0));
+    VERIFY (s.c == 4);
 }
 
 void test_point_record_fields ()
