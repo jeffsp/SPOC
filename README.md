@@ -32,7 +32,7 @@ Points are stored in SPOC file as a vector of point records.
 The order of point records is preserved.
 
 Point coordinates are stored as 64-bit double precision numbers, so
-about 16 decimal digits of precision is preserved, assuming an IEEE 754
+about 15 decimal digits of precision is preserved, assuming an IEEE 754
 standard.
 
 # Design
@@ -61,11 +61,10 @@ standard.
 ## Framework
 
 - [X] Update warning for OGC WKT to be more explicit
-- [ ] Research more about how to extract SRS from VLR and/or EVLR
 - [X] Add Doxygen support
 - [X] Add Design by Contract functionality
 - [X] Generate documentation
-  - [ ] Manual
+  - [ ] Command line application manual
   - [X] SDK
 - [X] Reorganize namespaces and headers
   - [X] Separate application headers from API headers
@@ -82,6 +81,7 @@ standard.
 - [X] Gitlab runner
 - [X] CI/CD
 - [X] Version number in header
+- [X] Memcheck with valgrind
 - [X] Test data files
 - [X] Unit test suite
 - [X] Application test suite
@@ -113,6 +113,8 @@ standard.
 
 - [X] spoc spoc2las/las2spoc
   - [X] Unit/integration tests
+  - [ ] Support streaming for large files
+  - [X] Read compressed files
 
 - [X] spoc srs: Get/set SRS
   - [X] Unit/integration tests
@@ -172,8 +174,7 @@ standard.
   - [ ] Read palette
   - [ ] Random palette=size
   - [ ] Random seed
-  - [ ] Copy to RGB
-  - [ ] By default, copy to e0,1,2
+  - [ ] Overwrite RGB. By default, copy to e0,1,2
   - [ ] Read/write compressed files
 
 - [X] spoc tool: Common operations
