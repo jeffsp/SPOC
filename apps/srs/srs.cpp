@@ -76,7 +76,7 @@ int main (int argc, char **argv)
                 throw runtime_error ("Could not open file for reading");
 
             // Read into spoc_file struct
-            spoc_file f = read_spoc_file_uncompressed (ifs);
+            spoc_file f = read_spoc_file (ifs);
 
             // Set SRS
             f.set_wkt (args.srs);
@@ -89,7 +89,7 @@ int main (int argc, char **argv)
             if (!ofs)
                 throw runtime_error ("Could not open file for writing");
 
-            write_spoc_file_uncompressed (ofs, f);
+            write_spoc_file (ofs, f);
         }
         else
         {
@@ -104,7 +104,7 @@ int main (int argc, char **argv)
                     throw runtime_error ("Could not open file for reading");
 
                 // Read into spoc_file struct
-                spoc_file f = read_spoc_file_uncompressed (ifs);
+                spoc_file f = read_spoc_file (ifs);
 
                 cout << f.get_wkt () << endl;
             }
