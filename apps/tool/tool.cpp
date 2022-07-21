@@ -41,7 +41,14 @@ int main (int argc, char **argv)
 
         // Show args
         if (args.verbose)
+        {
+            clog << "verbose\t" << args.verbose << endl;
+            clog << "random-seed\t" << args.random_seed << endl;
+            clog << "field_fn\t'" << args.field_fn << "'" << endl;
+            clog << "input_fn\t'" << args.input_fn << "'" << endl;
+            clog << "output_fn\t'" << args.output_fn << "'" << endl;
             clog << "command: " << args.command.name << "=" << args.command.params << endl;
+        }
 
         // Get the input stream
         input_stream is (args.verbose, args.input_fn);
@@ -58,6 +65,8 @@ int main (int argc, char **argv)
             const auto l = consume_field_name (s);
             get_field (f, os (), l);
         }
+        else if (args.command.name == "randomize-order")
+            f = randomize_order (f, args.random_seed);
         else if (args.command.name == "recenter-xy")
             f = recenter (f);
         else if (args.command.name == "recenter-xyz")

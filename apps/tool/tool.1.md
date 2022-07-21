@@ -25,12 +25,19 @@ Collection of tools to run on a SPOC file
 \-\-version, -e
 :   Print version information and exit
 
+\-\-random-seed=*#*, -r *#*
+:   Set the random seed equal to *#*
+
 # COMMANDS
 
-\-\-get-field=*F*
+\-\-get-field=*F*, -g *F*
 :   Get point field *F* and write it either to stdout or to a file as
     text. *F* can be one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or
     'e#', where the '#' after the 'e' specifies the extra field number.
+
+\-\-randomize-order
+:   Randomly reorder the point records. This can be useful when the
+    selection of points within, for example, a voxel should be unbiased.
 
 \-\-recenter-xy
 :   Recenter the point cloud by subtracting the mean X and Y value from
@@ -39,7 +46,7 @@ Collection of tools to run on a SPOC file
 \-\-recenter-xyz
 :   Same as recenter-xy, but also recenter the Z value
 
-\-\-set-field=*F*
+\-\-set-field=*F*, -s *F*
 :   Set point field *F* by reading it from a file or from stdin as text.
     *F* can be one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or 'e#',
     where the '#' after the 'e' specifies the extra field number.
