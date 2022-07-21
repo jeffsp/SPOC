@@ -178,7 +178,7 @@ standard.
 
 - [X] spoc tool: Common operations
   - [X] Get/Set field F as text
-    - [ ] Check to make sure text file has the correct number of points
+    - [X] Check to make sure text file has the correct number of points
           when setting a field
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
@@ -189,6 +189,7 @@ standard.
   - [ ] Copy field --src=F --dest=F
   - [ ] Restore: Restore points from one point cloud to another with
         the same voxel indexes. Undoes subsampling.
+  - [ ] Refactor: this application does not need to stream
   - [ ] Read/write compressed files
 
 - [X] spoc filter: Remove points with certain properties
