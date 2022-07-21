@@ -109,6 +109,17 @@ void test_set_field ()
             set_field (is, os, field_ifs, h, c);
         }
     }
+
+    // Throw an error if there are not enough values
+    const size_t n = 100;
+    auto f = generate_random_spoc_file (n, 8, false);
+    stringstream is, os, field_ifs;
+    write_spoc_file (is, f);
+    // Write field values with one missing
+    for (size_t i = 0; i < n - 1; ++i)
+        field_ifs << i << endl;
+    const auto h = read_header (is);
+    VERIFY_THROWS (set_field (is, os, field_ifs, h, "x");)
 }
 
 int main (int argc, char **argv)

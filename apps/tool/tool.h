@@ -131,6 +131,7 @@ void set_field (std::istream &is,
     // Check preconditions
     REQUIRE (is.good ());
     REQUIRE (os.good ());
+    REQUIRE (field_ifs.good ());
     REQUIRE (h.is_valid ());
     REQUIRE (app_utils::check_field_name (field_name));
 
@@ -158,10 +159,15 @@ void set_field (std::istream &is,
     // Read the values
     for (size_t i = 0; i < h.total_points; ++i)
     {
+        // Read the field value
         if (float_flag)
             field_ifs >> f_double[i];
         else
             field_ifs >> f_size_t[i];
+
+        // Make sure there are still values to read
+        if (field_ifs.eof ())
+            throw std::runtime_error ("Reached end-of-file before reading all field values");
     }
 
     // Get the extra index
