@@ -29,7 +29,7 @@ struct point_record
         , extra (0)
     {
     }
-    explicit point_record (const double x, const double y, const double z)
+    point_record (const double x, const double y, const double z)
         : x (x), y (y), z (z)
         , c (0) , p (0) , i (0)
         , r (0) , g (0) , b (0)
@@ -43,7 +43,7 @@ struct point_record
         , extra (extra_fields)
     {
     }
-    explicit point_record (const double x, const double y, const double z,
+    point_record (const double x, const double y, const double z,
         const uint32_t c, const uint32_t p, const uint16_t i,
         const uint16_t r, const uint16_t g, const uint16_t b)
         : x (x), y (y), z (z)
