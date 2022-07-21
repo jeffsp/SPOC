@@ -156,12 +156,11 @@ standard.
   - [X] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
   - [X] Add offset to X,Y,Z: addx/y/z #
   - [X] Scale by X,Y,Z: scale, scalex/y/z
+  - [ ] Set random seed
   - [ ] Add Gaussian noise to XYZ
-    - [ ] Set seed
     - [ ] Sigma=#
     - [ ] Sigma-xyz=#,#,#
   - [ ] Add Uniform noise to XYZ
-    - [ ] Set seed
     - [ ] Size=#
     - [ ] Size-xyz=#,#,#
   - [ ] Add --xprecision, --yprecision, --zprecision arguments to
@@ -183,6 +182,7 @@ standard.
           when setting a field
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
+  - [ ] Set random seed
   - [ ] Randomize the order of the points. This is useful when
         quantizing or subsampling to ensure that there is no bias in how
         the points are filtered out.
