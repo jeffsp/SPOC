@@ -9,6 +9,7 @@
 int main (int argc, char **argv)
 {
     using namespace std;
+    using namespace spoc::extent;
     using namespace spoc::io;
     using namespace spoc::spoc2las_app;
     using namespace spoc::spoc2las_cmd;
@@ -43,7 +44,7 @@ int main (int argc, char **argv)
             throw runtime_error ("Can't open file for reading");
 
         // Read spoc file
-        const auto f = read_spoc_file_uncompressed (ifs);
+        const auto f = read_spoc_file (ifs);
 
         if (args.verbose)
         {
@@ -51,16 +52,8 @@ int main (int argc, char **argv)
             clog << "read " << f.get_header ().wkt.size () << " byte WKT" << endl;
         }
 
-        // Get min x, y, z
-        double min_x = numeric_limits<double>::max ();
-        double min_y = numeric_limits<double>::max ();
-        double min_z = numeric_limits<double>::max ();
-        for (auto &p : f.get_point_records ())
-        {
-            min_x = min (min_x, p.x);
-            min_y = min (min_y, p.y);
-            min_z = min (min_z, p.z);
-        }
+        // Get the extent
+        const auto e = get_extent (f.get_point_records ());
 
         // Create the header
         LASheader lasheader;
@@ -75,9 +68,9 @@ int main (int argc, char **argv)
         lasheader.x_scale_factor = scale_factor;
         lasheader.y_scale_factor = scale_factor;
         lasheader.z_scale_factor = scale_factor;
-        lasheader.x_offset = min_x;
-        lasheader.y_offset = min_y;
-        lasheader.z_offset = min_z;
+        lasheader.x_offset = e.minp.x;
+        lasheader.y_offset = e.minp.y;
+        lasheader.z_offset = e.minp.z;
         lasheader.point_data_format = 2;
         lasheader.point_data_record_length = 26;
 
@@ -98,9 +91,9 @@ int main (int argc, char **argv)
         for (size_t i = 0; i < f.get_point_records ().size (); ++i)
         {
             const auto p = f.get_point_records ()[i];
-            laspoint.set_x ((p.x - min_x) / scale_factor);
-            laspoint.set_y ((p.y - min_y) / scale_factor);
-            laspoint.set_z ((p.z - min_z) / scale_factor);
+            laspoint.set_x ((p.x - e.minp.x) / scale_factor);
+            laspoint.set_y ((p.y - e.minp.y) / scale_factor);
+            laspoint.set_z ((p.z - e.minp.z) / scale_factor);
             laspoint.set_classification (p.c);
             laspoint.set_point_source_ID (p.p);
             laspoint.set_intensity (p.i);
