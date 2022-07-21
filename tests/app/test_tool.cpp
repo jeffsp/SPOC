@@ -49,6 +49,7 @@ void test_subtract_min ()
     // Generate spoc files
     auto f = generate_random_spoc_file (100, 8, false, true);
     auto g = subtract_min (f);
+    auto h = subtract_min (f, true);
 }
 
 void test_get_field ()
