@@ -36,6 +36,14 @@ struct point_record
         , extra (0)
     {
     }
+    point_record (const double x, const double y, const double z,
+        const uint32_t c)
+        : x (x), y (y), z (z)
+        , c (c) , p (0) , i (0)
+        , r (0) , g (0) , b (0)
+        , extra (0)
+    {
+    }
     explicit point_record (const size_t extra_fields)
         : x (0.0) , y (0.0) , z (0.0)
         , c (0) , p (0) , i (0)
