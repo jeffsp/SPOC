@@ -3,6 +3,7 @@
 #include "compression.h"
 #include "contracts.h"
 #include "extent.h"
+#include "file.h"
 #include "io.h"
 #include "json.h"
 #include "point.h"

@@ -9,6 +9,7 @@
 
 using namespace std;
 using namespace spoc::app_utils;
+using namespace spoc::file;
 using namespace spoc::header;
 using namespace spoc::io;
 

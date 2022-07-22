@@ -8,6 +8,7 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc::extent;
+    using namespace spoc::file;
     using namespace spoc::io;
     using namespace spoc::merge_app;
     using namespace spoc::merge_cmd;

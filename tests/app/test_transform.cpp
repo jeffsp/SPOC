@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 using namespace std;
+using namespace spoc::file;
 using namespace spoc::io;
 using namespace spoc::point;
 using namespace spoc::transform_app;

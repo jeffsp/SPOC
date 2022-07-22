@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 using namespace std;
+using namespace spoc::file;
 using namespace spoc::filter_app;
 using namespace spoc::io;
 using namespace spoc::point_record;

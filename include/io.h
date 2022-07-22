@@ -1,6 +1,7 @@
 #pragma once
 #include "contracts.h"
 #include "compression.h"
+#include "file.h"
 #include "header.h"
 #include "point_record.h"
 #include "version.h"
@@ -90,147 +91,6 @@ inline std::vector<T> read_compressed (std::istream &s, const size_t size)
     return x;
 }
 
-class spoc_file
-{
-    private:
-    header::header h;
-    point_record::point_records p;
-    public:
-    spoc_file () { }
-    spoc_file (const spoc_file &f)
-        : h (f.h)
-        , p (f.p)
-    {
-    }
-    spoc_file (const std::string &wkt, const bool compressed, const point_record::point_records &p)
-        : h (header::header (wkt, 0, p.size (), compressed))
-        , p (p)
-    {
-        if (!p.empty ())
-            h.extra_fields = p[0].extra.size ();
-        if (!check_records (p))
-            throw std::runtime_error ("The point records are inconsistent");
-    }
-    spoc_file (const std::string &wkt, const point_record::point_records &p)
-        : spoc_file (wkt, false, p)
-    {
-    }
-    spoc_file (const header::header &h, const point_record::point_records &p)
-        : h (h)
-        , p (p)
-    {
-        if (h.total_points != p.size ())
-            throw std::runtime_error ("The header total points does not match the data total points");
-        if (!p.empty () && p[0].extra.size () != h.extra_fields)
-            throw std::runtime_error ("The header extra fields size does not match the point records");
-        if (!check_records (p))
-            throw std::runtime_error ("The point records are inconsistent");
-    }
-    spoc_file clone_empty () const
-    {
-        // Copy the header and set its points to 0
-        header::header h0 = h;
-        h0.total_points = 0;
-
-        // Get empty point records vector
-        point_record::point_records pr;
-
-        // Create the empty clone
-        return spoc_file (h0, pr);
-    }
-
-    // Contract support
-    bool is_valid () const
-    {
-        if (p.size () != h.total_points)
-            return false;
-        if (!p.empty () && p[0].extra.size () != h.extra_fields)
-            return false;
-        return true;
-    }
-
-    // Readonly access
-    const header::header &get_header () const { return h; }
-    const point_record::point_records &get_point_records () const { return p; }
-    const point_record::point_record &get_point_record (const size_t n) const { return p[n]; }
-
-    // R/W access
-    std::string get_wkt () const
-    {
-        return h.wkt;
-    }
-    bool get_compressed () const
-    {
-        return h.compressed;
-    }
-    void set_wkt (const std::string &s)
-    {
-        h.wkt = s;
-    }
-    void set_compressed (const bool flag)
-    {
-        h.compressed = flag;
-    }
-    void add (const point_record::point_record &pr)
-    {
-        REQUIRE (pr.extra.size () == h.extra_fields);
-        p.push_back (pr);
-        ++h.total_points;
-        ENSURE (is_valid ());
-    }
-    void set (const size_t n, const point_record::point_record &r)
-    {
-        assert (n < p.size ());
-        p[n] = r;
-    }
-    void resize (const size_t new_size)
-    {
-        p.resize (new_size);
-        h.total_points = new_size;
-    }
-    void resize_extra (const size_t new_size)
-    {
-        for (size_t i = 0; i < p.size (); ++i)
-            p[i].extra.resize (new_size);
-        h.extra_fields = new_size;
-    }
-
-    // R/W access
-    point_record::point_record &operator[] (const size_t n)
-    {
-        assert (n < p.size ());
-        return p[n];
-    }
-    std::vector<point_record::point_record>::iterator begin ()
-    {
-        return p.begin ();
-    }
-    std::vector<point_record::point_record>::iterator end ()
-    {
-        return p.end ();
-    }
-    std::vector<point_record::point_record>::const_iterator begin () const
-    {
-        return p.begin ();
-    }
-    std::vector<point_record::point_record>::const_iterator end () const
-    {
-        return p.end ();
-    }
-
-    // Operators
-    bool operator== (const spoc_file &other) const
-    {
-        return
-            (h == other.h)
-            && (p == other.p);
-    }
-    bool operator!= (const spoc_file &other) const
-    {
-        return !(*this == other);
-    }
-};
-
 /// Helper I/O function
 /// @param s Input stream
 /// @param total_points Number of records to read
@@ -250,7 +110,7 @@ inline point_record::point_records read_uncompressed_points (std::istream &s,
 
 /// Helper I/O function
 /// @param s Input stream
-inline spoc_file read_spoc_file_uncompressed (std::istream &s)
+inline spoc::file::spoc_file read_spoc_file_uncompressed (std::istream &s)
 {
     // Read the header
     header::header h = header::read_header (s);
@@ -262,7 +122,7 @@ inline spoc_file read_spoc_file_uncompressed (std::istream &s)
     // Read the data
     point_record::point_records p = read_uncompressed_points (s, h.total_points, h.extra_fields);
 
-    return spoc_file (h, p);
+    return spoc::file::spoc_file (h, p);
 }
 
 /// Helper I/O function
@@ -317,7 +177,7 @@ inline point_record::point_records read_compressed_points (std::istream &s,
 
 /// Helper I/O function
 /// @param s Input stream
-inline spoc_file read_spoc_file_compressed (std::istream &s)
+inline spoc::file::spoc_file read_spoc_file_compressed (std::istream &s)
 {
     // Read the header
     header::header h = header::read_header (s);
@@ -329,12 +189,12 @@ inline spoc_file read_spoc_file_compressed (std::istream &s)
     // Read the data
     point_record::point_records prs = read_compressed_points (s, h.total_points, h.extra_fields);
 
-    return spoc_file (h, prs);
+    return spoc::file::spoc_file (h, prs);
 }
 
 /// Helper I/O function
 /// @param s Input stream
-inline spoc_file read_spoc_file (std::istream &s)
+inline spoc::file::spoc_file read_spoc_file (std::istream &s)
 {
     // Read the header
     header::header h = header::read_header (s);
@@ -348,13 +208,13 @@ inline spoc_file read_spoc_file (std::istream &s)
     else
         p = read_uncompressed_points (s, h.total_points, h.extra_fields);
 
-    return spoc_file (h, p);
+    return spoc::file::spoc_file (h, p);
 }
 
 /// Helper I/O function
 /// @param s Output stream
 /// @param f File structure to write
-inline void write_spoc_file_uncompressed (std::ostream &s, const spoc_file &f)
+inline void write_spoc_file_uncompressed (std::ostream &s, const spoc::file::spoc_file &f)
 {
     // Check compression flag
     if (f.get_header ().compressed)
@@ -375,7 +235,7 @@ inline void write_spoc_file_uncompressed (std::ostream &s, const spoc_file &f)
 /// Helper I/O function
 /// @param s Output stream
 /// @param f File structure to write
-inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
+inline void write_spoc_file_compressed (std::ostream &s, const spoc::file::spoc_file &f)
 {
     // Check compression flag
     if (!f.get_header ().compressed)
@@ -463,7 +323,7 @@ inline void write_spoc_file_compressed (std::ostream &s, const spoc_file &f)
 /// Helper I/O function
 /// @param s Output stream
 /// @param f File structure to write
-inline void write_spoc_file (std::ostream &s, const spoc_file &f)
+inline void write_spoc_file (std::ostream &s, const spoc::file::spoc_file &f)
 {
     // Check compression flag
     if (f.get_header ().compressed)

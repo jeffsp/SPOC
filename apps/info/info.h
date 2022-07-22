@@ -170,7 +170,7 @@ inline std::string get_summary_string (const std::string &label,
 
 // Process a spoc file and write to 'os'
 void process (std::ostream &os,
-    const spoc::io::spoc_file &f,
+    const spoc::file::spoc_file &f,
     const bool json,
     const bool header_info,
     const bool summary_info,

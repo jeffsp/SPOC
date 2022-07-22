@@ -10,6 +10,7 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc::app_utils;
+    using namespace spoc::file;
     using namespace spoc::io;
     using namespace spoc::tool_app;
     using namespace spoc::tool_cmd;

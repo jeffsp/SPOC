@@ -109,7 +109,7 @@ inline std::vector<spoc::point_record::point_record> generate_random_point_recor
     return p;
 }
 
-inline spoc::io::spoc_file generate_random_spoc_file (
+inline spoc::file::spoc_file generate_random_spoc_file (
     const size_t total_points,
     const size_t extra_fields = 0,
     const bool compressed = false,
@@ -117,7 +117,7 @@ inline spoc::io::spoc_file generate_random_spoc_file (
     const size_t seed = 123)
 {
     spoc::header::header h ("WKT", extra_fields, total_points, compressed);
-    spoc::io::spoc_file f (h, generate_random_point_records (total_points, extra_fields, rgb, seed));
+    spoc::file::spoc_file f (h, generate_random_point_records (total_points, extra_fields, rgb, seed));
     return f;
 }
 

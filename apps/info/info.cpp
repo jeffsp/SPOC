@@ -6,6 +6,7 @@
 int main (int argc, char **argv)
 {
     using namespace std;
+    using namespace spoc::file;
     using namespace spoc::info_app;
     using namespace spoc::info_cmd;
     using namespace spoc::io;
