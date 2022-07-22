@@ -7,5 +7,6 @@
 #include "json.h"
 #include "point.h"
 #include "subsampling.h"
+#include "utils.h"
 #include "version.h"
 #include "voxel.h"
