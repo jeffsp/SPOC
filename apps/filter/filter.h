@@ -70,12 +70,10 @@ struct xyz_hash
 {
     std::size_t operator() (const xyz &p) const
     {
-        // Get the hashes
-        size_t hx = std::hash<double> {}(p.x);
-        size_t hy = std::hash<double> {}(p.y);
-        size_t hz = std::hash<double> {}(p.z);
-        // Combine into one
-        return (hx << 0) ^ (hy << 1) ^ (hz << 2);
+        // Combine X, Y, Z
+        size_t h = 0;
+        utils::hash_combine (h, p.x, p.y, p.z);
+        return h;
     }
 };
 
