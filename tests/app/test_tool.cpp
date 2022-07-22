@@ -2,17 +2,38 @@
 #include "test_utils.h"
 #include <iostream>
 #include <stdexcept>
+#include <unordered_set>
 
 using namespace std;
 using namespace spoc::io;
+using namespace spoc::point_record;
 using namespace spoc::tool_app;
+
+void test_randomize_order ()
+{
+    const auto f = generate_random_spoc_file (1000);
+    const auto g = randomize_order (f, 123);
+    const auto h = randomize_order (f, 456);
+    VERIFY (f.get_point_records ().size () == g.get_point_records ().size ());
+    VERIFY (f.get_point_records ().size () == h.get_point_records ().size ());
+    // Contents are the same, but in a different order
+    unordered_set<point_record,point_record_hash> sf (f.begin (), f.end ());
+    unordered_set<point_record,point_record_hash> sg (g.begin (), g.end ());
+    unordered_set<point_record,point_record_hash> sh (h.begin (), h.end ());
+    VERIFY (sf == sg);
+    VERIFY (sf == sh);
+    VERIFY (f != g);
+    VERIFY (f != h);
+    VERIFY (g != h);
+}
 
 void test_recenter ()
 {
     for (auto rgb : {true, false})
     {
-        // Generate spoc files
-        auto f = generate_random_spoc_file (1000, 8, false, rgb);
+        // Generate spoc file
+        const bool compressed = false;
+        auto f = generate_random_spoc_file (1000, 8, compressed, rgb);
         auto g = recenter (f);
         auto h = recenter (f, true);
 
@@ -103,6 +124,7 @@ int main (int argc, char **argv)
 {
     try
     {
+        test_randomize_order ();
         test_recenter ();
         test_subtract_min ();
         test_get_field ();
