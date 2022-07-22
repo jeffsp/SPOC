@@ -45,7 +45,7 @@ void add_z (T &p, const double v)
 template<typename OP>
 void add (std::istream &is,
     std::ostream &os,
-    const spoc::io::header &h,
+    const spoc::header::header &h,
     OP op)
 {
     // Check preconditions
@@ -73,13 +73,13 @@ void add (std::istream &is,
 namespace detail
 {
 
-const spoc::io::header read_header_uncompressed (std::istream &is)
+const spoc::header::header read_header_uncompressed (std::istream &is)
 {
     // Check preconditions
     REQUIRE (is.good ());
 
     // Read the header
-    const spoc::io::header h = spoc::io::read_header (is);
+    const spoc::header::header h = spoc::header::read_header (is);
 
     // Check compression flag
     if (h.compressed)
@@ -287,7 +287,7 @@ void rotate_z (T &p, const double degrees)
 template<typename XOP,typename YOP,typename ZOP>
 void rotate (std::istream &is,
     std::ostream &os,
-    const spoc::io::header &h,
+    const spoc::header::header &h,
     XOP xop,
     YOP yop,
     ZOP zop)
@@ -389,7 +389,7 @@ void scale_z (T &p, const double v)
 template<typename OP>
 void scale (std::istream &is,
     std::ostream &os,
-    const spoc::io::header &h,
+    const spoc::header::header &h,
     OP op)
 {
     // Check preconditions

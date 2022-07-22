@@ -116,7 +116,7 @@ inline spoc::io::spoc_file generate_random_spoc_file (
     const bool rgb = true,
     const size_t seed = 123)
 {
-    spoc::io::header h ("WKT", extra_fields, total_points, compressed);
+    spoc::header::header h ("WKT", extra_fields, total_points, compressed);
     spoc::io::spoc_file f (h, generate_random_point_records (total_points, extra_fields, rgb, seed));
     return f;
 }

@@ -5,6 +5,7 @@
 
 using namespace std;
 using namespace spoc::diff_app;
+using namespace spoc::header;
 using namespace spoc::io;
 using namespace spoc::point_record;
 

@@ -9,52 +9,8 @@
 
 using namespace std;
 using namespace spoc::app_utils;
+using namespace spoc::header;
 using namespace spoc::io;
-
-void test_header ()
-{
-    {
-    header h;
-    VERIFY (h.is_valid ());
-    }
-
-    {
-    for (size_t i = 0; i < 4; ++i)
-    {
-        header h;
-        h.signature[i] = '!';
-        VERIFY (!h.is_valid ());
-    }
-    }
-
-    {
-    header h;
-    h.wkt = "Test WKT";
-    VERIFY (h.check_signature ());
-    stringstream s;
-    write_header (s, h);
-
-    const auto g = read_header (s);
-
-    VERIFY (h == g);
-    }
-
-    // Fail when reading signature
-    {
-    stringstream s;
-    // Write an invalid signature
-    s << "SPOX" << endl;
-    VERIFY_THROWS (read_header (s);)
-    }
-
-    // Fail when writing
-    {
-    stringstream s;
-    header h;
-    h.signature[3] = 'X';
-    VERIFY_THROWS (write_header (s, h);)
-    }
-}
 
 void test_spoc_file ()
 {
@@ -304,7 +260,6 @@ int main (int argc, char **argv)
 {
     try
     {
-        test_header ();
         test_spoc_file ();
         test_spoc_file_io ();
         test_spoc_file_rw_access ();
