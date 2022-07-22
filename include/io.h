@@ -90,101 +90,10 @@ inline std::vector<T> read_compressed (std::istream &s, const size_t size)
     return x;
 }
 
-// Helper functions
-std::vector<double> get_x (const point_record::point_records &p)
-{
-    std::vector<double> x (p.size ());
-    for (size_t n = 0; n < p.size (); ++n)
-        x[n] = p[n].x;
-    return x;
-}
-
-std::vector<double> get_y (const point_record::point_records &p)
-{
-    std::vector<double> x (p.size ());
-    for (size_t n = 0; n < p.size (); ++n)
-        x[n] = p[n].y;
-    return x;
-}
-
-std::vector<double> get_z (const point_record::point_records &p)
-{
-    std::vector<double> x (p.size ());
-    for (size_t n = 0; n < p.size (); ++n)
-        x[n] = p[n].z;
-    return x;
-}
-
-std::vector<uint32_t> get_c (const point_record::point_records &p)
-{
-    std::vector<uint32_t> x (p.size ());
-    for (size_t n = 0; n < p.size (); ++n)
-        x[n] = p[n].c;
-    return x;
-}
-
-std::vector<uint32_t> get_p (const point_record::point_records &p)
-{
-    std::vector<uint32_t> x (p.size ());
-    for (size_t n = 0; n < p.size (); ++n)
-        x[n] = p[n].p;
-    return x;
-}
-
-std::vector<uint16_t> get_i (const point_record::point_records &p)
-{
-    std::vector<uint16_t> x (p.size ());
-    for (size_t n = 0; n < p.size (); ++n)
-        x[n] = p[n].i;
-    return x;
-}
-
-std::vector<uint16_t> get_r (const point_record::point_records &p)
-{
-    std::vector<uint16_t> x (p.size ());
-    for (size_t n = 0; n < p.size (); ++n)
-        x[n] = p[n].r;
-    return x;
-}
-
-std::vector<uint16_t> get_g (const point_record::point_records &p)
-{
-    std::vector<uint16_t> x (p.size ());
-    for (size_t n = 0; n < p.size (); ++n)
-        x[n] = p[n].g;
-    return x;
-}
-
-std::vector<uint16_t> get_b (const point_record::point_records &p)
-{
-    std::vector<uint16_t> x (p.size ());
-    for (size_t n = 0; n < p.size (); ++n)
-        x[n] = p[n].b;
-    return x;
-}
-
-size_t get_extra_fields_size (const point_record::point_records &p)
-{
-    if (p.empty ())
-        return 0;
-    return p[0].extra.size ();
-}
-
-std::vector<uint64_t> get_extra (const size_t k, const point_record::point_records &p)
-{
-    std::vector<uint64_t> x (p.size ());
-    for (size_t n = 0; n < p.size (); ++n)
-    {
-        assert (k < p[n].extra.size ());
-        x[n] = p[n].extra[k];
-    }
-    return x;
-}
-
 class spoc_file
 {
     private:
-        header::header h;
+    header::header h;
     point_record::point_records p;
     public:
     spoc_file () { }
@@ -299,6 +208,26 @@ class spoc_file
     std::vector<point_record::point_record>::iterator end ()
     {
         return p.end ();
+    }
+    std::vector<point_record::point_record>::const_iterator begin () const
+    {
+        return p.begin ();
+    }
+    std::vector<point_record::point_record>::const_iterator end () const
+    {
+        return p.end ();
+    }
+
+    // Operators
+    bool operator== (const spoc_file &other) const
+    {
+        return
+            (h == other.h)
+            && (p == other.p);
+    }
+    bool operator!= (const spoc_file &other) const
+    {
+        return !(*this == other);
     }
 };
 

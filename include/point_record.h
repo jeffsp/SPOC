@@ -1,6 +1,8 @@
 #pragma once
 #include "point.h"
+#include "utils.h"
 #include <algorithm>
+#include <functional>
 
 namespace spoc
 {
@@ -22,6 +24,7 @@ struct point_record
     uint16_t b; // blue
     std::vector<uint64_t> extra;
 
+    // CTORs
     point_record ()
         : x (0.0) , y (0.0) , z (0.0)
         , c (0) , p (0) , i (0)
@@ -59,6 +62,43 @@ struct point_record
         , r (r) , g (g) , b (b)
         , extra (0)
     {
+    }
+
+    // Operators
+    bool operator== (const point_record &other) const
+    {
+        return other.x == x
+            && other.y == y
+            && other.z == z
+            && other.c == c
+            && other.p == p
+            && other.i == i
+            && other.r == r
+            && other.g == g
+            && other.b == b
+            && other.extra == extra
+            ;
+    }
+    bool operator!= (const point_record &other) const
+    {
+        return !(*this == other);
+    }
+};
+
+// Compute a hash value from a point record
+struct point_record_hash
+{
+    std::size_t operator() (const spoc::point_record::point_record &p) const
+    {
+        // Combine X, Y, Z
+        size_t h = 0;
+        utils::hash_combine (h, p.x, p.y, p.z);
+        // Combine C and P
+        utils::hash_combine (h, p.c, p.p);
+        // Combine I, R, G, B
+        utils::hash_combine (h, p.i, p.r, p.g, p.b);
+
+        return h;
     }
 };
 
@@ -107,28 +147,6 @@ inline point_record read_point_record (std::istream &s, const size_t extra_field
     return p;
 }
 
-// Helper operator
-inline bool operator== (const point_record &a, const point_record &b)
-{
-    if (a.x != b.x) return false;
-    if (a.y != b.y) return false;
-    if (a.z != b.z) return false;
-    if (a.c != b.c) return false;
-    if (a.p != b.p) return false;
-    if (a.i != b.i) return false;
-    if (a.r != b.r) return false;
-    if (a.g != b.g) return false;
-    if (a.b != b.b) return false;
-    if (a.extra != b.extra) return false;
-    return true;
-}
-
-// Helper operator
-inline bool operator!= (const point_record &a, const point_record &b)
-{
-    return !(a == b);
-}
-
 // Helper typedefs
 using point_records = std::vector<point_record>;
 
@@ -150,7 +168,98 @@ bool check_records (const point_records &prs)
     return true;
 }
 
+// Helper functions
+std::vector<double> get_x (const point_records &p)
+{
+    std::vector<double> x (p.size ());
+    for (size_t n = 0; n < p.size (); ++n)
+        x[n] = p[n].x;
+    return x;
+}
 
-} // namespace io
+std::vector<double> get_y (const point_records &p)
+{
+    std::vector<double> x (p.size ());
+    for (size_t n = 0; n < p.size (); ++n)
+        x[n] = p[n].y;
+    return x;
+}
+
+std::vector<double> get_z (const point_records &p)
+{
+    std::vector<double> x (p.size ());
+    for (size_t n = 0; n < p.size (); ++n)
+        x[n] = p[n].z;
+    return x;
+}
+
+std::vector<uint32_t> get_c (const point_records &p)
+{
+    std::vector<uint32_t> x (p.size ());
+    for (size_t n = 0; n < p.size (); ++n)
+        x[n] = p[n].c;
+    return x;
+}
+
+std::vector<uint32_t> get_p (const point_records &p)
+{
+    std::vector<uint32_t> x (p.size ());
+    for (size_t n = 0; n < p.size (); ++n)
+        x[n] = p[n].p;
+    return x;
+}
+
+std::vector<uint16_t> get_i (const point_records &p)
+{
+    std::vector<uint16_t> x (p.size ());
+    for (size_t n = 0; n < p.size (); ++n)
+        x[n] = p[n].i;
+    return x;
+}
+
+std::vector<uint16_t> get_r (const point_records &p)
+{
+    std::vector<uint16_t> x (p.size ());
+    for (size_t n = 0; n < p.size (); ++n)
+        x[n] = p[n].r;
+    return x;
+}
+
+std::vector<uint16_t> get_g (const point_records &p)
+{
+    std::vector<uint16_t> x (p.size ());
+    for (size_t n = 0; n < p.size (); ++n)
+        x[n] = p[n].g;
+    return x;
+}
+
+std::vector<uint16_t> get_b (const point_records &p)
+{
+    std::vector<uint16_t> x (p.size ());
+    for (size_t n = 0; n < p.size (); ++n)
+        x[n] = p[n].b;
+    return x;
+}
+
+size_t get_extra_fields_size (const point_records &p)
+{
+    if (p.empty ())
+        return 0;
+    return p[0].extra.size ();
+}
+
+std::vector<uint64_t> get_extra (const size_t k, const point_records &p)
+{
+    std::vector<uint64_t> x (p.size ());
+    for (size_t n = 0; n < p.size (); ++n)
+    {
+        assert (k < p[n].extra.size ());
+        x[n] = p[n].extra[k];
+    }
+    return x;
+}
+
+
+} // namespace point_record
 
 } // namespace spoc
