@@ -166,16 +166,6 @@ standard.
   - [ ] Add --xprecision, --yprecision, --zprecision arguments to
         compress in order to improve compression?
 
-- [X] spoc color: Set RGB values
-  - [ ] Transform classification to RGB
-  - [ ] Transform elevation to RGB
-  - [ ] Transform e# to RGB
-  - [ ] Read palette
-  - [ ] Random palette=size
-  - [ ] Random seed
-  - [ ] Overwrite RGB. By default, copy to e0,1,2
-  - [ ] Read/write compressed files
-
 - [X] spoc tool: Common operations
   - [X] Get/Set field F as text
     - [X] Check to make sure text file has the correct number of points
