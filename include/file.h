@@ -132,17 +132,22 @@ class spoc_file
         assert (n < p.size ());
         return p[n];
     }
+    const point_record::point_record &operator[] (const size_t n) const
+    {
+        assert (n < p.size ());
+        return p[n];
+    }
     std::vector<point_record::point_record>::iterator begin ()
+    {
+        return p.begin ();
+    }
+    std::vector<point_record::point_record>::const_iterator begin () const
     {
         return p.begin ();
     }
     std::vector<point_record::point_record>::iterator end ()
     {
         return p.end ();
-    }
-    std::vector<point_record::point_record>::const_iterator begin () const
-    {
-        return p.begin ();
     }
     std::vector<point_record::point_record>::const_iterator end () const
     {
