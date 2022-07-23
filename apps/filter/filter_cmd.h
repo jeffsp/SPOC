@@ -19,6 +19,7 @@ struct args
     bool verbose = false;
     bool version = false;
     std::unordered_set<int> keep_classes;
+    size_t random_seed = 0;
     std::unordered_set<int> remove_classes;
     bool unique_xyz = false;
     double subsample = 0.0;
@@ -37,6 +38,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"verbose", no_argument, 0, 'v'},
             {"version", no_argument, 0, 'e'},
             {"keep-class", required_argument, 0, 'k'},
+            {"random-seed", required_argument, 0, 'a'},
             {"remove-class", required_argument, 0, 'r'},
             {"unique-xyz", no_argument, 0, 'u'},
             {"subsample", required_argument, 0, 's'},
@@ -62,6 +64,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 'v': { args.verbose = true; break; }
             case 'e': { args.version = true; break; }
             case 'k': { args.keep_classes.insert (std::atoi (optarg)); break; }
+            case 'a': { args.random_seed = std::atol (optarg); break; }
             case 'r': { args.remove_classes.insert (std::atoi (optarg)); break; }
             case 'u': { args.unique_xyz = true; break; }
             case 's': { args.subsample = std::atof (optarg); break; }

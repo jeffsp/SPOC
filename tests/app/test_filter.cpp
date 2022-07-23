@@ -65,6 +65,7 @@ void test_remove_classes ()
 
 void test_unique_xyz ()
 {
+    {
     spoc_file f;
     f.add (point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
     f.add (point_record (0.1, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
@@ -73,14 +74,46 @@ void test_unique_xyz ()
     f.add (point_record (0.1, 0.0, 0.0, 4, 0, 0, 0, 0, 0));
     f.add (point_record (0.0, 0.2, 0.0, 5, 0, 0, 0, 0, 0));
     f.add (point_record (0.0, 0.0, 0.3, 6, 0, 0, 0, 0, 0));
-    auto g = unique_xyz (f);
+    const size_t random_seed = 0;
+    auto g = unique_xyz (f, random_seed);
     VERIFY (g.get_point_records ().size () == 4);
     VERIFY (g.get_point_records ().front ().c == 0);
     VERIFY (g.get_point_records ().back ().c == 3);
+    }
+
+    {
+    spoc_file f;
+    const size_t n = 1000;
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        f.add (point_record (i, 0.0, 0.0, i, 0, 0, 0, 0, 0));
+        f.add (point_record (i, 0.0, 0.0, i, 0, 0, 0, 0, 0));
+    }
+
+    // 1000 points + 1000 more duplicates
+    VERIFY (f.get_point_records ().size () == n*2);
+
+    auto g = unique_xyz (f, 0); // Don't randomize
+    auto h = unique_xyz (f, 123); // Do randomize
+
+    // Half are gone
+    VERIFY (g.get_point_records ().size () == n);
+    VERIFY (h.get_point_records ().size () == n);
+
+    // They should not have been selected randomly
+    VERIFY (g.get_point_records ().front ().c == 0);
+    VERIFY (g.get_point_records ().back ().c == n - 1);
+
+    // They should have been selected randomly
+    VERIFY (h.get_point_records ().front ().c != 0);
+    VERIFY (h.get_point_records ().back ().c != n - 1);
+    }
 }
 
 void test_subsample ()
 {
+    {
     spoc_file f;
     f.add (point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
     f.add (point_record (1.1, 1.1, 1.1, 1, 0, 0, 0, 0, 0));
@@ -88,18 +121,50 @@ void test_subsample ()
     f.add (point_record (3.1, 3.1, 3.1, 3, 0, 0, 0, 0, 0));
     f.add (point_record (4.1, 4.1, 4.1, 4, 0, 0, 0, 0, 0));
     f.add (point_record (5.1, 5.1, 5.1, 5, 0, 0, 0, 0, 0));
-    auto g = subsample (f, 6);
+    const size_t random_seed = 0;
+    auto g = subsample (f, 6, random_seed);
     VERIFY (g.get_point_records ().size () == 1);
     VERIFY (g.get_point_records ().front ().c == 0);
-    g = subsample (f, 1.0);
+    g = subsample (f, 1.0, random_seed);
     VERIFY (g.get_point_records ().size () == 6);
     VERIFY (g.get_point_records ().front ().c == 0);
     VERIFY (g.get_point_records ().back ().c == 5);
-    g = subsample (f, 2.0);
+    g = subsample (f, 2.0, random_seed);
     VERIFY (g.get_point_records ().size () == 3);
     VERIFY (g.get_point_records ()[0].c == 0);
     VERIFY (g.get_point_records ()[1].c == 2);
     VERIFY (g.get_point_records ()[2].c == 4);
+    }
+
+    {
+    spoc_file f;
+    const size_t n = 1000;
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        // A point every 1/2 meter along the diagonal
+        f.add (point_record (i, i, i, i, 0, 0, 0, 0, 0));
+        const auto j = i + 0.5;
+        f.add (point_record (j, j, j, i, 0, 0, 0, 0, 0));
+    }
+
+    VERIFY (f.get_point_records ().size () == n*2);
+
+    auto g = subsample (f, 1.0, 0); // Don't randomize
+    auto h = subsample (f, 1.0, 123); // Do randomize
+
+    // Half are gone
+    VERIFY (g.get_point_records ().size () == n);
+    VERIFY (h.get_point_records ().size () == n);
+
+    // They should not have been selected randomly
+    VERIFY (g.get_point_records ().front ().c == 0);
+    VERIFY (g.get_point_records ().back ().c == n - 1);
+
+    // They should have been selected randomly
+    VERIFY (h.get_point_records ().front ().c != 0);
+    VERIFY (h.get_point_records ().back ().c != n - 1);
+    }
 }
 
 int main (int argc, char **argv)

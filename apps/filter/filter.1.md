@@ -30,6 +30,10 @@ Remove point records from a SPOC file that satisfy certain properties
     All other point records are removed. This option may be specified
     multiple times.
 
+\-\-random-seed=*#*, -a *#*
+:   Set the random seed. This seed will determine the order of random
+    operations like subsampling and filtering out non-unique values.
+
 \-\-remove-class=*#*, -r *#*
 :   Remove all point records whose classification field is set to *#*.
     All other points are kept. This option may be specified multiple
@@ -39,16 +43,21 @@ Remove point records from a SPOC file that satisfy certain properties
 :   Remove duplicates with the same X, Y, Z values. This is useful for
     removing points whose X, Y, and Z values have been quantized with the
     spoc_transform application. This will prevent any two points from
-    occupying the same exact location in space. The first occurrance of
-    a point record with a non-unique X, Y, Z location is the one that
-    gets saved. All subsequent occurances are removed.
+    occupying the same exact location in space. If the random seed is
+    set to '0', then the first occurrance of a point record with a
+    non-unique X, Y, Z location is the one that gets saved. All
+    subsequent occurances are removed. If the random-seed is set to a
+    non-zero value, then the point with the non-unique value will be
+    selected randomly.
 
 \-\-subsample=*#*, -s *#*
 :   Subsample a point cloud by selecting a single random point record
     from each voxel of size *#*. This is useful for decimating a point
-    cloud while still preserving the local structure. The first
-    occurrance of a point record within a voxel is the one that gets
-    saved. All subsequent occurances are removed.
+    cloud while still preserving the local structure. If the random seed
+    is set to '0', then the first occurrance of a point record within a
+    voxel is the one that gets saved. All subsequent occurances are
+    removed. If the random-seed is set to a non-zero value, then the
+    point that gets saved will be selected randomly from each voxel.
 
 # SEE ALSO
 

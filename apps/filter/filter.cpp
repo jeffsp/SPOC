@@ -43,6 +43,7 @@ int main (int argc, char **argv)
             clog << "keep-classes\t" << args.keep_classes.size () << endl;
             for (const auto i : args.keep_classes)
                 clog << "\t" << i << endl;
+            clog << "random-seed\t" << args.random_seed << endl;
             clog << "remove-classes\t" << args.remove_classes.size () << endl;
             for (const auto i : args.remove_classes)
                 clog << "\t" << i << endl;
@@ -64,9 +65,9 @@ int main (int argc, char **argv)
         if (!args.remove_classes.empty ())
             f = remove_classes (f, args.remove_classes);
         if (args.unique_xyz)
-            f = unique_xyz (f);
+            f = unique_xyz (f, args.random_seed);
         if (args.subsample > 0.0)
-            f = subsample (f, args.subsample);
+            f = subsample (f, args.subsample, args.random_seed);
 
         // Get the output stream
         output_stream os (args.verbose, args.output_fn);
