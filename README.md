@@ -290,6 +290,7 @@ Examples of how to use the C++ API with compiled examples
   - [ ] Project to XY plane
   - [ ] Write raw raster to disk
   - [ ] Convert raw to png using imagemagick
+- [ ] Subsample with random indexes, assign class, undo subsampling
 
 # Proposed Functionality
 
