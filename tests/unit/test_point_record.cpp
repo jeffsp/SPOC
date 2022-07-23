@@ -6,6 +6,7 @@
 #include <random>
 #include <vector>
 #include <stdexcept>
+#include <unordered_set>
 
 using namespace std;
 using namespace spoc::point_record;
@@ -91,12 +92,60 @@ void test_point_record_fields ()
     }
 }
 
+void test_point_record_hash ()
+{
+    unordered_set<point_record,point_record_hash> s;
+    s.insert ({ 1, 0, 0, 0, 0, 0, 0, 0, 0, { 0, 0, 0 }});
+    s.insert ({ 0, 1, 0, 0, 0, 0, 0, 0, 0, { 0, 0, 0 }});
+    s.insert ({ 0, 0, 1, 0, 0, 0, 0, 0, 0, { 0, 0, 0 }});
+    s.insert ({ 0, 0, 0, 1, 0, 0, 0, 0, 0, { 0, 0, 0 }});
+    s.insert ({ 0, 0, 0, 0, 1, 0, 0, 0, 0, { 0, 0, 0 }});
+    s.insert ({ 0, 0, 0, 0, 0, 1, 0, 0, 0, { 0, 0, 0 }});
+    s.insert ({ 0, 0, 0, 0, 0, 0, 1, 0, 0, { 0, 0, 0 }});
+    s.insert ({ 0, 0, 0, 0, 0, 0, 0, 1, 0, { 0, 0, 0 }});
+    s.insert ({ 0, 0, 0, 0, 0, 0, 0, 0, 1, { 0, 0, 0 }});
+    s.insert ({ 0, 0, 0, 0, 0, 0, 0, 0, 0, { 1, 0, 0 }});
+    s.insert ({ 0, 0, 0, 0, 0, 0, 0, 0, 0, { 0, 1, 0 }});
+    s.insert ({ 0, 0, 0, 0, 0, 0, 0, 0, 0, { 0, 0, 1 }});
+    VERIFY (s.size () == 12);
+
+    // Generate hashes for each point_record and insert them into a set
+    unordered_set<size_t> u;
+    for (auto i : s)
+        u.insert (point_record_hash {} (i));
+
+    // They should all be unique
+    VERIFY (u.size () == 12);
+
+
+}
+
+void test_point_record_hash_load ()
+{
+    // Generate a bunch of unique points
+    const size_t n = 100;
+    const auto p = generate_random_point_records (n, 8);
+    // Put them in a set
+    unordered_set<point_record,point_record_hash> s;
+    for (const auto &i : p)
+        s.insert (i);
+    VERIFY (s.size () == n);
+    // Make sure the hash load is acceptable
+    //
+    // If any bucket has more than 10% of the point, then that means our
+    // hashing is not efficient
+    for (size_t i = 0; i < s.bucket_count(); ++i)
+        VERIFY (s.bucket_size (i) < n / 10);
+}
+
 int main (int argc, char **argv)
 {
     try
     {
         test_point_record_ctors ();
         test_point_record_fields ();
+        test_point_record_hash ();
+        test_point_record_hash_load ();
         return 0;
     }
     catch (const exception &e)
