@@ -63,6 +63,16 @@ struct point_record
         , extra (0)
     {
     }
+    point_record (const double x, const double y, const double z,
+        const uint32_t c, const uint32_t p, const uint16_t i,
+        const uint16_t r, const uint16_t g, const uint16_t b,
+        const std::vector<uint64_t> &extra)
+        : x (x), y (y), z (z)
+        , c (c) , p (p) , i (i)
+        , r (r) , g (g) , b (b)
+        , extra (extra)
+    {
+    }
 
     // Operators
     bool operator== (const point_record &other) const
@@ -97,6 +107,9 @@ struct point_record_hash
         utils::hash_combine (h, p.c, p.p);
         // Combine I, R, G, B
         utils::hash_combine (h, p.i, p.r, p.g, p.b);
+        // Combine extra
+        for (auto i : p.extra)
+            utils::hash_combine (h, i);
 
         return h;
     }
