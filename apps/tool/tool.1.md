@@ -35,10 +35,6 @@ Collection of tools to run on a SPOC file
     text. *F* can be one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or
     'e#', where the '#' after the 'e' specifies the extra field number.
 
-\-\-randomize-order
-:   Randomly reorder the point records. This can be useful when the
-    selection of points within, for example, a voxel should be unbiased.
-
 \-\-recenter-xy
 :   Recenter the point cloud by subtracting the mean X and Y value from
     each point's X and Y value

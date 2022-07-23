@@ -23,7 +23,6 @@ struct args
     bool help = false;
     bool verbose = false;
     bool version = false;
-    size_t random_seed = 0;
     spoc::tool_cmd::command command;
     std::string field_fn;
     std::string input_fn;
@@ -32,8 +31,7 @@ struct args
 
 enum command_values
 {
-    RANDOMIZE_ORDER = 1000,
-    RECENTER_XY,
+    RECENTER_XY = 1000,
     RECENTER_XYZ,
     SUBTRACT_MIN_XY,
     SUBTRACT_MIN_XYZ
@@ -62,9 +60,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"help", no_argument, 0, 'h'},
             {"verbose", no_argument, 0, 'v'},
             {"version", no_argument, 0, 'e'},
-            {"random-seed", required_argument, 0, 'r'},
             {"get-field", required_argument, 0, 'g'},
-            {"randomize-order", no_argument, 0, RANDOMIZE_ORDER},
             {"recenter-xy", no_argument, 0, RECENTER_XY},
             {"recenter-xyz", no_argument, 0, RECENTER_XYZ},
             {"set-field", required_argument, 0, 's'},
@@ -74,7 +70,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hver:g:s:f:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hveg:s:f:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -92,15 +88,9 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             }
             case 'v': { args.verbose = true; break; }
             case 'e': { args.version = true; break; }
-            case 'r': { args.random_seed = std::atol (optarg); break; }
             case 'g':
             {
                 args = set_command (args, "get-field", optarg);
-                break;
-            }
-            case RANDOMIZE_ORDER:
-            {
-                args = set_command (args, "randomize-order", optarg);
                 break;
             }
             case RECENTER_XY:

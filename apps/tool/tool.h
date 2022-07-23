@@ -4,7 +4,6 @@
 #include "spoc.h"
 #include <cassert>
 #include <iostream>
-#include <random>
 
 namespace spoc
 {
@@ -61,26 +60,6 @@ inline void get_field (const T &f, std::ostream &os, const std::string &field_na
             break;
         }
     }
-}
-
-// Recenter a point cloud about its mean
-template<typename T>
-inline T randomize_order (const T &f, const size_t seed)
-{
-    // Check preconditions
-    REQUIRE (f.is_valid ());
-
-    // Copy file
-    T g (f);
-
-    // Create rng
-    std::default_random_engine rng (seed);
-
-    // Randomize order
-    std::shuffle (g.begin (), g.end (), rng);
-
-    // Return the copy
-    return g;
 }
 
 // Recenter a point cloud about its mean
