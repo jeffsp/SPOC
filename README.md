@@ -172,10 +172,6 @@ standard.
           when setting a field
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
-  - [ ] Set random seed
-  - [ ] Randomize the order of the points. This is useful when
-        quantizing or subsampling to ensure that there is no bias in how
-        the points are filtered out.
   - [ ] Resize extra
   - [ ] Copy field --src=F --dest=F
   - [ ] Restore: Restore points from one point cloud to another with
@@ -204,10 +200,14 @@ These should be included in the SPOC API
 
   - [X] Generate voxel indexes
   - [X] Generate grid indexes (use i, j from voxel index)
-  - [ ] Subsampling function with lambda support
-  - [ ] Subsampling function with default for K=1 subsamples/voxel
+  - [ ] Add subsample.h
+    - [ ] Add function: Get unique indexes
+    - [ ] Add function: Get subsample indexes
   - [ ] Nearest neighbor operations with lambda support
-  - [ ] Raster class
+    - [ ] Max neighbors parameter
+    - [ ] Even distribution selection
+    - [ ] Gaussian distribution selection
+    - [ ] Weighted distance selection
 
 ### VIPER
 
@@ -263,7 +263,6 @@ These should be included in the VIPER API
     - [ ] Png output
       - [ ] Grayscale/RGB
 
-
 # Script Examples
 
 Examples of how to use the command line applications
@@ -295,7 +294,7 @@ Examples of how to use the C++ API with compiled examples
 # Proposed Functionality
 
 * spoc octree: break into files arranged as an octree, access/create spoc files
-  * Given a bunch of spoc files, create a quadtree structure
+  * Given a bunch of spoc files, create an octree structure
   * Don't divide on z value (create quadtrees)
   * Create a spoc file from an octree given an extent
   * Unit/integration tests
