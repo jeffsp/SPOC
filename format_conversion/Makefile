@@ -8,7 +8,7 @@ convert_laz:
 
 .PHONY: convert_spoc # Convert LAS files to SPOC files
 convert_spoc:
-	@PATH=$$(pwd)/../build/debug:$$PATH && \
+	@PATH=$$(pwd)/../build/release:$$PATH && \
 		./convert_spoc_all.sh \
 		$$(realpath ./datasets) \
 		$$(realpath ./results)
