@@ -114,7 +114,7 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 
 - [X] spoc spoc2las/las2spoc
   - [X] Unit/integration tests
-  - [ ] Support streaming for large files
+  - [X] Support streaming for large files
   - [X] Read compressed files
 
 - [X] spoc srs: Get/set SRS

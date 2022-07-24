@@ -9,6 +9,7 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc::file;
+    using namespace spoc::header;
     using namespace spoc::io;
     using namespace spoc::las2spoc_app;
     using namespace spoc::las2spoc_cmd;
@@ -40,6 +41,9 @@ int main (int argc, char **argv)
 
         las_reader l (args.input_fn);
 
+        // Get the wkt
+        string wkt;
+
         // Check the coordinate system
         if (l.lasreader->header.vlr_geo_ogc_wkt == nullptr)
         {
@@ -53,12 +57,41 @@ int main (int argc, char **argv)
             clog << endl;
             clog << "The output SPOC file's header will not contain a WKT string in the header." << endl;;
         }
-
-        // Read points and put them into point records
-        vector<point_record> point_records;
-
-        while (l.lasreader->read_point())
+        else
         {
+            wkt = string (l.lasreader->header.vlr_geo_ogc_wkt);
+        }
+
+        // Get header fields
+        const size_t extra_fields = 0;
+        const size_t total_points = l.lasreader->npoints;
+        const bool compressed = false;
+
+        // Allocate the header
+        header h (wkt, extra_fields, total_points, compressed);
+
+        if (args.verbose)
+        {
+            clog << total_points << " total points" << endl;
+
+            // Write them to specified file
+            clog << "writing " << args.output_fn << endl;
+        }
+
+        // Open the spoc file
+        ofstream ofs (args.output_fn);
+        if (!ofs)
+            throw runtime_error ("Could not open file for writing");
+
+        // Write the header
+        write_header (ofs, h);
+
+        // Process the points
+        for (size_t i = 0; i < h.total_points; ++i)
+        {
+            if (!l.lasreader->read_point())
+                throw runtime_error (string ("Error reading point record #") + to_string (i));
+
             point_record p;
             p.x = l.lasreader->point.get_x();
             p.y = l.lasreader->point.get_y();
@@ -69,26 +102,10 @@ int main (int argc, char **argv)
             p.r = l.lasreader->point.rgb[0];
             p.g = l.lasreader->point.rgb[1];
             p.b = l.lasreader->point.rgb[2];
-            point_records.push_back (p);
+
+            // Write it out
+            write_point_record (ofs, p);
         }
-
-        if (args.verbose)
-        {
-            clog << point_records.size () << " point records read" << endl;
-
-            // Write them to specified file
-            clog << "writing records to " << args.output_fn << endl;
-        }
-
-        ofstream ofs (args.output_fn);
-        if (!ofs)
-            throw runtime_error ("Could not open file for writing");
-
-        string wkt;
-        if (l.lasreader->header.vlr_geo_ogc_wkt != nullptr)
-            wkt = string (l.lasreader->header.vlr_geo_ogc_wkt);
-
-        write_spoc_file_uncompressed (ofs, spoc_file (wkt, point_records));
 
         return 0;
     }
