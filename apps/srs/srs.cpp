@@ -45,7 +45,7 @@ int main (int argc, char **argv)
                 clog << "Reading from stdin" << endl;
 
             // Read into spoc_file struct
-            spoc_file f = read_spoc_file_uncompressed (cin);
+            spoc_file f = read_spoc_file (cin);
 
             if (args.set_srs)
             {
@@ -55,7 +55,7 @@ int main (int argc, char **argv)
                 if (args.verbose)
                     clog << "Writing to stdout" << endl;
 
-                write_spoc_file_uncompressed (cout, f);
+                write_spoc_file (cout, f);
             }
             else
             {
