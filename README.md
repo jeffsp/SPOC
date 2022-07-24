@@ -8,40 +8,41 @@ A SPOC file consists of a **HEADER** followed by **POINT RECORDS**.
 
 The **HEADER** contains the following information:
 
-* SPOC file identifier
-* SPOC format major and minor version numbers
-* An arbitrary length character string that can be used to store
-  spatial reference system data
-* The number of 64-bit extra fields associated with each point record
-* The number of points records contained in the file
-* A flag indicating whether or not the contents are compressed
+* A SPOC file identifier consisting of the four characters: 'SPOC'
+* An 8-bit unsigned integer specifying the SPOC file format major version
+* An 8-bit unsigned integer specifying the SPOC file format minor version
+* A 64-bit unsigned integer specifying the length of the OGC WKT string
+* An arbitrary length OGC WKT string which is used to store spatial
+  reference data
+* A 64-bit unsigned integer specifying the number of 64-bit extra fields
+  associated with each point record
+* A 64-bit unsigned integer specifying the number of points records
+  contained in the file
+* A 8-bit unsigned integer flag indicating whether or not the contents
+  are compressed
 
-Each **POINT RECORD** in a SPOC file contains:
+Each **POINT RECORD** in a SPOC file contains the following information:
 
-* X, Y, and Z coordinates stored as 64-bit precision floating point numbers
-* 32-bit classification
-* 32-bit point ID
-* 16-bit intensity/NIR information
-* 16-bit red channel information
-* 16-bit green channel information
-* 16-bit blue channel information
-* Zero or more 64-bit extra fields
-
-Points are stored in SPOC file as a vector of point records.
-
-The order of point records is preserved.
-
-Point coordinates are stored as 64-bit double precision numbers, so
-about 15 decimal digits of precision is preserved, assuming an IEEE 754
-standard.
+* A 64-bit floating point X coordinate
+* A 64-bit floating point Y coordinate
+* A 64-bit floating point Z coordinate
+* A 32-bit unsigned integer classification
+* A 32-bit unsigned integer point ID
+* A 16-bit unsigned integer intensity/NIR value
+* A 16-bit unsigned integer red channel value
+* A 16-bit unsigned integer green channel value
+* A 16-bit unsigned integer blue channel value
+* Zero or more 64-bit unsigned integer extra fields
 
 # Design
 
+* Applications always preserve point record ordering
 * 64-bit double precision
 * Linear complexity algorithms
     * Exception: Quantiles in `spoc_info`
     * Exception: Nearest neighbor is linear in number of neighbors, not
       number of points
+* STL conformance where appropriate
 * Functional programming style: avoid OOP
 * Implicit streaming support
     * Streaming is provided by anonymous and named pipes
@@ -54,7 +55,7 @@ standard.
 * SPOC makes assumptions about the byte ordering, and is therefore not
   portable
 * This project is defined for Linux-based systems, including MAC OS and
-  the Windows Linux subsystem.
+  Windows Subsystem for Linux
 
 # Project Roadmap
 
