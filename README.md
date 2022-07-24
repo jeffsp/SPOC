@@ -99,6 +99,9 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 
 ## Applications
 
+- [ ] Speed up I/O by either increasing the read/write buffer sizes or
+      by manually buffering reads and writes.
+
 - [X] spoc info
   - [X] Header/summary
   - [X] Unit/integration tests
