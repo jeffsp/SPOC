@@ -22,6 +22,7 @@ The **HEADER** contains the following information:
   are compressed
 
 | Data type | Contents          | Notes |
+| ---       | ---               | ---   |
 | uint8_t   | 'S'               | File identifier 1 |
 | uint8_t   | 'P'               | File identifier 2 |
 | uint8_t   | 'O'               | File identifier 3 |
