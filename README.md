@@ -134,9 +134,8 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 - [X] spoc tile: Tile into regular non-overlapping tiles.
   - [X] Number of tiles on largest size
   - [X] Size of tile on one side
-  - [ ] Multi-pass tiling for large files
   - [X] Unit/integration tests
-  - [ ] Tile along a single axis in order to get transect slices
+  - [X] Tile along a single axis in order to get transect slices
   - [X] Read/write compressed files
 
 - [X] spoc merge: Combine several point clouds into one
