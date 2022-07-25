@@ -69,6 +69,12 @@ int main (int argc, char **argv)
             f = recenter (f);
         else if (args.command.name == "recenter-xyz")
             f = recenter (f, true);
+        else if (args.command.name == "resize-extra")
+        {
+            if (args.resize_extra < 0)
+                throw runtime_error ("The number of extra fields must be >= 0");
+            f = resize_extra (f, args.resize_extra);
+        }
         else if (args.command.name == "set-field")
         {
             if (args.field_fn.empty ())

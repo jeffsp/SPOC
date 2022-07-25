@@ -103,6 +103,24 @@ inline T recenter (const T &f, const bool z_flag = false)
     return g;
 }
 
+// Resize the extra fields
+template<typename T>
+inline T resize_extra (const T &f, const int sz)
+{
+    // Check preconditions
+    REQUIRE (f.is_valid ());
+    REQUIRE (sz >= 0);
+
+    // Copy file
+    T g (f);
+
+    // Change size
+    g.resize_extra (sz);
+
+    // Return the copy
+    return g;
+}
+
 template<typename T>
 inline T set_field (const T &f, std::istream &field_ifs, const std::string &field_name)
 {

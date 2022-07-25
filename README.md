@@ -190,6 +190,7 @@ Each **POINT RECORD** in a SPOC file contains the following information:
   - [X] Add Uniform noise to XYZ
     - [X] Size=#
     - [X] Size-xyz=#,#,#
+  - [ ] Copy field --src=F --dest=F
   - [ ] Add --precision-x, --precision-y, --precision-z arguments to
         compress in order to improve compression
 
@@ -199,8 +200,7 @@ Each **POINT RECORD** in a SPOC file contains the following information:
           when setting a field
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
-  - [ ] Resize extra
-  - [ ] Copy field --src=F --dest=F
+  - [X] Resize extra
   - [ ] Restore: Restore points from one point cloud to another with
         the same voxel indexes. Undoes subsampling.
   - [X] Refactor: This application does not need to stream

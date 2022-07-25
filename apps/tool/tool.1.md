@@ -42,6 +42,9 @@ Collection of tools to run on a SPOC file
 \-\-recenter-xyz
 :   Same as recenter-xy, but also recenter the Z value
 
+\-\-resize-extra=*#*
+:   Change the number of extra fields in each point record to *#*
+
 \-\-set-field=*F*, -s *F*
 :   Set point field *F* by reading it from a file or from stdin as text.
     *F* can be one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or 'e#',

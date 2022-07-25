@@ -47,9 +47,24 @@ void test_recenter ()
     }
 }
 
+void test_resize_extra ()
+{
+    // Generate spoc file
+    auto f = generate_random_spoc_file (100, 8, false, true);
+    auto g = resize_extra (f, 4);
+    VERIFY (g.get_point_records ().front ().extra.size () == 4);
+    VERIFY (g.get_point_records ().back ().extra.size () == 4);
+    g = resize_extra (f, 0);
+    VERIFY (g.get_point_records ().front ().extra.size () == 0);
+    VERIFY (g.get_point_records ().back ().extra.size () == 0);
+    g = resize_extra (f, 10);
+    VERIFY (g.get_point_records ().front ().extra.size () == 10);
+    VERIFY (g.get_point_records ().back ().extra.size () == 10);
+}
+
 void test_subtract_min ()
 {
-    // Generate spoc files
+    // Generate spoc file
     auto f = generate_random_spoc_file (100, 8, false, true);
     auto g = subtract_min (f);
     auto h = subtract_min (f, true);
@@ -59,7 +74,7 @@ void test_get_field ()
 {
     for (auto rgb : {true, false})
     {
-        // Generate spoc files
+        // Generate spoc file
         auto f = generate_random_spoc_file (100, 8, false, rgb);
 
         for (auto c : { "x", "y", "z",
@@ -76,7 +91,7 @@ void test_set_field ()
 {
     for (auto rgb : {true, false})
     {
-        // Generate spoc files
+        // Generate spoc file
         const size_t n = 100;
         auto f = generate_random_spoc_file (n, 8, false, rgb);
 
@@ -107,6 +122,7 @@ int main (int argc, char **argv)
     try
     {
         test_recenter ();
+        test_resize_extra ();
         test_subtract_min ();
         test_get_field ();
         test_set_field ();
