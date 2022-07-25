@@ -45,6 +45,19 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 * A 16-bit unsigned integer blue channel value
 * Zero or more 64-bit unsigned integer extra fields
 
+| Data type   | Contents          | Notes |
+| ---         | ---               | ---   |
+| double      | X coordinate      | Units are specified in the OGC WKT string |
+| double      | Y coordinate      | Units are specified in the OGC WKT string |
+| double      | Z coordinate      | Units are specified in the OGC WKT string |
+| uint32_t    | Classification    | Classification as defined by the ASPRS |
+| uint32_t    | Point indentifier | A point ID, which can indicate the collection source or any other appropriate value |
+| uint16_t    | Intensity/NIR     | An intensity or NIR value |
+| uint16_t    | Red               | The point's red channel value |
+| uint16_t    | Green             | The point's green channel value |
+| uint16_t    | Blue              | The point's blue channel value |
+| uint64_t[N] | Extra fields      | Zero or more extra fields, as indicated in the SPOC file header |
+
 # Design
 
 * Applications always preserve point record ordering
