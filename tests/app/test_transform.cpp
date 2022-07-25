@@ -12,7 +12,7 @@ using namespace spoc::transform_app;
 
 void test_transform_detail ()
 {
-    // Generate spoc files
+    // Generate spoc file
     auto f = generate_random_spoc_file (10, 3, true);
     stringstream is, os;
     write_spoc_file_compressed (is, f);
@@ -85,6 +85,97 @@ void test_transform_add ()
     }
 }
 
+void test_transform_copy_field ()
+{
+    // Generate spoc file
+    const size_t total_points = 100;
+    const size_t extra_fields = 8;
+    const bool compressed = false;
+    const bool rgb = true;
+    auto f = generate_random_spoc_file (total_points, extra_fields, compressed, rgb);
+
+    // Copy c to p
+    {
+        stringstream is, os;
+        write_spoc_file_uncompressed (is, f);
+        copy_field (is, os, "c", "p");
+        const auto g = read_spoc_file_uncompressed (os);
+        const auto c = get_c (f.get_point_records ());
+        const auto p = get_p (g.get_point_records ());
+        VERIFY (c == p);
+    }
+
+    // Copy e7 to e0
+    {
+        stringstream is, os;
+        write_spoc_file_uncompressed (is, f);
+        copy_field (is, os, "e7", "e0");
+        const auto g = read_spoc_file_uncompressed (os);
+        const auto e7 = get_extra (7, f.get_point_records ());
+        const auto e0 = get_extra (0, g.get_point_records ());
+        VERIFY (e7 == e0);
+    }
+
+    // Copy i to e2
+    {
+        stringstream is, os;
+        write_spoc_file_uncompressed (is, f);
+        copy_field (is, os, "i", "e2");
+        const auto g = read_spoc_file_uncompressed (os);
+        const auto i = get_i (f.get_point_records ());
+        const auto e2 = get_extra (2, g.get_point_records ());
+        // Convert to uint64_t
+        const vector<uint64_t> i64 (begin (i), end (i));
+        VERIFY (i64 == e2);
+    }
+
+    for (auto fn1 : { "c", "p", "i", "r", "g", "b",
+            "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7" })
+    {
+        for (auto fn2 : { "c", "p", "i", "r", "g", "b",
+                "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7" })
+        {
+            stringstream is, os;
+            write_spoc_file_uncompressed (is, f);
+            copy_field (is, os, fn1, fn2);
+            const auto g = read_spoc_file_uncompressed (os);
+        }
+        for (auto fn2 : { "x", "y", "z", "q", "w", "e8"})
+        {
+            {
+            bool failed = false;
+            try {
+                stringstream is, os;
+                write_spoc_file_uncompressed (is, f);
+                copy_field (is, os, fn1, fn2);
+                const auto g = read_spoc_file_uncompressed (os);
+            }
+            catch (...) { failed = true; }
+            // The preconditions are only checked in debug mode,
+            // so use assert() instead of verify()
+            assert (failed);
+            (void) failed; // Turn off 'set but not used' error
+            }
+
+            // Reverse order of field names
+            {
+            bool failed = false;
+            try {
+                stringstream is, os;
+                write_spoc_file_uncompressed (is, f);
+                copy_field (is, os, fn2, fn1);
+                const auto g = read_spoc_file_uncompressed (os);
+            }
+            catch (...) { failed = true; }
+            // The preconditions are only checked in debug mode,
+            // so use assert() instead of verify()
+            assert (failed);
+            (void) failed; // Turn off 'set but not used' error
+            }
+        }
+    }
+}
+
 void test_transform_gaussian_noise ()
 {
     // Generate spoc file
@@ -118,7 +209,7 @@ void test_transform_gaussian_noise ()
 
 void test_transform_quantize ()
 {
-    // Generate spoc files
+    // Generate spoc file
     auto f = generate_random_spoc_file (10, 3, false);
     stringstream is, os;
     write_spoc_file_uncompressed (is, f);
@@ -310,7 +401,7 @@ void test_transform_replace ()
 {
     for (auto rgb : {true, false})
     {
-        // Generate spoc files
+        // Generate spoc file
         const size_t total_points = 100;
         const size_t extra_fields = 8;
         auto f = generate_random_spoc_file (total_points, extra_fields, false, rgb);
@@ -420,7 +511,7 @@ void test_transform_set ()
 {
     for (auto rgb : {true, false})
     {
-        // Generate spoc files
+        // Generate spoc file
         auto f = generate_random_spoc_file (100, 8, false, rgb);
 
         for (auto c : { "x", "y", "z",
@@ -484,6 +575,7 @@ int main (int argc, char **argv)
     {
         test_transform_detail ();
         test_transform_add ();
+        test_transform_copy_field ();
         test_transform_gaussian_noise ();
         test_transform_quantize ();
         test_transform_rotate1 ();

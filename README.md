@@ -190,7 +190,7 @@ Each **POINT RECORD** in a SPOC file contains the following information:
   - [X] Add Uniform noise to XYZ
     - [X] Size=#
     - [X] Size-xyz=#,#,#
-  - [ ] Copy field --src=F --dest=F
+  - [X] Copy field --src=F --dest=F
   - [ ] Add --precision-x, --precision-y, --precision-z arguments to
         compress in order to improve compression
 

@@ -40,6 +40,11 @@ Collection of transformations to run on a SPOC file
 \-\-add-z=*#*
 :   Add an offset to the Z location of all points
 
+\-\-copy-field=*F1*,*F2*
+:   Copy all values in field *F1* to the field *F2*. *F1* and *F2* may be
+    one of 'c', 'p', 'i', 'r', 'g', 'b', or 'e#', where the '#' after
+    the 'e' specifies the extra field number.
+
 \-\-gaussian-noise=*#*
 :   Add Gaussian noise to each X, Y, and Z value with a standard
     deviation of *#*

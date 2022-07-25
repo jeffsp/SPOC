@@ -70,6 +70,13 @@ int main (int argc, char **argv)
             const auto v = consume_double (s);
             add_z (is (), os (), v);
         }
+        else if (args.command.name == "copy-field")
+        {
+            string s = args.command.params;
+            const auto f1 = consume_field_name (s);
+            const auto f2 = consume_field_name (s);
+            copy_field (is (), os (), f1, f2);
+        }
         else if (args.command.name == "gaussian-noise")
         {
             string s = args.command.params;

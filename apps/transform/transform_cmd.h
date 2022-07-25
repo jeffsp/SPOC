@@ -34,6 +34,7 @@ enum command_values
     ADD_X = 1000,
     ADD_Y, // = 1001
     ADD_Z, // = 1002, ..., etc.
+    COPY_FIELD,
     GAUSSIAN_NOISE,
     GAUSSIAN_NOISE_X,
     GAUSSIAN_NOISE_Y,
@@ -79,6 +80,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"add-x", required_argument, 0, ADD_X},
             {"add-y", required_argument, 0, ADD_Y},
             {"add-z", required_argument, 0, ADD_Z},
+            {"copy-field", required_argument, 0, COPY_FIELD},
             {"gaussian-noise", required_argument, 0, GAUSSIAN_NOISE},
             {"gaussian-noise-x", required_argument, 0, GAUSSIAN_NOISE_X},
             {"gaussian-noise-y", required_argument, 0, GAUSSIAN_NOISE_Y},
@@ -131,6 +133,11 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case ADD_Z:
             {
                 args = set_command (args, "add-z", optarg);
+                break;
+            }
+            case COPY_FIELD:
+            {
+                args = set_command (args, "copy-field", optarg);
                 break;
             }
             case QUANTIZE_XYZ:

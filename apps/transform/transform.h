@@ -118,6 +118,97 @@ void add_z (std::istream &is, std::ostream &os, const double v)
     add (is, os, h, op);
 }
 
+void copy_field (std::istream &is,
+    std::ostream &os,
+    const std::string &field_name1,
+    const std::string &field_name2)
+{
+    using namespace spoc::app_utils;
+
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+    REQUIRE (check_field_name (field_name1));
+    REQUIRE (check_field_name (field_name2));
+
+    // Check to make sure x, y, z, is not being used
+    switch (field_name1[0])
+    {
+        case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+    }
+    switch (field_name2[0])
+    {
+        case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+    }
+
+    // Read the header and make sure it's uncompressed
+    const auto h = detail::read_header_uncompressed (is);
+
+    // Get the extra indexes
+    const size_t j1 = is_extra_field (field_name1)
+        ? get_extra_index (field_name1)
+        : h.extra_fields + 1;
+    const size_t j2 = is_extra_field (field_name2)
+        ? get_extra_index (field_name2)
+        : h.extra_fields + 1;
+
+    // Write the header
+    write_header (os, h);
+
+    // Process the points
+    for (size_t i = 0; i < h.total_points; ++i)
+    {
+        // Read a point
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
+
+        // Get the value of the source field
+        size_t src = 0;
+        switch (field_name1[0])
+        {
+            case 'c': src = p.c; break;
+            case 'p': src = p.p; break;
+            case 'i': src = p.i; break;
+            case 'r': src = p.r; break;
+            case 'g': src = p.g; break;
+            case 'b': src = p.b; break;
+            case 'e': // extra
+            {
+                assert (is_extra_field (field_name1));
+                if (j1 >= p.extra.size ())
+                    throw std::runtime_error ("Invalid extra field specification");
+                src = p.extra[j1];
+            }
+            break;
+        }
+
+        // Set it in the dest field
+        switch (field_name2[0])
+        {
+            case 'c': p.c = src; break;
+            case 'p': p.p = src; break;
+            case 'i': p.i = src; break;
+            case 'r': p.r = src; break;
+            case 'g': p.g = src; break;
+            case 'b': p.b = src; break;
+            case 'e': // extra
+            {
+                assert (is_extra_field (field_name2));
+                if (j2 >= p.extra.size ())
+                    throw std::runtime_error ("Invalid extra field specification");
+                p.extra[j2] = src;
+            }
+            break;
+        }
+
+        // Write it back out
+        write_point_record (os, p);
+    }
+}
+
 void gaussian_noise (std::istream &is, std::ostream &os,
     const size_t random_seed,
     const double std_x, const double std_y, const double std_z)
@@ -209,7 +300,7 @@ void replace (std::istream &is,
     REQUIRE (os.good ());
     REQUIRE (check_field_name (field_name));
 
-    // Check to make suze x, y, z, is not being used
+    // Check to make sure x, y, z, is not being used
     switch (field_name[0])
     {
         case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
