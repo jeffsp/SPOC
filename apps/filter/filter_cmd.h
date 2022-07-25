@@ -45,7 +45,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvek:r:us:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvek:a:r:us:", long_options, &option_index);
         if (c == -1)
             break;
 

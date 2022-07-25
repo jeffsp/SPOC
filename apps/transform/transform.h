@@ -5,6 +5,7 @@
 #include <cassert>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <vector>
 #include <unordered_map>
 
@@ -114,6 +115,33 @@ void add_z (std::istream &is, std::ostream &os, const double v)
     // Read the header and make sure it's uncompressed
     const auto h = detail::read_header_uncompressed (is);
     auto op = [&v] (auto &p) { p.z += v; };
+    add (is, os, h, op);
+}
+
+void gaussian_noise (std::istream &is, std::ostream &os,
+    const size_t random_seed,
+    const double std_x, const double std_y, const double std_z)
+{
+    // Create rng
+    std::default_random_engine rng (random_seed);
+
+    // Create the distributions
+    std::normal_distribution<double> dx (0.0, std_x);
+    std::normal_distribution<double> dy (0.0, std_y);
+    std::normal_distribution<double> dz (0.0, std_z);
+
+    // Read the header and make sure it's uncompressed
+    const auto h = detail::read_header_uncompressed (is);
+
+    // Define the operation being performed
+    auto op = [&] (auto &p)
+    {
+        if (std_x != 0.0) p.x += dx (rng);
+        if (std_y != 0.0) p.y += dy (rng);
+        if (std_z != 0.0) p.z += dz (rng);
+    };
+
+    // Do it
     add (is, os, h, op);
 }
 
@@ -493,6 +521,33 @@ void set (std::istream &is,
         // Write it back out
         write_point_record (os, p);
     }
+}
+
+void uniform_noise (std::istream &is, std::ostream &os,
+    const size_t random_seed,
+    const double mag_x, const double mag_y, const double mag_z)
+{
+    // Create rng
+    std::default_random_engine rng (random_seed);
+
+    // Create the distributions
+    std::uniform_real_distribution<double> dx (-mag_x, mag_x);
+    std::uniform_real_distribution<double> dy (-mag_y, mag_y);
+    std::uniform_real_distribution<double> dz (-mag_z, mag_z);
+
+    // Read the header and make sure it's uncompressed
+    const auto h = detail::read_header_uncompressed (is);
+
+    // Define the operation being performed
+    auto op = [&] (auto &p)
+    {
+        if (mag_x != 0.0) p.x += dx (rng);
+        if (mag_y != 0.0) p.y += dy (rng);
+        if (mag_z != 0.0) p.z += dz (rng);
+    };
+
+    // Do it
+    add (is, os, h, op);
 }
 
 } // namespace transform_app

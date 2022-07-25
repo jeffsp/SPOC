@@ -25,6 +25,10 @@ Collection of transformations to run on a SPOC file
 \-\-version, -e
 :   Print version information and exit
 
+\-\-random-seed=*#*, -a *#*
+:   Set the random seed. This seed will determine the random values
+    generated for operations like adding noise.
+
 # COMMANDS
 
 \-\-add-x=*#*
@@ -35,6 +39,19 @@ Collection of transformations to run on a SPOC file
 
 \-\-add-z=*#*
 :   Add an offset to the Z location of all points
+
+\-\-gaussian-noise=*#*
+:   Add Gaussian noise to each X, Y, and Z value with a standard
+    deviation of *#*
+
+\-\-gaussian-noise-x=*#*
+:   Add Gaussian noise to each X value with a standard deviation of *#*
+
+\-\-gaussian-noise-y=*#*
+:   Add Gaussian noise to each Y value with a standard deviation of *#*
+
+\-\-gaussian-noise-z=*#*
+:   Add Gaussian noise to each Z value with a standard deviation of *#*
 
 \-\-quantize-xyz=*#*
 :   Quantize X, Y, and Z values to the specified precision by truncating.
@@ -68,6 +85,18 @@ Collection of transformations to run on a SPOC file
 :   Set the field *F* to *#*. *F* can be one of 'x', 'y', 'z', 'c', 'p',
     'i', 'r', 'g', 'b', or 'e#', where the '#' after the 'e' specifies
     the extra field number.
+
+\-\-uniform-noise=*#*
+:   Add uniform noise to each X, Y, and Z value of magnitude +/-*#*
+
+\-\-uniform-noise-x=*#*
+:   Add uniform noise to each X value of magnitude +/-*#*
+
+\-\-uniform-noise-y=*#*
+:   Add uniform noise to each Y value of magnitude +/-*#*
+
+\-\-uniform-noise-z=*#*
+:   Add uniform noise to each Z value of magnitude +/-*#*
 
 # SEE ALSO
 

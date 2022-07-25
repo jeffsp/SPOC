@@ -7,6 +7,7 @@ using namespace std;
 using namespace spoc::file;
 using namespace spoc::io;
 using namespace spoc::point;
+using namespace spoc::point_record;
 using namespace spoc::transform_app;
 
 void test_transform_detail ()
@@ -82,6 +83,37 @@ void test_transform_add ()
         VERIFY (p[3].y == qz[3].y);
         VERIFY (about_equal (p[3].z + offset, qz[3].z));
     }
+}
+
+void test_transform_gaussian_noise ()
+{
+    // Generate spoc file
+    auto f = generate_random_spoc_file (100, 3, false);
+    // Set X, Y, Z values to 0.0
+    for (auto &p : f)
+        p.x = p.y = p.z = 0.0;
+    // Write to a stream
+    stringstream is, os;
+    write_spoc_file_uncompressed (is, f);
+    // Add the noise
+    gaussian_noise (is, os, 123, 1.0, 2.0, 3.0);
+    // Get the result
+    auto g = read_spoc_file_uncompressed (os);
+    const auto x = get_x (g.get_point_records ());
+    const auto y = get_y (g.get_point_records ());
+    const auto z = get_z (g.get_point_records ());
+    const auto min_x = *min_element (begin (x), end (x));
+    const auto max_x = *max_element (begin (x), end (x));
+    const auto min_y = *min_element (begin (y), end (y));
+    const auto max_y = *max_element (begin (y), end (y));
+    const auto min_z = *min_element (begin (z), end (z));
+    const auto max_z = *max_element (begin (z), end (z));
+    VERIFY (min_x < -1 && max_x > 1);
+    VERIFY (min_y < -2 && max_y > 2);
+    VERIFY (min_z < -3 && max_y > 3);
+    VERIFY (min_x > -100 && max_x < 100);
+    VERIFY (min_y > -200 && max_y < 200);
+    VERIFY (min_z > -300 && max_z < 300);
 }
 
 void test_transform_quantize ()
@@ -418,18 +450,48 @@ void test_transform_set ()
     }
 }
 
+void test_transform_uniform_noise ()
+{
+    // Generate spoc file
+    auto f = generate_random_spoc_file (100, 3, false);
+    // Set X, Y, Z values to 0.0
+    for (auto &p : f)
+        p.x = p.y = p.z = 0.0;
+    // Write to a stream
+    stringstream is, os;
+    write_spoc_file_uncompressed (is, f);
+    // Add the noise
+    uniform_noise (is, os, 123, 1.0, 2.0, 3.0);
+    // Get the result
+    auto g = read_spoc_file_uncompressed (os);
+    const auto x = get_x (g.get_point_records ());
+    const auto y = get_y (g.get_point_records ());
+    const auto z = get_z (g.get_point_records ());
+    const auto min_x = *min_element (begin (x), end (x));
+    const auto max_x = *max_element (begin (x), end (x));
+    const auto min_y = *min_element (begin (y), end (y));
+    const auto max_y = *max_element (begin (y), end (y));
+    const auto min_z = *min_element (begin (z), end (z));
+    const auto max_z = *max_element (begin (z), end (z));
+    VERIFY (min_x > -1 && max_x < 1);
+    VERIFY (min_y > -2 && max_y < 2);
+    VERIFY (min_z > -3 && max_z < 3);
+}
+
 int main (int argc, char **argv)
 {
     try
     {
         test_transform_detail ();
         test_transform_add ();
+        test_transform_gaussian_noise ();
         test_transform_quantize ();
         test_transform_rotate1 ();
         test_transform_rotate2 ();
         test_transform_replace ();
         test_transform_scale ();
         test_transform_set ();
+        test_transform_uniform_noise ();
         return 0;
     }
     catch (const exception &e)

@@ -24,6 +24,7 @@ struct args
     bool verbose = false;
     bool version = false;
     spoc::transform_cmd::command command;
+    size_t random_seed = 0;
     std::string input_fn;
     std::string output_fn;
 };
@@ -33,6 +34,10 @@ enum command_values
     ADD_X = 1000,
     ADD_Y, // = 1001
     ADD_Z, // = 1002, ..., etc.
+    GAUSSIAN_NOISE,
+    GAUSSIAN_NOISE_X,
+    GAUSSIAN_NOISE_Y,
+    GAUSSIAN_NOISE_Z,
     QUANTIZE_XYZ,
     REPLACE,
     ROTATE_X,
@@ -42,6 +47,10 @@ enum command_values
     SCALE_Y,
     SCALE_Z,
     SET,
+    UNIFORM_NOISE,
+    UNIFORM_NOISE_X,
+    UNIFORM_NOISE_Y,
+    UNIFORM_NOISE_Z,
 };
 
 args set_command (const args &args, const std::string &name, const char *s)
@@ -70,7 +79,12 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"add-x", required_argument, 0, ADD_X},
             {"add-y", required_argument, 0, ADD_Y},
             {"add-z", required_argument, 0, ADD_Z},
+            {"gaussian-noise", required_argument, 0, GAUSSIAN_NOISE},
+            {"gaussian-noise-x", required_argument, 0, GAUSSIAN_NOISE_X},
+            {"gaussian-noise-y", required_argument, 0, GAUSSIAN_NOISE_Y},
+            {"gaussian-noise-z", required_argument, 0, GAUSSIAN_NOISE_Z},
             {"quantize-xyz", required_argument, 0, QUANTIZE_XYZ},
+            {"random-seed", required_argument, 0, 'a'},
             {"replace", required_argument, 0, REPLACE},
             {"rotate-x", required_argument, 0, ROTATE_X},
             {"rotate-y", required_argument, 0, ROTATE_Y},
@@ -79,6 +93,10 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"scale-y", required_argument, 0, SCALE_Y},
             {"scale-z", required_argument, 0, SCALE_Z},
             {"set", required_argument, 0, SET},
+            {"uniform-noise", required_argument, 0, UNIFORM_NOISE},
+            {"uniform-noise-x", required_argument, 0, UNIFORM_NOISE_X},
+            {"uniform-noise-y", required_argument, 0, UNIFORM_NOISE_Y},
+            {"uniform-noise-z", required_argument, 0, UNIFORM_NOISE_Z},
             {0, 0, 0, 0}
         };
 
@@ -118,6 +136,11 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case QUANTIZE_XYZ:
             {
                 args = set_command (args, "quantize-xyz", optarg);
+                break;
+            }
+            case 'a':
+            {
+                args.random_seed = std::atol (optarg);
                 break;
             }
             case REPLACE:

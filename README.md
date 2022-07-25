@@ -160,15 +160,15 @@ Each **POINT RECORD** in a SPOC file contains the following information:
   - [X] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
   - [X] Add offset to X,Y,Z: addx/y/z #
   - [X] Scale by X,Y,Z: scale, scalex/y/z
-  - [ ] Set random seed
-  - [ ] Add Gaussian noise to XYZ
-    - [ ] Sigma=#
-    - [ ] Sigma-xyz=#,#,#
-  - [ ] Add Uniform noise to XYZ
-    - [ ] Size=#
-    - [ ] Size-xyz=#,#,#
-  - [ ] Add --xprecision, --yprecision, --zprecision arguments to
-        compress in order to improve compression?
+  - [X] Set random seed
+  - [X] Add Gaussian noise to XYZ
+    - [X] Sigma=#
+    - [X] Sigma-xyz=#,#,#
+  - [X] Add Uniform noise to XYZ
+    - [X] Size=#
+    - [X] Size-xyz=#,#,#
+  - [ ] Add --precision-x, --precision-y, --precision-z arguments to
+        compress in order to improve compression
 
 - [X] spoc tool: Common operations
   - [X] Get/Set field F as text

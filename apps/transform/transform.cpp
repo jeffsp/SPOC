@@ -40,7 +40,11 @@ int main (int argc, char **argv)
 
         // Show args
         if (args.verbose)
+        {
+            clog << "verbose\t" << args.verbose << endl;
+            clog << "random-seed\t" << args.random_seed << endl;
             clog << "command: " << args.command.name << "\t" << args.command.params << endl;
+        }
 
         // Get the input stream
         input_stream is (args.verbose, args.input_fn);
@@ -65,6 +69,30 @@ int main (int argc, char **argv)
             string s = args.command.params;
             const auto v = consume_double (s);
             add_z (is (), os (), v);
+        }
+        else if (args.command.name == "gaussian-noise")
+        {
+            string s = args.command.params;
+            const auto v = consume_double (s);
+            gaussian_noise (is (), os (), args.random_seed, v, v, v);
+        }
+        else if (args.command.name == "gaussian-noise-x")
+        {
+            string s = args.command.params;
+            const auto v = consume_double (s);
+            gaussian_noise (is (), os (), args.random_seed, v, 0.0, 0.0);
+        }
+        else if (args.command.name == "gaussian-noise-y")
+        {
+            string s = args.command.params;
+            const auto v = consume_double (s);
+            gaussian_noise (is (), os (), args.random_seed, 0.0, v, 0.0);
+        }
+        else if (args.command.name == "gaussian-noise-z")
+        {
+            string s = args.command.params;
+            const auto v = consume_double (s);
+            gaussian_noise (is (), os (), args.random_seed, 0.0, 0.0, v);
         }
         else if (args.command.name == "quantize-xyz")
         {
@@ -122,6 +150,30 @@ int main (int argc, char **argv)
             const auto l = consume_field_name (s);
             const auto v = consume_double (s);
             spoc::transform_app::set (is (), os (), l, v);
+        }
+        else if (args.command.name == "uniform-noise")
+        {
+            string s = args.command.params;
+            const auto v = consume_double (s);
+            uniform_noise (is (), os (), args.random_seed, v, v, v);
+        }
+        else if (args.command.name == "uniform-noise-x")
+        {
+            string s = args.command.params;
+            const auto v = consume_double (s);
+            uniform_noise (is (), os (), args.random_seed, v, 0.0, 0.0);
+        }
+        else if (args.command.name == "uniform-noise-y")
+        {
+            string s = args.command.params;
+            const auto v = consume_double (s);
+            uniform_noise (is (), os (), args.random_seed, 0.0, v, 0.0);
+        }
+        else if (args.command.name == "uniform-noise-z")
+        {
+            string s = args.command.params;
+            const auto v = consume_double (s);
+            uniform_noise (is (), os (), args.random_seed, 0.0, 0.0, v);
         }
         else
             throw runtime_error ("An unknown command was encountered");
