@@ -21,16 +21,16 @@ The **HEADER** contains the following information:
 * A 8-bit unsigned integer flag indicating whether or not the contents
   are compressed
 
-| Data type  | Contents          | Notes |
-| ---        | ---               | ---   |
-| uint8_t[4] | 'SPOC'            | File identifier |
-| uint8_t    | Major version     | File format information |
-| uint8_t    | Minor version     | File format information |
-| uint64_t   | OGC WKT length    | Number of bytes in the next field |
-| uint8_t[N] | OGC WKT           | Arbitrary length string containing OGC WKT format spatial reference data |
-| uint64_t   | Extra fields      | Number of 64-bit unsigned extra fields in each record |
-| uint64_t   | Total points      | Total point records in the SPOC file |
-| uint8_t    | Compression flag  | Indicates if the file contents are compressed |
+| Data type     | Contents          | Notes |
+| ---           | ---               | ---   |
+| uint8[0..3]   | 'SPOC'            | 4 byte file identifier |
+| uint8         | Major version     | File format information |
+| uint8         | Minor version     | File format information |
+| uint64        | OGC WKT length    | Number of bytes in the next field |
+| uint8[0..N-1] | OGC WKT           | Arbitrary, possibly zero-length string containing OGC WKT format spatial reference data |
+| uint64        | Extra fields      | Number of 64-bit unsigned extra fields in each record |
+| uint64        | Total points      | Total point records in the SPOC file |
+| uint8         | Compression flag  | Indicates if the file contents are compressed |
 
 Each **POINT RECORD** in a SPOC file contains the following information:
 
@@ -45,18 +45,18 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 * A 16-bit unsigned integer blue channel value
 * Zero or more 64-bit unsigned integer extra fields
 
-| Data type   | Contents          | Notes |
-| ---         | ---               | ---   |
-| double      | X coordinate      | Units are specified in the OGC WKT string |
-| double      | Y coordinate      | Units are specified in the OGC WKT string |
-| double      | Z coordinate      | Units are specified in the OGC WKT string |
-| uint32_t    | Classification    | Classification as defined by the ASPRS |
-| uint32_t    | Point indentifier | A point ID, which can indicate the collection source or any other appropriate value |
-| uint16_t    | Intensity/NIR     | An intensity or NIR value |
-| uint16_t    | Red               | The point's red channel value |
-| uint16_t    | Green             | The point's green channel value |
-| uint16_t    | Blue              | The point's blue channel value |
-| uint64_t[N] | Extra fields      | Zero or more extra fields, as indicated in the SPOC file header |
+| Data type      | Contents          | Notes |
+| ---            | ---               | ---   |
+| double         | X coordinate      | Units are specified in the OGC WKT string |
+| double         | Y coordinate      | Units are specified in the OGC WKT string |
+| double         | Z coordinate      | Units are specified in the OGC WKT string |
+| uint32         | Classification    | Classification as defined by the ASPRS |
+| uint32         | Point indentifier | A point ID, which can indicate the collection source or any other appropriate value |
+| uint16         | Intensity/NIR     | An intensity or NIR value |
+| uint16         | Red               | The point's red channel value |
+| uint16         | Green             | The point's green channel value |
+| uint16         | Blue              | The point's blue channel value |
+| uint64[0..N-1] | Extra fields      | Zero or more extra fields, as indicated in the SPOC file header |
 
 # Design
 
