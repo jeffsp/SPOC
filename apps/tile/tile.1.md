@@ -57,6 +57,18 @@ to force overwrites.
 \-\-tile-size=*#*, -s *#*
 :   Length of one side of a tile
 
+\-\-tile-size-x=*#*, -x *#*
+:   Length of one side of a tile in the X direction. This option allows
+    you to have non-square tiles. You can alo use this option to
+    generate transect slices by setting this value while leaving the
+    tile size in the Y direction set to its default (-1).
+
+\-\-tile-size-y=*#*, -y *#*
+:   Length of one side of a tile in the Y direction. This option allows
+    you to have non-square tiles. You can alo use this option to
+    generate transect slices by setting this value while leaving the
+    tile size in the X direction set to its default (-1).
+
 \-\-prefix=*string*, -p *string*
 :   The prefix to use for the output files
 
