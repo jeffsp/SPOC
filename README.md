@@ -21,6 +21,19 @@ The **HEADER** contains the following information:
 * A 8-bit unsigned integer flag indicating whether or not the contents
   are compressed
 
+| Data type | Contents          | Notes |
+| uint8_t   | 'S'               | File identifier 1 |
+| uint8_t   | 'P'               | File identifier 2 |
+| uint8_t   | 'O'               | File identifier 3 |
+| uint8_t   | 'C'               | File identifier 4 |
+| uint8_t   | Major version     | File format information |
+| uint8_t   | Minor version     | File format information |
+| uint64_t  | OGC WKT length    | Number of bytes in the next field |
+| uint8_t   | OGC WKT           | Arbitraty length string |
+| uint64_t  | Extra fields      | Number of 64-bit unsigned extra fields in each record |
+| uint64_t  | Total points      | Total point records in the SPOC file |
+| uint8_t   | Compression flag  | Indicates if the file contents are compressed |
+
 Each **POINT RECORD** in a SPOC file contains the following information:
 
 * A 64-bit floating point X coordinate
