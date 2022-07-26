@@ -85,6 +85,7 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 
 ## Framework
 
+- [ ] Add I/O benchmarks
 - [X] Update warning for OGC WKT to be more explicit
 - [X] Add Doxygen support
 - [X] Add Design by Contract functionality
@@ -120,6 +121,16 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 - [X] read/write spoc files
 - [X] read/write las files
 - [X] Add --version option to all apps
+
+## Interface
+
+- [ ] Python extension reader/writer
+  - [ ] Use pybind11 framework from texmesh
+- [ ] Numpy reader/writer
+- [ ] Pandas dataframe reader/writer
+- [ ] QT Modeller reader/writer
+  - [ ] QT Modeller provides a Windows plugin API at
+        https://appliedimagery.com/developers
 
 ## Applications
 
@@ -201,8 +212,13 @@ Each **POINT RECORD** in a SPOC file contains the following information:
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
   - [X] Resize extra
-  - [ ] Restore: Restore points from one point cloud to another with
-        the same voxel indexes. Undoes subsampling.
+  - [ ] Generate voxel indexes -> e0,e1,e2
+    - [ ] resolution
+    - [ ] Downsample
+  - [ ] Create map
+    - [ ] Get e0,e1,e2,c -> map
+  - [ ] Apply map
+    - [ ] Apply map to original e0,e1,e2,c
   - [X] Refactor: This application does not need to stream
   - [X] Read/write compressed files
 
@@ -211,7 +227,9 @@ Each **POINT RECORD** in a SPOC file contains the following information:
   - [X] Remove classes
   - [X] Unique: Remove duplicates with same X, Y, Z values
   - [X] Subsample: Remove duplicates with same voxel indexes
-    - [X] voxel resolution
+    - [X] random-seed=*#*
+  - [ ] Subsample-fields: Remove duplicates with same e0,e1,e2 values
+    - [ ] random-seed=*#*
   - [X] Unit/app tests
   - [X] Read/write compressed files
 
