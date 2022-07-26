@@ -8,7 +8,7 @@ spoc_las2spoc - Convert a LAS format file to a SPOC format file
 
 # USAGE
 
-spoc_las2spoc [*options*] *filename.las* *filename.spoc*
+spoc_las2spoc [*options*] *filename.las* [*filename.spoc*]
 
 # DESCRIPTION
 

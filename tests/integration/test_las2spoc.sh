@@ -15,3 +15,4 @@ function cleanup {
 trap cleanup EXIT
 
 spoc_las2spoc ./test_data/lidar/juarez50.las ${TMPDIR}/juarez50.spoc
+spoc_las2spoc ./test_data/lidar/juarez50.las > ${TMPDIR}/juarez50.spoc

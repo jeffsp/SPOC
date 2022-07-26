@@ -1,3 +1,4 @@
+#include "app_utils.h"
 #include "las2spoc.h"
 #include "las2spoc_cmd.h"
 #include "spoc.h"
@@ -8,6 +9,7 @@
 int main (int argc, char **argv)
 {
     using namespace std;
+    using namespace spoc::app_utils;
     using namespace spoc::file;
     using namespace spoc::header;
     using namespace spoc::io;
@@ -78,13 +80,11 @@ int main (int argc, char **argv)
             clog << "writing " << args.output_fn << endl;
         }
 
-        // Open the spoc file
-        ofstream ofs (args.output_fn);
-        if (!ofs)
-            throw runtime_error ("Could not open file for writing");
+        // Get the output stream
+        output_stream os (args.verbose, args.output_fn);
 
         // Write the header
-        write_header (ofs, h);
+        write_header (os (), h);
 
         // Process the points
         for (size_t i = 0; i < h.total_points; ++i)
@@ -104,7 +104,7 @@ int main (int argc, char **argv)
             p.b = l.lasreader->point.rgb[2];
 
             // Write it out
-            write_point_record (ofs, p);
+            write_point_record (os (), p);
         }
 
         return 0;

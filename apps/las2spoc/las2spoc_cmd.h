@@ -59,13 +59,13 @@ args get_args (int argc, char **argv, const std::string &usage)
 
     args.input_fn = argv[optind++];
 
-    if (optind == argc)
-        throw std::runtime_error ("An output file was not specified");
-
-    args.output_fn = argv[optind++];
-
     if (optind != argc)
-        throw std::runtime_error ("Too many command line arguments were specified");
+    {
+        args.output_fn = argv[optind++];
+
+        if (optind != argc)
+            throw std::runtime_error ("Too many command line arguments were specified");
+    }
 
     return args;
 }
