@@ -85,7 +85,9 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 
 ## Framework
 
+- [ ] Create build and deploy containers
 - [ ] Add I/O benchmarks
+- [ ] Add compression benchmarks
 - [X] Update warning for OGC WKT to be more explicit
 - [X] Add Doxygen support
 - [X] Add Design by Contract functionality
