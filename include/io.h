@@ -100,8 +100,7 @@ inline point_record::point_records read_uncompressed_points (std::istream &s,
     const size_t extra_fields)
 {
     // Read the data
-    point_record::point_records p;
-    p.resize (total_points);
+    point_record::point_records p (total_points);
     for (size_t i = 0; i < p.size (); ++i)
         p[i] = point_record::read_point_record (s, extra_fields);
 
@@ -133,10 +132,6 @@ inline point_record::point_records read_compressed_points (std::istream &s,
     const size_t total_points,
     const size_t extra_fields)
 {
-    // Read the data
-    point_record::point_records prs;
-    prs.resize (total_points);
-
     // Read data
     std::vector<double> x = read_compressed<double> (s, total_points);
     std::vector<double> y = read_compressed<double> (s, total_points);
@@ -153,7 +148,7 @@ inline point_record::point_records read_compressed_points (std::istream &s,
         extra[j] = read_compressed<uint64_t> (s, total_points);
 
     // Copy them into the point records
-    prs.resize (total_points);
+    point_record::point_records prs (total_points);
 
     #pragma omp parallel for
     for (size_t n = 0; n < prs.size (); ++n)
