@@ -226,7 +226,7 @@ Each **POINT RECORD** in a SPOC file contains the following information:
   - [X] Unique: Remove duplicates with same X, Y, Z values
   - [X] Subsample: Remove duplicates with same voxel indexes
     - [X] random-seed=*#*
-    - [ ] save-voxel-indexes in e0,e1,e2
+    - [X] save-voxel-indexes in e0,e1,e2
   - [X] Unit/app tests
   - [X] Read/write compressed files
 
