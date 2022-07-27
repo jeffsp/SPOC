@@ -29,6 +29,7 @@ endmacro()
 
 add_unit_test(test_app_utils)
 add_unit_test(test_asprs)
+add_unit_test(test_benchmark_utils)
 add_unit_test(test_compress)
 add_unit_test(test_contracts)
 add_unit_test(test_cmd)
@@ -41,6 +42,13 @@ add_unit_test(test_point_record)
 add_unit_test(test_test_utils)
 add_unit_test(test_utils)
 add_unit_test(test_voxel)
+
+macro(add_benchmark name)
+    add_executable(${name} ./benchmarks/${name}.cpp)
+    target_link_libraries(${name} gmp z)
+endmacro()
+
+add_benchmark(benchmark_io)
 
 macro(add_app_test name)
     add_executable(test_${name} tests/app/test_${name}.cpp)
