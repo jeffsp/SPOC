@@ -122,14 +122,15 @@ void test_subsample ()
     f.add (point_record (4.1, 4.1, 4.1, 4, 0, 0, 0, 0, 0));
     f.add (point_record (5.1, 5.1, 5.1, 5, 0, 0, 0, 0, 0));
     const size_t random_seed = 0;
-    auto g = subsample (f, 6, random_seed);
+    const bool save_voxel_indexes = false;
+    auto g = subsample (f, 6, random_seed, save_voxel_indexes);
     VERIFY (g.get_point_records ().size () == 1);
     VERIFY (g.get_point_records ().front ().c == 0);
-    g = subsample (f, 1.0, random_seed);
+    g = subsample (f, 1.0, random_seed, save_voxel_indexes);
     VERIFY (g.get_point_records ().size () == 6);
     VERIFY (g.get_point_records ().front ().c == 0);
     VERIFY (g.get_point_records ().back ().c == 5);
-    g = subsample (f, 2.0, random_seed);
+    g = subsample (f, 2.0, random_seed, save_voxel_indexes);
     VERIFY (g.get_point_records ().size () == 3);
     VERIFY (g.get_point_records ()[0].c == 0);
     VERIFY (g.get_point_records ()[1].c == 2);
@@ -150,8 +151,9 @@ void test_subsample ()
 
     VERIFY (f.get_point_records ().size () == n*2);
 
-    auto g = subsample (f, 1.0, 0); // Don't randomize
-    auto h = subsample (f, 1.0, 123); // Do randomize
+    const bool save_voxel_indexes = false;
+    auto g = subsample (f, 1.0, 0, save_voxel_indexes); // Don't randomize
+    auto h = subsample (f, 1.0, 123, save_voxel_indexes); // Do randomize
 
     // Half are gone
     VERIFY (g.get_point_records ().size () == n);

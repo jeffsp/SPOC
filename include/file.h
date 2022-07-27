@@ -85,23 +85,36 @@ class spoc_file
     const point_record::point_records &get_point_records () const { return p; }
     const point_record::point_record &get_point_record (const size_t n) const { return p[n]; }
 
-    // R/W access
-    std::string get_wkt () const
-    {
-        return h.wkt;
-    }
-    bool get_compressed () const
-    {
-        return h.compressed;
-    }
+    // Read header
+    uint8_t get_major_version () const { return h.major_version; }
+    uint8_t get_minor_version () const { return h.minor_version; }
+    std::string get_wkt () const { return h.wkt; }
+    size_t get_extra_fields () const { return h.extra_fields; }
+    size_t get_total_points () const { return h.total_points; }
+    bool get_compressed () const { return h.compressed; }
+
+    // Change header and point records
     void set_wkt (const std::string &s)
     {
         h.wkt = s;
+    }
+    void resize (const size_t new_size)
+    {
+        p.resize (new_size);
+        h.total_points = new_size;
+    }
+    void resize_extra (const size_t extra_fields)
+    {
+        for (size_t i = 0; i < p.size (); ++i)
+            p[i].extra.resize (extra_fields);
+        h.extra_fields = extra_fields;
     }
     void set_compressed (const bool flag)
     {
         h.compressed = flag;
     }
+
+    // Point record R/W access
     void add (const point_record::point_record &pr)
     {
         REQUIRE (pr.extra.size () == h.extra_fields);
@@ -114,19 +127,8 @@ class spoc_file
         assert (n < p.size ());
         p[n] = r;
     }
-    void resize (const size_t new_size)
-    {
-        p.resize (new_size);
-        h.total_points = new_size;
-    }
-    void resize_extra (const size_t new_size)
-    {
-        for (size_t i = 0; i < p.size (); ++i)
-            p[i].extra.resize (new_size);
-        h.extra_fields = new_size;
-    }
 
-    // R/W access
+    // Point record R/W access
     point_record::point_record &operator[] (const size_t n)
     {
         assert (n < p.size ());

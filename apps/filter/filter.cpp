@@ -48,10 +48,15 @@ int main (int argc, char **argv)
             for (const auto i : args.remove_classes)
                 clog << "\t" << i << endl;
             clog << "unique-xyz\t" << args.unique_xyz << endl;
+            clog << "save-voxel-indexes\t" << args.save_voxel_indexes << endl;
             clog << "subsample\t" << args.subsample << endl;
             clog << "input-filename\t" << args.input_fn << endl;
             clog << "output-filename\t" << args.output_fn << endl;
         }
+
+        // Check the arguments
+        if (args.save_voxel_indexes == true && args.subsample <= 0.0)
+            throw runtime_error ("The 'save-voxel-indexes' parameter may only be set when 'subsample' is > 0.0");
 
         // Get the input stream
         input_stream is (args.verbose, args.input_fn);
@@ -67,7 +72,10 @@ int main (int argc, char **argv)
         if (args.unique_xyz)
             f = unique_xyz (f, args.random_seed);
         if (args.subsample > 0.0)
-            f = subsample (f, args.subsample, args.random_seed);
+            f = subsample (f,
+                args.subsample,
+                args.random_seed,
+                args.save_voxel_indexes);
 
         // Get the output stream
         output_stream os (args.verbose, args.output_fn);

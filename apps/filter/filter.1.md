@@ -39,6 +39,23 @@ Remove point records from a SPOC file that satisfy certain properties
     All other points are kept. This option may be specified multiple
     times.
 
+\-\-subsample=*#*, -s *#*
+:   Subsample a point cloud by selecting a single random point record
+    from each voxel of size *#*. This is useful for decimating a point
+    cloud while still preserving the local structure. If the random seed
+    is set to '0', then the first occurrance of a point record within a
+    voxel is the one that gets saved. All subsequent occurances are
+    removed. If the random-seed is set to a non-zero value, then the
+    point that gets saved will be selected randomly from each voxel.
+
+\-\-save-voxel-indexes, -i
+:   Save voxel indexes into extra fields e0, e1, and e2. This will allow
+    you to upsample the resulting point cloud with the *spoc_tool*
+    application after you have made modifications to is. For example, if
+    you assign classifications to the downsampled point cloud, you may
+    want to upsample the point cloud in order to propogate the
+    classifications up into the original high resolution point cloud.
+
 \-\-unique-xyz, -u
 :   Remove duplicates with the same X, Y, Z values. This is useful for
     removing points whose X, Y, and Z values have been quantized with the
@@ -50,15 +67,7 @@ Remove point records from a SPOC file that satisfy certain properties
     non-zero value, then the point with the non-unique value will be
     selected randomly.
 
-\-\-subsample=*#*, -s *#*
-:   Subsample a point cloud by selecting a single random point record
-    from each voxel of size *#*. This is useful for decimating a point
-    cloud while still preserving the local structure. If the random seed
-    is set to '0', then the first occurrance of a point record within a
-    voxel is the one that gets saved. All subsequent occurances are
-    removed. If the random-seed is set to a non-zero value, then the
-    point that gets saved will be selected randomly from each voxel.
-
 # SEE ALSO
 
+SPOC\_TOOL(1)
 SPOC\_TRANSFORM(1)
