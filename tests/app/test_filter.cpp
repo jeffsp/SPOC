@@ -169,6 +169,34 @@ void test_subsample ()
     }
 }
 
+void test_subsample_save_indexes ()
+{
+    auto f1 = generate_random_spoc_file (100, 0);
+    auto f2 = generate_random_spoc_file (100, 2);
+    auto f3 = generate_random_spoc_file (100, 4);
+
+    const size_t seed = 123;
+    const bool save_voxel_indexes = true;
+    auto g1 = subsample (f1, 1.0, seed, save_voxel_indexes);
+    auto g2 = subsample (f2, 1.0, seed, save_voxel_indexes);
+    auto g3 = subsample (f3, 1.0, seed, save_voxel_indexes);
+
+    // Make sure extra fields are increased when needed
+    VERIFY (f1.get_extra_fields () == 0);
+    VERIFY (g1.get_extra_fields () == 3);
+    VERIFY (f2.get_extra_fields () == 2);
+    VERIFY (g2.get_extra_fields () == 3);
+    VERIFY (f3.get_extra_fields () == 4);
+    VERIFY (g3.get_extra_fields () == 4);
+
+    for (const auto &i : g1)
+        VERIFY (i.extra.size () == 3);
+    for (const auto &i : g2)
+        VERIFY (i.extra.size () == 3);
+    for (const auto &i : g3)
+        VERIFY (i.extra.size () == 4);
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -177,6 +205,7 @@ int main (int argc, char **argv)
         test_remove_classes ();
         test_unique_xyz ();
         test_subsample ();
+        test_subsample_save_indexes ();
         return 0;
     }
     catch (const exception &e)

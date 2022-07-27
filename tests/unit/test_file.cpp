@@ -104,6 +104,20 @@ void test_spoc_file ()
     }
 }
 
+void test_spoc_file_header ()
+{
+    const string wkt ("WKT");
+    const size_t total_points = 1000;
+    const size_t extra_fields = 3;
+    header h ("WKT", extra_fields, total_points, false);
+    const auto p = generate_random_point_records (total_points, extra_fields);
+    const spoc_file f (h, p);
+    VERIFY (f.get_wkt () == wkt);
+    VERIFY (f.get_extra_fields () == extra_fields);
+    VERIFY (f.get_total_points () == total_points);
+    VERIFY (f.get_compressed () == false);
+}
+
 void test_spoc_file_rw_access ()
 {
     const size_t total_points = 10;
@@ -123,6 +137,7 @@ int main (int argc, char **argv)
     try
     {
         test_spoc_file ();
+        test_spoc_file_header ();
         test_spoc_file_rw_access ();
         return 0;
     }
