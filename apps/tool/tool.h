@@ -206,7 +206,7 @@ inline T set_field (const T &f, std::istream &field_ifs, const std::string &fiel
 
 // Subtract min x/y/z values from all values
 template<typename T>
-inline T subtract_min (T &f, const bool z_flag = false)
+inline T subtract_min (const T &f, const bool z_flag = false)
 {
     // Check preconditions
     REQUIRE (f.is_valid ());
@@ -228,6 +228,91 @@ inline T subtract_min (T &f, const bool z_flag = false)
 
     // Return copy
     return g;
+}
+
+// Upsample classifications in 'f' to 'g'g
+// Subtract min x/y/z values from all values
+template<typename T>
+inline T upsample_classifications (
+    const T &f,
+    const T &l,
+    const double resolution,
+    const bool verbose,
+    std::ostream &log)
+{
+    // Check preconditions
+    REQUIRE (f.is_valid ());
+    REQUIRE (l.is_valid ());
+    REQUIRE (resolution > 0.0);
+
+    using namespace spoc::voxel;
+
+    // Copy f, the high res spoc file
+    T h (f);
+
+    // Compute h's voxel indexes, relative to the extent in 'h'
+    const auto vh = get_voxel_indexes (f.get_point_records (), resolution);
+
+    // Compute l's voxel indexes, relative to the extent in 'h' (not l)
+    const auto eh = spoc::extent::get_extent (h.get_point_records ());
+    const auto vl = get_voxel_indexes (l.get_point_records (), eh, resolution);
+
+    // Get a map of voxel indexes to point record indexes in 'h'
+    const auto vmh = get_voxel_index_map (vh);
+
+    // Count the number of high resolution point records that get
+    // assigned to a low resolution classification
+    size_t assigned_points = 0;
+
+    // For each voxel index in the low resolution spoc file...
+    for (size_t i = 0; i < vl.size (); ++i)
+    {
+        // Get the voxel index
+        const auto &v = vl[i];
+
+        // Does it correspond to a voxel in the high resolution spoc
+        // file?
+        if (vmh.find (v) == vmh.end ())
+            continue; // No, skip to next voxel
+
+        // Get indexes of the point records that are in this high
+        // resolution voxel
+        const auto &indexes = vmh.at (v);
+
+        // Check our logic, if it matched a voxel, it can't be empty
+        assert (!indexes.empty ());
+
+        // Get a reference to the low resolution point record
+        const auto &p = l[i];
+
+        // For each point record index in this high resolution voxel...
+        for (const auto j : indexes)
+        {
+            // Set the high resolution point record's classification to
+            // the low resolution classification
+            assert (j < h.get_point_records ().size ());
+            h[j].c = p.c;
+
+            // Count the assignment
+            ++assigned_points;
+        }
+    }
+
+    if (verbose)
+    {
+        log << assigned_points
+            << " of "
+            << h.get_point_records ().size ()
+            << " upsampled point record classifications"
+            << " were assigned a value from the subsampled point records."
+            << std::endl;
+        if (assigned_points != h.get_point_records ().size ())
+            log << "Was the low resolution spoc file subsampled from the"
+                << " high resolution spoc file and at the same resolution?";
+    }
+
+    // Return the modified copy
+    return h;
 }
 
 } // namespace tool_app

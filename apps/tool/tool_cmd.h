@@ -24,6 +24,7 @@ struct args
     bool verbose = false;
     bool version = false;
     int resize_extra = -1;
+    double resolution = 0.0;
     spoc::tool_cmd::command command;
     std::string field_fn;
     std::string input_fn;
@@ -36,7 +37,9 @@ enum command_values
     RECENTER_XYZ,
     RESIZE_EXTRA,
     SUBTRACT_MIN_XY,
-    SUBTRACT_MIN_XYZ
+    SUBTRACT_MIN_XYZ,
+    UPSAMPLE_CLASSIFICATIONS,
+    RESOLUTION,
 };
 
 args set_command (const args &args, const std::string &name, const char *s)
@@ -70,6 +73,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"field-filename", required_argument, 0, 'f'},
             {"subtract-min-xy", no_argument, 0, SUBTRACT_MIN_XY},
             {"subtract-min-xyz", no_argument, 0, SUBTRACT_MIN_XYZ},
+            {"upsample-classifications", required_argument, 0, UPSAMPLE_CLASSIFICATIONS},
+            {"resolution", required_argument, 0, RESOLUTION},
             {0, 0, 0, 0}
         };
 
@@ -129,6 +134,16 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case SUBTRACT_MIN_XYZ:
             {
                 args = set_command (args, "subtract-min-xyz", optarg);
+                break;
+            }
+            case UPSAMPLE_CLASSIFICATIONS:
+            {
+                args = set_command (args, "upsample-classifications", optarg);
+                break;
+            }
+            case RESOLUTION:
+            {
+                args.resolution = atof (optarg);
                 break;
             }
         }

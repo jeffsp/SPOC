@@ -47,15 +47,23 @@ voxel_index get_voxel_index (const T &p, const U &minp, const double res)
 }
 
 template<typename T>
-std::vector<voxel_index> get_voxel_indexes (const T &points, const double res)
+std::vector<voxel_index> get_voxel_indexes (const T &points,
+    const spoc::extent::extent &e,
+    const double res)
 {
     // Return value
     std::vector<voxel_index> voxel_indexes (points.size ());
-    const auto e = spoc::extent::get_extent (points);
 #pragma omp parallel for
     for (size_t i = 0; i < voxel_indexes.size (); ++i)
         voxel_indexes[i] = get_voxel_index (points[i], e.minp, res);
     return voxel_indexes;
+}
+
+template<typename T>
+std::vector<voxel_index> get_voxel_indexes (const T &points, const double res)
+{
+    const auto e = spoc::extent::get_extent (points);
+    return get_voxel_indexes (points, e, res);
 }
 
 // Compute a hash value from a voxel index.

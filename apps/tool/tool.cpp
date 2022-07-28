@@ -47,6 +47,7 @@ int main (int argc, char **argv)
             clog << "field_fn\t'" << args.field_fn << "'" << endl;
             clog << "input_fn\t'" << args.input_fn << "'" << endl;
             clog << "output_fn\t'" << args.output_fn << "'" << endl;
+            clog << "resolution\t'" << args.resolution << "'" << endl;
             clog << "command: " << args.command.name << "=" << args.command.params << endl;
         }
 
@@ -92,6 +93,23 @@ int main (int argc, char **argv)
             f = subtract_min (f);
         else if (args.command.name == "subtract-min-xyz")
             f = subtract_min (f, true);
+        else if (args.command.name == "upsample-classifications")
+        {
+            // Check the resolution parameter
+            if (args.resolution <= 0.0)
+                throw runtime_error ("The 'resolution' option must be set to a value > 0.0 when using the 'upsample' command");
+
+            // Open the file
+            const auto fn = args.command.params;
+            if (args.verbose)
+                clog << "Opening " << fn << " for reading" << endl;
+            ifstream ifs (fn);
+            if (!ifs)
+                throw runtime_error ("Could not open file for reading");
+            // Read the spoc file
+            const auto g = read_spoc_file (ifs);
+            f = upsample_classifications (f, g, args.resolution, args.verbose, std::clog);
+        }
         else
             throw runtime_error ("An unknown command was encountered");
 

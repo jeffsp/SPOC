@@ -1,3 +1,4 @@
+#include "filter.h"
 #include "tool.h"
 #include "test_utils.h"
 #include <iostream>
@@ -117,6 +118,52 @@ void test_set_field ()
     VERIFY_THROWS (set_field (f, field_ifs, "x");)
 }
 
+void test_upsample_classifications ()
+{
+    const size_t n = 800;
+    const size_t extra_fields = 3;
+    auto f = generate_random_spoc_file (n, extra_fields);
+
+    // Assign all high res classifications to 0
+    for (auto &p : f)
+        p.c = 0;
+
+    // Subsample. The X, Y, and Z's are in the range +/-1.0
+    const double resolution = 1.0;
+    auto l = spoc::filter_app::subsample (f, resolution, 123);
+
+    // Assign all low res classifications to 9
+    for (auto &p : l)
+        p.c = 9;
+
+    // Each octant be filled with about 100 points
+    VERIFY (l.get_point_records ().size () == 8);
+
+    // Upsample, so all classes should be set to 9
+    const bool verbose = true;
+    stringstream s;
+    const auto h = upsample_classifications (f, l, resolution, verbose, s);
+    for (auto &p : h)
+        VERIFY (p.c == 9);
+
+    // Make a copy
+    auto l2 (l);
+
+    // Move the low resolution points
+    for (auto &p : l2) { p.x += 1.0; p.y += 1.0; p.z += 1.0; }
+
+    // Now only a single octant of the two point clouds overlap
+    const auto h2 = upsample_classifications (f, l2, resolution, verbose, s);
+    size_t assigned = 0;
+    for (auto &p : h2)
+        if (p.c == 9)
+            ++assigned;
+
+    // About 100 points should have been assigned
+    VERIFY (assigned < 150);
+    VERIFY (assigned > 50);
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -126,6 +173,7 @@ int main (int argc, char **argv)
         test_subtract_min ();
         test_get_field ();
         test_set_field ();
+        test_upsample_classifications ();
         return 0;
     }
     catch (const exception &e)

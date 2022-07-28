@@ -28,6 +28,9 @@ Collection of tools to run on a SPOC file
 \-\-random-seed=*#*, -r *#*
 :   Set the random seed equal to *#*
 
+\-\-resolution=*#*
+:   Set the resolution used for upsampling
+
 # COMMANDS
 
 \-\-get-field=*F*, -g *F*
@@ -62,7 +65,16 @@ Collection of tools to run on a SPOC file
 \-\-subtract-min-xyz
 :   Same as subtract-min-xy, but also subtract min from the Z value
 
+\-\-upsample-classifications=*FN*
+:   Upsample the classifications field from a low resolution SPOC file
+    into the high resolution SPOC file specified by *FN* and write the
+    result to the output file. The SPOC file being upsampled must have
+    first been subsampled from *FN* using the *spoc_filter* application.
+    The resolution should also be set using the *resolution* option, and
+    this resolution should be the same resolution used for subsampling.
+
 # SEE ALSO
 
+SPOC\_FILTER(1)
 SPOC\_TRANSFORM(1)
 SPOC\_INFO(1)
