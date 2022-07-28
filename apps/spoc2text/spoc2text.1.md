@@ -8,7 +8,7 @@ spoc_spoc2text - Convert a SPOC format file to text
 
 # USAGE
 
-spoc_spoc2text [*options*] *filename.spoc* *filename.txt*
+spoc_spoc2text [*options*] < *filename.spoc* > *filename.txt*
 
 # DESCRIPTION
 
