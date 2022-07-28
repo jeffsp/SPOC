@@ -137,21 +137,10 @@ inline T unique_xyz (const T &f, const size_t random_seed)
 }
 
 template<typename T>
-inline T subsample (const T &f,
-    const double res,
-    const size_t random_seed,
-    const bool save_voxel_indexes)
+inline T subsample (const T &f, const double res, const size_t random_seed)
 {
     // Get an empty clone of the spoc file
     T g = f.clone_empty ();
-
-    // Should we save the voxel indexes?
-    if (save_voxel_indexes)
-    {
-        // Resize extra if needed
-        if (g.get_extra_fields () < 3)
-            g.resize_extra (3);
-    }
 
     // Get a reference to the records
     const auto &prs = f.get_point_records ();
@@ -193,28 +182,9 @@ inline T subsample (const T &f,
         // Have we encountered this one before?
         if (s.find (v[j]) != s.end ())
             continue; // Yes, skip it
+
         // No, save the point
-        //
-        // Should we save the voxel indexes?
-        if (save_voxel_indexes)
-        {
-            // Yes, add the indexes to the point record
-            auto q = prs[j];
-            // Add extra fields if needed
-            if (q.extra.size () < 3)
-                q.extra.resize (3);
-            // Save the indexes
-            q.extra[0] = v[j].i;
-            q.extra[1] = v[j].j;
-            q.extra[2] = v[j].k;
-            // Add the modified record
-            g.add (q);
-        }
-        else
-        {
-            // No, just add the point
-            g.add (prs[j]);
-        }
+        g.add (prs[j]);
 
         // Remember this voxel index
         s.insert (v[j]);
