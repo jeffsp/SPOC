@@ -1,5 +1,6 @@
 #include "spoc2las.h"
-#include "test_utils.h"
+#include "spoc/spoc.h"
+#include "spoc/test_utils.h"
 #include <filesystem>
 #include <iostream>
 #include <stdexcept>

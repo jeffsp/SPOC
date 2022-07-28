@@ -1,5 +1,5 @@
-#include "app_utils.h"
-#include "spoc.h"
+#include "spoc/app_utils.h"
+#include "spoc/spoc.h"
 #include "transform.h"
 #include "transform_cmd.h"
 #include <cctype>

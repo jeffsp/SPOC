@@ -1,4 +1,6 @@
-#include "spoc.h"
+#include "spoc/app_utils.h"
+#include "spoc/spoc.h"
+#include "srs.h"
 #include "srs_cmd.h"
 #include <iostream>
 #include <stdexcept>

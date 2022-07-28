@@ -1,5 +1,5 @@
 #pragma once
-#include "version.h"
+#include "spoc/version.h"
 #include <cstdint>
 #include <fstream>
 #include <iomanip>

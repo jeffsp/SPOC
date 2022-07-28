@@ -1,6 +1,7 @@
+#include "spoc/app_utils.h"
+#include "spoc/spoc.h"
 #include "merge.h"
 #include "merge_cmd.h"
-#include "spoc.h"
 #include <iostream>
 #include <stdexcept>
 

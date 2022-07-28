@@ -1,6 +1,7 @@
-#include "app_utils.h"
+#include "spoc/app_utils.h"
+#include "spoc/spoc.h"
+#include "decompress.h"
 #include "decompress_cmd.h"
-#include "spoc.h"
 #include <iostream>
 #include <stdexcept>
 

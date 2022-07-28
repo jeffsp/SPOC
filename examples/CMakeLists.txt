@@ -14,7 +14,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -Werror -Wno-class-memaccess ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
-include_directories(../include)
+include_directories(..)
 
 macro(add_example name)
     add_executable(${name} ./${name}.cpp)

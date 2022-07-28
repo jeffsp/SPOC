@@ -1,3 +1,6 @@
+#include "spoc/extent.h"
+#include "spoc/point.h"
+#include "spoc/test_utils.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -9,12 +12,8 @@
 #include <random>
 #include <string>
 #include <vector>
-#include "compression.h"
-#include "extent.h"
-#include "test_utils.h"
 
 using namespace std;
-using namespace spoc::compression;
 using namespace spoc::extent;
 using namespace spoc::point;
 
@@ -39,10 +38,6 @@ void test_extent (const T &points)
         z[i] = y[i] + d[i];
 
     VERIFY (points == z);
-
-    const auto z1 = compress (encode_points (x));
-    const auto z2 = compress (encode_points (d));
-    const auto z3 = compress (encode_points (points));
 }
 
 void test (const size_t N,

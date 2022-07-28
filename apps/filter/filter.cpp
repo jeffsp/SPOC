@@ -1,5 +1,5 @@
-#include "app_utils.h"
-#include "spoc.h"
+#include "spoc/app_utils.h"
+#include "spoc/spoc.h"
 #include "filter.h"
 #include "filter_cmd.h"
 #include <cctype>

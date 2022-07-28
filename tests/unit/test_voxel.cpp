@@ -1,5 +1,5 @@
-#include "test_utils.h"
-#include "voxel.h"
+#include "spoc/test_utils.h"
+#include "spoc/voxel.h"
 #include <iostream>
 #include <stdexcept>
 

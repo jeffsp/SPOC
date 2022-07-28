@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cmd.h"
+#include "spoc/cmd.h"
 #include <set>
 #include <stdexcept>
 #include <string>

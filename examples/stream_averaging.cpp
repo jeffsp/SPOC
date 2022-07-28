@@ -4,7 +4,7 @@
 //
 //    $ generate_infinite_points | stream_averaging
 
-#include "spoc.h"
+#include "spoc/spoc.h"
 #include <chrono>
 #include <locale>
 

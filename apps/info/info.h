@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spoc.h"
+#include "spoc/spoc.h"
 #include <iostream>
 #include <map>
 #include <sstream>

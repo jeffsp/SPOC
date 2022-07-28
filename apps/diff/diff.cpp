@@ -1,3 +1,5 @@
+#include "spoc/app_utils.h"
+#include "spoc/spoc.h"
 #include "diff.h"
 #include "diff_cmd.h"
 #include <iostream>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "app_utils.h"
-#include "spoc.h"
+#include "spoc/app_utils.h"
+#include "spoc/spoc.h"
 #include <cassert>
 #include <iostream>
 

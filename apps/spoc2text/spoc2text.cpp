@@ -1,4 +1,6 @@
-#include "spoc.h"
+#include "spoc/app_utils.h"
+#include "spoc/spoc.h"
+#include "spoc2text.h"
 #include "spoc2text_cmd.h"
 #include <iomanip>
 #include <iostream>

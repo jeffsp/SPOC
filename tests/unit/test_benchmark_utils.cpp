@@ -1,5 +1,5 @@
-#include "benchmark_utils.h"
-#include "test_utils.h"
+#include "spoc/benchmark_utils.h"
+#include "spoc/test_utils.h"
 #include <iostream>
 #include <stdexcept>
 #include <thread>

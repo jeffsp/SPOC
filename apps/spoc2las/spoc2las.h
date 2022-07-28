@@ -1,6 +1,6 @@
 #pragma once
 
-#include "contracts.h"
+#include "spoc/contracts.h"
 #include "laswriter.hpp"
 #include <iostream>
 

@@ -6,9 +6,9 @@ prep_merge: cppcheck clean build test examples man_pages doxygen memcheck covera
 .PHONY: cppcheck # Run cppcheck
 cppcheck:
 	@echo "Running cppcheck..."
-	@cppcheck --std=c++14 --language=c++ --enable=all \
+	@cppcheck --std=c++17 --language=c++ --enable=all \
 		-q --error-exitcode=255 \
-		-I include -I apps -I laslib/LASlib/inc -I examples \
+		-I . -I apps -I laslib/LASlib/inc -I examples \
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
 		--suppress='*:laslib/LASlib/inc/*' \
@@ -74,7 +74,7 @@ coverage: build
 	@mkdir -p ./code_analysis
 	@echo "Running gcovr..."
 	@cd build/coverage/ && gcovr -r ../.. \
-		--filter=../../include/ \
+		--filter=../../spoc/ \
 		--filter=../../apps/ \
 		--exclude='(.+)?_cmd.h$$' \
 		--exclude='../../apps/(.+)?.cpp$$' \

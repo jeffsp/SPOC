@@ -4,7 +4,7 @@
 //
 //    $ noop < input.spoc > output.spoc
 
-#include "spoc.h"
+#include "spoc/spoc.h"
 
 int main (int argc, char **argv)
 {

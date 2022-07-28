@@ -1,10 +1,10 @@
 #pragma once
-#include "contracts.h"
-#include "compression.h"
-#include "file.h"
-#include "header.h"
-#include "point_record.h"
-#include "version.h"
+#include "spoc/compression.h"
+#include "spoc/contracts.h"
+#include "spoc/file.h"
+#include "spoc/header.h"
+#include "spoc/point_record.h"
+#include "spoc/version.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>

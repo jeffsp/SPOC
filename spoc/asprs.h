@@ -1,7 +1,7 @@
 #pragma once
-#include "compression.h"
-#include "point.h"
-#include "version.h"
+#include "spoc/compression.h"
+#include "spoc/point.h"
+#include "spoc/version.h"
 #include <unordered_map>
 
 namespace spoc

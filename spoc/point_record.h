@@ -1,6 +1,6 @@
 #pragma once
-#include "point.h"
-#include "utils.h"
+#include "spoc/point.h"
+#include "spoc/utils.h"
 #include <algorithm>
 #include <functional>
 

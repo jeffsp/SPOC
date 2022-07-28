@@ -1,7 +1,6 @@
-#include "app_utils.h"
-#include "compression.h"
-#include "spoc.h"
-#include "test_utils.h"
+#include "spoc/app_utils.h"
+#include "spoc/header.h"
+#include "spoc/test_utils.h"
 #include <iostream>
 #include <random>
 #include <vector>

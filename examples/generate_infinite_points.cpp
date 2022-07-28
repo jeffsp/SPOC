@@ -5,7 +5,7 @@
 //
 //    $ generate_infinite_points | stream_averaging
 
-#include "spoc.h"
+#include "spoc/spoc.h"
 #include <random>
 
 int main (int argc, char **argv)

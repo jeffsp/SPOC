@@ -1,6 +1,7 @@
+#include "spoc/app_utils.h"
+#include "spoc/spoc.h"
 #include "spoc2las.h"
 #include "spoc2las_cmd.h"
-#include "spoc.h"
 #include <chrono>
 #include <iostream>
 #include <stdexcept>

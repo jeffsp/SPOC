@@ -1,7 +1,5 @@
-#include "app_utils.h"
-#include "compression.h"
-#include "spoc.h"
-#include "test_utils.h"
+#include "spoc/point_record.h"
+#include "spoc/test_utils.h"
 #include <iostream>
 #include <random>
 #include <vector>

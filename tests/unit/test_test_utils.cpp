@@ -1,5 +1,5 @@
-#include "contracts.h"
-#include "test_utils.h"
+#include "spoc/contracts.h"
+#include "spoc/test_utils.h"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>

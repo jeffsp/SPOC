@@ -1,5 +1,5 @@
-#include "json.h"
-#include "test_utils.h"
+#include "spoc/json.h"
+#include "spoc/test_utils.h"
 #include <iostream>
 #include <stdexcept>
 

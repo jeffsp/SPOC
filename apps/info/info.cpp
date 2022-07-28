@@ -1,3 +1,5 @@
+#include "spoc/app_utils.h"
+#include "spoc/spoc.h"
 #include "info.h"
 #include "info_cmd.h"
 #include <iostream>

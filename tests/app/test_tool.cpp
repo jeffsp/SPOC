@@ -1,6 +1,6 @@
-#include "filter.h"
 #include "tool.h"
-#include "test_utils.h"
+#include "spoc/spoc.h"
+#include "spoc/test_utils.h"
 #include <iostream>
 #include <stdexcept>
 #include <unordered_set>
@@ -130,7 +130,7 @@ void test_upsample_classifications ()
 
     // Subsample. The X, Y, and Z's are in the range +/-1.0
     const double resolution = 1.0;
-    auto l = spoc::filter_app::subsample (f, resolution, 123);
+    auto l = spoc::subsampling::subsample (f, resolution, 123);
 
     // Assign all low res classifications to 9
     for (auto &p : l)
