@@ -1,3 +1,4 @@
+#include "app_utils.h"
 #include "spoc.h"
 #include "tile.h"
 #include "tile_cmd.h"
@@ -11,6 +12,7 @@
 int main (int argc, char **argv)
 {
     using namespace std;
+    using namespace spoc::app_utils;
     using namespace spoc::extent;
     using namespace spoc::file;
     using namespace spoc::io;
@@ -52,13 +54,11 @@ int main (int argc, char **argv)
             clog << "Reading " << args.fn << endl;
         }
 
-        ifstream ifs (args.fn);
-
-        if (!ifs)
-            throw runtime_error ("Could not open file for reading");
+        // Get the input stream
+        input_stream is (args.verbose, args.fn);
 
         // Read into spoc_file struct
-        spoc_file f = read_spoc_file (ifs);
+        spoc_file f = read_spoc_file (is ());
 
         if (args.verbose)
             clog << "Total points " << f.get_point_records ().size () << endl;
@@ -155,7 +155,11 @@ int main (int argc, char **argv)
             }
 
             // Get the filename extension
-            const string ext = filesystem::path (args.fn).extension();
+            const string ext = args.fn.empty ()
+                ?
+                (t.get_compressed () ? string ("zpoc") : string ("spoc"))
+                :
+                filesystem::path (args.fn).extension().string ();
 
             // Generate the filename
             stringstream sfn;

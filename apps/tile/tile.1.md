@@ -8,7 +8,7 @@ spoc_tile - Split a spoc file into non-overlapping square tiles
 
 # USAGE
 
-spoc_tile [*options*] *filename.spoc*
+spoc_tile [*options*] [*filename.spoc*]
 
 # DESCRIPTION
 
@@ -33,6 +33,12 @@ number.
 The program will not overwrite existing files. If the filename being
 written exists, the program will abort with an error. Use the 'f' option
 to force overwrites.
+
+If the input is read from an input file, the output file extension will
+be determined from the input file. If the input is read from stdin, the
+output file extension will 'spoc' if the output file is uncompressed,
+and the output file extension will be 'zpoc' if the output file is
+compressed.
 
 # OPTIONS
 
