@@ -122,15 +122,14 @@ void test_subsample ()
     f.add (point_record (4.1, 4.1, 4.1, 4, 0, 0, 0, 0, 0));
     f.add (point_record (5.1, 5.1, 5.1, 5, 0, 0, 0, 0, 0));
     const size_t random_seed = 0;
-    const bool save_voxel_indexes = false;
-    auto g = subsample (f, 6, random_seed, save_voxel_indexes);
+    auto g = subsample (f, 6, random_seed);
     VERIFY (g.get_point_records ().size () == 1);
     VERIFY (g.get_point_records ().front ().c == 0);
-    g = subsample (f, 1.0, random_seed, save_voxel_indexes);
+    g = subsample (f, 1.0, random_seed);
     VERIFY (g.get_point_records ().size () == 6);
     VERIFY (g.get_point_records ().front ().c == 0);
     VERIFY (g.get_point_records ().back ().c == 5);
-    g = subsample (f, 2.0, random_seed, save_voxel_indexes);
+    g = subsample (f, 2.0, random_seed);
     VERIFY (g.get_point_records ().size () == 3);
     VERIFY (g.get_point_records ()[0].c == 0);
     VERIFY (g.get_point_records ()[1].c == 2);
@@ -151,9 +150,8 @@ void test_subsample ()
 
     VERIFY (f.get_point_records ().size () == n*2);
 
-    const bool save_voxel_indexes = false;
-    auto g = subsample (f, 1.0, 0, save_voxel_indexes); // Don't randomize
-    auto h = subsample (f, 1.0, 123, save_voxel_indexes); // Do randomize
+    auto g = subsample (f, 1.0, 0); // Don't randomize
+    auto h = subsample (f, 1.0, 123); // Do randomize
 
     // Half are gone
     VERIFY (g.get_point_records ().size () == n);
@@ -169,34 +167,6 @@ void test_subsample ()
     }
 }
 
-void test_subsample_save_indexes ()
-{
-    auto f1 = generate_random_spoc_file (100, 0);
-    auto f2 = generate_random_spoc_file (100, 2);
-    auto f3 = generate_random_spoc_file (100, 4);
-
-    const size_t seed = 123;
-    const bool save_voxel_indexes = true;
-    auto g1 = subsample (f1, 1.0, seed, save_voxel_indexes);
-    auto g2 = subsample (f2, 1.0, seed, save_voxel_indexes);
-    auto g3 = subsample (f3, 1.0, seed, save_voxel_indexes);
-
-    // Make sure extra fields are increased when needed
-    VERIFY (f1.get_extra_fields () == 0);
-    VERIFY (g1.get_extra_fields () == 3);
-    VERIFY (f2.get_extra_fields () == 2);
-    VERIFY (g2.get_extra_fields () == 3);
-    VERIFY (f3.get_extra_fields () == 4);
-    VERIFY (g3.get_extra_fields () == 4);
-
-    for (const auto &i : g1)
-        VERIFY (i.extra.size () == 3);
-    for (const auto &i : g2)
-        VERIFY (i.extra.size () == 3);
-    for (const auto &i : g3)
-        VERIFY (i.extra.size () == 4);
-}
-
 int main (int argc, char **argv)
 {
     try
@@ -205,7 +175,6 @@ int main (int argc, char **argv)
         test_remove_classes ();
         test_unique_xyz ();
         test_subsample ();
-        test_subsample_save_indexes ();
         return 0;
     }
     catch (const exception &e)
