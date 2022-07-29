@@ -60,26 +60,36 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 
 # Design
 
-* Applications always preserve point record ordering
-* 64-bit double precision
-* Linear complexity algorithms
-    * Exception: Quantiles in `spoc_info`
-    * Exception: Nearest neighbor is linear in number of neighbors, not
-      number of points
-* STL conformance where appropriate
-* Functional programming style: avoid OOP
-* Implicit streaming support
+* Applications
+  * Always preserve point record ordering, except when the total number
+    of point records changes
+  * Implicit streaming support
     * Streaming is provided by anonymous and named pipes
     * Point record ordering is always preserved
     * LASlib does not support streaming
-* Avoid dependencies. Current dependencies are:
+  * Avoid dependencies. Current dependencies are:
     * zlib for compression
     * OpenMP for parallelization
     * laslib for las/spoc translation utilities
-* SPOC makes assumptions about the byte ordering, and is therefore not
-  portable
-* This project is defined for Linux-based systems, including MAC OS and
-  Windows Subsystem for Linux
+  * This project is defined for Linux-based systems, including MAC OS and
+    Windows Subsystem for Linux
+
+* API
+  * STL conformance where appropriate
+  * Functional programming style: avoid OOP
+  * X, Y, and Z point coordinates use 64-bit double precision data types
+  * Point records are stored in a vector, and functions operate on point
+    record vector indexes, rather than operating on the point records
+    themselves, where possible
+  * Most functions provide the strong exception guarantee by accepting
+    only const reference parameters and returning either indexes into the
+    input data or copies of the input data
+  * Linear complexity algorithms
+    * Exception: Quantiles in `spoc_info`
+    * Exception: Nearest neighbor is linear in number of neighbors, not
+      number of points
+  * SPOC makes assumptions about the byte ordering, and is therefore not
+    portable
 
 # Project Roadmap
 
