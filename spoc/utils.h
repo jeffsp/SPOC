@@ -1,4 +1,5 @@
 #pragma once
+#include "contracts.h"
 #include <functional>
 
 namespace spoc
@@ -29,6 +30,24 @@ inline void hash_combine (size_t &seed, const T &v, const Args&... args)
     //
     //     hash_combine(s,a), hash_combine(s,b,c)
     (hash_combine(seed, args), ...);
+}
+
+// Set X, Y, Z to nearest precision by truncating
+template<typename T>
+void quantize (T &p, const double precision)
+{
+    // Check preconditions
+    REQUIRE (precision != 0.0);
+
+    // Quantize x, y, z
+#pragma omp parallel for
+    for (size_t i = 0; i < p.size (); ++i)
+    {
+        // Quantize the point
+        p[i].x = static_cast<int> (p[i].x / precision) * precision;
+        p[i].y = static_cast<int> (p[i].y / precision) * precision;
+        p[i].z = static_cast<int> (p[i].z / precision) * precision;
+    }
 }
 
 } // namespace utils

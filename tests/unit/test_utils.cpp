@@ -53,6 +53,14 @@ void test_hash_combine ()
     VERIFY (h3 != h4);
 }
 
+void test_quantize ()
+{
+    auto q = generate_points (10);
+    quantize (q, 0.001);
+    quantize (q, 0.1);
+    quantize (q, 1.0);
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -63,6 +71,7 @@ int main (int argc, char **argv)
         test_hash_combine<int> ();
         test_hash_combine<float> ();
         test_hash_combine<double> ();
+        test_quantize ();
         return 0;
     }
     catch (const exception &e)

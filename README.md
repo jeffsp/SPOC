@@ -244,7 +244,8 @@ These should be included in the SPOC API
 
   - [X] Generate voxel indexes
   - [X] Generate grid indexes (use i, j from voxel index)
-  - [ ] Expose rotate, scale, and translate functions in spoc/affine.h header
+  - [X] Expose rotate, scale, and translate functions in spoc/affine.h header
+  - [X] Expose quantize function in spoc/utils.h header
   - [X] Add subsampling.h
     - [X] Add function: Get unique indexes
     - [X] Add function: Get subsample indexes
