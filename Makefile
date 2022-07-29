@@ -1,7 +1,7 @@
 default: build test
 
 .PHONY: prep_merge # Prepare for merging
-prep_merge: cppcheck clean build test examples man_pages doxygen memcheck coverage
+prep_merge: cppcheck clean build test examples man_pages doxygen coverage memcheck
 
 .PHONY: cppcheck # Run cppcheck
 cppcheck:
