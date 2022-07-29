@@ -11,56 +11,56 @@ using namespace spoc::subsampling;
 void test_subsample ()
 {
     {
-    spoc_file f;
-    f.add (point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
-    f.add (point_record (1.1, 1.1, 1.1, 1, 0, 0, 0, 0, 0));
-    f.add (point_record (2.1, 2.1, 2.1, 2, 0, 0, 0, 0, 0));
-    f.add (point_record (3.1, 3.1, 3.1, 3, 0, 0, 0, 0, 0));
-    f.add (point_record (4.1, 4.1, 4.1, 4, 0, 0, 0, 0, 0));
-    f.add (point_record (5.1, 5.1, 5.1, 5, 0, 0, 0, 0, 0));
+    point_records p;
+    p.push_back (point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
+    p.push_back (point_record (1.1, 1.1, 1.1, 1, 0, 0, 0, 0, 0));
+    p.push_back (point_record (2.1, 2.1, 2.1, 2, 0, 0, 0, 0, 0));
+    p.push_back (point_record (3.1, 3.1, 3.1, 3, 0, 0, 0, 0, 0));
+    p.push_back (point_record (4.1, 4.1, 4.1, 4, 0, 0, 0, 0, 0));
+    p.push_back (point_record (5.1, 5.1, 5.1, 5, 0, 0, 0, 0, 0));
     const size_t random_seed = 0;
-    auto g = subsample (f, 6, random_seed);
-    VERIFY (g.get_point_records ().size () == 1);
-    VERIFY (g.get_point_records ().front ().c == 0);
-    g = subsample (f, 1.0, random_seed);
-    VERIFY (g.get_point_records ().size () == 6);
-    VERIFY (g.get_point_records ().front ().c == 0);
-    VERIFY (g.get_point_records ().back ().c == 5);
-    g = subsample (f, 2.0, random_seed);
-    VERIFY (g.get_point_records ().size () == 3);
-    VERIFY (g.get_point_records ()[0].c == 0);
-    VERIFY (g.get_point_records ()[1].c == 2);
-    VERIFY (g.get_point_records ()[2].c == 4);
+    auto ind = subsample (p, 6, random_seed);
+    VERIFY (ind.size () == 1);
+    VERIFY (p[ind.front ()].c == 0);
+    ind = subsample (p, 1.0, random_seed);
+    VERIFY (ind.size () == 6);
+    VERIFY (p[ind.front ()].c == 0);
+    VERIFY (p[ind.back ()].c == 5);
+    ind = subsample (p, 2.0, random_seed);
+    VERIFY (ind.size () == 3);
+    VERIFY (p[ind[0]].c == 0);
+    VERIFY (p[ind[1]].c == 2);
+    VERIFY (p[ind[2]].c == 4);
     }
 
     {
-    spoc_file f;
+    point_records p;
     const size_t n = 1000;
 
     for (size_t i = 0; i < n; ++i)
     {
         // A point every 1/2 meter along the diagonal
-        f.add (point_record (i, i, i, i, 0, 0, 0, 0, 0));
+        p.push_back (point_record (i, i, i, i, 0, 0, 0, 0, 0));
         const auto j = i + 0.5;
-        f.add (point_record (j, j, j, i, 0, 0, 0, 0, 0));
+        p.push_back (point_record (j, j, j, i, 0, 0, 0, 0, 0));
     }
 
-    VERIFY (f.get_point_records ().size () == n*2);
+    VERIFY (p.size () == n*2);
 
-    auto g = subsample (f, 1.0, 0); // Don't randomize
-    auto h = subsample (f, 1.0, 123); // Do randomize
+    auto ind1 = subsample (p, 1.0, 0); // Don't randomize
+    auto ind2 = subsample (p, 1.0, 123); // Do randomize
 
     // Half are gone
-    VERIFY (g.get_point_records ().size () == n);
-    VERIFY (h.get_point_records ().size () == n);
+    VERIFY (ind1.size () == n);
+    VERIFY (ind2.size () == n);
 
     // They should not have been selected randomly
-    VERIFY (g.get_point_records ().front ().c == 0);
-    VERIFY (g.get_point_records ().back ().c == n - 1);
+    VERIFY (p[ind1.front ()].c == 0);
+    VERIFY (p[ind1.back ()].c == n - 1);
 
     // They should have been selected randomly
-    VERIFY (h.get_point_records ().front ().c != 0);
-    VERIFY (h.get_point_records ().back ().c != n - 1);
+    VERIFY (p[ind2.front ()].c != 0);
+    VERIFY (p[ind2.back ()].c != n - 1);
     }
 }
 

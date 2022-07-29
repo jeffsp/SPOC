@@ -145,6 +145,9 @@ Each **POINT RECORD** in a SPOC file contains the following information:
   - [X] By default, don't show quantiles to avoid sorting
   - [X] Flag to turn on quantile summary, just show min/max instead
   - [X] Read compressed files
+  - [ ] Add metrics
+    - [ ] Point density
+    - [ ] Point density upper bound estimate
 
 - [X] spoc spoc2text/text2spoc
   - [X] Unit/integration tests
@@ -214,9 +217,8 @@ Each **POINT RECORD** in a SPOC file contains the following information:
   - [X] Recenter points about mean
   - [X] Subtract minimum X, Y, and Z from all points: subtract-min
   - [X] Resize extra
-  - [ ] Upsample
-    - [ ] field
-    - [ ] resolution
+  - [X] Upsample classifications
+    - [X] resolution
   - [X] Refactor: This application does not need to stream
   - [X] Read/write compressed files
 
@@ -242,7 +244,8 @@ These should be included in the SPOC API
 
   - [X] Generate voxel indexes
   - [X] Generate grid indexes (use i, j from voxel index)
-  - [ ] Add subsample.h
+  - [ ] Expose rotate, scale, and translate functions in spoc/affine.h header
+  - [ ] Add subsampling.h
     - [ ] Add function: Get unique indexes
     - [ ] Add function: Get subsample indexes
   - [ ] Nearest neighbor operations with lambda support

@@ -13,16 +13,10 @@ namespace subsampling
 {
 
 template<typename T>
-inline T subsample (const T &f, const double res, const size_t random_seed)
+inline std::vector<size_t> subsample (const T &p, const double res, const size_t random_seed)
 {
-    // Get an empty clone of the spoc file
-    T g = f.clone_empty ();
-
-    // Get a reference to the records
-    const auto &prs = f.get_point_records ();
-
     // Get indexes into the point cloud
-    std::vector<size_t> indexes (prs.size ());
+    std::vector<size_t> indexes (p.size ());
 
     // 0, 1, 2, ...
     std::iota (indexes.begin (), indexes.end (), 0);
@@ -40,33 +34,38 @@ inline T subsample (const T &f, const double res, const size_t random_seed)
     using namespace spoc::voxel;
 
     // Get the voxel indexes for each point
-    const auto v = get_voxel_indexes (f.get_point_records (), res);
+    const auto v = get_voxel_indexes (p, res);
 
     // Save the set of all unique voxel indexes
     voxel_index_set s;
 
+    // The return value indexes
+    std::vector<size_t> r;
+
+    r.reserve (p.size ());
+
     // For each record
-    for (size_t i = 0; i < prs.size (); ++i)
+    for (size_t i = 0; i < p.size (); ++i)
     {
         // Get the index
         const auto j = indexes[i];
 
         // Check logic
-        assert (j < prs.size ());
+        assert (j < p.size ());
         assert (j < v.size ());
 
         // Have we encountered this one before?
         if (s.find (v[j]) != s.end ())
             continue; // Yes, skip it
 
-        // No, save the point
-        g.add (prs[j]);
+        // No, save the index
+        r.push_back (j);
 
         // Remember this voxel index
         s.insert (v[j]);
     }
 
-    return g;
+    return r;
 }
 
 } // namespace subsampling

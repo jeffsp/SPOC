@@ -44,3 +44,19 @@ spoc_tool -s c \
 
 # The files should differ
 ! spoc_diff test_data/eo/romeo007.spoc ${TMPDIR}/romeo007.spoc
+
+#spoc_info test_data/eo/romeo007.spoc
+
+# Here is how you can do everything with pipes:
+# 1. Remove all classifications
+# 2. Subsample
+# 3. Set all classifications to ground
+# 4. Upsample: all the high resolution points are set to ground
+# 5. Show the results
+spoc_transform --set=c,0 < test_data/eo/romeo007.spoc | \
+spoc_filter --subsample=1.0 | \
+spoc_transform --set=c,2 | \
+spoc_tool --upsample-classifications=test_data/eo/romeo007.spoc --resolution=1.0 | \
+spoc_info > ${TMPDIR}/romeo007_upsampled.txt
+
+#cat ${TMPDIR}/romeo007_upsampled.txt

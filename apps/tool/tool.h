@@ -230,19 +230,18 @@ inline T subtract_min (const T &f, const bool z_flag = false)
     return g;
 }
 
-// Upsample classifications in 'f' to 'g'g
-// Subtract min x/y/z values from all values
+// Upsample classifications in 'l' to 'f'
 template<typename T>
 inline T upsample_classifications (
-    const T &f,
     const T &l,
+    const T &f,
     const double resolution,
     const bool verbose,
     std::ostream &log)
 {
     // Check preconditions
-    REQUIRE (f.is_valid ());
     REQUIRE (l.is_valid ());
+    REQUIRE (f.is_valid ());
     REQUIRE (resolution > 0.0);
 
     using namespace spoc::voxel;

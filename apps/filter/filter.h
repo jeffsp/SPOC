@@ -139,7 +139,20 @@ inline T unique_xyz (const T &f, const size_t random_seed)
 template<typename T>
 inline T subsample (const T &f, const double res, const size_t random_seed)
 {
-    return spoc::subsampling::subsample (f, res, random_seed);
+    // Get an empty clone of the spoc file
+    T g = f.clone_empty ();
+
+    // Get a reference to the records
+    const auto &prs = f.get_point_records ();
+
+    // Get the indexes into f
+    const auto indexes = spoc::subsampling::subsample (prs, res, random_seed);
+
+    // Add them
+    for (auto i : indexes)
+        g.add (prs[i]);
+
+    return g;
 }
 
 } // namespace filter_app

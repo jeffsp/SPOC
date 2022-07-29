@@ -130,7 +130,13 @@ void test_upsample_classifications ()
 
     // Subsample. The X, Y, and Z's are in the range +/-1.0
     const double resolution = 1.0;
-    auto l = spoc::subsampling::subsample (f, resolution, 123);
+    auto ind = spoc::subsampling::subsample (f.get_point_records (), resolution, 123);
+
+    spoc::file::spoc_file l = f.clone_empty ();
+    const auto &prs = f.get_point_records ();
+    const auto indexes = spoc::subsampling::subsample (prs, resolution, 123);
+    for (auto i : indexes)
+        l.add (prs[i]);
 
     // Assign all low res classifications to 9
     for (auto &p : l)
@@ -142,7 +148,7 @@ void test_upsample_classifications ()
     // Upsample, so all classes should be set to 9
     const bool verbose = true;
     stringstream s;
-    const auto h = upsample_classifications (f, l, resolution, verbose, s);
+    const auto h = upsample_classifications (l, f, resolution, verbose, s);
     for (auto &p : h)
         VERIFY (p.c == 9);
 
@@ -153,7 +159,7 @@ void test_upsample_classifications ()
     for (auto &p : l2) { p.x += 1.0; p.y += 1.0; p.z += 1.0; }
 
     // Now only a single octant of the two point clouds overlap
-    const auto h2 = upsample_classifications (f, l2, resolution, verbose, s);
+    const auto h2 = upsample_classifications (l2, f, resolution, verbose, s);
     size_t assigned = 0;
     for (auto &p : h2)
         if (p.c == 9)
