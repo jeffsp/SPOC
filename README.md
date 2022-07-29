@@ -86,7 +86,7 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 ## Framework
 
 - [ ] Create build and deploy containers
-- [ ] Add I/O benchmarks
+- [X] Add I/O benchmarks
 - [ ] Add compression benchmarks
 - [X] Update warning for OGC WKT to be more explicit
 - [X] Add Doxygen support
@@ -245,9 +245,9 @@ These should be included in the SPOC API
   - [X] Generate voxel indexes
   - [X] Generate grid indexes (use i, j from voxel index)
   - [ ] Expose rotate, scale, and translate functions in spoc/affine.h header
-  - [ ] Add subsampling.h
-    - [ ] Add function: Get unique indexes
-    - [ ] Add function: Get subsample indexes
+  - [X] Add subsampling.h
+    - [X] Add function: Get unique indexes
+    - [X] Add function: Get subsample indexes
   - [ ] Nearest neighbor operations with lambda support
     - [ ] Max neighbors parameter
     - [ ] Even distribution selection
@@ -318,7 +318,7 @@ Examples of how to use the command line applications
         a transect
   - [ ] Regularization, add noise
   - [ ] Tile
-- [ ] Decimate/undecimate
+- [ ] Subsample/upsample
 - [ ] Transform with pipes
 - [X] Stream averaging
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils.h"
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -13,6 +14,7 @@ namespace point
 {
 
 /// A point in 3D space
+/// @tparam T point type
 template<typename T>
 struct point
 {
@@ -21,11 +23,27 @@ struct point
     T z = 0;
 };
 
+/// Compute a hash value from a point struct
+/// @tparam T point type
+template<typename T>
+struct point_hash
+{
+    std::size_t operator() (const point<T> &p) const
+    {
+        // Combine X, Y, Z
+        size_t h = 0;
+        utils::hash_combine (h, p.x, p.y, p.z);
+        return h;
+    }
+};
+
 /// Compare two points for equality
 ///
+/// @tparam T point type
 /// @param a First point
 /// @param b Second point
-inline bool operator== (const point<double> &a, const point<double> &b)
+template<typename T>
+inline bool operator== (const point<T> &a, const point<T> &b)
 {
     if (a.x != b.x) return false;
     if (a.y != b.y) return false;
@@ -35,18 +53,22 @@ inline bool operator== (const point<double> &a, const point<double> &b)
 
 /// Compare two points for inequality
 ///
+/// @tparam T point type
 /// @param a First point
 /// @param b Second point
-inline bool operator!= (const point<double> &a, const point<double> &b)
+template<typename T>
+inline bool operator!= (const point<T> &a, const point<T> &b)
 {
     return !(a == b);
 }
 
 /// Subtract one point from another
 ///
+/// @tparam T point type
 /// @param a First point
 /// @param b Second point
-inline point<double> operator-= (point<double> &a, const point<double> &b)
+template<typename T>
+inline point<T> operator-= (point<T> &a, const point<T> &b)
 {
     a.x -= b.x;
     a.y -= b.y;
@@ -56,9 +78,11 @@ inline point<double> operator-= (point<double> &a, const point<double> &b)
 
 /// Subtract one point from another
 ///
+/// @tparam T point type
 /// @param a First point
 /// @param b Second point
-inline point<double> operator- (const point<double> &a, const point<double> &b)
+template<typename T>
+inline point<T> operator- (const point<T> &a, const point<T> &b)
 {
     auto c (a);
     return c -= b;
@@ -66,9 +90,11 @@ inline point<double> operator- (const point<double> &a, const point<double> &b)
 
 /// Add one point to another
 ///
+/// @tparam T point type
 /// @param a First point
 /// @param b Second point
-inline point<double> operator+= (point<double> &a, const point<double> &b)
+template<typename T>
+inline point<T> operator+= (point<T> &a, const point<T> &b)
 {
     a.x += b.x;
     a.y += b.y;
@@ -78,9 +104,11 @@ inline point<double> operator+= (point<double> &a, const point<double> &b)
 
 /// Add one point to another
 ///
+/// @tparam T point type
 /// @param a First point
 /// @param b Second point
-inline point<double> operator+ (const point<double> &a, const point<double> &b)
+template<typename T>
+inline point<T> operator+ (const point<T> &a, const point<T> &b)
 {
     auto c (a);
     return c += b;
@@ -88,9 +116,11 @@ inline point<double> operator+ (const point<double> &a, const point<double> &b)
 
 /// Helper function for printing a point
 ///
+/// @tparam T point type
 /// @param s Output stream
 /// @param p Point to print
-inline std::ostream &operator<< (std::ostream &s, const point<double> &p)
+template<typename T>
+inline std::ostream &operator<< (std::ostream &s, const point<T> &p)
 {
     s << ' ' << p.x;
     s << ' ' << p.y;
@@ -100,9 +130,11 @@ inline std::ostream &operator<< (std::ostream &s, const point<double> &p)
 
 /// Point less than operator
 ///
+/// @tparam T point type
 /// @param a First point
 /// @param b Second point
-inline bool operator< (const point<double> &a, const point<double> &b)
+template<typename T>
+inline bool operator< (const point<T> &a, const point<T> &b)
 {
     if (a.x < b.x) return true;
     if (a.x > b.x) return false;

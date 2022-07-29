@@ -6,8 +6,10 @@
 #include <unordered_set>
 
 using namespace std;
+using namespace spoc::file;
 using namespace spoc::io;
 using namespace spoc::point_record;
+using namespace spoc::subsampling;
 using namespace spoc::tool_app;
 
 void test_recenter ()
@@ -130,11 +132,11 @@ void test_upsample_classifications ()
 
     // Subsample. The X, Y, and Z's are in the range +/-1.0
     const double resolution = 1.0;
-    auto ind = spoc::subsampling::subsample (f.get_point_records (), resolution, 123);
+    auto ind = get_subsample_indexes (f.get_point_records (), resolution, 123);
 
-    spoc::file::spoc_file l = f.clone_empty ();
+    spoc_file l = f.clone_empty ();
     const auto &prs = f.get_point_records ();
-    const auto indexes = spoc::subsampling::subsample (prs, resolution, 123);
+    const auto indexes = get_subsample_indexes (prs, resolution, 123);
     for (auto i : indexes)
         l.add (prs[i]);
 

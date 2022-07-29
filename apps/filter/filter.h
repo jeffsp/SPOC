@@ -53,36 +53,6 @@ inline T remove_classes (const T &f, const U &c)
     return g;
 }
 
-namespace detail
-{
-
-struct xyz
-{
-    double x, y, z;
-    bool operator== (const xyz &other) const
-    {
-        return other.x == x
-            && other.y == y
-            && other.z == z;
-    }
-};
-
-// Compute a hash value from an xyz struct
-struct xyz_hash
-{
-    std::size_t operator() (const xyz &p) const
-    {
-        // Combine X, Y, Z
-        size_t h = 0;
-        utils::hash_combine (h, p.x, p.y, p.z);
-        return h;
-    }
-};
-
-using xyz_set = std::unordered_set<xyz,xyz_hash>;
-
-} // namespace detail
-
 template<typename T>
 inline T unique_xyz (const T &f, const size_t random_seed)
 {
@@ -92,46 +62,12 @@ inline T unique_xyz (const T &f, const size_t random_seed)
     // Get a reference to the records
     const auto &prs = f.get_point_records ();
 
-    // Save each unique xyz location
-    detail::xyz_set xyzs;
+    // Get the indexes into f of the unique locations
+    const auto indexes = spoc::subsampling::get_unique_xyz_indexes (prs, random_seed);
 
-    // Get indexes into the point cloud
-    std::vector<size_t> indexes (prs.size ());
-
-    // 0, 1, 2, ...
-    std::iota (indexes.begin (), indexes.end (), 0);
-
-    // Should we do this in a random order?
-    if (random_seed != 0)
-    {
-        // Yes, create rng
-        std::default_random_engine rng (random_seed);
-
-        // Randomize order
-        std::shuffle (indexes.begin (), indexes.end (), rng);
-    }
-
-    // For each record
-    for (size_t i = 0; i < prs.size (); ++i)
-    {
-        // Check logic
-        assert (indexes[i] < prs.size ());
-
-        // Get the point
-        const auto p = prs[indexes[i]];
-
-        // Get the xyz location
-        detail::xyz l {p.x, p.y, p.z};
-
-        // Have we encountered it before?
-        if (xyzs.find (l) != xyzs.end ())
-            continue; // Yes, skip it
-
-        g.add (p); // No, save the point
-
-        // Remember its location
-        xyzs.insert (l);
-    }
+    // Add them
+    for (auto i : indexes)
+        g.add (prs[i]);
 
     return g;
 }
@@ -146,7 +82,7 @@ inline T subsample (const T &f, const double res, const size_t random_seed)
     const auto &prs = f.get_point_records ();
 
     // Get the indexes into f
-    const auto indexes = spoc::subsampling::subsample (prs, res, random_seed);
+    const auto indexes = spoc::subsampling::get_subsample_indexes (prs, res, random_seed);
 
     // Add them
     for (auto i : indexes)

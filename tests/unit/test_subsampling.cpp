@@ -19,14 +19,14 @@ void test_subsample ()
     p.push_back (point_record (4.1, 4.1, 4.1, 4, 0, 0, 0, 0, 0));
     p.push_back (point_record (5.1, 5.1, 5.1, 5, 0, 0, 0, 0, 0));
     const size_t random_seed = 0;
-    auto ind = subsample (p, 6, random_seed);
+    auto ind = get_subsample_indexes (p, 6, random_seed);
     VERIFY (ind.size () == 1);
     VERIFY (p[ind.front ()].c == 0);
-    ind = subsample (p, 1.0, random_seed);
+    ind = get_subsample_indexes (p, 1.0, random_seed);
     VERIFY (ind.size () == 6);
     VERIFY (p[ind.front ()].c == 0);
     VERIFY (p[ind.back ()].c == 5);
-    ind = subsample (p, 2.0, random_seed);
+    ind = get_subsample_indexes (p, 2.0, random_seed);
     VERIFY (ind.size () == 3);
     VERIFY (p[ind[0]].c == 0);
     VERIFY (p[ind[1]].c == 2);
@@ -47,8 +47,8 @@ void test_subsample ()
 
     VERIFY (p.size () == n*2);
 
-    auto ind1 = subsample (p, 1.0, 0); // Don't randomize
-    auto ind2 = subsample (p, 1.0, 123); // Do randomize
+    auto ind1 = get_subsample_indexes (p, 1.0, 0); // Don't randomize
+    auto ind2 = get_subsample_indexes (p, 1.0, 123); // Do randomize
 
     // Half are gone
     VERIFY (ind1.size () == n);
