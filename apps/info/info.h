@@ -13,7 +13,7 @@ namespace info_app
 {
 
 template<typename T>
-std::map<std::string,size_t> get_class_count_map (const T &c)
+inline std::map<std::string,size_t> get_class_count_map (const T &c)
 {
     std::unordered_map<int,size_t> m;
 
@@ -34,6 +34,40 @@ std::map<std::string,size_t> get_class_count_map (const T &c)
     }
 
     return a;
+}
+
+template<typename T>
+inline std::map<std::string,double> get_metric_values (const T &p)
+{
+    using namespace spoc::extent;
+    using namespace spoc::voxel;
+    const auto e = get_extent (p);
+    // Get the area
+    const auto area = (e.maxp.x - e.minp.x) * (e.maxp.y - e.minp.y);
+    const double resolution = 1.0;
+    const auto vi = get_voxel_indexes (p, e, resolution);
+    // Get the total number of unique voxel indexes
+    const auto vis = get_voxel_index_set (vi);
+    // Convert voxel indexes to grid indexes
+    auto gi (vi);
+    for (auto &i : gi)
+        i.k = 0;
+    // Get the total number of unique grid indexes
+    const auto gis = get_voxel_index_set (gi);
+    std::map<std::string,double> v;
+    v["extent_point_density"] = p.size () / area;
+    v["grid_point_density"] = static_cast<double> (p.size ()) / gis.size ();
+    v["voxel_point_density"] = static_cast<double> (p.size ()) / vis.size ();
+    return v;
+}
+
+inline std::map<std::string,std::string> get_metric_units ()
+{
+    return std::map<std::string,std::string> {
+        { "extent_point_density", "pts/unit^2" },
+        { "grid_point_density", "pts/unit^2" },
+        { "voxel_point_density", "pts/unit^3" },
+    };
 }
 
 template<typename T,typename U>
@@ -169,12 +203,13 @@ inline std::string get_summary_string (const std::string &label,
 }
 
 // Process a spoc file and write to 'os'
-void process (std::ostream &os,
+inline void process (std::ostream &os,
     const spoc::file::spoc_file &f,
     const bool json,
     const bool header_info,
     const bool summary_info,
-    const bool classifications,
+    const bool classification_info,
+    const bool metric_info,
     const bool compact,
     const bool quartiles)
 {
@@ -220,7 +255,7 @@ void process (std::ostream &os,
             j["summary"] = s;
         }
 
-        if (classifications)
+        if (classification_info)
         {
             json::object c;
 
@@ -230,6 +265,18 @@ void process (std::ostream &os,
                 c[i.first] = i.second;
 
             j["classifications"] = c;
+        }
+
+        if (metric_info)
+        {
+            const auto metric_value_map = get_metric_values (f.get_point_records ());
+
+            json::object c;
+
+            for (auto i : metric_value_map)
+                c[i.first] = i.second;
+
+            j["metrics"] = c;
         }
 
         if (compact)
@@ -269,7 +316,7 @@ void process (std::ostream &os,
             }
         }
 
-        if (classifications)
+        if (classification_info)
         {
             const auto class_count_map = get_class_count_map (get_c (f.get_point_records ()));
             const auto class_map = spoc::asprs::get_asprs_class_map ();
@@ -285,6 +332,20 @@ void process (std::ostream &os,
                     << i.second
                     << "\t"
                     << l
+                    << std::endl;
+            }
+        }
+
+        if (metric_info)
+        {
+            const auto metric_value_map = get_metric_values (f.get_point_records ());
+            const auto metric_units_map = get_metric_units ();
+
+            for (auto i : metric_value_map)
+            {
+                os << i.first
+                    << "\t" << i.second
+                    << "\t" << metric_units_map.at (i.first)
                     << std::endl;
             }
         }

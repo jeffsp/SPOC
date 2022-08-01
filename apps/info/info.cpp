@@ -41,7 +41,8 @@ int main (int argc, char **argv)
             clog << "json\t" << args.json << endl;
             clog << "header-info\t" << args.header_info << endl;
             clog << "summary-info\t" << args.summary_info << endl;
-            clog << "classifications\t" << args.classifications << endl;
+            clog << "classification-info\t" << args.classification_info << endl;
+            clog << "metric-info\t" << args.metric_info << endl;
             clog << "compact\t" << args.compact << endl;
             clog << "quartiles\t" << args.quartiles << endl;
             clog << "filenames\t" << args.fns.size () << endl;
@@ -57,7 +58,8 @@ int main (int argc, char **argv)
 
             process (cout, f,
                 args.json, args.header_info, args.summary_info,
-                args.classifications, args.compact, args.quartiles);
+                args.classification_info, args.metric_info,
+                args.compact, args.quartiles);
         }
         else
         {
@@ -76,7 +78,8 @@ int main (int argc, char **argv)
 
                 process (cout, f,
                     args.json, args.header_info, args.summary_info,
-                    args.classifications, args.compact, args.quartiles);
+                    args.classification_info, args.metric_info,
+                    args.compact, args.quartiles);
             }
         }
 

@@ -69,8 +69,11 @@ highest 25% of the values are spread out over the range 89 to 4088.
 \-\-quartiles, -q
 : Toggle quartile printing
 
-\-\-classifications, -l
+\-\-classification-info, -l
 : Toggle classification information switch
+
+\-\-metric-info, -l
+: Toggle metric information switch
 
 \-\-compact, -c
 : Toggle compact output mode switch

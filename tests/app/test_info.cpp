@@ -21,17 +21,22 @@ void test_info_empty ()
             {
                 for (auto classifications : {true, false})
                 {
-                    for (auto compact : {true, false})
+                    for (auto metric_info : {true, false})
                     {
-                        for (auto quartiles : {true, false})
+                        for (auto compact : {true, false})
                         {
-                            stringstream t;
-                            process (t, f1, json,
-                                header_info, summary_info,
-                                classifications, compact, quartiles);
-                            process (t, f2, json,
-                                header_info, summary_info,
-                                classifications, compact, quartiles);
+                            for (auto quartiles : {true, false})
+                            {
+                                stringstream t;
+                                process (t, f1, json,
+                                    header_info, summary_info,
+                                    classifications, metric_info,
+                                    compact, quartiles);
+                                process (t, f2, json,
+                                    header_info, summary_info,
+                                    classifications, metric_info,
+                                    compact, quartiles);
+                            }
                         }
                     }
                 }
@@ -54,17 +59,22 @@ void test_info ()
             {
                 for (auto classifications : {true, false})
                 {
-                    for (auto compact : {true, false})
+                    for (auto metric_info : {true, false})
                     {
-                        for (auto quartiles : {true, false})
+                        for (auto compact : {true, false})
                         {
-                            stringstream t;
-                            process (t, f1, json,
-                                header_info, summary_info,
-                                classifications, compact, quartiles);
-                            process (t, f2, json,
-                                header_info, summary_info,
-                                classifications, compact, quartiles);
+                            for (auto quartiles : {true, false})
+                            {
+                                stringstream t;
+                                process (t, f1, json,
+                                    header_info, summary_info,
+                                    classifications, metric_info,
+                                    compact, quartiles);
+                                process (t, f2, json,
+                                    header_info, summary_info,
+                                    classifications, metric_info,
+                                    compact, quartiles);
+                            }
                         }
                     }
                 }

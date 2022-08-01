@@ -19,8 +19,9 @@ struct args
     bool json = false;
     bool header_info = true;
     bool summary_info = true;
+    bool classification_info = true;
+    bool metric_info = true;
     bool compact = true;
-    bool classifications = true;
     bool quartiles = false;
     std::vector<std::string> fns;
 };
@@ -38,13 +39,14 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"json", no_argument, 0, 'j'},
             {"header-info", no_argument, 0, 'a'},
             {"summary-info", no_argument, 0, 's'},
-            {"classifications", no_argument, 0, 'l'},
+            {"classification-info", no_argument, 0, 'l'},
+            {"metric-info", no_argument, 0, 'm'},
             {"compact", no_argument, 0, 'c'},
             {"quartiles", no_argument, 0, 'q'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvejaslcq", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvejaslcmq", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -65,7 +67,8 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 'j': args.json = !args.json; break;
             case 'a': args.header_info = !args.header_info; break;
             case 's': args.summary_info = !args.summary_info; break;
-            case 'l': args.classifications = !args.classifications; break;
+            case 'l': args.classification_info = !args.classification_info; break;
+            case 'm': args.metric_info = !args.metric_info; break;
             case 'c': args.compact = !args.compact; break;
             case 'q': args.quartiles = !args.quartiles; break;
         }
