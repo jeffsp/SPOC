@@ -156,8 +156,10 @@ Each **POINT RECORD** in a SPOC file contains the following information:
   - [X] Flag to turn on quantile summary, just show min/max instead
   - [X] Read compressed files
   - [ ] Add metrics
-    - [ ] Point density
-    - [ ] Point density upper bound estimate
+    - [X] Points/m^2 (extent)
+    - [X] Points/m^2 (grid cell)
+    - [X] Points/m^3 (voxel)
+    - [ ] Point spacing estimate
 
 - [X] spoc spoc2text/text2spoc
   - [X] Unit/integration tests
@@ -337,7 +339,7 @@ Examples of how to use the command line applications
 
 Examples of how to use the C++ API with compiled examples
 
-- [X] Noop a with streams
+- [X] Noop with streams
 - [X] Very large spoc file with streaming
 - [ ] Nearest neighbor processing
 - [ ] DSM creation
@@ -354,4 +356,3 @@ Examples of how to use the C++ API with compiled examples
   * Don't divide on z value (create quadtrees)
   * Create a spoc file from an octree given an extent
   * Unit/integration tests
-
