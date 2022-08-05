@@ -251,6 +251,17 @@ inline bool about_equal (const std::vector<point<double>> &a,
     return true;
 }
 
+/// Calculate the euclidean distance between two points
+///
+/// @param a First point
+/// @param b Second point
+inline double distance(const point<double> &a,
+        const point<double> &b)
+{
+    point<double> dis = a - b;
+    return std::sqrt((dis.x * dis.x) + (dis.y * dis.y) + (dis.z * dis.z));
+}
+
 } // namespace point
 
 } // namespace spoc
