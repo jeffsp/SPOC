@@ -136,6 +136,47 @@ void test_point_record_hash_load ()
         VERIFY (s.bucket_size (i) < n / 10);
 }
 
+void test_point_record_all_zero ()
+{
+    // Generate a bunch of unique points
+    const size_t n = 10;
+    const size_t extra_fields = 3;
+    auto p = generate_random_point_records (n, extra_fields);
+
+    // None are zero
+    VERIFY (!has_all_zero_c (p));
+    VERIFY (!has_all_zero_p (p));
+    VERIFY (!has_all_zero_i (p));
+    VERIFY (!has_all_zero_r (p));
+    VERIFY (!has_all_zero_g (p));
+    VERIFY (!has_all_zero_b (p));
+    VERIFY (!has_all_zero_rgb (p));
+    for (size_t i = 0; i < extra_fields; ++i)
+        VERIFY (!has_all_zero_extra (i, p));
+
+    // Set them to zero
+    for_each (begin (p), end (p), [] (point_record &i) { i.c = 0; });
+    VERIFY (has_all_zero_c (p));
+    for_each (begin (p), end (p), [] (point_record &i) { i.p = 0; });
+    VERIFY (has_all_zero_p (p));
+    for_each (begin (p), end (p), [] (point_record &i) { i.i = 0; });
+    VERIFY (has_all_zero_i (p));
+    for_each (begin (p), end (p), [] (point_record &i) { i.r = 0; });
+    VERIFY (has_all_zero_r (p));
+    for_each (begin (p), end (p), [] (point_record &i) { i.g = 0; });
+    VERIFY (has_all_zero_g (p));
+    VERIFY (!has_all_zero_rgb (p));
+    for_each (begin (p), end (p), [] (point_record &i) { i.b = 0; });
+    VERIFY (has_all_zero_b (p));
+    VERIFY (has_all_zero_rgb (p));
+    for (size_t j = 0; j < extra_fields; ++j)
+    {
+        VERIFY (!has_all_zero_extra (j, p));
+        for_each (begin (p), end (p), [&] (point_record &i) { i.extra[j] = 0; });
+        VERIFY (has_all_zero_extra (j, p));
+    }
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -144,6 +185,7 @@ int main (int argc, char **argv)
         test_point_record_fields ();
         test_point_record_hash ();
         test_point_record_hash_load ();
+        test_point_record_all_zero ();
         return 0;
     }
     catch (const exception &e)

@@ -272,6 +272,52 @@ std::vector<uint64_t> get_extra (const size_t k, const point_records &p)
     return x;
 }
 
+inline bool has_all_zero_c (const point_records &prs)
+{
+    return !std::any_of (std::begin (prs), std::end (prs),
+        [] (const point_record &pr) { return pr.c != 0; });
+}
+
+inline bool has_all_zero_p (const point_records &prs)
+{
+    return !std::any_of (std::begin (prs), std::end (prs),
+        [] (const point_record &pr) { return pr.p != 0; });
+}
+
+inline bool has_all_zero_i (const point_records &prs)
+{
+    return !std::any_of (std::begin (prs), std::end (prs),
+        [] (const point_record &pr) { return pr.i != 0; });
+}
+
+inline bool has_all_zero_r (const point_records &prs)
+{
+    return !std::any_of (std::begin (prs), std::end (prs),
+        [] (const point_record &pr) { return pr.r != 0; });
+}
+
+inline bool has_all_zero_g (const point_records &prs)
+{
+    return !std::any_of (std::begin (prs), std::end (prs),
+        [] (const point_record &pr) { return pr.g != 0; });
+}
+
+inline bool has_all_zero_b (const point_records &prs)
+{
+    return !std::any_of (std::begin (prs), std::end (prs),
+        [] (const point_record &pr) { return pr.b != 0; });
+}
+
+inline bool has_all_zero_rgb (const point_records &prs)
+{
+    return (has_all_zero_r (prs) && has_all_zero_g (prs) && has_all_zero_b (prs));
+}
+
+inline bool has_all_zero_extra (const size_t n, const point_records &prs)
+{
+    return !std::any_of (std::begin (prs), std::end (prs),
+        [&] (const point_record &pr) { return pr.extra[n] != 0; });
+}
 
 } // namespace point_record
 
