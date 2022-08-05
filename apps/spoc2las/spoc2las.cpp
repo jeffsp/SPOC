@@ -65,7 +65,7 @@ int main (int argc, char **argv)
         tm local_tm = *localtime(&tt);
         lasheader.file_creation_day = local_tm.tm_yday;
         lasheader.file_creation_year = local_tm.tm_year + 1900;
-        const double scale_factor = 0.001;
+        const double scale_factor = 0.01;
         lasheader.x_scale_factor = scale_factor;
         lasheader.y_scale_factor = scale_factor;
         lasheader.z_scale_factor = scale_factor;
@@ -92,9 +92,9 @@ int main (int argc, char **argv)
         for (size_t i = 0; i < f.get_point_records ().size (); ++i)
         {
             const auto p = f.get_point_records ()[i];
-            laspoint.set_x ((p.x - e.minp.x) / scale_factor);
-            laspoint.set_y ((p.y - e.minp.y) / scale_factor);
-            laspoint.set_z ((p.z - e.minp.z) / scale_factor);
+            laspoint.set_x (p.x);
+            laspoint.set_y (p.y);
+            laspoint.set_z (p.z);
             laspoint.set_classification (p.c);
             laspoint.set_point_source_ID (p.p);
             laspoint.set_intensity (p.i);
