@@ -290,7 +290,7 @@ inline void process (std::ostream &os,
         {
             os << "major_version\t" << int (f.get_header ().major_version) << endl;
             os << "minor_version\t" << int (f.get_header ().minor_version) << endl;
-            os << "wkt\t" << f.get_header ().wkt << endl;
+            os << "ogc_wkt\t'" << f.get_header ().wkt << "'" << endl;
             os << "total_points\t" << f.get_header ().total_points << endl;
             os << "compressed\t" << (f.get_header ().compressed ? "true" : "false") << endl;
         }
