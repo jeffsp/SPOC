@@ -9,3 +9,4 @@ laslib/LASlib/example/lasexample_simple_classification
 laslib/LASlib/example/lasexample_write_only
 laslib/LASlib/example/lasexample_write_only_full_waveform
 laslib/LASlib/example/lasexample_write_only_with_extra_bytes
+*.swp

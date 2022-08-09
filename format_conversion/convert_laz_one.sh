@@ -1,9 +1,11 @@
 #!/usr/bin/bash
 
+# usage: convert_laz_one.sh <input_filename> <output_directory>
+
 # Get filename parts
 fn=$(basename $1)
 dn=$(dirname $1)
-sn=$(basename ${dn})
+sn=${fn%.*}
 echo converting ${sn}...
 
 # Convert to las
