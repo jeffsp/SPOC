@@ -59,6 +59,20 @@ std::vector<voxel_index> get_voxel_indexes (const T &points,
     return voxel_indexes;
 }
 
+template<typename T, typename U>
+std::vector<voxel_index> get_voxel_indexes (const T &points,
+    const std::vector<U> &point_indexes,
+    const double res)
+{
+    // get extent so we can get the minimum point
+    const auto e = spoc::extent::get_extent (points);
+    std::vector<voxel_index> voxel_indexes (point_indexes.size ());
+#pragma omp parallel for
+    for (size_t i = 0; i < voxel_indexes.size (); ++i)
+        voxel_indexes[i] = get_voxel_index (points[point_indexes[i]], e.minp, res);
+    return voxel_indexes;
+}
+
 template<typename T>
 std::vector<voxel_index> get_voxel_indexes (const T &points, const double res)
 {

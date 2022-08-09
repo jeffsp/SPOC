@@ -106,6 +106,23 @@ void test_vim ()
     VERIFY (vim2.find ({0, 0, 3}) == vim2.end ());
 }
 
+void test_get_voxel_indexes_w_indexes ()
+{
+    P pc;
+    pc.push_back({0, 0, 0});
+    pc.push_back({1, 1, 1});
+    pc.push_back({2, 2, 2});
+    // Don't use the last point
+    std::vector<int> idxs {0, 1};
+    // Should end up with {0, 0, 0}, {1, 1, 1}
+    auto v1 = get_voxel_indexes (pc, idxs, 0.99); // {0,0,0} {1,1,1}
+    VERIFY (v1[0] == voxel_index(0, 0, 0));
+    VERIFY (v1[1] == voxel_index(1, 1, 1));
+    VERIFY (v1.size() == 2);
+}
+
+
+
 int main ()
 {
     try
