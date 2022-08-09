@@ -44,6 +44,7 @@ add_unit_test(test_test_utils)
 add_unit_test(test_subsampling)
 add_unit_test(test_utils)
 add_unit_test(test_voxel)
+add_unit_test(test_radius_search)
 
 macro(add_benchmark name)
     add_executable(${name} ./benchmarks/${name}.cpp)
