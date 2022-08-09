@@ -80,6 +80,62 @@ inline std::vector<spoc::point::point<double>> generate_points (
     return points;
 }
 
+template<typename T>
+T get_noisy_point_cloud (const size_t n_points, const double x_extent, const double y_extent, const double z_extent, const int seed = 123)
+{
+    // Fill it with noise
+    std::default_random_engine g;
+    std::uniform_real_distribution<double> u;
+
+    // Set the seed
+    g.seed (seed);
+
+    T pc (n_points);
+
+    // Generate the cloud
+    for (auto &i : pc)
+    {
+        // Random coords, uniform X,Y,Z
+        i.x = u (g) * x_extent;
+        i.y = u (g) * y_extent;
+        i.z = u (g) * z_extent;
+    }
+
+    return pc;
+}
+
+
+template<typename T>
+T get_noisy_gaussian_point_cloud (const size_t n_points, const double radius, const double z_stddev, const int seed = 123)
+{
+    // Fill it with noise
+    std::default_random_engine g;
+    std::uniform_real_distribution<double> u;
+    std::normal_distribution<double> d;
+
+    // Set the seed
+    g.seed (seed);
+
+    T pc (n_points);
+
+    // Generate the cloud
+    for (auto &i : pc)
+    {
+        // Use Box-Muller to distribute uniformly over a disk of radius 'r' and with a normal marginal distribution
+        // with stddev 'z_stddev' along the z-axis.
+        //
+        // (Hint: Generating random polar coords does not distribute uniformly.)
+        constexpr double pi2 = 2.0 * M_PI;
+        const double x = u (g);
+        const double y = u (g);
+        i.x = radius * sqrt (-2.0 * log (x)) * cos (pi2 * y);
+        i.y = radius * sqrt (-2.0 * log (x)) * sin (pi2 * y);
+        i.z = z_stddev * d (g);
+    }
+
+    return pc;
+}
+
 inline std::vector<spoc::point_record::point_record> generate_random_point_records (
     const size_t total_points,
     const size_t extra_fields = 0,
