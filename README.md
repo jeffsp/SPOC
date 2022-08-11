@@ -351,8 +351,13 @@ Examples of how to use the C++ API with compiled examples
 
 # Proposed Functionality
 
-* spoc octree: break into files arranged as an octree, access/create spoc files
-  * Given a bunch of spoc files, create an octree structure
-  * Don't divide on z value (create quadtrees)
-  * Create a spoc file from an octree given an extent
+* spoctree: break into files arranged as an octree, access/create spoc files
+  * Given a bunch of spoc files, create a spoctree file
+  * Spoctree is immutable (i.e. can't add to or delete from spoctree)
+  * Octree cells divide until they reach a minimum size, based upon point record size (e.g. 1Mb per cell)
+  * Generate a spoc file from a spoctree given an extent
+    * API call
+    * Application interface
+    * X,Y extent
+    * X,Y,Z extent
   * Unit/integration tests
