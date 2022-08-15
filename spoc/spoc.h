@@ -7,6 +7,7 @@
 #include "spoc/io.h"
 #include "spoc/json.h"
 #include "spoc/point.h"
+#include "spoc/radius_search.h"
 #include "spoc/subsampling.h"
 #include "spoc/utils.h"
 #include "spoc/version.h"
