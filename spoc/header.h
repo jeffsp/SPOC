@@ -21,7 +21,7 @@ struct header
     /// @param total_points Total points in the SPOC file
     /// @param compressed Compression flag
     header (const std::string &wkt,
-            const size_t extra_fields,
+            const uint8_t extra_fields,
             const size_t total_points,
             const bool compressed)
         : wkt (wkt)
@@ -65,7 +65,7 @@ struct header
     /// Well-known-text string
     std::string wkt;
     /// The number of extra fields in each point record
-    size_t extra_fields;
+    uint8_t extra_fields;
     /// The total number of points in the file
     size_t total_points;
     /// A flag that indicates if the records are compressed or not
@@ -85,7 +85,7 @@ inline std::ostream &operator<< (std::ostream &s, const header &h)
         << static_cast<int> (h.minor_version)
         << std::endl;
     s << h.wkt << std::endl;
-    s << "extra_fields " << h.extra_fields << std::endl;
+    s << "extra_fields " << static_cast<unsigned> (h.extra_fields) << std::endl;
     s << "total_points " << h.total_points << std::endl;
     s << "compressed " << (h.compressed ? "true" : "false")  << std::endl;
     return s;
@@ -121,7 +121,7 @@ inline void write_header (std::ostream &s, const header &h)
     const uint64_t len = h.wkt.size ();
     s.write (reinterpret_cast<const char*>(&len), sizeof(uint64_t));
     s.write (reinterpret_cast<const char*>(&h.wkt[0]), h.wkt.size ());
-    s.write (reinterpret_cast<const char*>(&h.extra_fields), sizeof(uint64_t));
+    s.write (reinterpret_cast<const char*>(&h.extra_fields), sizeof(uint8_t));
     s.write (reinterpret_cast<const char*>(&h.total_points), sizeof(uint64_t));
     s.write (reinterpret_cast<const char*>(&h.compressed), sizeof(uint8_t));
     s.flush ();
@@ -141,7 +141,7 @@ inline header read_header (std::istream &s)
     s.read (reinterpret_cast<char*>(&len), sizeof(uint64_t));
     h.wkt.resize (len);
     s.read (reinterpret_cast<char*>(&h.wkt[0]), len);
-    s.read (reinterpret_cast<char*>(&h.extra_fields), sizeof(uint64_t));
+    s.read (reinterpret_cast<char*>(&h.extra_fields), sizeof(uint8_t));
     s.read (reinterpret_cast<char*>(&h.total_points), sizeof(uint64_t));
     s.read (reinterpret_cast<char*>(&h.compressed), sizeof(uint8_t));
     return h;

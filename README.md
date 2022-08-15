@@ -28,7 +28,7 @@ The **HEADER** contains the following information:
 | uint8         | Minor version     | File format information |
 | uint64        | OGC WKT length    | Number of bytes in the next field |
 | uint8[0..N-1] | OGC WKT           | Arbitrary, possibly zero-length string containing OGC WKT format spatial reference data |
-| uint64        | Extra fields      | Number of 64-bit unsigned extra fields in each record |
+| uint8         | Extra fields      | Number of 64-bit unsigned extra fields in each record |
 | uint64        | Total points      | Total point records in the SPOC file |
 | uint8         | Compression flag  | Indicates if the file contents are compressed |
 
