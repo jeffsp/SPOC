@@ -34,6 +34,8 @@ struct header
         signature[2] = 'O';
         signature[3] = 'C'; // Cloud
         signature[4] = '\0'; // Terminate
+        if (wkt.size () > 0xFFFF)
+            throw std::runtime_error ("The OGC WKT length may not exceed 65535");
     }
     /// Constructor
     header () : header (std::string (), 0, 0, false)
@@ -52,6 +54,8 @@ struct header
     bool is_valid () const
     {
         if (!check_signature ())
+            return false;
+        if (wkt.size () > 0xFFFF)
             return false;
         return true;
     }
@@ -118,8 +122,8 @@ inline void write_header (std::ostream &s, const header &h)
     s.write (reinterpret_cast<const char*>(h.signature), 4 * sizeof(char));
     s.write (reinterpret_cast<const char*>(&h.major_version), sizeof(uint8_t));
     s.write (reinterpret_cast<const char*>(&h.minor_version), sizeof(uint8_t));
-    const uint64_t len = h.wkt.size ();
-    s.write (reinterpret_cast<const char*>(&len), sizeof(uint64_t));
+    const uint16_t len = h.wkt.size ();
+    s.write (reinterpret_cast<const char*>(&len), sizeof(uint16_t));
     s.write (reinterpret_cast<const char*>(&h.wkt[0]), h.wkt.size ());
     s.write (reinterpret_cast<const char*>(&h.extra_fields), sizeof(uint8_t));
     s.write (reinterpret_cast<const char*>(&h.total_points), sizeof(uint64_t));
@@ -137,8 +141,8 @@ inline header read_header (std::istream &s)
         throw std::runtime_error ("Invalid spoc file format");
     s.read (reinterpret_cast<char*>(&h.major_version), sizeof(uint8_t));
     s.read (reinterpret_cast<char*>(&h.minor_version), sizeof(uint8_t));
-    uint64_t len = 0;
-    s.read (reinterpret_cast<char*>(&len), sizeof(uint64_t));
+    uint16_t len = 0;
+    s.read (reinterpret_cast<char*>(&len), sizeof(uint16_t));
     h.wkt.resize (len);
     s.read (reinterpret_cast<char*>(&h.wkt[0]), len);
     s.read (reinterpret_cast<char*>(&h.extra_fields), sizeof(uint8_t));

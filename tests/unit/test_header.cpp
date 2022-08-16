@@ -46,6 +46,13 @@ void test_header ()
     VERIFY_THROWS (read_header (s);)
     }
 
+    // Fail when wkt is too long
+    {
+    vector<char> s (0x10000);
+    string wkt (&s[0], 0x10000);
+    VERIFY_THROWS (header h (wkt, 0, 0, false);)
+    }
+
     // Fail when writing
     {
     stringstream s;
