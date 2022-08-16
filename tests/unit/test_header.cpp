@@ -53,6 +53,15 @@ void test_header ()
     VERIFY_THROWS (header h (wkt, 0, 0, false);)
     }
 
+    // Fail when wkt is too long
+    {
+    vector<char> s (0x10000);
+    string wkt (&s[0], 0x10000);
+    header h ("WKT", 0, 0, false);
+    h.wkt = wkt;
+    VERIFY (!h.is_valid ());
+    }
+
     // Fail when writing
     {
     stringstream s;
