@@ -8,10 +8,9 @@ cppcheck:
 	@echo "Running cppcheck..."
 	@cppcheck --std=c++17 --language=c++ --enable=all \
 		-q --error-exitcode=255 \
-		-I . -I apps -I laslib/LASlib/inc -I examples \
+		-I . -I apps -I examples \
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
-		--suppress='*:laslib/LASlib/inc/*' \
 		apps/*/*.cpp
 
 # Run cmake when CMakeLists.txt changes
@@ -24,12 +23,8 @@ cppcheck:
 	@cd build/release && cmake -DCMAKE_BUILD_TYPE=Release ../..
 	@cd build/coverage && cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_COVERAGE=ON ../..
 
-.PHONY: laslib # Build LASlib library
-laslib:
-	$(MAKE) -j -C laslib/LASlib
-
 .PHONY: build # Compile all applications and tests
-build: ./build/debug/Makefile laslib
+build: ./build/debug/Makefile
 	cd build/debug && make -j 8
 	cd build/release && make -j 8
 	cd build/coverage && make -j 8
