@@ -16,3 +16,6 @@ trap cleanup EXIT
 
 spoc_srs ./test_data/lidar/juarez50.spoc > /dev/null
 spoc_srs -s "invalid" ./test_data/lidar/juarez50.spoc ${TMPDIR}/juarez50_invalid_srs.spoc
+spoc_srs < ./test_data/lidar/juarez50.spoc > /dev/null
+spoc_srs ./test_data/lidar/juarez50.spoc > /dev/null
+spoc_srs ./test_data/lidar/juarez50.spoc ./test_data/lidar/rome012.spoc ./test_data/eo/romeo007.spoc > /dev/null
