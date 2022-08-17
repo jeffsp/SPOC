@@ -115,7 +115,7 @@ inline T resize_extra (const T &f, const int sz)
     T g (f);
 
     // Change size
-    g.resize_extra (sz);
+    g.resize_extra_fields (sz);
 
     // Return the copy
     return g;

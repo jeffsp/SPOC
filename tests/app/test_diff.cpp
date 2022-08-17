@@ -143,7 +143,7 @@ void test_diff_fields ()
     // Generate spoc files
     auto f3 = generate_random_spoc_file (100, 5, true);
     auto f4 (f3);
-    f4.resize_extra (6);
+    f4.resize_extra_fields (6);
     VERIFY (diff (f3, f4) != 0);
 }
 
