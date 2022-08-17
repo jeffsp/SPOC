@@ -54,33 +54,6 @@ class spoc_file
     public:
     /// @brief Default CTOR
     spoc_file () { }
-    /// @brief Copy CTOR
-    /// @param f Spoc file to copy
-    spoc_file (const spoc_file &f)
-        : h (f.h)
-        , p (f.p)
-    {
-    }
-    /// @brief CTOR
-    /// @param wkt OGC WKT string
-    /// @param compressed Compression flag
-    /// @param p Point records
-    spoc_file (const std::string &wkt, const bool compressed, const point_record::point_records &p)
-        : h (header::header (wkt, 0, p.size (), compressed))
-        , p (p)
-    {
-        if (!p.empty ())
-            h.extra_fields = p[0].extra.size ();
-        if (!check_records (p))
-            throw std::runtime_error ("The point records are inconsistent");
-    }
-    /// @brief CTOR
-    /// @param wkt OGC WKT string
-    /// @param p Point records
-    spoc_file (const std::string &wkt, const point_record::point_records &p)
-        : spoc_file (wkt, false, p)
-    {
-    }
     /// @brief CTOR
     /// @param h Spoc header struct
     /// @param p Point records
@@ -90,10 +63,55 @@ class spoc_file
     {
         if (h.total_points != p.size ())
             throw std::runtime_error ("The header total points does not match the data total points");
-        if (!p.empty () && p[0].extra.size () != h.extra_fields)
-            throw std::runtime_error ("The header extra fields size does not match the point records");
-        if (!check_records (p))
+        if (!p.empty () && h.extra_fields != p[0].extra.size ())
+            throw std::runtime_error ("The number of extra fields does not match the point records");
+        if (!check_records (p, h.extra_fields))
             throw std::runtime_error ("The point records are inconsistent");
+    }
+    /// @brief CTOR
+    /// @param wkt OGC WKT string
+    /// @param extra_fields Number fo extra fields in each point record
+    /// @param p Point records
+    /// @param compressed Compression flag
+    spoc_file (const std::string &wkt,
+        const size_t extra_fields,
+        const point_record::point_records &p,
+        const bool compressed)
+        : spoc_file (header::header (wkt, extra_fields, p.size (), compressed), p)
+    {
+    }
+    /// @brief CTOR
+    /// @param wkt OGC WKT string
+    explicit spoc_file (const std::string &wkt)
+        : spoc_file (wkt, 0, point_record::point_records (), false)
+    {
+    }
+    /// @brief CTOR
+    /// @param wkt OGC WKT string
+    /// @param p Point records
+    /// @param compressed Compression flag
+    spoc_file (const std::string &wkt,
+        const point_record::point_records &p,
+        const bool compressed = false)
+        : spoc_file (wkt, p.empty () ? 0 : p[0].extra.size (), p, compressed)
+    {
+    }
+    /// @brief CTOR
+    /// @param wkt OGC WKT string
+    /// @param extra_fields Number fo extra fields in each point record
+    /// @param compressed Compression flag
+    spoc_file (const std::string &wkt,
+        const size_t extra_fields,
+        const bool compressed = false)
+        : spoc_file (wkt, extra_fields, point_record::point_records (), compressed)
+    {
+    }
+    /// @brief Copy CTOR
+    /// @param f Spoc file to copy
+    spoc_file (const spoc_file &f)
+        : h (f.h)
+        , p (f.p)
+    {
     }
     /// @brief Create a clone of a spoc file with 0 point records
     spoc_file clone_empty () const
@@ -207,6 +225,13 @@ class spoc_file
     const_reference back () const
     { return p.back (); }
 
+    /// @brief Random access
+    /// @param i Point record index
+    reference operator[] (size_type i)
+    {
+        assert (i < p.size ());
+        return p[i];
+    }
     /// @brief Readonly random access
     /// @param i Point record index
     const_reference operator[] (size_type i) const
@@ -214,6 +239,12 @@ class spoc_file
         assert (i < p.size ());
         return p[i];
     }
+    /// @brief Checked random access
+    /// @param i Point record index
+    ///
+    /// Throws if the subscript is invalid.
+    reference at (size_type i)
+    { return p.at (i); }
     /// @brief Readonly checked random access
     /// @param i Point record index
     ///
@@ -221,9 +252,15 @@ class spoc_file
     const_reference at (size_type i) const
     { return p.at (i); }
 
+    /// @brief Iterator access
+    iterator begin ()
+    { return p.begin (); }
     /// @brief Readonly iterator access
     const_iterator begin () const
     { return p.begin (); }
+    /// @brief Iterator access
+    iterator end ()
+    { return p.end (); }
     /// @brief Readonly iterator access
     const_iterator end () const
     { return p.end (); }

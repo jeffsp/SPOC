@@ -84,7 +84,10 @@ void test_spoc_file ()
     // Make the size check fail
     auto q = f.get_point_record (0);
     q.extra.resize (extra_fields + 1);
-    f.set (0, q);
+    // set() checks the size of 'extra'
+    VERIFY_THROWS (f.set (0, q);)
+    // operator[] does not
+    f[0] = q;
     f.set_compressed (true);
     const auto g = f.get_compressed ();
     VERIFY (g);

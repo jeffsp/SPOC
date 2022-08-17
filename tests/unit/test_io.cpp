@@ -43,7 +43,7 @@ void test_spoc_file_io ()
     {
     stringstream s;
     const string wkt = "Test wkt";
-    write_spoc_file_compressed (s, spoc_file (wkt, true, p));
+    write_spoc_file_compressed (s, spoc_file (wkt, p, true));
     const auto f = read_spoc_file (s);
 
     VERIFY (f.get_header ().wkt == wkt);
@@ -68,7 +68,7 @@ void test_spoc_file_compressed_io ()
     {
     stringstream s;
     const string wkt = "Test wkt";
-    write_spoc_file_compressed (s, spoc_file (wkt, true, p));
+    write_spoc_file_compressed (s, spoc_file (wkt, p, true));
     const auto f = read_spoc_file_compressed (s);
 
     VERIFY (wkt == f.get_header ().wkt);
@@ -82,7 +82,7 @@ void test_spoc_file_compressed_io ()
     stringstream s2;
     stringstream s3;
     write_spoc_file_uncompressed (s1, spoc_file (wkt, p));
-    write_spoc_file_compressed (s2, spoc_file (wkt, true, p));
+    write_spoc_file_compressed (s2, spoc_file (wkt, p, true));
     // Zero some fields
     for (auto &i : p)
     {
@@ -90,7 +90,7 @@ void test_spoc_file_compressed_io ()
         i.extra[3] = 0;
         i.extra[7] = 0;
     }
-    write_spoc_file_compressed (s3, spoc_file (wkt, true, p));
+    write_spoc_file_compressed (s3, spoc_file (wkt, p, true));
     const auto f1 = read_spoc_file_uncompressed (s1);
     const auto f2 = read_spoc_file_compressed (s2);
     const auto f3 = read_spoc_file_compressed (s3);
@@ -103,34 +103,34 @@ void test_spoc_file_compressed_io ()
     // Write compressed with uncompressed writer
     {
     stringstream s;
-    VERIFY_THROWS (write_spoc_file_uncompressed (s, spoc_file ("WKT", true, p));)
+    VERIFY_THROWS (write_spoc_file_uncompressed (s, spoc_file ("WKT", p, true));)
     }
 
     // Write uncompressed with compressed writer
     {
     stringstream s;
-    VERIFY_THROWS (write_spoc_file_compressed (s, spoc_file ("WKT", false, p));)
+    VERIFY_THROWS (write_spoc_file_compressed (s, spoc_file ("WKT", p, false));)
     }
 
     // Read uncompressed with compressed reader
     {
     stringstream s;
-    write_spoc_file_uncompressed (s, spoc_file ("WKT", false, p));
+    write_spoc_file_uncompressed (s, spoc_file ("WKT", p, false));
     VERIFY_THROWS (const auto f = read_spoc_file_compressed (s);)
     }
 
     // Read compressed with uncompressed reader
     {
     stringstream s;
-    write_spoc_file_compressed (s, spoc_file ("WKT", true, p));
+    write_spoc_file_compressed (s, spoc_file ("WKT", p, true));
     VERIFY_THROWS (const auto f = read_spoc_file_uncompressed (s);)
     }
 
     {
     stringstream s;
-    write_spoc_file (s, spoc_file ("WKT", false, p));
+    write_spoc_file (s, spoc_file ("WKT", p, false));
     auto f = read_spoc_file (s);
-    write_spoc_file (s, spoc_file ("WKT", true, p));
+    write_spoc_file (s, spoc_file ("WKT", p, true));
     f = read_spoc_file (s);
     }
 }

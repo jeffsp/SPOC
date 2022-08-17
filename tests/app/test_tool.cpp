@@ -138,7 +138,7 @@ void test_upsample_classifications ()
     const auto &prs = f.get_point_records ();
     const auto indexes = get_subsample_indexes (prs, resolution, 123);
     for (auto i : indexes)
-        l.add (prs[i]);
+        l.push_back (prs[i]);
 
     // Assign all low res classifications to 9
     for (auto &p : l)

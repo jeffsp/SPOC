@@ -29,10 +29,11 @@ void test_merge ()
 void test_merge_quiet ()
 {
     // Generate spoc files
-    auto f1 = generate_random_spoc_file (100, 8, true);
-    auto f2 = generate_random_spoc_file (100, 8, false);
+    const size_t extra_fields = 8;
+    auto f1 = generate_random_spoc_file (100, extra_fields, true);
+    auto f2 = generate_random_spoc_file (100, extra_fields, false);
 
-    spoc_file f;
+    spoc_file f ("WKT", extra_fields);
     const auto id = -1;
     const auto quiet = true;
     append (f1, f, id, quiet);
