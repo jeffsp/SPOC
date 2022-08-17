@@ -119,6 +119,15 @@ class spoc_file
         return true;
     }
 
+    /// @brief Get number of point records in the file
+    /// @return The total number of point records in the file
+    size_type size () const
+    { return p.size (); }
+    /// @brief Reserve space for more point records
+    /// @param n Number of point records to reserve
+    void reserve (size_type n)
+    { p.reserve (n); }
+
     /// @brief Readonly header access
     const header::header &get_header () const { return h; }
     /// @brief Readonly header access
@@ -170,59 +179,93 @@ class spoc_file
         h.extra_fields = extra_fields;
     }
 
-    // Point record R/W access
-    void add (const point_record::point_record &pr)
+    /// @brief Swap this spoc_file with another
+    void swap (spoc_file &f)
     {
-        REQUIRE (pr.extra.size () == h.extra_fields);
+        std::swap (h, f.h);
+        std::swap (p, f.p);
+    }
+    /// @brief Copy assignment
+    spoc_file &operator= (const spoc_file &rhs)
+    {
+        if (this != &rhs)
+        {
+            spoc_file tmp (rhs);
+            swap (tmp);
+        }
+        return *this;
+    }
+    /// @brief Assign all point record values
+    /// @param v Point record value to assign
+    void assign (const value_type &v)
+    { p.assign (p.size (), v); }
+
+    /// @brief Readonly point record access
+    const_reference front () const
+    { return p.front (); }
+    /// @brief Readonly point record access
+    const_reference back () const
+    { return p.back (); }
+
+    /// @brief Readonly random access
+    /// @param i Point record index
+    const_reference operator[] (size_type i) const
+    {
+        assert (i < p.size ());
+        return p[i];
+    }
+    /// @brief Readonly checked random access
+    /// @param i Point record index
+    ///
+    /// Throws if the subscript is invalid.
+    const_reference at (size_type i) const
+    { return p.at (i); }
+
+    /// @brief Readonly iterator access
+    const_iterator begin () const
+    { return p.begin (); }
+    /// @brief Readonly iterator access
+    const_iterator end () const
+    { return p.end (); }
+    /// @brief Readonly iterator access
+    const_reverse_iterator rbegin () const
+    { return p.rbegin (); }
+    /// @brief Readonly iterator access
+    const_reverse_iterator rend () const
+    { return p.rend (); }
+
+    /// @brief Clear all point records
+    void clear ()
+    {
+        p.clear ();
+        h.total_points = 0;
+    }
+    /// @brief Checked point record write access
+    void push_back (const point_record::point_record &pr)
+    {
+        if (pr.extra.size () != h.extra_fields)
+            throw std::runtime_error ("spoc_file::push_back(): the point record number of extra fields does not match the header");
         p.push_back (pr);
         ++h.total_points;
         ENSURE (is_valid ());
     }
-    void set (const size_t n, const point_record::point_record &r)
+    /// @brief Checked point record write access
+    /// @param i Point record index
+    /// @param pr Point record value
+    void set (const size_t i, const point_record::point_record &pr)
     {
-        assert (n < p.size ());
-        p[n] = r;
+        REQUIRE (i < p.size ());
+        if (pr.extra.size () != h.extra_fields)
+            throw std::runtime_error ("spoc_file::set(): the point record number of extra fields does not match the header");
+        p[i] = pr;
     }
 
-    // Point record R/W access
-    point_record::point_record &operator[] (const size_t n)
-    {
-        assert (n < p.size ());
-        return p[n];
-    }
-    const point_record::point_record &operator[] (const size_t n) const
-    {
-        assert (n < p.size ());
-        return p[n];
-    }
-    std::vector<point_record::point_record>::iterator begin ()
-    {
-        return p.begin ();
-    }
-    std::vector<point_record::point_record>::const_iterator begin () const
-    {
-        return p.begin ();
-    }
-    std::vector<point_record::point_record>::iterator end ()
-    {
-        return p.end ();
-    }
-    std::vector<point_record::point_record>::const_iterator end () const
-    {
-        return p.end ();
-    }
-
-    // Operators
+    /// @brief Logical operator support
     bool operator== (const spoc_file &other) const
-    {
-        return
-            (h == other.h)
-            && (p == other.p);
-    }
+    { return (h == other.h) && (p == other.p); }
+    /// @brief Logical operator support
     bool operator!= (const spoc_file &other) const
-    {
-        return !(*this == other);
-    }
+    { return !(*this == other); }
 };
 
 } // namespace file

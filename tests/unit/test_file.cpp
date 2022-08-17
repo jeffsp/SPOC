@@ -26,7 +26,7 @@ void test_spoc_file ()
     }
     {
     spoc_file f;
-    f.add (spoc::point_record::point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
+    f.push_back (spoc::point_record::point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
     header &h = const_cast<header &> (f.get_header ());
     VERIFY (f.is_valid ());
     h.extra_fields = 1;
