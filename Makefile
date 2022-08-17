@@ -22,10 +22,9 @@ cppcheck:
 	@echo "Running cppcheck..."
 	@cppcheck --std=c++17 --language=c++ --enable=all \
 		-q --error-exitcode=255 \
-		-I . -I apps -I laslib/LASlib/inc -I examples \
+		-I . -I apps -I examples \
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
-		--suppress='*:laslib/LASlib/inc/*' \
 		apps/*/*.cpp
 
 ################################################################
@@ -44,20 +43,11 @@ cppcheck:
 
 ################################################################
 #
-# Build LASlib
-#
-################################################################
-.PHONY: laslib # Build LASlib library
-laslib:
-	$(MAKE) -j -C laslib/LASlib
-
-################################################################
-#
 # Compile applications and tests
 #
 ################################################################
 .PHONY: build # Compile all applications and tests
-build: ./build/debug/Makefile laslib
+build: ./build/debug/Makefile
 	cd build/debug && make -j 8
 	cd build/release && make -j 8
 	cd build/coverage && make -j 8
