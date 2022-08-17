@@ -9,6 +9,7 @@ int main (int argc, char **argv)
 {
     using namespace std;
     using namespace spoc::file;
+    using namespace spoc::header;
     using namespace spoc::io;
     using namespace spoc::srs_cmd;
 
@@ -46,11 +47,11 @@ int main (int argc, char **argv)
             if (args.verbose)
                 clog << "Reading from stdin" << endl;
 
-            // Read into spoc_file struct
-            spoc_file f = read_spoc_file (cin);
-
             if (args.set_srs)
             {
+                // Read into spoc_file struct
+                auto f = read_spoc_file (cin);
+
                 // Set SRS
                 f.set_wkt (args.srs);
 
@@ -61,7 +62,10 @@ int main (int argc, char **argv)
             }
             else
             {
-                cout << f.get_wkt () << endl;
+                // Read the header
+                auto h = read_header (cin);
+
+                cout << h.wkt << endl;
             }
         }
         else if (args.set_srs)
@@ -106,10 +110,10 @@ int main (int argc, char **argv)
                 if (!ifs)
                     throw runtime_error ("Could not open file for reading");
 
-                // Read into spoc_file struct
-                spoc_file f = read_spoc_file (ifs);
+                // Read the header
+                auto h = read_header (ifs);
 
-                cout << f.get_wkt () << endl;
+                cout << h.wkt << endl;
             }
         }
 
