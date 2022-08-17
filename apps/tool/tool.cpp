@@ -74,6 +74,8 @@ int main (int argc, char **argv)
         {
             if (args.resize_extra < 0)
                 throw runtime_error ("The number of extra fields must be >= 0");
+            if (args.resize_extra > 255)
+                throw runtime_error ("The number of extra fields must be < 256");
             f = resize_extra (f, args.resize_extra);
         }
         else if (args.command.name == "set-field")
