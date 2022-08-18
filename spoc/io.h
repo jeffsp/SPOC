@@ -119,9 +119,15 @@ inline spoc::file::spoc_file read_spoc_file_uncompressed (std::istream &s)
         throw std::runtime_error ("Uncompressed reader can't read a compressed file");
 
     // Read the data
-    point_record::point_records p = read_uncompressed_points (s, h.total_points, h.extra_fields);
+    point_record::point_records prs = read_uncompressed_points (s, h.total_points, h.extra_fields);
 
-    return spoc::file::spoc_file (h, p);
+    // Create the file
+    spoc::file::spoc_file f (h.wkt, h.extra_fields, false);
+
+    // Set the point records
+    f.set_point_records (prs);
+
+    return f;
 }
 
 /// Helper I/O function
@@ -184,7 +190,13 @@ inline spoc::file::spoc_file read_spoc_file_compressed (std::istream &s)
     // Read the data
     point_record::point_records prs = read_compressed_points (s, h.total_points, h.extra_fields);
 
-    return spoc::file::spoc_file (h, prs);
+    // Create the file
+    spoc::file::spoc_file f (h.wkt, h.extra_fields, true);
+
+    // Set the point records
+    f.set_point_records (prs);
+
+    return f;
 }
 
 /// Helper I/O function
@@ -195,15 +207,21 @@ inline spoc::file::spoc_file read_spoc_file (std::istream &s)
     header::header h = header::read_header (s);
 
     // The points
-    point_record::point_records p;
+    point_record::point_records prs;
 
     // Check compression flag
     if (h.compressed)
-        p = read_compressed_points (s, h.total_points, h.extra_fields);
+        prs = read_compressed_points (s, h.total_points, h.extra_fields);
     else
-        p = read_uncompressed_points (s, h.total_points, h.extra_fields);
+        prs = read_uncompressed_points (s, h.total_points, h.extra_fields);
 
-    return spoc::file::spoc_file (h, p);
+    // Create the file
+    spoc::file::spoc_file f (h.wkt, h.extra_fields, h.compressed);
+
+    // Set the point records
+    f.set_point_records (prs);
+
+    return f;
 }
 
 /// Helper I/O function

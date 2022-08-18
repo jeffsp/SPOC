@@ -47,13 +47,7 @@ inline int diff (const spoc::file::spoc_file &f1,
 
     if (check_header)
     {
-        if (f1.get_header ().major_version != f2.get_header ().major_version)
-            return_code = -1;
-        else if (f1.get_header ().minor_version != f2.get_header ().minor_version)
-            return_code = -1;
-        else if (f1.get_header ().total_points != f2.get_header ().total_points)
-            return_code = -1;
-        else if (f1.get_header ().wkt != f2.get_header ().wkt)
+        if (f1.get_header () != f2.get_header ())
             return_code = -1;
     }
     if (check_data)

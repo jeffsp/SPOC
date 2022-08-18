@@ -41,9 +41,9 @@ void test_transform_add ()
         // Test streaming functions
         stringstream is, os;
         const string wkt ("Test WKT");
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, 0));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, 0));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, 0));
 
         add_x (is, os, offset);
         auto r = read_spoc_file_uncompressed (os);

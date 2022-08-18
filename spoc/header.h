@@ -12,10 +12,10 @@ namespace spoc
 namespace header
 {
 
-/// POD struct for SPOC file header
+/// SPOC file header
 struct header
 {
-    /// Constructor
+    /// @brief Constructor
     /// @param wkt Well known text string
     /// @param extra_fields Number of extra fields in each point record
     /// @param total_points Total points in the SPOC file
@@ -23,7 +23,7 @@ struct header
     header (const std::string &wkt,
             const uint8_t extra_fields,
             const size_t total_points,
-            const bool compressed)
+            const bool compressed = false)
         : wkt (wkt)
         , extra_fields (extra_fields)
         , total_points (total_points)
@@ -37,7 +37,7 @@ struct header
         if (wkt.size () > 0xFFFF)
             throw std::runtime_error ("The OGC WKT length may not exceed 65535");
     }
-    /// Constructor
+    /// @brief Constructor
     header () : header (std::string (), 0, 0, false)
     {
     }
@@ -76,26 +76,7 @@ struct header
     uint8_t compressed;
 };
 
-/// Helper I/O function
-/// @param s Output stream
-/// @param h Header struct
-inline std::ostream &operator<< (std::ostream &s, const header &h)
-{
-    for (auto i : {0, 1, 2 ,3})
-        s << h.signature[i];
-    s << std::endl;
-    s << static_cast<int> (h.major_version)
-        << "."
-        << static_cast<int> (h.minor_version)
-        << std::endl;
-    s << h.wkt << std::endl;
-    s << "extra_fields " << static_cast<unsigned> (h.extra_fields) << std::endl;
-    s << "total_points " << h.total_points << std::endl;
-    s << "compressed " << (h.compressed ? "true" : "false")  << std::endl;
-    return s;
-}
-
-/// Helper equals operator
+/// Helper relational operator
 /// @param a First header
 /// @param b Second header
 inline bool operator== (const header &a, const header &b)
@@ -112,7 +93,24 @@ inline bool operator== (const header &a, const header &b)
     return true;
 }
 
-/// Helper I/O function
+/// Helper relational operator
+/// @param a First header
+/// @param b Second header
+inline bool operator!= (const header &a, const header &b)
+{
+    for (auto i : {0, 1, 2, 3})
+        // cppcheck-suppress useStlAlgorithm
+        if (a.signature[i] != b.signature[i]) return true;
+    if (a.major_version != b.major_version) return true;
+    if (a.minor_version != b.minor_version) return true;
+    if (a.wkt != b.wkt) return true;
+    if (a.extra_fields != b.extra_fields) return true;
+    if (a.total_points != b.total_points) return true;
+    if (a.compressed != b.compressed) return true;
+    return false;
+}
+
+/// I/O function
 /// @param s Output stream
 /// @param h Header struct
 inline void write_header (std::ostream &s, const header &h)
@@ -131,7 +129,7 @@ inline void write_header (std::ostream &s, const header &h)
     s.flush ();
 }
 
-/// Helper I/O function
+/// I/O function
 /// @param s Input stream
 inline header read_header (std::istream &s)
 {
@@ -151,6 +149,24 @@ inline header read_header (std::istream &s)
     return h;
 }
 
+/// Helper I/O function
+/// @param s Output stream
+/// @param h Header struct
+inline std::ostream &operator<< (std::ostream &s, const header &h)
+{
+    for (auto i : {0, 1, 2 ,3})
+        s << h.signature[i];
+    s << std::endl;
+    s << static_cast<int> (h.major_version)
+        << "."
+        << static_cast<int> (h.minor_version)
+        << std::endl;
+    s << h.wkt << std::endl;
+    s << "extra_fields " << static_cast<unsigned> (h.extra_fields) << std::endl;
+    s << "total_points " << h.total_points << std::endl;
+    s << "compressed " << (h.compressed ? "true" : "false")  << std::endl;
+    return s;
+}
 
 } // namespace header
 

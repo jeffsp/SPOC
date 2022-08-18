@@ -19,11 +19,14 @@ void test_spoc_file ()
     // Test spoc_file::is_valid()
     {
     spoc_file f;
+    // Force header to be invalid. Don't ever do this.
     header &h = const_cast<header &> (f.get_header ());
     VERIFY (f.is_valid ());
     h.total_points = 1;
     VERIFY (!f.is_valid ());
     }
+
+    // Test push_back
     {
     spoc_file f;
     f.push_back (spoc::point_record::point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
@@ -33,107 +36,48 @@ void test_spoc_file ()
     VERIFY (!f.is_valid ());
     }
 
-    // Test CTORs
-    const size_t total_points = 1000;
-    const size_t extra_fields = 3;
-    auto p = generate_random_point_records (total_points, extra_fields);
-    p[100].extra.resize (extra_fields + 1);
-    header h ("WKT", extra_fields, total_points, false);
-
-    VERIFY_THROWS (spoc_file f (h, p);)
-    VERIFY_THROWS ({
-        stringstream s;
-        const string wkt = "Test wkt";
-        write_spoc_file_uncompressed (s, spoc_file (wkt, p));
-    })
-
-    VERIFY_THROWS ({
-        stringstream s;
-        const string wkt = "Test wkt";
-        write_spoc_file_compressed (s, spoc_file (wkt, p));
-    })
-
-    header h2 ("WKT", extra_fields, total_points + 1, false);
-    VERIFY_THROWS (spoc_file f (h2, p);)
-
-    header h3 ("WKT", extra_fields + 1, total_points, false);
-    VERIFY_THROWS (spoc_file f (h3, p);)
-
-    {
+    // Test set_point_records
     const size_t total_points = 100;
     const size_t extra_fields = 3;
     auto p = generate_random_point_records (total_points, extra_fields);
-    const string wkt = "Test wkt";
-    auto f = spoc_file (wkt, p);
-    auto g = f.get_wkt ();
-    VERIFY (g == wkt);
-    f.set_wkt ("Test WKT 2");
-    for (size_t i = 0; i < f.get_point_records ().size (); ++i)
-    {
-        const auto q = f.get_point_record (i);
-        f.set (i, q);
-    }
-    }
+    p[10].extra.resize (extra_fields + 1);
 
-    {
-    const size_t total_points = 100;
-    const size_t extra_fields = 3;
-    auto p = generate_random_point_records (total_points, extra_fields);
-    const string wkt = "Test wkt";
-    auto f = spoc_file (wkt, p);
-    // Make the size check fail
-    auto q = f.get_point_record (0);
-    q.extra.resize (extra_fields + 1);
-    // set() checks the size of 'extra'
-    VERIFY_THROWS (f.set (0, q);)
-    // operator[] does not
-    f[0] = q;
-    f.set_compressed (true);
-    const auto g = f.get_compressed ();
-    VERIFY (g);
+    spoc_file f ("WKT", extra_fields, false);
+    VERIFY_THROWS (f.set_point_records (p);)
 
-    // Throw because size check fails
-    VERIFY_THROWS ({
-        stringstream s;
-        f.set_compressed (true);
-        write_spoc_file_compressed (s, f);
-    })
-
-    // Throw because size check fails
-    VERIFY_THROWS ({
-        stringstream s;
-        f.set_compressed (false);
-        write_spoc_file_uncompressed (s, f);
-    })
-    }
+    p[10].extra.resize (extra_fields - 1);
+    spoc_file g ("WKT", extra_fields + 1, false);
+    VERIFY_THROWS (g.set_point_records (p);)
 }
 
 void test_spoc_file_header ()
 {
+    const size_t total_points = 100;
+    const size_t extra_fields = 3;
     const string wkt ("WKT");
-    const size_t total_points = 1000;
-    const size_t extra_fields = 3;
-    header h ("WKT", extra_fields, total_points, false);
-    const auto p = generate_random_point_records (total_points, extra_fields);
-    const spoc_file f (h, p);
-    VERIFY (f.get_wkt () == wkt);
-    VERIFY (f.get_extra_fields () == extra_fields);
-    VERIFY (f.get_total_points () == total_points);
-    VERIFY (f.get_compressed () == false);
-}
-
-void test_spoc_file_rw_access ()
-{
-    const size_t total_points = 10;
-    const size_t extra_fields = 3;
     auto p = generate_random_point_records (total_points, extra_fields);
-    auto f = spoc_file ("WKT", p);
-    f[0].x = 2.0;
-    // Test operator[]
-    VERIFY (f[0].x == 2.0);
-    // Test begin(), end()
-    for (auto &i : f)
-        i.x = 1.0;
+
+    spoc_file f (wkt, extra_fields);
+    VERIFY (f.get_header ().wkt == wkt);
+    VERIFY (f.get_header ().extra_fields == extra_fields);
+    VERIFY (f.get_header ().total_points == 0);
+    VERIFY (f.get_header ().compressed == false);
+    f.set_point_records (p);
+    VERIFY (f.get_header ().wkt == wkt);
+    VERIFY (f.get_header ().extra_fields == extra_fields);
+    VERIFY (f.get_header ().total_points == total_points);
+    VERIFY (f.get_header ().compressed == false);
+
+    spoc_file g (wkt, extra_fields, true);
+    VERIFY (g.get_header ().wkt == wkt);
+    VERIFY (g.get_header ().extra_fields == extra_fields);
+    VERIFY (g.get_header ().total_points == 0);
+    VERIFY (g.get_header ().compressed == true);
+    g.set_point_records (p);
+    VERIFY (g.get_header ().wkt == wkt);
+    VERIFY (g.get_header ().extra_fields == extra_fields);
+    VERIFY (g.get_header ().total_points == total_points);
+    VERIFY (g.get_header ().compressed == true);
 }
 
 int main (int argc, char **argv)
@@ -142,7 +86,6 @@ int main (int argc, char **argv)
     {
         test_spoc_file ();
         test_spoc_file_header ();
-        test_spoc_file_rw_access ();
         return 0;
     }
     catch (const exception &e)
