@@ -127,8 +127,9 @@ void test_upsample_classifications ()
     auto f = generate_random_spoc_file (n, extra_fields);
 
     // Assign all high res classifications to 0
-    for (auto &p : f)
-        p.c = 0;
+    auto p = f.get_point_records ();
+    for (auto &i : p)
+        i.c = 0;
 
     // Subsample. The X, Y, and Z's are in the range +/-1.0
     const double resolution = 1.0;
@@ -141,8 +142,10 @@ void test_upsample_classifications ()
         l.push_back (prs[i]);
 
     // Assign all low res classifications to 9
-    for (auto &p : l)
-        p.c = 9;
+    auto r = l.get_point_records ();
+    for (auto &i : r)
+        i.c = 9;
+    l.set_point_records (r);
 
     // Each octant be filled with about 100 points
     VERIFY (l.get_point_records ().size () == 8);
@@ -151,20 +154,24 @@ void test_upsample_classifications ()
     const bool verbose = true;
     stringstream s;
     const auto h = upsample_classifications (l, f, resolution, verbose, s);
-    for (auto &p : h)
-        VERIFY (p.c == 9);
+    r = l.get_point_records ();
+    for (auto &i : r)
+        VERIFY (i.c == 9);
+    l.set_point_records (r);
 
     // Make a copy
     auto l2 (l);
 
     // Move the low resolution points
-    for (auto &p : l2) { p.x += 1.0; p.y += 1.0; p.z += 1.0; }
+    r = l2.get_point_records ();
+    for (auto &i : r) { i.x += 1.0; i.y += 1.0; i.z += 1.0; }
+    l2.set_point_records (r);
 
     // Now only a single octant of the two point clouds overlap
     const auto h2 = upsample_classifications (l2, f, resolution, verbose, s);
     size_t assigned = 0;
-    for (auto &p : h2)
-        if (p.c == 9)
+    for (const auto &i : h2.get_point_records ())
+        if (i.c == 9)
             ++assigned;
 
     // About 100 points should have been assigned
