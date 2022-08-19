@@ -71,7 +71,7 @@ class spoc_file
     /// @param wkt OGC WKT string
     /// @param compressed Compression flag
     /// @param prs Point records
-    explicit spoc_file (const uint8_t major_version,
+    spoc_file (const uint8_t major_version,
         const uint8_t minor_version,
         const std::string &wkt,
         const bool compressed = false,
@@ -89,26 +89,16 @@ class spoc_file
     /// @param wkt OGC WKT string
     /// @param compressed Compression flag
     /// @param prs Point records
-    explicit spoc_file (const std::string &wkt,
-        const bool compressed = false,
-        const point_record::point_records &prs = point_record::point_records ())
-        : major_version (0)
-        , minor_version (0)
-        , wkt (wkt)
-        , compressed (compressed)
-        , prs (prs)
+    spoc_file (const std::string &wkt,
+        const bool compressed,
+        const point_record::point_records &prs)
+        : spoc_file (0, 0, wkt, compressed, prs)
     {
-        // Check for consistency
-        check_extra_fields (prs);
     }
     /// @brief Copy CTOR
     /// @param f Spoc file to copy
     spoc_file (const spoc_file &f)
-        : major_version (f.major_version)
-        , minor_version (f.minor_version)
-        , wkt (f.wkt)
-        , compressed (f.compressed)
-        , prs (f.prs)
+        : spoc_file (f.major_version, f.minor_version, f.wkt, f.compressed, f.prs)
     {
     }
 
@@ -188,6 +178,8 @@ class spoc_file
     /// @brief Swap this spoc_file with another
     void swap (spoc_file &f)
     {
+        std::swap (major_version, f.major_version);
+        std::swap (minor_version, f.minor_version);
         std::swap (wkt, f.wkt);
         std::swap (compressed, f.compressed);
         std::swap (prs, f.prs);
