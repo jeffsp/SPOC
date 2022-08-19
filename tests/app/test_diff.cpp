@@ -85,55 +85,55 @@ void test_diff_fields ()
     prs1[0].x = prs1[0].x + 1;
     f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f1.set_point_records (prs2);
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
     prs1[0].y = prs1[0].y + 1;
     f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f1.set_point_records (prs2);
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
     prs1[0].z = prs1[0].z + 1;
     f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f1.set_point_records (prs2);
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
     prs1[0].c = prs1[0].c + 1;
     f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f1.set_point_records (prs2);
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
     prs1[0].p = prs1[0].p + 1;
     f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f1.set_point_records (prs2);
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
     prs1[0].i = prs1[0].i + 1;
     f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f1.set_point_records (prs2);
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
     prs1[0].r = prs1[0].r + 1;
     f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f1.set_point_records (prs2);
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
     prs1[0].g = prs1[0].g + 1;
     f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f1.set_point_records (prs2);
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
     prs1[0].b = prs1[0].b + 1;
     f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f1.set_point_records (prs2);
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
     for (size_t i = 0; i < prs1[0].extra.size (); ++i)
@@ -141,7 +141,7 @@ void test_diff_fields ()
         prs1[0].extra[i] = prs1[0].extra[i] + 1;
         f1.set_point_records (prs1);
         VERIFY (diff (f1, f2) != 0);
-        f1.set_point_records (prs2);
+        f1.set_point_records (prs1 = prs2);
         VERIFY (diff (f1, f2) == 0);
     }
 
@@ -169,7 +169,6 @@ void test_diff_individual_fields ()
     prs1[0].x = prs1[0].x + 1;
     f1.set_point_records (prs1);
     VERIFY (diff (f1, f2, false, false, fields) != 0);
-    f1.set_point_records (prs2);
 
     // Reverse meaning
     VERIFY (diff (f1, f2, false, false, fields, true) == 0);
@@ -198,7 +197,7 @@ int main (int argc, char **argv)
         test_diff ();
         test_diff_header ();
         test_diff_fields ();
-        //test_diff_individual_fields ();
+        test_diff_individual_fields ();
         return 0;
     }
     catch (const exception &e)
