@@ -72,8 +72,6 @@ void test_relational ()
     // Change wkt
     test_equal (h1, h2);
     h1.wkt[0] += 1;
-    clog << "h1 " << h1.wkt << endl;
-    clog << "h2 " << h2.wkt << endl;
     test_not_equal (h1, h2);
     h1 = h2;
 
