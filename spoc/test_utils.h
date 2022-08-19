@@ -173,7 +173,7 @@ inline spoc::file::spoc_file generate_random_spoc_file (
     const size_t seed = 123)
 {
     const auto prs = generate_random_point_records (total_points, extra_fields, rgb, seed);
-    spoc::file::spoc_file f ("WKT", extra_fields, compressed, prs);
+    spoc::file::spoc_file f ("WKT", compressed, prs);
     return f;
 }
 

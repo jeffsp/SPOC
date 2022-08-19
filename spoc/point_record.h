@@ -160,24 +160,8 @@ inline point_record read_point_record (std::istream &s, const size_t extra_field
     return p;
 }
 
-// Helper typedefs
+// Helper typedef
 using point_records = std::vector<point_record>;
-
-// Helper function
-bool check_records (const point_records &prs, const size_t extra_fields)
-{
-    // Degenerate case
-    if (prs.empty ())
-        return true;
-
-    // Make sure they all have the same number of extra fields
-    if (std::any_of (prs.cbegin(), prs.cend(),
-        [&](const point_record &p)
-        { return p.extra.size () != extra_fields; }))
-        return false;
-
-    return true;
-}
 
 // Helper functions
 std::vector<double> get_x (const point_records &p)

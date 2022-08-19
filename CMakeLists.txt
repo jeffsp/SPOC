@@ -59,7 +59,7 @@ macro(add_app_test name)
     target_include_directories(test_${name} PRIVATE apps/${name})
 endmacro()
 
-add_app_test(diff)
+#add_app_test(diff)
 #add_app_test(filter)
 #add_app_test(info)
 #add_app_test(merge)

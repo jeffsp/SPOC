@@ -41,7 +41,7 @@ struct header
     header () : header (std::string (), 0, 0, false)
     {
     }
-    /// Check to make sure the header contains a valid signature
+    /// @brief Check to make sure the header contains a valid signature
     bool check_signature () const
     {
         if (signature[0] != 'S') return false;
@@ -50,7 +50,7 @@ struct header
         if (signature[3] != 'C') return false;
         return true;
     }
-    /// Check to make sure the header structure is valid
+    /// @brief Check to make sure the header structure is valid
     bool is_valid () const
     {
         if (!check_signature ())
