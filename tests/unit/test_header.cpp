@@ -12,20 +12,93 @@ using namespace spoc::header;
 
 void test_header ()
 {
+    // Test is_valid
     {
     header h;
     VERIFY (h.is_valid ());
     }
 
-    {
+    // Test is_valid
     for (size_t i = 0; i < 4; ++i)
     {
         header h;
         h.signature[i] = '!';
         VERIFY (!h.is_valid ());
     }
-    }
+}
 
+template<typename T>
+void test_equal (const T &h1, const T &h2)
+{
+    VERIFY (h1 == h2);
+    VERIFY (!(h1 != h2));
+    VERIFY (h2 == h1);
+    VERIFY (!(h2 != h1));
+}
+
+template<typename T>
+void test_not_equal (const T &h1, const T &h2)
+{
+    VERIFY (h1 != h2);
+    VERIFY (!(h1 == h2));
+    VERIFY (h2 != h1);
+    VERIFY (!(h2 == h1));
+}
+
+void test_relational ()
+{
+    header h1, h2;
+    h1.wkt = "WKT";
+    h2.wkt = "WKT";
+
+    // Change signature
+    test_equal (h1, h2);
+    h1.signature[3] = 'X';
+    test_not_equal (h1, h2);
+    h1 = h2;
+
+    // Change major_version
+    test_equal (h1, h2);
+    h1.major_version += 1;
+    test_not_equal (h1, h2);
+    h1 = h2;
+
+    // Change minor_version
+    test_equal (h1, h2);
+    h1.minor_version += 1;
+    test_not_equal (h1, h2);
+    h1 = h2;
+
+    // Change wkt
+    test_equal (h1, h2);
+    h1.wkt[0] += 1;
+    clog << "h1 " << h1.wkt << endl;
+    clog << "h2 " << h2.wkt << endl;
+    test_not_equal (h1, h2);
+    h1 = h2;
+
+    // Change extra_fields
+    test_equal (h1, h2);
+    h1.extra_fields += 1;
+    test_not_equal (h1, h2);
+    h1 = h2;
+
+    // Change total_points
+    test_equal (h1, h2);
+    h1.total_points += 1;
+    test_not_equal (h1, h2);
+    h1 = h2;
+
+    // Change compressed
+    test_equal (h1, h2);
+    h1.compressed = !h1.compressed;
+    test_not_equal (h1, h2);
+    h1 = h2;
+}
+
+void test_read_write ()
+{
+    // Test read/write
     {
     header h;
     h.wkt = "Test WKT";
@@ -76,6 +149,8 @@ int main (int argc, char **argv)
     try
     {
         test_header ();
+        test_relational ();
+        test_read_write ();
         return 0;
     }
     catch (const exception &e)
