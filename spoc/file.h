@@ -51,6 +51,8 @@ inline void check_extra_fields (const point_record::point_records &prs)
 class spoc_file
 {
     private:
+    uint8_t major_version;
+    uint8_t minor_version;
     std::string wkt;
     bool compressed;
     point_record::point_records prs;
@@ -58,8 +60,30 @@ class spoc_file
     public:
     /// @brief CTOR
     spoc_file ()
-        : compressed (false)
+        : major_version (0)
+        , minor_version (0)
+        , compressed (false)
     {
+    }
+    /// @brief CTOR
+    /// @param major_version Version information
+    /// @param minor_version Version information
+    /// @param wkt OGC WKT string
+    /// @param compressed Compression flag
+    /// @param prs Point records
+    explicit spoc_file (const uint8_t major_version,
+        const uint8_t minor_version,
+        const std::string &wkt,
+        const bool compressed = false,
+        const point_record::point_records &prs = point_record::point_records ())
+        : major_version (major_version)
+        , minor_version (minor_version)
+        , wkt (wkt)
+        , compressed (compressed)
+        , prs (prs)
+    {
+        // Check for consistency
+        check_extra_fields (prs);
     }
     /// @brief CTOR
     /// @param wkt OGC WKT string
@@ -68,7 +92,9 @@ class spoc_file
     explicit spoc_file (const std::string &wkt,
         const bool compressed = false,
         const point_record::point_records &prs = point_record::point_records ())
-        : wkt (wkt)
+        : major_version (0)
+        , minor_version (0)
+        , wkt (wkt)
         , compressed (compressed)
         , prs (prs)
     {
