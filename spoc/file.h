@@ -104,7 +104,9 @@ class spoc_file
     /// @brief Copy CTOR
     /// @param f Spoc file to copy
     spoc_file (const spoc_file &f)
-        : wkt (f.wkt)
+        : major_version (f.major_version)
+        , minor_version (f.minor_version)
+        , wkt (f.wkt)
         , compressed (f.compressed)
         , prs (f.prs)
     {
@@ -117,6 +119,12 @@ class spoc_file
             return false;
         return true;
     }
+
+    /// @brief Readonly version access
+    unsigned get_major_version () const { return major_version; }
+
+    /// @brief Readonly version access
+    unsigned get_minor_version () const { return minor_version; }
 
     /// @brief Readonly wkt access
     std::string get_wkt () const { return wkt; }
@@ -132,7 +140,7 @@ class spoc_file
     {
         const size_t extra_fields = prs.empty () ? 0 : prs[0].extra.size ();
         const size_t total_points = prs.size ();
-        header::header h (wkt, extra_fields, total_points, compressed);
+        header::header h (major_version, minor_version, wkt, extra_fields, total_points, compressed);
 
         ENSURE (h.is_valid ());
         return h;

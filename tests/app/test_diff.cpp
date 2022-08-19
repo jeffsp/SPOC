@@ -51,32 +51,20 @@ void test_diff_header ()
     }
 
     {
-    header h1;
-    header h2;
-    h1.major_version = 1;
-    h2.major_version = 2;
-    spoc_file f1 (h1);
-    spoc_file f2 (h2);
+    spoc_file f1 (1, 1, "WKT");
+    spoc_file f2 (1, 2, "WKT");
     VERIFY (diff (f1, f2) != 0);
     }
 
     {
-    header h1;
-    header h2;
-    h1.minor_version = 1;
-    h2.minor_version = 2;
-    spoc_file f1 (h1);
-    spoc_file f2 (h2);
+    spoc_file f1 (1, 2, "WKT");
+    spoc_file f2 (1, 1, "WKT");
     VERIFY (diff (f1, f2) != 0);
     }
 
     {
-    header h1;
-    header h2;
-    h1.wkt = "A";
-    h2.wkt = "B";
-    spoc_file f1 (h1);
-    spoc_file f2 (h2);
+    spoc_file f1 (1, 2, "WKT1");
+    spoc_file f2 (1, 2, "WKT2");
     VERIFY (diff (f1, f2) != 0);
     }
 }

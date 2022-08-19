@@ -16,15 +16,21 @@ namespace header
 struct header
 {
     /// @brief Constructor
+    /// @param major_version Version information
+    /// @param minor_version Version information
     /// @param wkt Well known text string
     /// @param extra_fields Number of extra fields in each point record
     /// @param total_points Total points in the SPOC file
     /// @param compressed Compression flag
-    header (const std::string &wkt,
+    header (const uint8_t major_version,
+            const uint8_t minor_version,
+            const std::string &wkt,
             const uint8_t extra_fields,
             const size_t total_points,
             const bool compressed = false)
-        : wkt (wkt)
+        : major_version (major_version)
+        , minor_version (minor_version)
+        , wkt (wkt)
         , extra_fields (extra_fields)
         , total_points (total_points)
         , compressed (compressed)
@@ -38,7 +44,20 @@ struct header
             throw std::runtime_error ("The OGC WKT length may not exceed 65535");
     }
     /// @brief Constructor
-    header () : header (std::string (), 0, 0, false)
+    /// @param wkt Well known text string
+    /// @param extra_fields Number of extra fields in each point record
+    /// @param total_points Total points in the SPOC file
+    /// @param compressed Compression flag
+    header (const std::string &wkt,
+            const uint8_t extra_fields,
+            const size_t total_points,
+            const bool compressed = false)
+        : header (MAJOR_VERSION, MINOR_VERSION, wkt, extra_fields, total_points, compressed)
+    {
+    }
+    /// @brief Constructor
+    header ()
+        : header (MAJOR_VERSION, MINOR_VERSION, std::string (), 0, 0, false)
     {
     }
     /// @brief Check to make sure the header contains a valid signature
@@ -63,9 +82,9 @@ struct header
     /// Signature characters
     char signature[5];
     /// Version information
-    uint8_t major_version = MAJOR_VERSION;
+    uint8_t major_version;
     /// Version information
-    uint8_t minor_version = MINOR_VERSION;
+    uint8_t minor_version;
     /// Well-known-text string
     std::string wkt;
     /// The number of extra fields in each point record
