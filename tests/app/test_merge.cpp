@@ -13,10 +13,8 @@ using namespace spoc::merge_app;
 
 void test_merge ()
 {
-    header h1 ("A", 0, 0, false);
-    header h2 ("B", 0, 0, false);
-    spoc_file f1 (h1, point_records ());
-    spoc_file f2 (h2, point_records ());
+    spoc_file f1 ("A", false, point_records ());
+    spoc_file f2 ("B", false, point_records ());
 
     spoc_file f;
     const auto id = -1;
@@ -33,12 +31,11 @@ void test_merge_quiet ()
     auto f1 = generate_random_spoc_file (100, extra_fields, true);
     auto f2 = generate_random_spoc_file (100, extra_fields, false);
 
-    spoc_file f ("WKT", extra_fields);
+    spoc_file f ("WKT", false, point_records ());
     const auto id = -1;
     const auto quiet = true;
     append (f1, f, id, quiet);
     append (f2, f, id, quiet);
-    VERIFY (f.get_header ().total_points == 200);
     VERIFY (f.get_point_records ().size () == 200);
 }
 
