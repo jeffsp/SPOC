@@ -60,8 +60,8 @@ class spoc_file
     public:
     /// @brief CTOR
     spoc_file ()
-        : major_version (0)
-        , minor_version (0)
+        : major_version (MAJOR_VERSION)
+        , minor_version (MINOR_VERSION)
         , compressed (false)
     {
     }
@@ -92,7 +92,7 @@ class spoc_file
     spoc_file (const std::string &wkt,
         const bool compressed,
         const point_record::point_records &prs)
-        : spoc_file (0, 0, wkt, compressed, prs)
+        : spoc_file (MAJOR_VERSION, MINOR_VERSION, wkt, compressed, prs)
     {
     }
     /// @brief Copy CTOR
@@ -100,6 +100,13 @@ class spoc_file
     spoc_file (const spoc_file &f)
         : spoc_file (f.major_version, f.minor_version, f.wkt, f.compressed, f.prs)
     {
+    }
+
+    /// @brief Get a clone containing no point records
+    spoc_file clone_empty () const
+    {
+        spoc_file f (major_version, minor_version, wkt, compressed, point_record::point_records ());
+        return f;
     }
 
     /// @brief Contract support
@@ -125,6 +132,13 @@ class spoc_file
     /// @brief Readonly point records access
     const point_record::point_records &get_point_records () const { return prs; }
 
+    /// @brief Readonly point record access
+    const point_record::point_record &get_point_record (const size_t i) const
+    {
+        assert (i < prs.size ());
+        return prs[i];
+    }
+
     /// @brief Build a header from the file information
     const header::header get_header () const
     {
@@ -135,6 +149,12 @@ class spoc_file
         ENSURE (h.is_valid ());
         return h;
     }
+
+    /// @brief Write compressed access
+    void set_wkt (const std::string &s) { wkt = s; }
+
+    /// @brief Write compressed access
+    void set_compressed (const bool flag) { compressed = flag; }
 
     /// @brief Set the point records in a SPOC file
     /// @param prs The point records to set
@@ -194,19 +214,20 @@ class spoc_file
         }
         return *this;
     }
-    /*
 
     /// @brief Checked point record write access
     /// @param i Point record index
     /// @param pr Point record value
-    void set (const size_t i, const point_record::point_record &pr)
+    void set_point_record (const size_t i, const point_record::point_record &p)
     {
-        REQUIRE (i < p.size ());
-        if (pr.extra.size () != h.extra_fields)
-            throw std::runtime_error ("spoc_file::set(): the point record number of extra fields does not match the header");
-        p[i] = pr;
+        REQUIRE (i < prs.size ());
+        const size_t extra_fields = prs.empty () ? 0 : prs[0].extra.size ();
+        if (p.extra.size () != extra_fields)
+            throw std::runtime_error ("spoc_file::set_point_record(): the point record extra fields size is inconsistent with existing point records");
+        prs[i] = p;
     }
 
+    /*
     /// @brief Logical operator support
     bool operator== (const spoc_file &other) const
     { return (h == other.h) && (p == other.p); }
