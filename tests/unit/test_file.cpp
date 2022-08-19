@@ -33,11 +33,43 @@ void test_spoc_file ()
     }
 
     // Test set_point_records
+    {
     const size_t total_points = 100;
     const size_t extra_fields = 3;
     auto p = generate_random_point_records (total_points, extra_fields);
     p[10].extra.resize (extra_fields + 1);
     VERIFY_THROWS (spoc_file f ("WKT", false, p);)
+    }
+}
+
+void test_spoc_file_get_set ()
+{
+    const size_t total_points = 100;
+    const size_t extra_fields = 3;
+    auto p = generate_random_point_records (total_points, extra_fields);
+    spoc_file f ("WKT", false, p);
+
+    VERIFY (f.get_wkt () == "WKT");
+    f.set_wkt ("test");
+    VERIFY (f.get_wkt () == "test");
+
+    VERIFY (f.get_compressed () == false);
+    f.set_compressed (true);
+    VERIFY (f.get_compressed () == true);
+    f.set_compressed (false);
+    VERIFY (f.get_compressed () == false);
+
+    p[10].extra.resize (extra_fields + 1);
+    VERIFY_THROWS (f.set_point_records (p);)
+
+    auto q = p[0];
+    q.extra.resize (q.extra.size () + 1);
+    VERIFY_THROWS (f.set_point_record (0, q);)
+    VERIFY_THROWS (f.push_back (q);)
+
+    spoc::point_record::point_records &prs = const_cast<spoc::point_record::point_records &> (f.get_point_records ());
+    prs[10].extra.resize (extra_fields - 1);
+    VERIFY (!f.is_valid ());
 }
 
 void test_spoc_file_header ()
@@ -75,6 +107,7 @@ int main (int argc, char **argv)
     try
     {
         test_spoc_file ();
+        test_spoc_file_get_set ();
         test_spoc_file_header ();
         return 0;
     }

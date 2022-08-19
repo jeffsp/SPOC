@@ -40,13 +40,6 @@ inline bool all_same_size_extra (const point_record::point_records &prs)
     return true;
 }
 
-// Helper function
-inline void check_extra_fields (const point_record::point_records &prs)
-{
-    if (!all_same_size_extra (prs))
-        throw std::runtime_error ("The point record extra fields have inconsistent sizes");
-}
-
 /// @brief SPOC format file
 class spoc_file
 {
@@ -83,7 +76,8 @@ class spoc_file
         , prs (prs)
     {
         // Check for consistency
-        check_extra_fields (prs);
+        if (!all_same_size_extra (prs))
+            throw std::runtime_error ("The point record extra fields have inconsistent sizes");
     }
     /// @brief CTOR
     /// @param wkt OGC WKT string
@@ -146,7 +140,6 @@ class spoc_file
         const size_t total_points = prs.size ();
         header::header h (major_version, minor_version, wkt, extra_fields, total_points, compressed);
 
-        ENSURE (h.is_valid ());
         return h;
     }
 
@@ -161,7 +154,8 @@ class spoc_file
     void set_point_records (const point_record::point_records &prs)
     {
         // Check for consistency
-        check_extra_fields (prs);
+        if (!all_same_size_extra (prs))
+            throw std::runtime_error ("The point record extra fields have inconsistent sizes");
 
         // Set the point records
         this->prs = prs;
