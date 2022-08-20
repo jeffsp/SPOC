@@ -220,15 +220,6 @@ class spoc_file
             throw std::runtime_error ("spoc_file::set_point_record(): the point record extra fields size is inconsistent with existing point records");
         prs[i] = p;
     }
-
-    /*
-    /// @brief Logical operator support
-    bool operator== (const spoc_file &other) const
-    { return (h == other.h) && (p == other.p); }
-    /// @brief Logical operator support
-    bool operator!= (const spoc_file &other) const
-    { return !(*this == other); }
-    */
 };
 
 } // namespace file
