@@ -19,6 +19,7 @@ private:
 public:
     timer () : running (false)
     {
+        start ();
     }
     void start ()
     {
