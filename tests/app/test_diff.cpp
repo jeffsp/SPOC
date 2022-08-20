@@ -39,18 +39,6 @@ void test_diff ()
 void test_diff_header ()
 {
     {
-    spoc_file f1;
-    spoc_file f2;
-    VERIFY (diff (f1, f2) == 0);
-    f1.resize_point_records (2);
-    f2.resize_point_records (3);
-    VERIFY (diff (f1, f2) != 0);
-    f1.resize_point_records (3);
-    f2.resize_point_records (3);
-    VERIFY (diff (f1, f2) == 0);
-    }
-
-    {
     spoc_file f1 (1, 1, "WKT");
     spoc_file f2 (1, 2, "WKT");
     VERIFY (diff (f1, f2) != 0);
