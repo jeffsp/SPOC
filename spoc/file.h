@@ -85,7 +85,7 @@ class spoc_file
     /// @param prs Point records
     spoc_file (const std::string &wkt,
         const bool compressed,
-        const point_record::point_records &prs)
+        const point_record::point_records &prs = point_record::point_records ())
         : spoc_file (MAJOR_VERSION, MINOR_VERSION, wkt, compressed, prs)
     {
     }
@@ -99,8 +99,11 @@ class spoc_file
     /// @brief Get a clone containing no point records
     spoc_file clone_empty () const
     {
-        spoc_file f (major_version, minor_version, wkt, compressed, point_record::point_records ());
-        return f;
+        return spoc_file (major_version,
+            minor_version,
+            wkt,
+            compressed,
+            point_record::point_records ());
     }
 
     /// @brief Contract support
@@ -149,17 +152,6 @@ class spoc_file
     /// @brief Write compressed access
     void set_compressed (const bool flag) { compressed = flag; }
 
-    /// @brief Set the point records in a SPOC file
-    /// @param prs The point records to set
-    void set_point_records (const point_record::point_records &prs)
-    {
-        // Check for consistency
-        if (!all_same_size_extra (prs))
-            throw std::runtime_error ("The point record extra fields have inconsistent sizes");
-
-        // Set the point records
-        this->prs = prs;
-    }
     /// @brief Add a point record
     void push_back (const point_record::point_record &pr)
     {
@@ -169,13 +161,6 @@ class spoc_file
 
         // Save the point
         prs.push_back (pr);
-    }
-
-    /// @brief Point record write access
-    /// @param new_size The new size of the point records
-    void resize_point_records (const size_t new_size)
-    {
-        prs.resize (new_size);
     }
 
     /// @brief Point record write access
@@ -219,6 +204,40 @@ class spoc_file
         if (p.extra.size () != extra_fields)
             throw std::runtime_error ("spoc_file::set_point_record(): the point record extra fields size is inconsistent with existing point records");
         prs[i] = p;
+    }
+
+    /// @brief Set the point records in a SPOC file
+    /// @param prs The point records to set
+    void set_point_records (const point_record::point_records &prs)
+    {
+        // Check for consistency
+        if (!all_same_size_extra (prs))
+            throw std::runtime_error ("The point record extra fields have inconsistent sizes");
+
+        // Set the point records
+        this->prs = prs;
+    }
+
+    /// @brief Move point records from the spoc_file object
+    /// @return rvalue reference
+    ///
+    /// Upon return, the spoc_file point records will be empty
+    point_record::point_records &&move_point_records ()
+    {
+        return std::move (prs);
+    }
+    /// @brief Move point records to the spoc_file object
+    /// @param prs The point records to move from
+    ///
+    /// Upon return, the passed point record vector will be empty
+    void move_point_records (point_record::point_records &prs)
+    {
+        // Check for consistency
+        if (!all_same_size_extra (prs))
+            throw std::runtime_error ("The point record extra fields have inconsistent sizes");
+
+        // Move the point records
+        this->prs = std::move (prs);
     }
 };
 
