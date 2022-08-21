@@ -102,6 +102,30 @@ void test_spoc_file_header ()
     VERIFY (g.get_header ().compressed == true);
 }
 
+void test_spoc_move ()
+{
+    const size_t total_points = 100;
+    const size_t extra_fields = 3;
+    auto p = generate_random_point_records (total_points, extra_fields);
+    spoc_file f ("WKT", false, p);
+    VERIFY (f.get_point_records ().size () == total_points);
+
+    // Move from f to q
+    auto q = f.move_point_records ();
+    VERIFY (f.get_point_records ().empty ());
+    VERIFY (q.size () == total_points);
+
+    // Can't move from invalid point records
+    q[10].extra.resize (extra_fields + 1);
+    VERIFY_THROWS (f.move_point_records (q);)
+    q[10].extra.resize (extra_fields);
+
+    // Move from q to f
+    f.move_point_records (q);
+    VERIFY (q.empty ());
+    VERIFY (f.get_point_records ().size () == total_points);
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -109,6 +133,7 @@ int main (int argc, char **argv)
         test_spoc_file ();
         test_spoc_file_get_set ();
         test_spoc_file_header ();
+        test_spoc_move ();
         return 0;
     }
     catch (const exception &e)
