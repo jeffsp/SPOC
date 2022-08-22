@@ -141,17 +141,14 @@ int main (int argc, char **argv)
             // Set the compression bit
             t.set_compressed (f.get_compressed ());
 
-            // Set the number of points in the file
-            t.resize (v.size ());
-
             // For each point index in this tile...
             for (size_t j = 0; j < v.size (); ++j)
             {
                 // Get the point from the input file
                 const auto p = f.get_point_record (v[j]);
 
-                // Set it in the output file
-                t.set (j, p);
+                // Add it to the output file
+                t.push_back (p);
             }
 
             // Get the filename extension

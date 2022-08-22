@@ -119,9 +119,12 @@ inline spoc::file::spoc_file read_spoc_file_uncompressed (std::istream &s)
         throw std::runtime_error ("Uncompressed reader can't read a compressed file");
 
     // Read the data
-    point_record::point_records p = read_uncompressed_points (s, h.total_points, h.extra_fields);
+    point_record::point_records prs = read_uncompressed_points (s, h.total_points, h.extra_fields);
 
-    return spoc::file::spoc_file (h, p);
+    // Create the file
+    spoc::file::spoc_file f (h.wkt, false, prs);
+
+    return f;
 }
 
 /// Helper I/O function
@@ -184,7 +187,10 @@ inline spoc::file::spoc_file read_spoc_file_compressed (std::istream &s)
     // Read the data
     point_record::point_records prs = read_compressed_points (s, h.total_points, h.extra_fields);
 
-    return spoc::file::spoc_file (h, prs);
+    // Create the file
+    spoc::file::spoc_file f (h.wkt, true, prs);
+
+    return f;
 }
 
 /// Helper I/O function
@@ -195,15 +201,18 @@ inline spoc::file::spoc_file read_spoc_file (std::istream &s)
     header::header h = header::read_header (s);
 
     // The points
-    point_record::point_records p;
+    point_record::point_records prs;
 
     // Check compression flag
     if (h.compressed)
-        p = read_compressed_points (s, h.total_points, h.extra_fields);
+        prs = read_compressed_points (s, h.total_points, h.extra_fields);
     else
-        p = read_uncompressed_points (s, h.total_points, h.extra_fields);
+        prs = read_uncompressed_points (s, h.total_points, h.extra_fields);
 
-    return spoc::file::spoc_file (h, p);
+    // Create the file
+    spoc::file::spoc_file f (h.wkt, h.compressed, prs);
+
+    return f;
 }
 
 /// Helper I/O function
@@ -211,19 +220,17 @@ inline spoc::file::spoc_file read_spoc_file (std::istream &s)
 /// @param f File structure to write
 inline void write_spoc_file_uncompressed (std::ostream &s, const spoc::file::spoc_file &f)
 {
+    REQUIRE (f.is_valid ());
+
     // Check compression flag
-    if (f.get_header ().compressed)
+    if (f.get_compressed ())
         throw std::runtime_error ("Uncompressed writer can't write a compressed file");
 
-    // Make sure the points records are OK
-    if (!check_records (f.get_point_records ()))
-        throw std::runtime_error ("Invalid point records");
-
-    // Write the file
+    // Write the header
     write_header (s, f.get_header ());
 
-    const auto &prs = f.get_point_records ();
-    for (const auto &p : prs)
+    // Write the points
+    for (const auto &p : f.get_point_records ())
         write_point_record (s, p);
 }
 
@@ -232,15 +239,14 @@ inline void write_spoc_file_uncompressed (std::ostream &s, const spoc::file::spo
 /// @param f File structure to write
 inline void write_spoc_file_compressed (std::ostream &s, const spoc::file::spoc_file &f)
 {
+    REQUIRE (f.is_valid ());
+
     // Check compression flag
-    if (!f.get_header ().compressed)
+    if (!f.get_compressed ())
         throw std::runtime_error ("Compressed writer can't write an uncompressed file");
 
+    // Get the point records
     const auto &prs = f.get_point_records ();
-
-    // Make sure the points records are OK
-    if (!check_records (prs))
-        throw std::runtime_error ("Invalid point records");
 
     // Stuff the data into vectors
     const size_t total_points = prs.size ();

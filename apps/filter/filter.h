@@ -30,7 +30,7 @@ inline T keep_classes (const T &f, const U &c)
     for (const auto &p : prs)
         // If it's in the set, keep it
         if (c.find (p.c) != c.end ())
-            g.add (p);
+            g.push_back (p);
 
     return g;
 }
@@ -48,7 +48,7 @@ inline T remove_classes (const T &f, const U &c)
     for (const auto &p : prs)
         // If it's not in the set, keep it
         if (c.find (p.c) == c.end ())
-            g.add (p);
+            g.push_back (p);
 
     return g;
 }
@@ -67,7 +67,7 @@ inline T unique_xyz (const T &f, const size_t random_seed)
 
     // Add them
     for (auto i : indexes)
-        g.add (prs[i]);
+        g.push_back (prs[i]); // cppcheck-suppress useStlAlgorithm
 
     return g;
 }
@@ -86,7 +86,7 @@ inline T subsample (const T &f, const double res, const size_t random_seed)
 
     // Add them
     for (auto i : indexes)
-        g.add (prs[i]);
+        g.push_back (prs[i]); // cppcheck-suppress useStlAlgorithm
 
     return g;
 }

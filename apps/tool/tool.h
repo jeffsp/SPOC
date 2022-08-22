@@ -87,17 +87,23 @@ inline T recenter (const T &f, const bool z_flag = false)
     double cy = n ? sy / n : 0.0;
     double cz = n ? sz / n : 0.0;
 
-    // Copy file
-    T g (f);
+    // Copy points
+    auto p = f.get_point_records ();
 
-    // Recenter its points
-    for (size_t i = 0; i < n; ++i)
+    // Recenter the points
+    for (auto &i : p)
     {
-        g[i].x -= cx;
-        g[i].y -= cy;
+        i.x -= cx;
+        i.y -= cy;
         if (z_flag)
-            g[i].z -= cz;
+            i.z -= cz;
     }
+
+    // Get a clone
+    auto g = f.clone_empty ();
+
+    // Set the new points
+    g.set_point_records (p);
 
     // Return the copy
     return g;
@@ -115,7 +121,7 @@ inline T resize_extra (const T &f, const int sz)
     T g (f);
 
     // Change size
-    g.resize_extra (sz);
+    g.resize_extra_fields (sz);
 
     // Return the copy
     return g;
@@ -172,8 +178,8 @@ inline T set_field (const T &f, std::istream &field_ifs, const std::string &fiel
         ? app_utils::get_extra_index (field_name)
         : f.get_header ().extra_fields + 1;
 
-    // Copy the file
-    T g (f);
+    // Copy points
+    auto p = f.get_point_records ();
 
     // Process the points
     for (size_t i = 0; i < n; ++i)
@@ -181,24 +187,30 @@ inline T set_field (const T &f, std::istream &field_ifs, const std::string &fiel
         // Process the point
         switch (field_name[0])
         {
-            case 'x': g[i].x = f_double[i]; break;
-            case 'y': g[i].y = f_double[i]; break;
-            case 'z': g[i].z = f_double[i]; break;
-            case 'c': g[i].c = f_size_t[i]; break;
-            case 'p': g[i].p = f_size_t[i]; break;
-            case 'i': g[i].i = f_size_t[i]; break;
-            case 'r': g[i].r = f_size_t[i]; break;
-            case 'g': g[i].g = f_size_t[i]; break;
-            case 'b': g[i].b = f_size_t[i]; break;
+            case 'x': p[i].x = f_double[i]; break;
+            case 'y': p[i].y = f_double[i]; break;
+            case 'z': p[i].z = f_double[i]; break;
+            case 'c': p[i].c = f_size_t[i]; break;
+            case 'p': p[i].p = f_size_t[i]; break;
+            case 'i': p[i].i = f_size_t[i]; break;
+            case 'r': p[i].r = f_size_t[i]; break;
+            case 'g': p[i].g = f_size_t[i]; break;
+            case 'b': p[i].b = f_size_t[i]; break;
             case 'e': // extra
             {
                 assert (app_utils::is_extra_field (field_name));
-                assert (j < g[i].extra.size ());
-                g[i].extra[j] = f_size_t[i];
+                assert (j < p[i].extra.size ());
+                p[i].extra[j] = f_size_t[i];
             }
             break;
         }
     }
+
+    // Get a clone
+    auto g = f.clone_empty ();
+
+    // Set the new points
+    g.set_point_records (p);
 
     // Return copy
     return g;
@@ -214,17 +226,23 @@ inline T subtract_min (const T &f, const bool z_flag = false)
     // Get minimum value
     const auto e = extent::get_extent (f.get_point_records ());
 
-    // Copy it
-    T g (f);
+    // Copy points
+    auto p = f.get_point_records ();
 
-    // Recenter its points
-    for (size_t i = 0; i < g.get_point_records ().size (); ++i)
+    // Subtract min from points
+    for (auto &i : p)
     {
-        g[i].x -= e.minp.x;
-        g[i].y -= e.minp.y;
+        i.x -= e.minp.x;
+        i.y -= e.minp.y;
         if (z_flag)
-            g[i].z -= e.minp.z;
+            i.z -= e.minp.z;
     }
+
+    // Get a clone
+    auto g = f.clone_empty ();
+
+    // Set the new points
+    g.set_point_records (p);
 
     // Return copy
     return g;
@@ -282,7 +300,7 @@ inline T upsample_classifications (
         assert (!indexes.empty ());
 
         // Get a reference to the low resolution point record
-        const auto &p = l[i];
+        const auto &p = l.get_point_record (i);
 
         // For each point record index in this high resolution voxel...
         for (const auto j : indexes)
@@ -290,7 +308,13 @@ inline T upsample_classifications (
             // Set the high resolution point record's classification to
             // the low resolution classification
             assert (j < h.get_point_records ().size ());
-            h[j].c = p.c;
+
+            // Get the high resolution point record
+            auto r = h.get_point_record (j);
+
+            // Set it to low res classification
+            r.c = p.c;
+            h.set_point_record (j, r);
 
             // Count the assignment
             ++assigned_points;

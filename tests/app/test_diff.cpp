@@ -39,42 +39,20 @@ void test_diff ()
 void test_diff_header ()
 {
     {
-    spoc_file f1;
-    spoc_file f2;
-    VERIFY (diff (f1, f2) == 0);
-    f1.resize (2);
-    f2.resize (3);
-    VERIFY (diff (f1, f2) != 0);
-    f1.resize (3);
-    f2.resize (3);
-    VERIFY (diff (f1, f2) == 0);
-    }
-
-    {
-    header h1;
-    header h2;
-    h1.major_version = 1;
-    h2.major_version = 2;
-    spoc_file f1 (h1, point_records ());
-    spoc_file f2 (h2, point_records ());
+    spoc_file f1 (1, 1, "WKT");
+    spoc_file f2 (1, 2, "WKT");
     VERIFY (diff (f1, f2) != 0);
     }
 
     {
-    header h1;
-    header h2;
-    h1.minor_version = 1;
-    h2.minor_version = 2;
-    spoc_file f1 (h1, point_records ());
-    spoc_file f2 (h2, point_records ());
+    spoc_file f1 (1, 2, "WKT");
+    spoc_file f2 (1, 1, "WKT");
     VERIFY (diff (f1, f2) != 0);
     }
 
     {
-    header h1 ("A", 0, 0, false);
-    header h2 ("B", 0, 0, false);
-    spoc_file f1 (h1, point_records ());
-    spoc_file f2 (h2, point_records ());
+    spoc_file f1 (1, 2, "WKT1");
+    spoc_file f2 (1, 2, "WKT2");
     VERIFY (diff (f1, f2) != 0);
     }
 }
@@ -82,68 +60,83 @@ void test_diff_header ()
 void test_diff_fields ()
 {
     // Generate spoc files
-    auto f1 = generate_random_spoc_file (100, 5, true);
+    const size_t total_points = 100;
+    const size_t extra_fields = 5;
+    auto f1 = generate_random_spoc_file (total_points, extra_fields);
     auto f2 (f1);
 
     VERIFY (diff (f1, f2) == 0);
 
-    f1[0].x = f1[0].x + 1;
+    auto prs1 = f1.get_point_records ();
+    auto prs2 = f2.get_point_records ();
+
+    prs1[0].x = prs1[0].x + 1;
+    f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f2[0].x = f1[0].x;
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
-    f1[0].y = f1[0].y + 1;
+    prs1[0].y = prs1[0].y + 1;
+    f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f2[0].y = f1[0].y;
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
-    f1[0].z = f1[0].z + 1;
+    prs1[0].z = prs1[0].z + 1;
+    f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f2[0].z = f1[0].z;
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
-    f1[0].c = f1[0].c + 1;
+    prs1[0].c = prs1[0].c + 1;
+    f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f2[0].c = f1[0].c;
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
-    f1[0].p = f1[0].p + 1;
+    prs1[0].p = prs1[0].p + 1;
+    f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f2[0].p = f1[0].p;
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
-    f1[0].i = f1[0].i + 1;
+    prs1[0].i = prs1[0].i + 1;
+    f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f2[0].i = f1[0].i;
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
-    f1[0].r = f1[0].r + 1;
+    prs1[0].r = prs1[0].r + 1;
+    f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f2[0].r = f1[0].r;
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
-    f1[0].g = f1[0].g + 1;
+    prs1[0].g = prs1[0].g + 1;
+    f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f2[0].g = f1[0].g;
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
-    f1[0].b = f1[0].b + 1;
+    prs1[0].b = prs1[0].b + 1;
+    f1.set_point_records (prs1);
     VERIFY (diff (f1, f2) != 0);
-    f2[0].b = f1[0].b;
+    f1.set_point_records (prs1 = prs2);
     VERIFY (diff (f1, f2) == 0);
 
-    for (size_t i = 0; i < f1[0].extra.size (); ++i)
+    for (size_t i = 0; i < prs1[0].extra.size (); ++i)
     {
-        f1[0].extra[i] = f1[0].extra[i] + 1;
+        prs1[0].extra[i] = prs1[0].extra[i] + 1;
+        f1.set_point_records (prs1);
         VERIFY (diff (f1, f2) != 0);
-        f2[0].extra[i] = f1[0].extra[i];
+        f1.set_point_records (prs1 = prs2);
         VERIFY (diff (f1, f2) == 0);
     }
 
     // Generate spoc files
     auto f3 = generate_random_spoc_file (100, 5, true);
     auto f4 (f3);
-    f4.resize_extra (6);
+    f4.resize_extra_fields (6);
     VERIFY (diff (f3, f4) != 0);
 }
 
@@ -158,11 +151,16 @@ void test_diff_individual_fields ()
     vector<int> fields { 'x' };
     VERIFY (diff (f1, f2, false, false, fields) == 0);
 
-    f1[0].x = f1[0].x + 1;
+    auto prs1 = f1.get_point_records ();
+    auto prs2 = f2.get_point_records ();
+
+    prs1[0].x = prs1[0].x + 1;
+    f1.set_point_records (prs1);
     VERIFY (diff (f1, f2, false, false, fields) != 0);
+
     // Reverse meaning
     VERIFY (diff (f1, f2, false, false, fields, true) == 0);
-    f2[0].x = f1[0].x;
+    f1.set_point_records (prs2);
     VERIFY (diff (f1, f2, false, false, fields) == 0);
     // Reverse meaning
     VERIFY (diff (f1, f2, false, false, fields, true) != 0);
@@ -172,7 +170,6 @@ void test_diff_individual_fields ()
     for (auto f : {'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', '0', '4' })
     {
         fields[0] = f;
-        f1[0].x = f1[0].x + 1;
         VERIFY (diff (f1, f2, false, false, fields) != 0);
     }
 

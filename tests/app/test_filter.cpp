@@ -13,11 +13,11 @@ using namespace spoc::point_record;
 void test_keep_classes ()
 {
     spoc_file f;
-    f.add (point_record (0.0, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.0, 0.0, 3, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 3, 0, 0, 0, 0, 0));
     auto g = keep_classes (f, unordered_set<int> { 2 });
     VERIFY (g.get_point_records ().size () == 3);
     VERIFY (g.get_point_records ().front ().c == 2);
@@ -39,11 +39,11 @@ void test_keep_classes ()
 void test_remove_classes ()
 {
     spoc_file f;
-    f.add (point_record (0.0, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.0, 0.0, 3, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 3, 0, 0, 0, 0, 0));
     auto g = remove_classes (f, unordered_set<int> { 2 });
     VERIFY (g.get_point_records ().size () == 2);
     VERIFY (g.get_point_records ().front ().c == 1);
@@ -67,13 +67,13 @@ void test_unique_xyz ()
 {
     {
     spoc_file f;
-    f.add (point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
-    f.add (point_record (0.1, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.2, 0.0, 2, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.0, 0.3, 3, 0, 0, 0, 0, 0));
-    f.add (point_record (0.1, 0.0, 0.0, 4, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.2, 0.0, 5, 0, 0, 0, 0, 0));
-    f.add (point_record (0.0, 0.0, 0.3, 6, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.1, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.2, 0.0, 2, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.3, 3, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.1, 0.0, 0.0, 4, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.2, 0.0, 5, 0, 0, 0, 0, 0));
+    f.push_back (point_record (0.0, 0.0, 0.3, 6, 0, 0, 0, 0, 0));
     const size_t random_seed = 0;
     auto g = unique_xyz (f, random_seed);
     VERIFY (g.get_point_records ().size () == 4);
@@ -87,8 +87,8 @@ void test_unique_xyz ()
 
     for (size_t i = 0; i < n; ++i)
     {
-        f.add (point_record (i, 0.0, 0.0, i, 0, 0, 0, 0, 0));
-        f.add (point_record (i, 0.0, 0.0, i, 0, 0, 0, 0, 0));
+        f.push_back (point_record (i, 0.0, 0.0, i, 0, 0, 0, 0, 0));
+        f.push_back (point_record (i, 0.0, 0.0, i, 0, 0, 0, 0, 0));
     }
 
     // 1000 points + 1000 more duplicates

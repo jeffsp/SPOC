@@ -19,118 +19,111 @@ void test_spoc_file ()
     // Test spoc_file::is_valid()
     {
     spoc_file f;
-    header &h = const_cast<header &> (f.get_header ());
+    // Force header to be invalid. Don't ever do this.
+    header h = f.get_header ();
     VERIFY (f.is_valid ());
-    h.total_points = 1;
-    VERIFY (!f.is_valid ());
     }
+
+    // Test push_back
     {
     spoc_file f;
-    f.add (spoc::point_record::point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
-    header &h = const_cast<header &> (f.get_header ());
-    VERIFY (f.is_valid ());
-    h.extra_fields = 1;
-    VERIFY (!f.is_valid ());
+    f.push_back (spoc::point_record::point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
+    header h = f.get_header ();
+    VERIFY (h.total_points == 1);
     }
 
-    // Test CTORs
-    const size_t total_points = 1000;
-    const size_t extra_fields = 3;
-    auto p = generate_random_point_records (total_points, extra_fields);
-    p[100].extra.resize (extra_fields + 1);
-    header h ("WKT", extra_fields, total_points, false);
-
-    VERIFY_THROWS (spoc_file f (h, p);)
-    VERIFY_THROWS ({
-        stringstream s;
-        const string wkt = "Test wkt";
-        write_spoc_file_uncompressed (s, spoc_file (wkt, p));
-    })
-
-    VERIFY_THROWS ({
-        stringstream s;
-        const string wkt = "Test wkt";
-        write_spoc_file_compressed (s, spoc_file (wkt, p));
-    })
-
-    header h2 ("WKT", extra_fields, total_points + 1, false);
-    VERIFY_THROWS (spoc_file f (h2, p);)
-
-    header h3 ("WKT", extra_fields + 1, total_points, false);
-    VERIFY_THROWS (spoc_file f (h3, p);)
-
+    // Test set_point_records
     {
     const size_t total_points = 100;
     const size_t extra_fields = 3;
     auto p = generate_random_point_records (total_points, extra_fields);
-    const string wkt = "Test wkt";
-    auto f = spoc_file (wkt, p);
-    auto g = f.get_wkt ();
-    VERIFY (g == wkt);
-    f.set_wkt ("Test WKT 2");
-    for (size_t i = 0; i < f.get_point_records ().size (); ++i)
-    {
-        const auto q = f.get_point_record (i);
-        f.set (i, q);
+    p[10].extra.resize (extra_fields + 1);
+    VERIFY_THROWS (spoc_file f ("WKT", false, p);)
     }
-    }
+}
 
-    {
+void test_spoc_file_get_set ()
+{
     const size_t total_points = 100;
     const size_t extra_fields = 3;
     auto p = generate_random_point_records (total_points, extra_fields);
-    const string wkt = "Test wkt";
-    auto f = spoc_file (wkt, p);
-    // Make the size check fail
-    auto q = f.get_point_record (0);
-    q.extra.resize (extra_fields + 1);
-    f.set (0, q);
+    spoc_file f ("WKT", false, p);
+
+    VERIFY (f.get_wkt () == "WKT");
+    f.set_wkt ("test");
+    VERIFY (f.get_wkt () == "test");
+
+    VERIFY (f.get_compressed () == false);
     f.set_compressed (true);
-    const auto g = f.get_compressed ();
-    VERIFY (g);
+    VERIFY (f.get_compressed () == true);
+    f.set_compressed (false);
+    VERIFY (f.get_compressed () == false);
 
-    // Throw because size check fails
-    VERIFY_THROWS ({
-        stringstream s;
-        f.set_compressed (true);
-        write_spoc_file_compressed (s, f);
-    })
+    p[10].extra.resize (extra_fields + 1);
+    VERIFY_THROWS (f.set_point_records (p);)
 
-    // Throw because size check fails
-    VERIFY_THROWS ({
-        stringstream s;
-        f.set_compressed (false);
-        write_spoc_file_uncompressed (s, f);
-    })
-    }
+    auto q = p[0];
+    q.extra.resize (q.extra.size () + 1);
+    VERIFY_THROWS (f.set_point_record (0, q);)
+    VERIFY_THROWS (f.push_back (q);)
+
+    spoc::point_record::point_records &prs = const_cast<spoc::point_record::point_records &> (f.get_point_records ());
+    prs[10].extra.resize (extra_fields - 1);
+    VERIFY (!f.is_valid ());
 }
 
 void test_spoc_file_header ()
 {
-    const string wkt ("WKT");
-    const size_t total_points = 1000;
+    const size_t total_points = 100;
     const size_t extra_fields = 3;
-    header h ("WKT", extra_fields, total_points, false);
-    const auto p = generate_random_point_records (total_points, extra_fields);
-    const spoc_file f (h, p);
-    VERIFY (f.get_wkt () == wkt);
-    VERIFY (f.get_extra_fields () == extra_fields);
-    VERIFY (f.get_total_points () == total_points);
-    VERIFY (f.get_compressed () == false);
+    const string wkt ("WKT");
+    auto p = generate_random_point_records (total_points, extra_fields);
+
+    spoc_file f (wkt, false, p);
+    VERIFY (f.get_header ().wkt == wkt);
+    VERIFY (f.get_header ().extra_fields == extra_fields);
+    VERIFY (f.get_header ().total_points == 100);
+    VERIFY (f.get_header ().compressed == false);
+    f.set_point_records (p);
+    VERIFY (f.get_header ().wkt == wkt);
+    VERIFY (f.get_header ().extra_fields == extra_fields);
+    VERIFY (f.get_header ().total_points == total_points);
+    VERIFY (f.get_header ().compressed == false);
+
+    spoc_file g (wkt, true, p);
+    VERIFY (g.get_header ().wkt == wkt);
+    VERIFY (g.get_header ().extra_fields == extra_fields);
+    VERIFY (g.get_header ().total_points == 100);
+    VERIFY (g.get_header ().compressed == true);
+    g.set_point_records (p);
+    VERIFY (g.get_header ().wkt == wkt);
+    VERIFY (g.get_header ().extra_fields == extra_fields);
+    VERIFY (g.get_header ().total_points == total_points);
+    VERIFY (g.get_header ().compressed == true);
 }
 
-void test_spoc_file_rw_access ()
+void test_spoc_move ()
 {
-    const size_t total_points = 10;
+    const size_t total_points = 100;
     const size_t extra_fields = 3;
     auto p = generate_random_point_records (total_points, extra_fields);
-    auto f = spoc_file ("WKT", p);
-    f[0].x = 2.0;
-    // Test operator[]
-    VERIFY (f[0].x == 2.0);
-    // Test begin(), end()
-    for (auto &i : f)
-        i.x = 1.0;
+    spoc_file f ("WKT", false, p);
+    VERIFY (f.get_point_records ().size () == total_points);
+
+    // Move from f to q
+    auto q = f.move_point_records ();
+    VERIFY (f.get_point_records ().empty ());
+    VERIFY (q.size () == total_points);
+
+    // Can't move from invalid point records
+    q[10].extra.resize (extra_fields + 1);
+    VERIFY_THROWS (f.move_point_records (q);)
+    q[10].extra.resize (extra_fields);
+
+    // Move from q to f
+    f.move_point_records (q);
+    VERIFY (q.empty ());
+    VERIFY (f.get_point_records ().size () == total_points);
 }
 
 int main (int argc, char **argv)
@@ -138,8 +131,9 @@ int main (int argc, char **argv)
     try
     {
         test_spoc_file ();
+        test_spoc_file_get_set ();
         test_spoc_file_header ();
-        test_spoc_file_rw_access ();
+        test_spoc_move ();
         return 0;
     }
     catch (const exception &e)

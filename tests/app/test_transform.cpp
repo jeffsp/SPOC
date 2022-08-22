@@ -41,9 +41,9 @@ void test_transform_add ()
         // Test streaming functions
         stringstream is, os;
         const string wkt ("Test WKT");
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
 
         add_x (is, os, offset);
         auto r = read_spoc_file_uncompressed (os);
@@ -165,9 +165,13 @@ void test_transform_gaussian_noise ()
 {
     // Generate spoc file
     auto f = generate_random_spoc_file (100, 3, false);
+    // Copy point records
+    auto prs = f.get_point_records ();
     // Set X, Y, Z values to 0.0
-    for (auto &p : f)
+    for (auto &p : prs)
         p.x = p.y = p.z = 0.0;
+    // Set new points
+    f.set_point_records (prs);
     // Write to a stream
     stringstream is, os;
     write_spoc_file_uncompressed (is, f);
@@ -228,9 +232,9 @@ void test_transform_rotate ()
         // Test streaming functions
         stringstream is, os;
         const string wkt ("Test WKT");
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
 
         rotate_x (is, os, degrees);
         auto r = read_spoc_file_uncompressed (os);
@@ -265,9 +269,13 @@ void test_transform_replace ()
         const size_t total_points = 100;
         const size_t extra_fields = 8;
         auto f = generate_random_spoc_file (total_points, extra_fields, false, rgb);
+        // Copy point records
+        auto prs = f.get_point_records ();
         for (size_t i = 0; i < total_points; ++i)
             for (size_t j = 0; j < extra_fields; ++j)
-                f[i].extra[j] = f[i].extra[j] % 5;
+                prs[i].extra[j] = prs[i].extra[j] % 5;
+        // Set new points
+        f.set_point_records (prs);
 
         for (auto v1 : { 1.0, 2.0, 3.0, 4.0, 5.0 })
         {
@@ -322,9 +330,9 @@ void test_transform_scale ()
         // Test streaming functions
         stringstream is, os;
         const string wkt ("Test WKT");
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
 
         scale_x (is, os, s);
         auto r = read_spoc_file_uncompressed (os);
@@ -389,9 +397,13 @@ void test_transform_uniform_noise ()
 {
     // Generate spoc file
     auto f = generate_random_spoc_file (100, 3, false);
+    // Copy point records
+    auto prs = f.get_point_records ();
     // Set X, Y, Z values to 0.0
-    for (auto &p : f)
+    for (auto &p : prs)
         p.x = p.y = p.z = 0.0;
+    // Set new points
+    f.set_point_records (prs);
     // Write to a stream
     stringstream is, os;
     write_spoc_file_uncompressed (is, f);

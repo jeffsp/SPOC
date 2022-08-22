@@ -52,6 +52,7 @@ macro(add_benchmark name)
 endmacro()
 
 add_benchmark(benchmark_io)
+add_benchmark(benchmark_spoc_file)
 
 macro(add_app_test name)
     add_executable(test_${name} tests/app/test_${name}.cpp)

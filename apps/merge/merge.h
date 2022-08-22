@@ -21,23 +21,17 @@ void append (
     if (!quiet && (f1.get_header ().wkt != f2.get_header ().wkt))
         s << "WARNING: The spatial reference systems differ" << std::endl;
 
-    // Save the old size
-    const size_t f2_size = f2.get_header ().total_points;
-
-    // Make room for new points
-    f2.resize (f1.get_header ().total_points + f2.get_header ().total_points);
-
     // Append 'f1' to 'f2'
-    for (size_t i = 0; i < f1.get_header ().total_points; ++i)
+    for (size_t i = 0; i < f1.get_point_records ().size (); ++i)
     {
         // Get the point from 'f1'
-        auto p = f1.get_point_records ()[i];
+        auto p = f1.get_point_record (i);
 
         // Set its ID
         p.p = id;
 
         // Add it to 'b'
-        f2.set (f2_size + i, p);
+        f2.push_back (p);
     }
 }
 

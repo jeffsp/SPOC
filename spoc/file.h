@@ -21,151 +21,223 @@ namespace spoc
 namespace file
 {
 
+// Helper function
+inline bool all_same_size_extra (const point_record::point_records &prs)
+{
+    // Degenerate case
+    if (prs.empty ())
+        return true;
+
+    // Get the size of the first record
+    const size_t extra_fields = prs[0].extra.size ();
+
+    // Make sure they all have the same number of extra fields
+    if (std::any_of (prs.cbegin(), prs.cend(),
+        [&](const point_record::point_record &p)
+        { return p.extra.size () != extra_fields; }))
+        return false;
+
+    return true;
+}
+
+/// @brief SPOC format file
 class spoc_file
 {
     private:
-    header::header h;
-    point_record::point_records p;
+    uint8_t major_version;
+    uint8_t minor_version;
+    std::string wkt;
+    bool compressed;
+    point_record::point_records prs;
+
     public:
-    spoc_file () { }
+    /// @brief CTOR
+    spoc_file ()
+        : major_version (MAJOR_VERSION)
+        , minor_version (MINOR_VERSION)
+        , compressed (false)
+    {
+    }
+    /// @brief CTOR
+    /// @param major_version Version information
+    /// @param minor_version Version information
+    /// @param wkt OGC WKT string
+    /// @param compressed Compression flag
+    /// @param prs Point records
+    spoc_file (const uint8_t major_version,
+        const uint8_t minor_version,
+        const std::string &wkt,
+        const bool compressed = false,
+        const point_record::point_records &prs = point_record::point_records ())
+        : major_version (major_version)
+        , minor_version (minor_version)
+        , wkt (wkt)
+        , compressed (compressed)
+        , prs (prs)
+    {
+        // Check for consistency
+        if (!all_same_size_extra (prs))
+            throw std::runtime_error ("The point record extra fields have inconsistent sizes");
+    }
+    /// @brief CTOR
+    /// @param wkt OGC WKT string
+    /// @param compressed Compression flag
+    /// @param prs Point records
+    spoc_file (const std::string &wkt,
+        const bool compressed,
+        const point_record::point_records &prs = point_record::point_records ())
+        : spoc_file (MAJOR_VERSION, MINOR_VERSION, wkt, compressed, prs)
+    {
+    }
+    /// @brief Copy CTOR
+    /// @param f Spoc file to copy
     spoc_file (const spoc_file &f)
-        : h (f.h)
-        , p (f.p)
+        : spoc_file (f.major_version, f.minor_version, f.wkt, f.compressed, f.prs)
     {
     }
-    spoc_file (const std::string &wkt, const bool compressed, const point_record::point_records &p)
-        : h (header::header (wkt, 0, p.size (), compressed))
-        , p (p)
-    {
-        if (!p.empty ())
-            h.extra_fields = p[0].extra.size ();
-        if (!check_records (p))
-            throw std::runtime_error ("The point records are inconsistent");
-    }
-    spoc_file (const std::string &wkt, const point_record::point_records &p)
-        : spoc_file (wkt, false, p)
-    {
-    }
-    spoc_file (const header::header &h, const point_record::point_records &p)
-        : h (h)
-        , p (p)
-    {
-        if (h.total_points != p.size ())
-            throw std::runtime_error ("The header total points does not match the data total points");
-        if (!p.empty () && p[0].extra.size () != h.extra_fields)
-            throw std::runtime_error ("The header extra fields size does not match the point records");
-        if (!check_records (p))
-            throw std::runtime_error ("The point records are inconsistent");
-    }
+
+    /// @brief Get a clone containing no point records
     spoc_file clone_empty () const
     {
-        // Copy the header and set its points to 0
-        header::header h0 = h;
-        h0.total_points = 0;
-
-        // Get empty point records vector
-        point_record::point_records pr;
-
-        // Create the empty clone
-        return spoc_file (h0, pr);
+        return spoc_file (major_version,
+            minor_version,
+            wkt,
+            compressed,
+            point_record::point_records ());
     }
 
-    // Contract support
+    /// @brief Contract support
     bool is_valid () const
     {
-        if (p.size () != h.total_points)
-            return false;
-        if (!p.empty () && p[0].extra.size () != h.extra_fields)
+        if (!all_same_size_extra (prs))
             return false;
         return true;
     }
 
-    // Readonly access
-    const header::header &get_header () const { return h; }
-    const point_record::point_records &get_point_records () const { return p; }
-    const point_record::point_record &get_point_record (const size_t n) const { return p[n]; }
+    /// @brief Readonly version access
+    unsigned get_major_version () const { return major_version; }
 
-    // Read header
-    uint8_t get_major_version () const { return h.major_version; }
-    uint8_t get_minor_version () const { return h.minor_version; }
-    std::string get_wkt () const { return h.wkt; }
-    size_t get_extra_fields () const { return h.extra_fields; }
-    size_t get_total_points () const { return h.total_points; }
-    bool get_compressed () const { return h.compressed; }
+    /// @brief Readonly version access
+    unsigned get_minor_version () const { return minor_version; }
 
-    // Change header and point records
-    void set_wkt (const std::string &s)
+    /// @brief Readonly wkt access
+    std::string get_wkt () const { return wkt; }
+
+    /// @brief Readonly compressed access
+    bool get_compressed () const { return compressed; }
+
+    /// @brief Readonly point records access
+    const point_record::point_records &get_point_records () const { return prs; }
+
+    /// @brief Readonly point record access
+    const point_record::point_record &get_point_record (const size_t i) const
     {
-        h.wkt = s;
-    }
-    void resize (const size_t new_size)
-    {
-        p.resize (new_size);
-        h.total_points = new_size;
-    }
-    void resize_extra (const size_t extra_fields)
-    {
-        for (size_t i = 0; i < p.size (); ++i)
-            p[i].extra.resize (extra_fields);
-        h.extra_fields = extra_fields;
-    }
-    void set_compressed (const bool flag)
-    {
-        h.compressed = flag;
+        assert (i < prs.size ());
+        return prs[i];
     }
 
-    // Point record R/W access
-    void add (const point_record::point_record &pr)
+    /// @brief Build a header from the file information
+    const header::header get_header () const
     {
-        REQUIRE (pr.extra.size () == h.extra_fields);
-        p.push_back (pr);
-        ++h.total_points;
-        ENSURE (is_valid ());
-    }
-    void set (const size_t n, const point_record::point_record &r)
-    {
-        assert (n < p.size ());
-        p[n] = r;
+        const size_t extra_fields = prs.empty () ? 0 : prs[0].extra.size ();
+        const size_t total_points = prs.size ();
+        header::header h (major_version, minor_version, wkt, extra_fields, total_points, compressed);
+
+        return h;
     }
 
-    // Point record R/W access
-    point_record::point_record &operator[] (const size_t n)
+    /// @brief Write compressed access
+    void set_wkt (const std::string &s) { wkt = s; }
+
+    /// @brief Write compressed access
+    void set_compressed (const bool flag) { compressed = flag; }
+
+    /// @brief Add a point record
+    void push_back (const point_record::point_record &pr)
     {
-        assert (n < p.size ());
-        return p[n];
-    }
-    const point_record::point_record &operator[] (const size_t n) const
-    {
-        assert (n < p.size ());
-        return p[n];
-    }
-    std::vector<point_record::point_record>::iterator begin ()
-    {
-        return p.begin ();
-    }
-    std::vector<point_record::point_record>::const_iterator begin () const
-    {
-        return p.begin ();
-    }
-    std::vector<point_record::point_record>::iterator end ()
-    {
-        return p.end ();
-    }
-    std::vector<point_record::point_record>::const_iterator end () const
-    {
-        return p.end ();
+        // Check size of extra fields
+        if (!prs.empty () && pr.extra.size () != prs[0].extra.size ())
+            throw std::runtime_error ("The number of extra fields is incorrect");
+
+        // Save the point
+        prs.push_back (pr);
     }
 
-    // Operators
-    bool operator== (const spoc_file &other) const
+    /// @brief Point record write access
+    /// @param extra_fields The new size of the extra fields
+    ///
+    /// This is an expensive operation because all extra
+    /// fields in all point records must be resized
+    void resize_extra_fields (const size_t extra_fields)
     {
-        return
-            (h == other.h)
-            && (p == other.p);
+        for (auto &p : prs)
+            p.extra.resize (extra_fields);
     }
-    bool operator!= (const spoc_file &other) const
+
+    /// @brief Swap this spoc_file with another
+    void swap (spoc_file &f)
     {
-        return !(*this == other);
+        std::swap (major_version, f.major_version);
+        std::swap (minor_version, f.minor_version);
+        std::swap (wkt, f.wkt);
+        std::swap (compressed, f.compressed);
+        std::swap (prs, f.prs);
+    }
+    /// @brief Copy assignment
+    spoc_file &operator= (const spoc_file &rhs)
+    {
+        if (this != &rhs)
+        {
+            spoc_file tmp (rhs);
+            swap (tmp);
+        }
+        return *this;
+    }
+
+    /// @brief Checked point record write access
+    /// @param i Point record index
+    /// @param pr Point record value
+    void set_point_record (const size_t i, const point_record::point_record &p)
+    {
+        REQUIRE (i < prs.size ());
+        const size_t extra_fields = prs.empty () ? 0 : prs[0].extra.size ();
+        if (p.extra.size () != extra_fields)
+            throw std::runtime_error ("spoc_file::set_point_record(): the point record extra fields size is inconsistent with existing point records");
+        prs[i] = p;
+    }
+
+    /// @brief Set the point records in a SPOC file
+    /// @param prs The point records to set
+    void set_point_records (const point_record::point_records &prs)
+    {
+        // Check for consistency
+        if (!all_same_size_extra (prs))
+            throw std::runtime_error ("The point record extra fields have inconsistent sizes");
+
+        // Set the point records
+        this->prs = prs;
+    }
+
+    /// @brief Move point records from the spoc_file object
+    /// @return rvalue reference
+    ///
+    /// Upon return, the spoc_file point records will be empty
+    point_record::point_records &&move_point_records ()
+    {
+        return std::move (prs);
+    }
+    /// @brief Move point records to the spoc_file object
+    /// @param prs The point records to move from
+    ///
+    /// Upon return, the passed point record vector will be empty
+    void move_point_records (point_record::point_records &prs)
+    {
+        // Check for consistency
+        if (!all_same_size_extra (prs))
+            throw std::runtime_error ("The point record extra fields have inconsistent sizes");
+
+        // Move the point records
+        this->prs = std::move (prs);
     }
 };
 
