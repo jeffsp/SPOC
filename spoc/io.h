@@ -1,6 +1,7 @@
 #pragma once
 #include "spoc/compression.h"
 #include "spoc/contracts.h"
+#include "spoc/file.h"
 #include "spoc/header.h"
 #include "spoc/point_record.h"
 #include "spoc/version.h"
