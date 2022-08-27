@@ -301,14 +301,15 @@ void radius_search (
 /// @param indexes Indexes into the point cloud to look at
 /// @param radius Radius to search in meters
 /// @param neighbor_op Operation to perform on point and neighbors
+/// @param max_neighbors Maximum allowable number of neighbors
 ///
 /// Points that are not referenced in the 'indexes' parameter are ignored.
 /// That is, they will not be searched for neighbors, and they will never be
 /// listed as neighbors. They are effectively removed from the point cloud.
 template<typename T,typename U,typename V>
-void radius_search_indexes (const T &points, const U &indexes, const double radius, V neighbor_op)
+void radius_search_indexes (const T &points, const U &indexes, const double radius, V neighbor_op, const size_t max_neighbors = 32)
 {
-    radius_search (points, indexes, indexes, radius, neighbor_op);
+    radius_search (points, indexes, indexes, radius, neighbor_op, max_neighbors);
 }
 
 /// @brief Perform 'op' on neighbors within a specified radius. Search all available
