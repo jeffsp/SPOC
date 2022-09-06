@@ -11,10 +11,10 @@ The **HEADER** contains the following information:
 * A SPOC file identifier consisting of the four characters: 'SPOC'
 * An 8-bit unsigned integer specifying the SPOC file format major version
 * An 8-bit unsigned integer specifying the SPOC file format minor version
-* A 64-bit unsigned integer specifying the length of the OGC WKT string
+* A 16-bit unsigned integer specifying the length of the OGC WKT string
 * An arbitrary length OGC WKT string which is used to store spatial
   reference data
-* A 64-bit unsigned integer specifying the number of 64-bit extra fields
+* An 8-bit unsigned integer specifying the number of 64-bit extra fields
   associated with each point record
 * A 64-bit unsigned integer specifying the number of points records
   contained in the file
@@ -61,29 +61,28 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 # Design
 
 * Applications
-  * Always preserve point record ordering, except when the total number
-    of point records changes
+  * X, Y, and Z point coordinates use 64-bit double precision data types
+  * Where possible, always preserve point record ordering
   * Implicit streaming support
     * Streaming is provided by anonymous and named pipes
-    * Point record ordering is always preserved
-    * LASlib does not support streaming
+    * LASlib does not support streaming, so LAS conversion applications
+      do not stream
   * Avoid dependencies. Current dependencies are:
     * zlib for compression
     * OpenMP for parallelization
-    * laslib for las/spoc translation utilities
+    * LASLib for las/spoc translation utilities
   * This project is defined for Linux-based systems, including MAC OS and
     Windows Subsystem for Linux
 
 * API
   * STL conformance where appropriate
-  * Functional programming style: avoid OOP
-  * X, Y, and Z point coordinates use 64-bit double precision data types
-  * Point records are stored in a vector, and functions operate on point
-    record vector indexes, rather than operating on the point records
-    themselves, where possible
-  * Most functions provide the strong exception guarantee by accepting
-    only const reference parameters and returning either indexes into the
-    input data or copies of the input data
+  * Functional programming style: OOP constructs require strong justification
+  * Where possible, point records are stored in a vector, and functions
+    manipulate point record vector indexes, rather than manipulating
+    point records
+  * Most functions provide the strong exception guarantee by using
+    call-by-const-reference or call-by-value and returning either
+    indexes into the input data or copies of the input data
   * Linear complexity algorithms
     * Exception: Quantiles in `spoc_info`
     * Exception: Nearest neighbor is linear in number of neighbors, not
@@ -97,6 +96,7 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 
 - [ ] Create build and deploy containers
 - [X] Add I/O benchmarks
+- [X] Add point record get/set benchmarks
 - [ ] Add compression benchmarks
 - [X] Update warning for OGC WKT to be more explicit
 - [X] Add Doxygen support
@@ -136,8 +136,7 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 
 ## Interface
 
-- [ ] Python extension reader/writer
-  - [ ] Use pybind11 framework from texmesh
+- [ ] Python extension reader/writer using pybind11 framework
 - [ ] Numpy reader/writer
 - [ ] Pandas dataframe reader/writer
 - [ ] QT Modeller reader/writer
