@@ -1,4 +1,5 @@
 #pragma once
+#include "spoc/affine.h"
 #include "spoc/asprs.h"
 #include "spoc/compression.h"
 #include "spoc/contracts.h"

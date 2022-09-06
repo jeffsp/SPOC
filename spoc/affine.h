@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 namespace spoc
 {
 
@@ -12,7 +14,7 @@ void add_x (T &p, const double v)
 {
 #pragma omp parallel for
     for (size_t i = 0; i < p.size (); ++i)
-        p[i].x = p[i].x + v;
+        p[i].x += v;
 }
 
 // Add offset
@@ -21,7 +23,7 @@ void add_y (T &p, const double v)
 {
 #pragma omp parallel for
     for (size_t i = 0; i < p.size (); ++i)
-        p[i].y = p[i].y + v;
+        p[i].y += v;
 }
 
 // Add offset
@@ -30,7 +32,20 @@ void add_z (T &p, const double v)
 {
 #pragma omp parallel for
     for (size_t i = 0; i < p.size (); ++i)
-        p[i].z = p[i].z + v;
+        p[i].z += v;
+}
+
+// Add offset
+template<typename T>
+void add (T &p, const typename T::value_type &v)
+{
+#pragma omp parallel for
+    for (size_t i = 0; i < p.size (); ++i)
+    {
+        p[i].x += v.x;
+        p[i].y += v.y;
+        p[i].z += v.z;
+    }
 }
 
 // Rotate about the X, Y, or Z axis
