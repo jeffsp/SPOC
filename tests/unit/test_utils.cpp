@@ -8,6 +8,7 @@
 
 using namespace std;
 using namespace spoc::utils;
+using namespace spoc::test_utils;
 
 template<typename T>
 void test_hash_value ()

@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace spoc::radius_search;
+using namespace spoc::test_utils;
 using namespace spoc::voxel;
 
 // Dummy

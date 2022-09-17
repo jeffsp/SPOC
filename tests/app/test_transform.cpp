@@ -9,6 +9,7 @@ using namespace spoc::file;
 using namespace spoc::io;
 using namespace spoc::point;
 using namespace spoc::point_record;
+using namespace spoc::test_utils;
 using namespace spoc::transform_app;
 
 void test_transform_detail ()

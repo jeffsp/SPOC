@@ -7,6 +7,7 @@
 using namespace std;
 using namespace spoc::extent;
 using namespace spoc::point;
+using namespace spoc::test_utils;
 using namespace spoc::tile_app;
 
 void test_get_tile_size ()

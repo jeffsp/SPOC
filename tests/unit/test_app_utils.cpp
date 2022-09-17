@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace spoc::app_utils;
+using namespace spoc::test_utils;
 
 void test_input_stream ()
 {

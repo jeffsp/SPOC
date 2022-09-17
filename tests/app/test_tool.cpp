@@ -10,6 +10,7 @@ using namespace spoc::file;
 using namespace spoc::io;
 using namespace spoc::point_record;
 using namespace spoc::subsampling;
+using namespace spoc::test_utils;
 using namespace spoc::tool_app;
 
 void test_recenter ()
