@@ -13,6 +13,7 @@ using namespace spoc::app_utils;
 using namespace spoc::file;
 using namespace spoc::header;
 using namespace spoc::io;
+using namespace spoc::test_utils;
 
 void test_spoc_file_io ()
 {

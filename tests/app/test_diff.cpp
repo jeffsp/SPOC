@@ -10,6 +10,7 @@ using namespace spoc::file;
 using namespace spoc::header;
 using namespace spoc::io;
 using namespace spoc::point_record;
+using namespace spoc::test_utils;
 
 void test_diff ()
 {

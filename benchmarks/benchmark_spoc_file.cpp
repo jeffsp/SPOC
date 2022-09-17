@@ -8,6 +8,7 @@
 using namespace std;
 using namespace spoc::benchmark_utils;
 using namespace spoc::file;
+using namespace spoc::test_utils;
 
 void benchmark_push_back ()
 {

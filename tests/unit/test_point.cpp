@@ -8,6 +8,7 @@
 using namespace std;
 using namespace spoc::point;
 using namespace spoc::point_record;
+using namespace spoc::test_utils;
 
 template<typename T>
 void test_point_hash ()

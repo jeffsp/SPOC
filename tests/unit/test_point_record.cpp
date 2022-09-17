@@ -8,6 +8,7 @@
 
 using namespace std;
 using namespace spoc::point_record;
+using namespace spoc::test_utils;
 
 void test_point_record_ctors ()
 {

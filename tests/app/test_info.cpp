@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace spoc::info_app;
+using namespace spoc::test_utils;
 
 void test_info_empty ()
 {

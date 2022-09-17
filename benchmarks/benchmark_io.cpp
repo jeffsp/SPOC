@@ -10,6 +10,7 @@ using namespace std;
 using namespace spoc::benchmark_utils;
 using namespace spoc::point_record;
 using namespace spoc::io;
+using namespace spoc::test_utils;
 
 template<typename T>
 void benchmark_write (const T &p, const size_t extra_fields)

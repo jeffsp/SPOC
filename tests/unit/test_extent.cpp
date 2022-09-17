@@ -16,6 +16,7 @@
 using namespace std;
 using namespace spoc::extent;
 using namespace spoc::point;
+using namespace spoc::test_utils;
 
 template<typename T>
 void test_extent (const T &points)

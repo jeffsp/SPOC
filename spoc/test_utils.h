@@ -52,15 +52,18 @@ void test_verification (const bool flag,
         VERIFY (failed);\
     }
 
+namespace spoc
+{
+
+namespace test_utils
+{
+
 inline std::vector<spoc::point::point<double>> generate_points (
     const size_t N,
     const int min_exponent = std::numeric_limits<double>::min_exponent / 2,
     const int max_exponent = std::numeric_limits<double>::max_exponent / 2)
 {
-    using namespace std;
-    using namespace spoc::point;
-
-    vector<point<double>> points (N);
+    std::vector<spoc::point::point<double>> points (N);
 
     // Generate random doubles at varying scales.
     //
@@ -74,7 +77,7 @@ inline std::vector<spoc::point::point<double>> generate_points (
         const double x = std::ldexp (d (g), exp (g));
         const double y = std::ldexp (d (g), exp (g));
         const double z = std::ldexp (d (g), exp (g));
-        p = point<double> {x, y, z};
+        p = spoc::point::point<double> {x, y, z};
     }
 
     return points;
@@ -215,3 +218,7 @@ inline std::string generate_tmp_filename (const size_t total_chars = 16)
 
     return p.string ();
 }
+
+} // namespace test_utils
+
+} // namespace spoc
