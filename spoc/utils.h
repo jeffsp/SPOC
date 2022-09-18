@@ -50,6 +50,45 @@ void quantize (T &p, const double precision)
     }
 }
 
+template<typename T>
+typename T::value_type get_center (const T &points)
+{
+    typename T::value_type c;
+    for (const auto &p : points)
+    {
+        c.x += p.x;
+        c.y += p.y;
+        c.z += p.z;
+    }
+    c.x /= points.size ();
+    c.y /= points.size ();
+    c.z /= points.size ();
+    return c;
+}
+
+template<typename T,typename U>
+T crop (const T &points, const U &extent)
+{
+    T q;
+    q.reserve (points.size ());
+    for (const auto &p : points)
+    {
+        // If it does not lie within extent, ignore it
+        if (
+            p.x < extent.minp.x ||
+            p.y < extent.minp.y ||
+            p.z < extent.minp.z ||
+            p.x > extent.maxp.x ||
+            p.y > extent.maxp.y ||
+            p.z > extent.maxp.z
+           )
+            continue;
+        // Save it
+        q.push_back (p);
+    }
+    return q;
+}
+
 } // namespace utils
 
 } // namespace spoc
