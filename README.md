@@ -351,7 +351,10 @@ Examples of how to use the C++ API with compiled examples
 # Proposed Functionality
 
 * spoctree: break into files arranged as an octree, access/create spoc files
-  * Given a bunch of spoc files, create a spoctree file
+  * Given a bunch of spoc files, create a spoctree file. Each entry in the spoctree file should contain:
+    * Filename
+    * Extent
+    * MD5Sum
   * Spoctree is immutable (i.e. can't add to or delete from spoctree)
   * Octree cells divide until they reach a minimum size, based upon point record size (e.g. 1Mb per cell)
   * Generate a spoc file from a spoctree given an extent
