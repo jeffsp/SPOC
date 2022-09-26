@@ -50,6 +50,16 @@ void test (const size_t N,
     test_extent (points);
 }
 
+void test_area ()
+{
+    VERIFY (about_equal (get_area (spoc::extent::extent {{1.0, 2.0, 3.0}, {4.0, 6.0, 8.0}}), 3.0 * 4.0));
+}
+
+void test_volume ()
+{
+    VERIFY (about_equal (get_volume (spoc::extent::extent {{1.0, 2.0, 3.0}, {4.0, 6.0, 8.0}}), 3.0 * 4.0 * 5.0));
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -67,6 +77,8 @@ int main (int argc, char **argv)
         test (10'000, -40, 0);
         test (10'000, -50, 0);
         test (1'000, 0, 12);
+        test_area ();
+        test_volume ();
 
         return 0;
     }

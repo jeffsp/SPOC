@@ -18,6 +18,19 @@ struct extent
     spoc::point::point<double> maxp;
 };
 
+double get_volume (const extent &e)
+{
+    return (e.maxp.x - e.minp.x)
+        * (e.maxp.y - e.minp.y)
+        * (e.maxp.z - e.minp.z);
+}
+
+double get_area (const extent &e)
+{
+    return (e.maxp.x - e.minp.x)
+        * (e.maxp.y - e.minp.y);
+}
+
 template<typename T>
 extent get_extent (const T &points)
 {
