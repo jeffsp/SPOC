@@ -363,3 +363,36 @@ Examples of how to use the C++ API with compiled examples
     * X,Y extent
     * X,Y,Z extent
   * Unit/integration tests
+
+# Design by Contract
+
+assert(), require(), ensure()
+
+These are design by contract. The keyword is 'design'.
+
+These macros are used during code design, not for debugging.
+
+If you use them correctly, you are likely to never need a debugger.
+
+User facing functions, library interface functions, and
+support/helper functions.
+
+### Example
+### Example
+
+## throw() should be used on library interface and user-facing
+functions.
+
+### Example
+### Example
+
+## Design by contract macros are only executed during debug execution,
+during CI/CD, and therefore should only be used in support
+functions.
+
+### Example
+### Example
+
+## Failfast principle.
+
+Resist the urge to fix a problem if you know the solution.
