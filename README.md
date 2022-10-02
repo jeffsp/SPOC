@@ -1,6 +1,44 @@
 # Introduction
 
-SPOC is a Simple POint Cloud format used to store 3D geospatial data.
+This repository contains library code and applications for reading,
+writing, and processing Simple POint Cloud, or SPOC, format files.
+
+SPOC format files are used to store 3D geospatial data.
+
+This format was developed in response to the need to manipulate and
+store point cloud data for the purposes of point cloud analysis, in
+particular with respect to machine learning algorithm design and
+development.
+
+Support for the following features were prioritized when developing this
+format:
+
+* 64-bit floating point coordinates for supporting datasets with high
+  dynamic ranges
+
+* Streaming file I/O for supporting command chaining using named and
+  anonymous pipes
+
+* Variable length inline point record extra fields for assigning
+  arbitrary point attributes
+
+The following should also be noted with regards to library support for
+the SPOC file format
+
+* Spatial reference system strings are stored in the header and
+  maintained during file I/O; however, these strings are never parsed or
+  used to process point record data by this library
+
+* Raster products, like GeoTIFF, Esri Grid, or PCI Gemomatics are not
+  supported by this library
+
+* Vector products, like ESRI shapefiles, GeoJSON, Google Keyhole Markup
+  (KML), or OpenStreetMap data are not supported by this library
+
+* SPOC format files are very similar to ASPRS LAS format files, with the
+  notable exceptions listed above: LAS files only support 32-bit
+  floating point coordinates, do not easily support streaming I/O, and
+  do not support inline variable length records
 
 # File format
 
@@ -58,39 +96,43 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 | uint16         | Blue              | The point's blue channel value |
 | uint64[0..N-1] | Extra fields      | Zero or more extra fields, as indicated in the SPOC file header |
 
-# Design
+# Applications
 
-* Applications
-  * X, Y, and Z point coordinates use 64-bit double precision data types
-  * Where possible, always preserve point record ordering
-  * Implicit streaming support
-    * Streaming is provided by anonymous and named pipes
-    * LASlib does not support streaming, so LAS conversion applications
-      do not stream
-  * Avoid dependencies. Current dependencies are:
-    * zlib for compression
-    * OpenMP for parallelization
-    * LASLib for las/spoc translation utilities
-  * This project is defined for Linux-based systems, including MAC OS and
-    Windows Subsystem for Linux
+Applications provided by this repository adhere to these design
+principles:
 
-* API
-  * STL conformance where appropriate
-  * Functional programming style: OOP constructs require strong justification
-  * Where possible, point records are stored in a vector, and functions
-    manipulate point record vector indexes, rather than manipulating
-    point records
-  * Most functions provide the strong exception guarantee by using
-    call-by-const-reference or call-by-value and returning either
-    indexes into the input data or copies of the input data
-  * Linear complexity algorithms
-    * Exception: Quantiles in `spoc_info`
-    * Exception: Nearest neighbor is linear in number of neighbors, not
+* Applications are command line oriented and are designed to run on a
+  Linux, MacOS, or Windows Subsystem for Linux terminal
+* Where possible, always preserve point record ordering
+* Implicit streaming support by reading/writing records to a stream
+  where possible. This will improve performance by allowing piped commands
+  to operate in parallel. See examples below.
+* Avoid dependencies. Current dependencies are:
+  * zlib for compression
+  * OpenMP for parallelization
+
+The library API follows these principles:
+
+* STL conformance where appropriate
+* Functional programming style. Use OOP sparingly and with strong
+  justification.
+* Where possible, point records are stored in a vector, and functions
+  manipulate point record vector indexes, rather than manipulating the
+  point records themselves
+* Most functions provide the strong exception guarantee by using
+  call-by-const-reference or call-by-value and returning either indexes
+  into the input data or copies of the input data
+* Linear complexity algorithms
+  * Exception: Quantiles in `spoc_info` require point record sorting
+  * Exception: Nearest neighbor algorithms are linear in the number of neighbors, not
       number of points
-  * SPOC makes assumptions about the byte ordering, and is therefore not
-    portable
+* This library currently makes assumptions about the byte ordering, and
+  it is therefore not portable to other architectures
 
 # Project Roadmap
+
+This roadmap lists the target features and functionality and their
+current development status.
 
 ## Framework
 
@@ -134,14 +176,11 @@ Each **POINT RECORD** in a SPOC file contains the following information:
 - [X] read/write las files
 - [X] Add --version option to all apps
 
-## Interface
+## Python Interface
 
-- [ ] Python extension reader/writer using pybind11 framework
+- [ ] Python extension reader/writer using pybind11 or similar framework
 - [ ] Numpy reader/writer
 - [ ] Pandas dataframe reader/writer
-- [ ] QT Modeller reader/writer
-  - [ ] QT Modeller provides a Windows plugin API at
-        https://appliedimagery.com/developers
 
 ## Applications
 
@@ -243,84 +282,7 @@ Each **POINT RECORD** in a SPOC file contains the following information:
   - [X] Unit/app tests
   - [X] Read/write compressed files
 
-## API Functionality
-
-This is a list of functions and capabilities that could potentially be
-added. Some of these are place-holders that obviously don't belong and
-should be moved to a separate API, like VIPER.
-
-### SPOC
-
-These should be included in the SPOC API
-
-  - [X] Generate voxel indexes
-  - [X] Generate grid indexes (use i, j from voxel index)
-  - [X] Expose rotate, scale, and translate functions in spoc/affine.h header
-  - [X] Expose quantize function in spoc/utils.h header
-  - [X] Add subsampling.h
-    - [X] Add function: Get unique indexes
-    - [X] Add function: Get subsample indexes
-  - [ ] Nearest neighbor operations with lambda support
-    - [ ] Max neighbors parameter
-    - [ ] Even distribution selection
-    - [ ] Gaussian distribution selection
-    - [ ] Weighted distance selection
-
-### VIPER
-
-These should be included in the VIPER API
-
-  - [ ] Geotiff I/O
-  - [ ] Shapefile I/O
-  - [ ] Raster class
-  - [ ] Raster interpolation
-  - [ ] DTM creation
-  - [ ] Semantic segmentation
-    - [ ] CNN-based
-    - [ ] PCT-based
-    - [ ] Training
-    - [ ] Inference
-  - [ ] Generate neighbor indexes within a radius
-    - [ ] Save the nearest K neighbors
-    - [ ] Randomly select K neighbors within the radius
-  - [ ] Generate connected component IDs
-    - [ ] Connection radius for connecting by proximity
-    - [ ] Connection field(s)
-    - [ ] Combine proximity and other field(s) (for example, TEXPERT
-          calls this 'regioning')
-  - [ ] Generate cluster IDs based upon data fields, xyz, cpi, rgb, extra[n]:
-    - [ ] Save component ID to extra[n]
-    - [ ] Set value of K
-    - [ ] Use K means clustering
-    - [ ] Use spectral clustering
-    - [ ] Use Newman clustering
-  - [ ] 2D/3D field smoothing - filter fields like classification, but
-        does not affect 3D structure of point cloud
-    - [ ] Classifications (voting, random)
-    - [ ] RGB (voting, average)
-    - [ ] Intensity (voting, average)
-  - [ ] Spatial smoothing - 2D/3D spatial filtering, changes 3D structure
-    - [ ] Square filter
-    - [ ] Gaussian filter (deconcolve)
-    - [ ] Median filter
-  - [ ] Projection: Project points onto a 2D plane. In order to project
-                    onto XZ or YZ or an arbitrary plane, first rotate the
-                    point cloud, then project.
-    - [ ] Grid size (resolution)
-    - [ ] Field: z, c, p, i, r, g, b, extra[0..N]
-    - [ ] Z elevation = min/max/median/mode/avg/%centile
-    - [ ] Normalize output
-    - [ ] Z-score output
-    - [ ] Pixel data type, int/uint/float, 8/16/32/64
-    - [ ] Interpolate results: Use after filtering ground points to
-          create DTMs
-      - [ ] Extrapolate edges on/off
-    - [ ] Geotiff output
-      - [ ] Nodata value
-    - [ ] Png output
-      - [ ] Grayscale/RGB
-
-# Script Examples
+## Script Examples
 
 Examples of how to use the command line applications
 
@@ -334,7 +296,7 @@ Examples of how to use the command line applications
 - [ ] Transform with pipes
 - [X] Stream averaging
 
-# C++ Programming Examples
+## C++ Programming Examples
 
 Examples of how to use the C++ API with compiled examples
 
@@ -364,15 +326,28 @@ Examples of how to use the C++ API with compiled examples
     * X,Y,Z extent
   * Unit/integration tests
 
-# Design by Contract
+# A final note about library design
 
-assert(), require(), ensure()
+This library adheres to the Design by Contract concept
+
+Preconditions
+Postconditions
+Invariants
+Side Effects
+Exception guarantees
+
+Design by Contract macros
+
+assert(), REQUIRE(), ENSURE()
 
 These are design by contract. The keyword is 'design'.
 
 These macros are used during code design, not for debugging.
 
-If you use them correctly, you are likely to never need a debugger.
+Indeed, if assert statements are used liberally and in the proper way,
+the developers of this library have found that the use of a debugging
+application is not needed. That's not to say that we don't ever write
+bugs, it simply means that 
 
 User facing functions, library interface functions, and
 support/helper functions.
