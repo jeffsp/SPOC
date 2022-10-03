@@ -119,7 +119,7 @@ The library API follows these principles:
 * Where possible, point records are stored in a vector, and functions
   manipulate point record vector indexes, rather than manipulating the
   point records themselves
-* Most functions provide the strong exception guarantee by using
+* Most functions provide the strong exception safety guarantee by using
   call-by-const-reference or call-by-value and returning either indexes
   into the input data or copies of the input data
 * Linear complexity algorithms
@@ -328,46 +328,23 @@ Examples of how to use the C++ API with compiled examples
 
 # A final note about library design
 
-This library adheres to the Design by Contract concept
+This library adheres to Design by Contract which is implemented using
+macros which are enabled during debug compilation. In the release
+version of the build, the macros have no effect (i.e., they are no-ops).
 
-Preconditions
-Postconditions
-Invariants
-Side Effects
-Exception guarantees
+Preconditions are specified typically upon function entry with the macro
+**REQUIRE()**.
 
-Design by Contract macros
+Postconditions are specified before function return with the macro
+**ENSURE()**.
 
-assert(), REQUIRE(), ENSURE()
+Invariants are specified throughout the code with the **assert()** macro.
 
-These are design by contract. The keyword is 'design'.
+Note that design by contract macros are used during development and aid
+in code **design**. They are not used for debugging or for error
+checking.
 
-These macros are used during code design, not for debugging.
-
-Indeed, if assert statements are used liberally and in the proper way,
-the developers of this library have found that the use of a debugging
-application is not needed. That's not to say that we don't ever write
-bugs, it simply means that 
-
-User facing functions, library interface functions, and
-support/helper functions.
-
-### Example
-### Example
-
-## throw() should be used on library interface and user-facing
-functions.
-
-### Example
-### Example
-
-## Design by contract macros are only executed during debug execution,
-during CI/CD, and therefore should only be used in support
-functions.
-
-### Example
-### Example
-
-## Failfast principle.
-
-Resist the urge to fix a problem if you know the solution.
+As noted above, side effects are typically reduced by adhering to a
+function style of programming. Also, the **strong** exception safety
+guarantee is often provided by passing parameters that are const
+reference and by using copy semantics when performance allows it.
