@@ -59,6 +59,13 @@ Remove point records from a SPOC file that satisfy certain properties
     non-zero value, then the point with the non-unique value will be
     selected randomly.
 
+\-\-remove-coords, -c
+:   Remove points based on their coordinate values. To use this option
+	specify a coordinate value, a comparison operator, and a value
+	separated by a comma. For example x,>,10 will remove all points with
+	an x value greater than 10. Available coordinate values are x, y, and z.
+	Available comparison operators are >, and <.
+
 # SEE ALSO
 
 SPOC\_TOOL(1)

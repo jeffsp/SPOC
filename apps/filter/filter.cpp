@@ -49,6 +49,7 @@ int main (int argc, char **argv)
                 clog << "\t" << i << endl;
             clog << "unique-xyz\t" << args.unique_xyz << endl;
             clog << "subsample\t" << args.subsample << endl;
+            clog << "remove-coords" << args.remove_coords << endl;
             clog << "input-filename\t" << args.input_fn << endl;
             clog << "output-filename\t" << args.output_fn << endl;
         }
@@ -68,6 +69,8 @@ int main (int argc, char **argv)
             f = unique_xyz (f, args.random_seed);
         if (args.subsample > 0.0)
             f = subsample (f, args.subsample, args.random_seed);
+        if (!args.remove_coords.empty())
+            f = remove_coords(f, args.remove_coords);
 
         // Get the output stream
         output_stream os (args.verbose, args.output_fn);

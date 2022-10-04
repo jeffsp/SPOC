@@ -23,6 +23,7 @@ struct args
     std::unordered_set<int> remove_classes;
     bool unique_xyz = false;
     double subsample = 0.0;
+    std::string remove_coords;
     std::string input_fn;
     std::string output_fn;
 };
@@ -42,10 +43,11 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"remove-class", required_argument, 0, 'r'},
             {"unique-xyz", no_argument, 0, 'u'},
             {"subsample", required_argument, 0, 's'},
+            {"remove-coords", required_argument, 0, 'c'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hvek:a:r:us:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hvek:a:r:us:c:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -68,6 +70,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 'r': { args.remove_classes.insert (std::atoi (optarg)); break; }
             case 'u': { args.unique_xyz = true; break; }
             case 's': { args.subsample = std::atof (optarg); break; }
+            case 'c': { args.remove_coords = std::string (optarg); break; }
         }
     }
 
