@@ -126,6 +126,60 @@ void test_subsample ()
     VERIFY (l.get_point_records ().size () == 8);
 }
 
+void test_remove_coords ()
+{
+    spoc_file f;
+    f.push_back (point_record (0.0, 0.0, 0.0));
+    f.push_back (point_record (1.0, 1.0, 1.0));
+    f.push_back (point_record (1.0, 1.0, 2.0));
+    auto g = remove_coords (f, "x,>,0.9");
+    VERIFY (g.get_point_records ().size () == 1);
+    g = remove_coords (f, "y,<,0.1");
+    VERIFY (g.get_point_records ().size () == 2);
+    g = remove_coords (f, "z,<,2.0");
+    VERIFY (g.get_point_records ().size () == 1);
+    bool fail = false;
+    try
+    {
+        g = remove_coords (f, "q,>,1.0");
+    }
+    catch (const exception &e)
+    {
+        fail = true;
+    }
+    VERIFY (fail);
+    fail = false;
+    try
+    {
+        g = remove_coords (f, "x,-,1.0");
+    }
+    catch (const exception &e)
+    {
+        fail = true;
+    }
+    VERIFY (fail);
+    fail = false;
+    try
+    {
+        g = remove_coords (f, "x,<,1.0,fail");
+    }
+    catch (const exception &e)
+    {
+        fail = true;
+    }
+    VERIFY (fail);
+    fail = false;
+    try
+    {
+        g = remove_coords (f, "x,<,abc");
+    }
+    catch (const exception &e)
+    {
+        fail = true;
+    }
+    VERIFY (fail);
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -134,6 +188,7 @@ int main (int argc, char **argv)
         test_remove_classes ();
         test_unique_xyz ();
         test_subsample ();
+        test_remove_coords ();
         return 0;
     }
     catch (const exception &e)
