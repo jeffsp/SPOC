@@ -1,5 +1,5 @@
 % SPOC_DIFF(1) SPOC User's Manual | Version 0
-% spoc@zetamon.xyz
+% spoc@spocfile.xyz
 % December 25, 2021
 
 # NAME
