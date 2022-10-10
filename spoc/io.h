@@ -99,10 +99,59 @@ inline point_record::point_records read_uncompressed_points (std::istream &s,
     const size_t total_points,
     const size_t extra_fields)
 {
-    // Read the data
-    point_record::point_records p (total_points);
-    for (size_t i = 0; i < p.size (); ++i)
-        p[i] = point_record::read_point_record (s, extra_fields);
+    // Allocate the buffer
+    const size_t buffer_size = 1 * 1024;
+    std::vector<char> buffer (buffer_size);
+
+    // Determine sizes
+    const size_t struct_size =
+        sizeof(double) // x
+        + sizeof(double) // y
+        + sizeof(double) // z
+        + sizeof(uint32_t) // c
+        + sizeof(uint32_t) // p
+        + sizeof(uint16_t) // i
+        + sizeof(uint16_t) // r
+        + sizeof(uint16_t) // g
+        + sizeof(uint16_t); // b
+    const size_t extra_size = extra_fields * sizeof(uint64_t);
+    const size_t record_size = struct_size + extra_size;
+    const size_t records_per_buffer = buffer_size / record_size;
+
+    // Allocate the records
+    point_record::point_records p (total_points, point_record::point_record (extra_fields));
+
+    // Read records in chunks
+    for (size_t i = 0; i < p.size (); i += records_per_buffer)
+    {
+        // Fill the buffer
+        const size_t total_records =
+            (i + records_per_buffer < total_points)
+            ? records_per_buffer
+            : total_points - i;
+        s.read (&buffer[0], total_records * record_size);
+
+        // Convert from raw memory to record
+        for (size_t j = 0; j < total_records; ++j)
+        {
+            // Get pointer into the buffer
+            const size_t buffer_index = j * record_size;
+            assert (buffer_index < buffer.size ());
+            const char *buffer_ptr = &buffer[buffer_index];
+
+            // Get pointer into the record vector
+            const size_t record_index = i + j;
+            assert (record_index < p.size ());
+            char *record_ptr = reinterpret_cast<char *> (&p[record_index]);
+
+            // Mem copy the struct part
+            std::copy (buffer_ptr, buffer_ptr + struct_size, record_ptr);
+
+            // Mem copy the extra fields
+            char *extra_ptr = reinterpret_cast<char *> (&p[record_index].extra[0]);
+            std::copy (buffer_ptr + struct_size, buffer_ptr + struct_size + extra_size, extra_ptr);
+        }
+    }
 
     return p;
 }
