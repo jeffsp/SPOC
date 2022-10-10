@@ -121,7 +121,7 @@ The library API follows these principles:
   point records themselves
 * Most functions provide the strong exception safety guarantee by using
   call-by-const-reference or call-by-value and returning either indexes
-  into the input data or copies of the input data
+  into the input data or copies of the input data.
 * Linear complexity algorithms
   * Exception: Quantiles in `spoc_info` require point record sorting
   * Exception: Nearest neighbor algorithms are linear in the number of neighbors, not
@@ -329,8 +329,8 @@ Examples of how to use the C++ API with compiled examples
 # A final note about library design
 
 This library adheres to Design by Contract which is implemented using
-macros which are enabled during debug compilation. In the release
-version of the build, the macros have no effect (i.e., they are no-ops).
+macros and are enabled during debug compilation. In the release version
+of the build, the macros have no effect (i.e., they are no-ops).
 
 Preconditions are specified typically upon function entry with the macro
 **REQUIRE()**.
@@ -348,3 +348,18 @@ As noted above, side effects are typically reduced by adhering to a
 function style of programming. Also, the **strong** exception safety
 guarantee is often provided by passing parameters that are const
 reference and by using copy semantics when performance allows it.
+
+# References
+
+https://www.boost.org/community/exception\_safety.html
+
+https://en.cppreference.com/w/cpp/language/copy\_elision
+
+https://stackoverflow.com/questions/21471836/what-can-c-offer-as-far-as-functional-programming
+
+https://stackoverflow.com/questions/21605579/how-true-is-want-speed-pass-by-value
+(Note that David Abraham's original article, "Want speed? Pass by
+value", at the time of this writing, does not appear to have a
+persistent URL, and cpp-next.com is defunct.
+
+https://en.wikipedia.org/wiki/Lambda\_lifting
