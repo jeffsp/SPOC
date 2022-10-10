@@ -49,7 +49,7 @@ int main (int argc, char **argv)
                 clog << "\t" << i << endl;
             clog << "unique-xyz\t" << args.unique_xyz << endl;
             clog << "subsample\t" << args.subsample << endl;
-            clog << "remove-coords" << args.remove_coords << endl;
+            clog << "remove-coords\t" << args.remove_coords << endl;
             clog << "input-filename\t" << args.input_fn << endl;
             clog << "output-filename\t" << args.output_fn << endl;
         }
