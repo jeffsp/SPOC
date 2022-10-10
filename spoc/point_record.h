@@ -145,7 +145,7 @@ inline void write_point_record (std::ostream &s, const point_record &p)
 // Record I/O
 inline point_record read_point_record (std::istream &s, const size_t extra_fields)
 {
-    point_record p;
+    point_record p (extra_fields);
     s.read (reinterpret_cast<char*>(&p.x), sizeof(double)
         + sizeof(double)
         + sizeof(double)
@@ -155,7 +155,6 @@ inline point_record read_point_record (std::istream &s, const size_t extra_field
         + sizeof(uint16_t)
         + sizeof(uint16_t)
         + sizeof(uint16_t));
-    p.extra.resize (extra_fields);
     s.read (reinterpret_cast<char*>(&p.extra[0]), p.extra.size () * sizeof(uint64_t));
     return p;
 }
