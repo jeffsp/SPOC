@@ -184,7 +184,7 @@ current development status.
 
 ## Applications
 
-- [ ] Speed up I/O by either increasing the read/write buffer sizes or
+- [X] Speed up I/O by either increasing the read/write buffer sizes or
       by manually buffering reads and writes.
 
 - [X] spoc info
