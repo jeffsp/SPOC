@@ -14,10 +14,14 @@ using namespace spoc::io;
 using namespace spoc::point_record;
 using namespace spoc::test_utils;
 
+const string fn ("/tmp/benchmark_io.tmp");
+
 template<typename T>
 void benchmark_write_uncompressed (const T &p, const size_t extra_fields)
 {
-    stringstream s;
+    ofstream ofs (fn);
+    if (!ofs)
+        throw runtime_error ("Can't open file for writing");
 
     clog << "Writing " << p.size () << " point records uncompressed" << endl;
 
@@ -25,7 +29,7 @@ void benchmark_write_uncompressed (const T &p, const size_t extra_fields)
     timer t;
 
     for (const auto &i : p)
-        write_point_record (s, i);
+        write_point_record (ofs, i);
 
     clog << t.elapsed_ms () << "ms" << endl;
 }
@@ -33,29 +37,37 @@ void benchmark_write_uncompressed (const T &p, const size_t extra_fields)
 template<typename T>
 void benchmark_read_uncompressed (const T &p, const size_t extra_fields)
 {
-    stringstream s;
+    {
+    ofstream ofs (fn);
+    if (!ofs)
+        throw runtime_error ("Can't open file for writing");
 
     // Write them to the stream
     for (const auto &i : p)
-        write_point_record (s, i);
+        write_point_record (ofs, i);
+    }
 
     clog << "Reading " << p.size () << " point records uncompressed" << endl;
+
+    ifstream ifs (fn);
+    if (!ifs)
+        throw runtime_error ("Can't open file for reading");
 
     // Read them back out and time it
     timer t;
 
     // Allocate space for them
-    point_records r = read_uncompressed_points (s, p.size (), extra_fields);
+    point_records r = read_uncompressed_points (ifs, p.size (), extra_fields);
 
     clog << t.elapsed_ms () << "ms" << endl;
-
-    VERIFY (p == r);
 }
 
 template<typename T>
 void benchmark_write_compressed (const T &p, const size_t extra_fields)
 {
-    stringstream s;
+    ofstream ofs (fn);
+    if (!ofs)
+        throw runtime_error ("Can't open file for writing");
 
     clog << "Writing " << p.size () << " point records compressed" << endl;
 
@@ -64,7 +76,7 @@ void benchmark_write_compressed (const T &p, const size_t extra_fields)
     // Write them to the stream and time it
     timer t;
 
-    write_spoc_file_compressed (s, spoc_file (wkt, true, p));
+    write_spoc_file_compressed (ofs, spoc_file (wkt, true, p));
 
     clog << t.elapsed_ms () << "ms" << endl;
 }
@@ -72,17 +84,25 @@ void benchmark_write_compressed (const T &p, const size_t extra_fields)
 template<typename T>
 void benchmark_read_compressed (const T &p, const size_t extra_fields)
 {
-    stringstream s;
+    {
+    ofstream ofs (fn);
+    if (!ofs)
+        throw runtime_error ("Can't open file for writing");
 
     // Write them to the stream
-    write_spoc_file_compressed (s, spoc_file ("WKT", true, p));
+    write_spoc_file_compressed (ofs, spoc_file ("WKT", true, p));
+    }
 
     clog << "Reading " << p.size () << " point records compressed" << endl;
+
+    ifstream ifs (fn);
+    if (!ifs)
+        throw runtime_error ("Can't open file for reading");
 
     // Read them back out and time it
     timer t;
 
-    const auto f = read_spoc_file_compressed (s);
+    const auto f = read_spoc_file_compressed (ifs);
 
     clog << t.elapsed_ms () << "ms" << endl;
 }
