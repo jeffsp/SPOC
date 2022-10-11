@@ -116,7 +116,7 @@ inline T remove_coords (const T &f, const std::string &op)
     // Get an empty clone of the spoc file
     T g = f.clone_empty ();
 
-    auto ops = detail::split(op, ",");
+    auto ops = detail::split(op, " ");
 
     if (ops.size() != 3)
         throw std::runtime_error("Did not find correct number of arguments for remove-coords option");

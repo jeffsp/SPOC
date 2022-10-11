@@ -61,9 +61,9 @@ Remove point records from a SPOC file that satisfy certain properties
 
 \-\-remove-coords, -c
 :   Remove points based on their coordinate values. To use this option
-	specify a coordinate value, a comparison operator, and a float value
-	separated by a comma. Enclose these values in quotation marks. For
-    example -c "x,>,10" will remove all points with an x value greater
+    specify a coordinate value, a comparison operator, and a float value
+    separated by a space. Enclose these values in quotation marks. For
+    example -c "x > 10" will remove all points with an x value greater
     than 10. Available coordinate values are x, y, and z. Available
     comparison operators are >, and <.
 
