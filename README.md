@@ -40,6 +40,13 @@ the SPOC file format
   floating point coordinates, do not easily support streaming I/O, and
   do not support inline variable length records
 
+
+# Support
+
+[https://gitlab.com/jeffsp/spoc_viewer](https://gitlab.com/jeffsp/spoc_viewer)
+[https://gitlab.com/jeffsp/spoc_conversion](https://gitlab.com/jeffsp/spoc_conversion)
+
+
 # File format
 
 A SPOC file consists of a **HEADER** followed by **POINT RECORDS**.
