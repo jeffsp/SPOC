@@ -19,3 +19,11 @@ def getminorversion():
     """
 
     return spocpy.spocpy_cpp.getminorversion()
+
+
+def readheader(filename):
+    """
+    Read the header of a SPOC file
+    """
+
+    return spocpy.spocpy_cpp.readheader(filename)
