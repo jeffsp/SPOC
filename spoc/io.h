@@ -147,9 +147,12 @@ inline point_record::point_records read_uncompressed_points (std::istream &s,
             // Mem copy the struct part
             std::copy (buffer_ptr, buffer_ptr + struct_size, record_ptr);
 
-            // Mem copy the extra fields
-            char *extra_ptr = reinterpret_cast<char *> (&p[record_index].extra[0]);
-            std::copy (buffer_ptr + struct_size, buffer_ptr + struct_size + extra_size, extra_ptr);
+            // If there are extra fields, mem copy them
+            if (extra_size > 0)
+            {
+                char *extra_ptr = reinterpret_cast<char *> (&p[record_index].extra[0]);
+                std::copy (buffer_ptr + struct_size, buffer_ptr + struct_size + extra_size, extra_ptr);
+            }
         }
     }
 
