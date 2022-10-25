@@ -1,35 +1,42 @@
 #!/usr/bin/env python3
 """
-Spocpy example
+Spocpy timings example
 """
 
+import glob
 import spocpy as sp
+import time
 
 
 def main():
 
-    # Read a DSM
-    with rasterio.open('../test_data/12_2071_2100_4_dsm.tif', 'r') as d:
-        dsm = d.read()
+    # Get all spoc and zpoc files in the test data
+    fns = [fn for fn in glob.glob('../../test_data/*/*.spoc')]
+    fns.extend([fn for fn in glob.glob('../../test_data/*/*.zpoc')])
 
-    # Inline numpy version
-    tic = time.perf_counter()
-    y1 = np.zeros(x.shape, dtype=np.dtype('b'))
-    y1[(x != 0) & (x != np.nan) & (x > -999)] = 1
-    toc = time.perf_counter() - tic
-    print(f'Inline numpy version: {toc:0.5f} seconds elapsed')
+    # Read just the headers
+    print('Reading all headers...')
 
-    # Python functions version
     tic = time.perf_counter()
-    y2 = texmeshpy.utils.getmask(x)
+    for fn in fns:
+        h = sp.readheader(fn)
     toc = time.perf_counter() - tic
-    print(f'Python module version: {toc:0.5f} seconds elapsed')
 
-    # C++ version
+    print(f'{toc:0.8f} seconds elapsed')
+
+    # Read all point records
+    print('Reading all point records...')
+
+    total_point_records = 0
     tic = time.perf_counter()
-    y3 = texmeshpy.utilscpp.getmask(x)
+    for fn in fns:
+        f = sp.readspocfile(fn)
+        prs = f.getPointRecords()
+        total_point_records += len(prs)
     toc = time.perf_counter() - tic
-    print(f'C++ extension version: {toc:0.5f} seconds elapsed')
+
+    print(f'{toc:0.8f} seconds elapsed')
+    print(f'{total_point_records} total point records read')
 
 
 if __name__ == "__main__":

@@ -137,6 +137,29 @@ class TestAll(unittest.TestCase):
             self.assertTrue(r.z > 20.0)
             self.assertTrue(r.z < 30.0)
 
+    def test_spoc_file_pandas_helpers(self):
+        # Read a file
+        f = sp.readspocfile('../../test_data/lidar/juarez50.spoc')
+        n = len(f.getPointRecords())
+        x = f.getX()
+        y = f.getY()
+        z = f.getZ()
+        c = f.getC()
+        p = f.getP()
+        i = f.getI()
+        r = f.getR()
+        g = f.getG()
+        b = f.getB()
+        self.assertTrue(len(x) == n)
+        self.assertTrue(len(y) == n)
+        self.assertTrue(len(z) == n)
+        self.assertTrue(len(c) == n)
+        self.assertTrue(len(p) == n)
+        self.assertTrue(len(i) == n)
+        self.assertTrue(len(r) == n)
+        self.assertTrue(len(g) == n)
+        self.assertTrue(len(b) == n)
+
 
 if __name__ == '__main__':
     unittest.main()

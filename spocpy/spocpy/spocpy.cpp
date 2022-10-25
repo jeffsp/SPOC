@@ -100,6 +100,16 @@ PYBIND11_MODULE(spocpy_cpp,m)
         .def("setPointRecord", &spoc::file::spoc_file::set_point_record)
         .def("getPointRecords", &spoc::file::spoc_file::get_point_records)
         .def("setPointRecords", &spoc::file::spoc_file::set_point_records)
+        .def("getX", &spoc::file::spoc_file::get_x)
+        .def("getY", &spoc::file::spoc_file::get_y)
+        .def("getZ", &spoc::file::spoc_file::get_z)
+        .def("getC", &spoc::file::spoc_file::get_c)
+        .def("getP", &spoc::file::spoc_file::get_p)
+        .def("getI", &spoc::file::spoc_file::get_i)
+        .def("getR", &spoc::file::spoc_file::get_r)
+        .def("getG", &spoc::file::spoc_file::get_g)
+        .def("getB", &spoc::file::spoc_file::get_b)
+        .def("getExtra", &spoc::file::spoc_file::get_extra)
         ;
     m.def("readspocfile", &py_readspocfile, "Read a SPOC file");
     m.def("writespocfile", &py_writespocfile, "Write a SPOC file");
