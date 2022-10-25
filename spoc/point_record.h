@@ -138,7 +138,8 @@ inline void write_point_record (std::ostream &s, const point_record &p)
         + sizeof(uint16_t)
         + sizeof(uint16_t)
         + sizeof(uint16_t));
-    s.write (reinterpret_cast<const char*>(&p.extra[0]), p.extra.size () * sizeof(uint64_t));
+    if (p.extra.size () != 0)
+        s.write (reinterpret_cast<const char*>(&p.extra[0]), p.extra.size () * sizeof(uint64_t));
     s.flush ();
 }
 
@@ -155,7 +156,8 @@ inline point_record read_point_record (std::istream &s, const size_t extra_field
         + sizeof(uint16_t)
         + sizeof(uint16_t)
         + sizeof(uint16_t));
-    s.read (reinterpret_cast<char*>(&p.extra[0]), p.extra.size () * sizeof(uint64_t));
+    if (p.extra.size () != 0)
+        s.read (reinterpret_cast<char*>(&p.extra[0]), p.extra.size () * sizeof(uint64_t));
     return p;
 }
 
