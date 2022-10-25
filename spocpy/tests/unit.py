@@ -4,7 +4,9 @@ Spocpy tests
 """
 
 import os
+import random
 import shutil
+import string
 import tempfile
 import unittest
 import spocpy.spocpy_cpp as sp_cpp
@@ -21,6 +23,10 @@ class TestAll(unittest.TestCase):
         # Clean up
         shutil.rmtree(self.temp_dir)
 
+    def temp_filename(self, length=16):
+        fn = ''.join(random.choices(string.ascii_uppercase, k=length))
+        return os.path.join(self.temp_dir, fn)
+
     def test_version(self):
         # print(f'Version {sp.getmajorversion()}.{sp.getminorversion()}')
         # Check python interface against cpp extension
@@ -31,7 +37,8 @@ class TestAll(unittest.TestCase):
 
     def test_header(self):
         # Try to read a non-existent file
-        self.assertRaises(RuntimeError, sp.readheader, 'does not exist')
+        doesnt_exist = self.temp_filename()
+        self.assertRaises(RuntimeError, sp.readheader, doesnt_exist)
         # Read a test file
         h = sp.readheader('../../test_data/lidar/juarez50.spoc')
         # Check its fields
@@ -69,7 +76,7 @@ class TestAll(unittest.TestCase):
         self.assertEqual(pr.extra[0], 5)
         self.assertEqual(pr.extra[-1], 1)
 
-    def test_file(self):
+    def test_spoc_file(self):
         # Read a file
         f = sp.readspocfile('../../test_data/lidar/juarez50.spoc')
         self.assertTrue(f.getMajorVersion() == sp.getmajorversion())
@@ -87,20 +94,48 @@ class TestAll(unittest.TestCase):
         self.assertFalse(pr10.x == 0.0)
         self.assertTrue(pr10.x == prs[10].x)
 
-    def test_file_io(self):
-        self.assertRaises(RuntimeError, sp.readspocfile, 'does not exist')
+    def test_spoc_file_io(self):
+        # Try to read a non-existent file
+        doesnt_exist = self.temp_filename()
+        self.assertRaises(RuntimeError, sp.readspocfile, doesnt_exist)
         # Read a file
         f1 = sp.readspocfile('../../test_data/lidar/juarez50.spoc')
-        print(f1)
         # Write it back out
-        fn = os.path.join(self.temp_dir, "test_file.spoc")
-        print(fn)
+        fn = self.temp_filename()
         sp.writespocfile(fn, f1)
         # Read it back in
         f2 = sp.readspocfile(fn)
-        print(f2)
-        # They should be the same
-        #self.assertTrue(f1 == f2)
+        # They should have the same number of point records
+        self.assertTrue(len(f1.getPointRecords()) == len(f2.getPointRecords()))
+
+    def test_spoc_file_create(self):
+        # Create a spoc file
+        wkt = "test wkt"
+        f = sp.SpocFile(wkt, False)
+        # Add some records
+        prs = []
+        for n in range(0, 100):
+            r = sp.PointRecord()
+            r.x = 0 + 10 * random.random()
+            r.y = 10 + 10 * random.random()
+            r.z = 20 + 10 * random.random()
+            prs.append(r)
+        f.setPointRecords(prs)
+        # Write it out
+        fn = self.temp_filename()
+        sp.writespocfile(fn, f)
+        # Read it back in
+        f2 = sp.readspocfile(fn)
+        self.assertTrue(f2.getWKT() == wkt)
+        # Check the records
+        self.assertTrue(len(f2.getPointRecords()) == 100)
+        for r in f2.getPointRecords():
+            self.assertTrue(r.x > 0.0)
+            self.assertTrue(r.x < 10.0)
+            self.assertTrue(r.y > 10.0)
+            self.assertTrue(r.y < 20.0)
+            self.assertTrue(r.z > 20.0)
+            self.assertTrue(r.z < 30.0)
 
 
 if __name__ == '__main__':

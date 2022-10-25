@@ -89,7 +89,7 @@ PYBIND11_MODULE(spocpy_cpp,m)
         ;
 
     py::class_<spoc::file::spoc_file>(m, "SpocFile")
-        .def(py::init<const uint8_t, const uint8_t, const std::string &, const bool>())
+        .def(py::init<const std::string &, const bool>())
         .def("getMajorVersion", &spoc::file::spoc_file::get_major_version)
         .def("getMinorVersion", &spoc::file::spoc_file::get_minor_version)
         .def("getWKT", &spoc::file::spoc_file::get_wkt)
