@@ -239,6 +239,27 @@ class spoc_file
         // Move the point records
         this->prs = std::move (prs);
     }
+
+    /// @brief Pandas dataframe helper
+    std::vector<double> get_x () const { return point_record::get_x (prs); }
+    /// @brief Pandas dataframe helper
+    std::vector<double> get_y () const { return point_record::get_y (prs); }
+    /// @brief Pandas dataframe helper
+    std::vector<double> get_z () const { return point_record::get_z (prs); }
+    /// @brief Pandas dataframe helper
+    std::vector<uint32_t> get_c () const { return point_record::get_c (prs); }
+    /// @brief Pandas dataframe helper
+    std::vector<uint32_t> get_p () const { return point_record::get_p (prs); }
+    /// @brief Pandas dataframe helper
+    std::vector<uint16_t> get_i () const { return point_record::get_i (prs); }
+    /// @brief Pandas dataframe helper
+    std::vector<uint16_t> get_r () const { return point_record::get_r (prs); }
+    /// @brief Pandas dataframe helper
+    std::vector<uint16_t> get_g () const { return point_record::get_g (prs); }
+    /// @brief Pandas dataframe helper
+    std::vector<uint16_t> get_b () const { return point_record::get_b (prs); }
+    /// @brief Pandas dataframe helper
+    std::vector<uint64_t> get_extra (const size_t k) const { return point_record::get_extra (k, prs); }
 };
 
 } // namespace file
