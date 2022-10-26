@@ -109,6 +109,16 @@ void test_set_field ()
                 field_ifs << i << endl;
             set_field (f, field_ifs, c);
         }
+
+        // The number of extra fields will be resized if there are not enough
+        // to fit the new field
+        {
+            stringstream field_ifs;
+            // Write field values
+            for (size_t i = 0; i < n; ++i)
+                field_ifs << i << endl;
+            set_field (f, field_ifs, "e10");
+        }
     }
 
     // Throw an error if there are not enough values
