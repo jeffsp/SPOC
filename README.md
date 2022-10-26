@@ -186,9 +186,10 @@ current development status.
 
 ## Python Interface
 
-- [ ] Python extension reader/writer using pybind11 or similar framework
-- [ ] Numpy reader/writer
-- [ ] Pandas dataframe reader/writer
+- [X] Python extension reader/writer using pybind11
+- [X] Numpy/Pandas helpers in Python extension
+- [X] Simple Python examples
+- [ ] Simple SPOC file viewer using Plotly
 
 ## Applications
 
