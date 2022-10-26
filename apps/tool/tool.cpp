@@ -57,14 +57,14 @@ int main (int argc, char **argv)
         // Read the input file
         spoc_file f = read_spoc_file (is ());
 
-        // Get the output stream
-        output_stream os (args.verbose, args.output_fn);
-
         if (args.command.name == "get-field")
         {
             string s = args.command.params;
             const auto l = consume_field_name (s);
-            get_field (f, os (), l);
+            get_field (f, cout, l);
+
+            // Short-circuit so that the SPOC file is not written
+            return 0;
         }
         else if (args.command.name == "recenter-xy")
             f = recenter (f);
@@ -72,11 +72,12 @@ int main (int argc, char **argv)
             f = recenter (f, true);
         else if (args.command.name == "resize-extra")
         {
-            if (args.resize_extra < 0)
+            const int new_size = std::stoi (args.command.params);
+            if (new_size < 0)
                 throw runtime_error ("The number of extra fields must be >= 0");
-            if (args.resize_extra > 255)
+            if (new_size > 255)
                 throw runtime_error ("The number of extra fields must be < 256");
-            f = resize_extra (f, args.resize_extra);
+            f = resize_extra (f, new_size);
         }
         else if (args.command.name == "set-field")
         {
@@ -114,6 +115,9 @@ int main (int argc, char **argv)
         }
         else
             throw runtime_error ("An unknown command was encountered");
+
+        // Get the output stream
+        output_stream os (args.verbose, args.output_fn);
 
         // Write it out
         write_spoc_file (os (), f);

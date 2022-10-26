@@ -34,7 +34,7 @@ inline void get_field (const T &f, std::ostream &os, const std::string &field_na
     // Get the extra index
     const size_t j = app_utils::is_extra_field (field_name)
         ? app_utils::get_extra_index (field_name)
-        : f.get_header ().extra_fields + 1;
+        : f.get_extra_fields () + 1;
 
     // Write out the fields
     for (const auto &p : f.get_point_records ())
@@ -173,13 +173,25 @@ inline T set_field (const T &f, std::istream &field_ifs, const std::string &fiel
             throw std::runtime_error ("Reached end-of-file before reading all field values");
     }
 
-    // Get the extra index
-    const size_t j = app_utils::is_extra_field (field_name)
-        ? app_utils::get_extra_index (field_name)
-        : f.get_header ().extra_fields + 1;
-
     // Copy points
     auto p = f.get_point_records ();
+
+    // Set the extra index to something invalid
+    size_t j = f.get_extra_fields () + 1;
+
+    // Get the extra index, if needed
+    if (app_utils::is_extra_field (field_name))
+    {
+        // 'j' is only used if the field starts with 'e'
+        j = app_utils::get_extra_index (field_name);
+
+        // If there are not enough extra fields, add them
+        if (j >= f.get_extra_fields ())
+        {
+            for (auto &i : p)
+                i.extra.resize (j + 1);
+        }
+    }
 
     // Process the points
     for (size_t i = 0; i < n; ++i)

@@ -23,7 +23,6 @@ struct args
     bool help = false;
     bool verbose = false;
     bool version = false;
-    int resize_extra = -1;
     double resolution = 0.0;
     spoc::tool_cmd::command command;
     std::string field_fn;
