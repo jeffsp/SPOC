@@ -31,12 +31,17 @@ Collection of tools to run on a SPOC file
 \-\-resolution=*#*
 :   Set the resolution used for upsampling
 
+\-\-field-filename=*FN*
+:   Set the filename of the text file used with the *set-field* command.
+    This file (or named pipe) will contain newline separated values for
+    the field being set.
+
 # COMMANDS
 
 \-\-get-field=*F*, -g *F*
-:   Get point field *F* and write it either to stdout or to a file as
-    text. *F* can be one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or
-    'e#', where the '#' after the 'e' specifies the extra field number.
+:   Get point field *F* and write it to stdout as text. *F* can be one of
+    'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or 'e#', where the '#'
+    after the 'e' specifies the extra field number.
 
 \-\-recenter-xy
 :   Recenter the point cloud by subtracting the mean X and Y value from
@@ -49,14 +54,10 @@ Collection of tools to run on a SPOC file
 :   Change the number of extra fields in each point record to *#*
 
 \-\-set-field=*F*, -s *F*
-:   Set point field *F* by reading it from a file or from stdin as text.
-    *F* can be one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or 'e#',
-    where the '#' after the 'e' specifies the extra field number.
-
-\-\-field-filename=*FN*
-:   Set the filename of the text file used with the *set-field* command.
-    This file (or named pipe) will contain newline separated values for
-    the field being set.
+:   Set point field *F* by reading it from a file specified by the
+    --field-filename option. *F* can be one of 'x', 'y', 'z', 'c', 'p',
+    'i', 'r', 'g', 'b', or 'e#', where the '#' after the 'e' specifies
+    the extra field number.
 
 \-\-subtract-min-xy
 :   Subtract minimum X and Y values from all X and Y values, thereby
