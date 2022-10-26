@@ -311,7 +311,7 @@ inline void process (std::ostream &os,
                 stringstream s;
                 s.precision (3);
                 s << fixed;
-                s << "extra " << k << "\t";
+                s << "extra_" << k << "\t";
                 os << get_summary_string<uint64_t> (s.str (), get_extra (k, f.get_point_records ()), compact, quartiles);
             }
         }
