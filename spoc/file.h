@@ -136,10 +136,16 @@ class spoc_file
         return prs[i];
     }
 
-    /// @brief Build a header from the file information
-    const header::header get_header () const
+    /// @brief Get the number of extra fields
+    size_t get_extra_fields () const
     {
-        const size_t extra_fields = prs.empty () ? 0 : prs[0].extra.size ();
+        return prs.empty () ? 0 : prs[0].extra.size ();
+    }
+
+    /// @brief Build a header from the file information
+    header::header get_header () const
+    {
+        const size_t extra_fields = get_extra_fields ();
         const size_t total_points = prs.size ();
         header::header h (major_version, minor_version, wkt, extra_fields, total_points, compressed);
 
