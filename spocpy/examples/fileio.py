@@ -29,7 +29,7 @@ def main():
     print('Files:')
     for fn in fns:
 
-        # Read the header
+        # Read the file
         f = sp.readspocfile(fn)
 
         # Print the version
