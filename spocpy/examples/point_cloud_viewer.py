@@ -56,24 +56,21 @@ app.layout = html.Div(
                 'width': '200px',
                 },
             children=[
-                html.Div(
-                    dcc.Checklist(
-                        [
-                            {'label': html.Div(['Elevation']), 'value': 'Elevation'},
-                            {'label': html.Div(['RGB']), 'value': 'RGB'},
-                            {'label': html.Div(['Intensity']), 'value': 'INT'},
-                            {'label': html.Div(['Classification']), 'value': 'CLS'},
-                            {'label': html.Div(['Point ID']), 'value': 'PID'},
-                            {'label': html.Div(['Extra[0]']), 'value': 'EXT'},
-                        ],
-                        value=['ELE'],
-                        id='color-checklist',
-                        )
-                    ),
-                html.Div(dcc.Slider(0, 10, 1, id='slider1', vertical=False)),
-                html.Div(dcc.Slider(0, 10, 1, id='slider2', vertical=False)),
-                html.Div(dcc.Slider(0, 10, 1, id='slider3', vertical=False)),
-                html.Div(dcc.Slider(0, 10, 1, id='slider4', vertical=False)),
+                html.Label('Point Size'),
+                html.Div(dcc.Slider(1, 7, 1,
+                                    id='pointsize-slider',
+                                    vertical=False,
+                                    value=2)),
+                html.Label('Elevation'),
+                html.Div(dcc.Slider(0, 10, 1,
+                                    id='elevation-slider',
+                                    vertical=False,
+                                    value=10)),
+                html.Label('Classification'),
+                html.Div(dcc.Slider(0, 10, 1,
+                                    id='classification-slider',
+                                    vertical=False,
+                                    value=0)),
                 ]
             ),
         html.Div(
@@ -85,6 +82,7 @@ app.layout = html.Div(
                 },
             children=[
                     dcc.Graph(
+                        id='point-cloud-graph',
                         figure=fig,
                         style={
                             'width': '100%',
@@ -95,6 +93,19 @@ app.layout = html.Div(
             )
         ]
     )
+
+
+@app.callback(
+    Output('point-cloud-graph', 'figure'),
+    Input('pointsize-slider', 'value'))
+def update_figure(pointsize_value):
+    """
+    Update the point cloud graph when the point size changes
+    """
+    print('point size', pointsize_value)
+    fig.update_traces(marker=dict(size=pointsize_value, color=colors))
+
+    return fig
 
 
 app.run_server(debug=True)
