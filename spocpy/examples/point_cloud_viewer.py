@@ -52,19 +52,34 @@ app.layout = html.Div(
             style={
                 'display': 'flex',
                 'background-color': 'rgb(245,245,245)',
-                'flex-direction': 'row',
+                'flex-direction': 'column',
+                'width': '200px',
                 },
             children=[
-                html.Div(dcc.Slider(0, 100, 10, id='slider1', vertical=True)),
-                html.Div(dcc.Slider(0, 100, 10, id='slider2', vertical=True)),
-                html.Div(dcc.Slider(0, 100, 10, id='slider3', vertical=True)),
-                html.Div(dcc.Slider(0, 100, 10, id='slider4', vertical=True)),
+                html.Div(
+                    dcc.Checklist(
+                        [
+                            {'label': html.Div(['Elevation']), 'value': 'Elevation'},
+                            {'label': html.Div(['RGB']), 'value': 'RGB'},
+                            {'label': html.Div(['Intensity']), 'value': 'INT'},
+                            {'label': html.Div(['Classification']), 'value': 'CLS'},
+                            {'label': html.Div(['Point ID']), 'value': 'PID'},
+                            {'label': html.Div(['Extra[0]']), 'value': 'EXT'},
+                        ],
+                        value=['ELE'],
+                        id='color-checklist',
+                        )
+                    ),
+                html.Div(dcc.Slider(0, 10, 1, id='slider1', vertical=False)),
+                html.Div(dcc.Slider(0, 10, 1, id='slider2', vertical=False)),
+                html.Div(dcc.Slider(0, 10, 1, id='slider3', vertical=False)),
+                html.Div(dcc.Slider(0, 10, 1, id='slider4', vertical=False)),
                 ]
             ),
         html.Div(
             id="point-cloud",
             style={
-                'background-color': 'rgb(0,255,0)',
+                'background-color': 'rgb(235,235,225)',
                 'width': '100%',
                 'height': '100%',
                 },
