@@ -23,29 +23,26 @@ df["x"] = f.getX()
 df["y"] = f.getY()
 df["z"] = f.getZ()
 
-# Define a colormap
-elevation_colormap = px.colors.sequential.Rainbow
+# Define callback control variables
+control = {
+        'default_pointsize_value':  2,
+        'default_marker_value': 'rgb',
+        'last_pointsize_value': 2,
+        'last_marker_value': 'rgb',
+    }
 
 # Create figure
 fig = px.scatter_3d(data_frame=df, x='x', y='y', z='z')
 fig.update_layout(template='simple_white')
 fig.update_layout(margin=dict(l=0, r=0, b=0, t=0))
 fig.update_scenes(aspectmode='data')
+fig.update_traces(marker=dict(size=control['default_pointsize_value']))
 
 # Create the app
 app = Dash(__name__)
 
-# Define callback control variables
-control = {
-        'default_pointsize_value':  2,
-        'default_elevation_value': 10,
-        'default_rgb_value': 0,
-        'default_classification_value': 0,
-        'last_pointsize_value': 2,
-        'last_elevation_value': 10,
-        'last_rgb_value': 0,
-        'last_classification_value': 0,
-    }
+# Define a colormap
+elevation_colormap = px.colors.sequential.Rainbow
 
 # Create a colormap
 classification_colormap = [
@@ -103,24 +100,15 @@ app.layout = html.Div(
                     id='pointsize-slider',
                     vertical=False,
                     value=control['default_pointsize_value'])),
-                html.Label('Elevation'),
-                html.Div(dcc.Slider(
-                    0, 10, 1,
-                    id='elevation-slider',
-                    vertical=False,
-                    value=control['default_elevation_value'])),
-                html.Label('RGB'),
-                html.Div(dcc.Slider(
-                    0, 10, 1,
-                    id='rgb-slider',
-                    vertical=False,
-                    value=control['default_rgb_value'])),
-                html.Label('Classification'),
-                html.Div(dcc.Slider(
-                    0, 10, 1,
-                    id='classification-slider',
-                    vertical=False,
-                    value=control['default_classification_value'])),
+                html.Label('Marker'),
+                html.Div(dcc.Dropdown(
+                    id='marker-dropdown',
+                    options=[
+                        {'label': 'Elevation', 'value': 'ele'},
+                        {'label': 'RGB', 'value': 'rgb'},
+                        {'label': 'Classification', 'value': 'cls'},
+                        ],
+                    value=control['default_marker_value'])),
                 ]
             ),
         html.Div(
@@ -148,60 +136,57 @@ app.layout = html.Div(
 @app.callback(
     Output('point-cloud-graph', 'figure'),
     Input('pointsize-slider', 'value'),
-    Input('elevation-slider', 'value'),
-    Input('rgb-slider', 'value'),
-    Input('classification-slider', 'value'))
+    Input('marker-dropdown', 'value'))
 def update_figure(
         pointsize_value,
-        elevation_value,
-        rgb_value,
-        classification_value):
+        marker_value):
     """
-    Update the point cloud graph when the color or point size changes
+    Update the point cloud graph when the marker
     """
 
-    if control['last_elevation_value'] != elevation_value \
-            or \
-            control['last_rgb_value'] != rgb_value \
-            or \
-            control['last_classification_value'] != classification_value:
+    if control['last_marker_value'] != marker_value:
 
         # Save state
-        control['last_elevation_value'] = elevation_value
-        control['last_rgb_value'] = rgb_value
-        control['last_classification_value'] = classification_value
+        control['last_marker_value'] = marker_value
 
-        # Get point cloud values
-        z = f.getZ()
-        r = f.getR()
-        g = f.getG()
-        b = f.getB()
-        c = f.getC()
+        if marker_value == 'ele':
 
-        # Recompute colors
-        #
-        # Get elevation colors
-        zmin = np.amin(z)
-        d = np.amax(z) - zmin
-        elevation_indexes = [int((z[i]-zmin)*(len(elevation_colormap)-1)/d)
-                             for i in range(0, len(z))]
-        elevation_colors = [elevation_colormap[i]
-                            for i in elevation_indexes]
+            # Get elevation colors
+            z = f.getZ()
+            zmin = np.amin(z)
+            d = np.amax(z) - zmin
+            elevation_indexes = [int((z[i]-zmin)*(len(elevation_colormap)-1)/d)
+                                 for i in range(0, len(z))]
+            colors = [elevation_colormap[i]
+                      for i in elevation_indexes]
 
-        # Get RGB colors
-        rgb_colors = [f'rgb({rr//256},{gg//256},{bb//256})'
+            fig.update_layout(showlegend=False)
+
+        elif marker_value == 'rgb':
+
+            # Get RGB colors
+            r = f.getR()
+            g = f.getG()
+            b = f.getB()
+            colors = [f'rgb({rr//256},{gg//256},{bb//256})'
                       for rr, gg, bb in zip(r, g, b)]
 
-        # Get classification colors
-        classification_colors = [classification_colormap[cc]
-                                 for cc in c]
+            fig.update_layout(showlegend=False)
+
+        elif marker_value == 'cls':
+
+            # Get classification colors
+            c = f.getC()
+            colors = [classification_colormap[cc]
+                      for cc in c]
+
+            fig.update_layout(showlegend=False)
+
+        else:
+            print('Invalid marker value')
 
         # Change colors
-        fig.update_traces(marker=dict(color=rgb_colors))
-
-        # Show legend if needed
-        showlegend = True if classification_value > 0 else False
-        fig.update_layout(showlegend=showlegend)
+        fig.update_traces(marker=dict(color=colors))
 
     elif control['last_pointsize_value'] != pointsize_value:
         # Reset state
