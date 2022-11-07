@@ -9,10 +9,16 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import spocpy as sp
+from random import randrange
 
 
-# Read a file
-fn = '../../test_data/eo/romeo007.spoc'
+# Read the file
+fn = '../../test_data/eo/romeo007_segmented_e0.spoc'
+
+# First read the header
+h = sp.readheader(fn)
+
+# Read the entire file
 f = sp.readspocfile(fn)
 
 # Create a Pandas dataframe
@@ -26,7 +32,7 @@ df["z"] = f.getZ()
 # Define callback control variables
 control = {
         'default_pointsize_value':  2,
-        'default_marker_value': 'rgb',
+        'default_marker_value': 'ele',
         'last_pointsize_value': 2,
         'last_marker_value': 'rgb',
     }
@@ -76,6 +82,11 @@ classification_colormap = [
     'rgb(0,0,160)',      # 27 solar panel
     ]
 
+# Create a random colormap
+segment_colormap = [f'rgb({randrange(0,256)},'
+                    f'{randrange(0,256)},'
+                    f'{randrange(0,256)})' for i in range(256)]
+
 # Create the layout
 app.layout = html.Div(
     id='body',
@@ -107,6 +118,7 @@ app.layout = html.Div(
                         {'label': 'Elevation', 'value': 'ele'},
                         {'label': 'RGB', 'value': 'rgb'},
                         {'label': 'Classification', 'value': 'cls'},
+                        {'label': 'Segment', 'value': 'seg'},
                         ],
                     value=control['default_marker_value'])),
                 ]
@@ -177,8 +189,20 @@ def update_figure(
 
             # Get classification colors
             c = f.getC()
-            colors = [classification_colormap[cc]
-                      for cc in c]
+            colors = [classification_colormap[cc] for cc in c]
+
+            fig.update_layout(showlegend=False)
+
+        elif marker_value == 'seg':
+
+            # Segments should be in e[0]
+            if h.extra_fields < 1:
+                raise Exception("Expected segment numbers in e[0],"
+                                "but this file has no extra fields")
+
+            # Get the segment colors
+            e = f.getExtra(0)
+            colors = [segment_colormap[ee] for ee in e]
 
             fig.update_layout(showlegend=False)
 
