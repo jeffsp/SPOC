@@ -230,4 +230,4 @@ def update_figure(
     return fig
 
 
-app.run_server(debug=True)
+app.run_server(debug=True, host='0.0.0.0')
