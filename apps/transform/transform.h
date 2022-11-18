@@ -558,7 +558,12 @@ void apply (std::istream &is,
         auto p = spoc::point_record::read_point_record (is, h.extra_fields);
 
         // Apply each operation, one by one
-        for (auto &op : ops)
+        //
+        // The reference to 'op' is required because some operations
+        // hold state that is changed, like for example a random
+        // number generator. Cppcheck is an error for suggesting
+        // otherwise.
+        for (auto &op : ops) // cppcheck-suppress constVariable
             p = op (p);
 
         // Write it back out
