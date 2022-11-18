@@ -132,16 +132,16 @@ void test_remove_coords ()
     f.push_back (point_record (0.0, 0.0, 0.0));
     f.push_back (point_record (1.0, 1.0, 1.0));
     f.push_back (point_record (1.0, 1.0, 2.0));
-    auto g = remove_coords (f, "x,>,0.9");
+    auto g = remove_coords (f, "x > 0.9");
     VERIFY (g.get_point_records ().size () == 1);
-    g = remove_coords (f, "y,<,0.1");
+    g = remove_coords (f, "y < 0.1");
     VERIFY (g.get_point_records ().size () == 2);
-    g = remove_coords (f, "z,<,2.0");
+    g = remove_coords (f, "z < 2.0");
     VERIFY (g.get_point_records ().size () == 1);
     bool fail = false;
     try
     {
-        g = remove_coords (f, "q,>,1.0");
+        g = remove_coords (f, "q > 1.0");
     }
     catch (const exception &e)
     {
@@ -151,7 +151,7 @@ void test_remove_coords ()
     fail = false;
     try
     {
-        g = remove_coords (f, "x,-,1.0");
+        g = remove_coords (f, "x - 1.0");
     }
     catch (const exception &e)
     {
@@ -161,7 +161,7 @@ void test_remove_coords ()
     fail = false;
     try
     {
-        g = remove_coords (f, "x,<,1.0,fail");
+        g = remove_coords (f, "x < 1.0 fail");
     }
     catch (const exception &e)
     {
@@ -171,7 +171,7 @@ void test_remove_coords ()
     fail = false;
     try
     {
-        g = remove_coords (f, "x,<,abc");
+        g = remove_coords (f, "x < abc");
     }
     catch (const exception &e)
     {

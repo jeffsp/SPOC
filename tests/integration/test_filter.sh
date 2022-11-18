@@ -10,3 +10,7 @@ spoc_filter --unique-xyz \
 spoc_filter --subsample=1.1 \
     test_data/lidar/juarez50.spoc \
     ${TMPDIR}/output.spoc
+
+spoc_filter --remove-coords "x > 100" \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
