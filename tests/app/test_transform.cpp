@@ -221,6 +221,12 @@ void test_transform_gaussian_noise ()
     VERIFY (min_x > -100 && max_x < 100);
     VERIFY (min_y > -200 && max_y < 200);
     VERIFY (min_z > -300 && max_z < 300);
+    commands[0] = command ("gaussian-noise", "1.0");
+    commands[1] = command ("gaussian-noise", "2.0");
+    commands[2] = command ("gaussian-noise", "3.0");
+    write_spoc_file_uncompressed (is, f);
+    // Add the noise
+    apply (is, os, commands, random_seed);
 }
 
 void test_transform_quantize ()
@@ -502,6 +508,15 @@ void test_transform_uniform_noise ()
     VERIFY (min_x > -1 && max_x < 1);
     VERIFY (min_y > -2 && max_y < 2);
     VERIFY (min_z > -3 && max_z < 3);
+    commands[0] = command ("uniform-noise-x", "1.0");
+    write_spoc_file_uncompressed (is, f);
+    apply (is, os, commands, random_seed);
+    commands[0] = command ("uniform-noise-y", "1.0");
+    write_spoc_file_uncompressed (is, f);
+    apply (is, os, commands, random_seed);
+    commands[0] = command ("uniform-noise-z", "1.0");
+    write_spoc_file_uncompressed (is, f);
+    apply (is, os, commands, random_seed);
 }
 
 void test_transform_multiple_ops ()
@@ -548,6 +563,19 @@ void test_transform_multiple_ops ()
     VERIFY (about_equal (p1.back ().z, p3.back ().z));
 }
 
+void test_transform_bad_command ()
+{
+    bool failed = false;
+    try {
+        stringstream is, os;
+        vector<command> commands (1);
+        commands[0] = command ("xxx", "1.0");
+        apply (is, os, commands, 123);
+    }
+    catch (...) { failed = true; }
+    VERIFY (failed);
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -563,6 +591,7 @@ int main (int argc, char **argv)
         test_transform_set ();
         test_transform_uniform_noise ();
         test_transform_multiple_ops ();
+        test_transform_bad_command ();
         return 0;
     }
     catch (const exception &e)
