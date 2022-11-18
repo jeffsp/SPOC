@@ -15,35 +15,6 @@ namespace spoc
 namespace transform_app
 {
 
-// Add to X, Y, or Z
-template<typename OP>
-void add (std::istream &is,
-    std::ostream &os,
-    const spoc::header::header &h,
-    OP op)
-{
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (h.is_valid ());
-
-    // Write the header
-    write_header (os, h);
-
-    // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
-    {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-
-        // Scale the point
-        op (p);
-
-        // Write it back out
-        write_point_record (os, p);
-    }
-}
-
 namespace detail
 {
 
@@ -67,42 +38,30 @@ const spoc::header::header read_header_uncompressed (std::istream &is)
 
 }
 
-void add_x (std::istream &is, std::ostream &os, const double v)
+using PR = spoc::point_record::point_record;
+using OP = std::function<PR(PR)>;
+
+OP get_add_x_op (double v)
 {
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-    auto op = [&v] (auto &p) { p.x += v; };
-    add (is, os, h, op);
+    OP op = [=] (PR p) { p.x += v; return p; };
+    return op;
 }
 
-void add_y (std::istream &is, std::ostream &os, const double v)
+OP get_add_y_op (double v)
 {
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-    auto op = [&v] (auto &p) { p.y += v; };
-    add (is, os, h, op);
+    OP op = [=] (PR p) { p.y += v; return p; };
+    return op;
 }
 
-void add_z (std::istream &is, std::ostream &os, const double v)
+OP get_add_z_op (double v)
 {
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-    auto op = [&v] (auto &p) { p.z += v; };
-    add (is, os, h, op);
+    OP op = [=] (PR p) { p.z += v; return p; };
+    return op;
 }
 
-void copy_field (std::istream &is,
-    std::ostream &os,
-    const std::string &field_name1,
-    const std::string &field_name2)
+OP get_copy_field_op (std::string field_name1, std::string field_name2, const size_t extra_fields)
 {
     using namespace spoc::app_utils;
-
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (check_field_name (field_name1));
-    REQUIRE (check_field_name (field_name2));
 
     // Check to make sure x, y, z, is not being used
     switch (field_name1[0])
@@ -118,26 +77,17 @@ void copy_field (std::istream &is,
         case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
     }
 
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-
     // Get the extra indexes
     const size_t j1 = is_extra_field (field_name1)
         ? get_extra_index (field_name1)
-        : h.extra_fields + 1;
+        : extra_fields + 1;
     const size_t j2 = is_extra_field (field_name2)
         ? get_extra_index (field_name2)
-        : h.extra_fields + 1;
+        : extra_fields + 1;
 
-    // Write the header
-    write_header (os, h);
-
-    // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
+    // Get the operation
+    OP op = [=] (PR p)
     {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-
         // Get the value of the source field
         size_t src = 0;
         switch (field_name1[0])
@@ -177,14 +127,16 @@ void copy_field (std::istream &is,
             break;
         }
 
-        // Write it back out
-        write_point_record (os, p);
-    }
+        return p;
+    };
+
+    return op;
 }
 
-void gaussian_noise (std::istream &is, std::ostream &os,
-    const size_t random_seed,
-    const double std_x, const double std_y, const double std_z)
+OP get_gaussian_noise_op (const size_t random_seed,
+    const double std_x,
+    const double std_y,
+    const double std_z)
 {
     // Create rng
     std::default_random_engine rng (random_seed);
@@ -194,53 +146,38 @@ void gaussian_noise (std::istream &is, std::ostream &os,
     std::normal_distribution<double> dy (0.0, std_y);
     std::normal_distribution<double> dz (0.0, std_z);
 
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-
-    // Define the operation being performed
-    auto op = [&] (auto &p)
+    // Get the operation
+    OP op = [=] (PR p) mutable
     {
-        if (std_x != 0.0) p.x += dx (rng);
-        if (std_y != 0.0) p.y += dy (rng);
-        if (std_z != 0.0) p.z += dz (rng);
+        if (std_x != 0.0)
+            p.x += dx (rng);
+        if (std_y != 0.0)
+            p.y += dy (rng);
+        if (std_z != 0.0)
+            p.z += dz (rng);
+        return p;
     };
 
-    // Do it
-    add (is, os, h, op);
+    return op;
 }
 
 // Set X, Y, Z to nearest precision by truncating
-void quantize (std::istream &is,
-    std::ostream &os,
-    const double precision)
+OP get_quantize_op (const double precision)
 {
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (precision != 0.0);
-
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-
-    // Write the header
-    write_header (os, h);
-
-    // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
+    // Get the operation
+    OP op = [=] (PR p)
     {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-
         // Quantize the point
         p.x = static_cast<int> (p.x / precision) * precision;
         p.y = static_cast<int> (p.y / precision) * precision;
         p.z = static_cast<int> (p.z / precision) * precision;
+        return p;
+    };
 
-        // Write it back out
-        write_point_record (os, p);
-    }
+    return op;
 }
 
+/*
 // Replace values in one field with values in another
 void replace (std::istream &is,
     std::ostream &os,
@@ -516,6 +453,305 @@ void uniform_noise (std::istream &is, std::ostream &os,
     // Do it
     add (is, os, h, op);
 }
+*/
+
+template<typename T>
+void apply (std::istream &is,
+    std::ostream &os,
+    const T &commands,
+    const size_t random_seed)
+{
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+
+    // Read the header and make sure it's uncompressed
+    const auto h = detail::read_header_uncompressed (is);
+    REQUIRE (h.is_valid ());
+
+    // Write the same header to the output stream
+    write_header (os, h);
+
+    using PR = spoc::point_record::point_record;
+    std::vector<std::function<PR(PR)>> ops;
+
+    using namespace spoc::app_utils;
+
+    // Check the commands
+    for (auto c : commands)
+    {
+        if (c.name == "add-x")
+        {
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_add_x_op (v));
+        }
+        else if (c.name == "add-y")
+        {
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_add_y_op (v));
+        }
+        else if (c.name == "add-z")
+        {
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_add_z_op (v));
+        }
+        else if (c.name == "copy-field")
+        {
+            std::string s = c.params;
+            const auto f1 = consume_field_name (s);
+            const auto f2 = consume_field_name (s);
+            ops.push_back (get_copy_field_op (f1, f2, h.extra_fields));
+        }
+        else if (c.name == "gaussian-noise")
+        {
+            // Get variance for X, Y, Z
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_gaussian_noise_op (random_seed, v, v, v));
+        }
+        else if (c.name == "gaussian-noise-x")
+        {
+            // Get variance for X
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_gaussian_noise_op (random_seed, v, 0.0, 0.0));
+        }
+        else if (c.name == "gaussian-noise-y")
+        {
+            // Get variance for Y
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_gaussian_noise_op (random_seed, 0.0, v, 0.0));
+        }
+        else if (c.name == "gaussian-noise-z")
+        {
+            // Get variance for Z
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_gaussian_noise_op (random_seed, 0.0, 0.0, v));
+        }
+        else if (c.name == "quantize-xyz")
+        {
+            // Get precision
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_quantize_op (v));
+        }
+        else
+        {
+            throw std::runtime_error (std::string ("An unknown command was encountered: ") + c.name);
+        }
+        /*
+        else if (c.name == "replace")
+        {
+            string s = c.params;
+            const auto l = consume_field_name (s);
+            const auto v1 = consume_int (s);
+            const auto v2 = consume_int (s);
+            replace (is (), os (), l, v1, v2);
+        }
+        else if (c.name == "rotate-x")
+        {
+            string s = c.params;
+            const auto v = consume_double (s);
+            rotate_x (is (), os (), v);
+        }
+        else if (c.name == "rotate-y")
+        {
+            string s = c.params;
+            const auto v = consume_double (s);
+            rotate_y (is (), os (), v);
+        }
+        else if (c.name == "rotate-z")
+        {
+            string s = c.params;
+            const auto v = consume_double (s);
+            rotate_z (is (), os (), v);
+        }
+        else if (c.name == "scale-x")
+        {
+            string s = c.params;
+            const auto v = consume_double (s);
+            scale_x (is (), os (), v);
+        }
+        else if (c.name == "scale-y")
+        {
+            string s = c.params;
+            const auto v = consume_double (s);
+            scale_y (is (), os (), v);
+        }
+        else if (c.name == "scale-z")
+        {
+            string s = c.params;
+            const auto v = consume_double (s);
+            scale_z (is (), os (), v);
+        }
+        else if (c.name == "set")
+        {
+            string s = c.params;
+            const auto l = consume_field_name (s);
+            const auto v = consume_double (s);
+            spoc::transform_app::set (is (), os (), l, v);
+        }
+        else if (c.name == "uniform-noise")
+        {
+            string s = c.params;
+            const auto v = consume_double (s);
+            uniform_noise (is (), os (), args.random_seed, v, v, v);
+        }
+        else if (c.name == "uniform-noise-x")
+        {
+            string s = c.params;
+            const auto v = consume_double (s);
+            uniform_noise (is (), os (), args.random_seed, v, 0.0, 0.0);
+        }
+        else if (c.name == "uniform-noise-y")
+        {
+            string s = c.params;
+            const auto v = consume_double (s);
+            uniform_noise (is (), os (), args.random_seed, 0.0, v, 0.0);
+        }
+        else if (c.name == "uniform-noise-z")
+        {
+            string s = c.params;
+            const auto v = consume_double (s);
+            uniform_noise (is (), os (), args.random_seed, 0.0, 0.0, v);
+        }
+        else
+            throw runtime_error (std::string ("An unknown command was encountered: ") + c.name);
+        if (c.name == "copy-field")
+        {
+            string s = c.params;
+            const auto f1 = consume_field_name (s);
+            const auto f2 = consume_field_name (s);
+
+            // Check to make sure x, y, z, is not being used
+            switch (field_name1[0])
+            {
+                case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+                case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+                case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+            }
+            switch (field_name2[0])
+            {
+                case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+                case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+                case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+            }
+            ops.push_back (get_cop
+        }
+        else if (c.name == "gaussian-noise")
+        {
+        }
+        */
+    }
+
+    // Process the points
+    for (size_t i = 0; i < h.total_points; ++i)
+    {
+        // Read a point
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
+
+        // Apply each operation, one by one
+        for (auto &op : ops)
+            p = op (p);
+
+        /*
+            else if (c.name == "quantize-xyz")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                quantize (is (), os (), v);
+            }
+            else if (c.name == "replace")
+            {
+                string s = c.params;
+                const auto l = consume_field_name (s);
+                const auto v1 = consume_int (s);
+                const auto v2 = consume_int (s);
+                replace (is (), os (), l, v1, v2);
+            }
+            else if (c.name == "rotate-x")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                rotate_x (is (), os (), v);
+            }
+            else if (c.name == "rotate-y")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                rotate_y (is (), os (), v);
+            }
+            else if (c.name == "rotate-z")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                rotate_z (is (), os (), v);
+            }
+            else if (c.name == "scale-x")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                scale_x (is (), os (), v);
+            }
+            else if (c.name == "scale-y")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                scale_y (is (), os (), v);
+            }
+            else if (c.name == "scale-z")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                scale_z (is (), os (), v);
+            }
+            else if (c.name == "set")
+            {
+                string s = c.params;
+                const auto l = consume_field_name (s);
+                const auto v = consume_double (s);
+                spoc::transform_app::set (is (), os (), l, v);
+            }
+            else if (c.name == "uniform-noise")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                uniform_noise (is (), os (), args.random_seed, v, v, v);
+            }
+            else if (c.name == "uniform-noise-x")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                uniform_noise (is (), os (), args.random_seed, v, 0.0, 0.0);
+            }
+            else if (c.name == "uniform-noise-y")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                uniform_noise (is (), os (), args.random_seed, 0.0, v, 0.0);
+            }
+            else if (c.name == "uniform-noise-z")
+            {
+                string s = c.params;
+                const auto v = consume_double (s);
+                uniform_noise (is (), os (), args.random_seed, 0.0, 0.0, v);
+            }
+            else
+                throw runtime_error (std::string ("An unknown command was encountered: ") + c.name);
+        }
+        */
+
+        // Write it back out
+        write_point_record (os, p);
+    }
+
+}
+
 
 } // namespace transform_app
 

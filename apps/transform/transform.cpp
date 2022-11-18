@@ -35,7 +35,7 @@ int main (int argc, char **argv)
             return 0;
 
         // Check the arguments
-        if (args.command.name.empty ())
+        if (args.commands.empty ())
             throw runtime_error ("No command was specified");
 
         // Show args
@@ -43,7 +43,9 @@ int main (int argc, char **argv)
         {
             clog << "verbose\t" << args.verbose << endl;
             clog << "random-seed\t" << args.random_seed << endl;
-            clog << "command: " << args.command.name << "\t" << args.command.params << endl;
+            clog << "commands:" << endl;
+            for (auto c : args.commands)
+                clog << "\t" << c.name << "\t" << c.params << endl;
         }
 
         // Get the input stream
@@ -52,138 +54,8 @@ int main (int argc, char **argv)
         // Get the output stream
         output_stream os (args.verbose, args.output_fn);
 
-        if (args.command.name == "add-x")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            add_x (is (), os (), v);
-        }
-        else if (args.command.name == "add-y")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            add_y (is (), os (), v);
-        }
-        else if (args.command.name == "add-z")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            add_z (is (), os (), v);
-        }
-        else if (args.command.name == "copy-field")
-        {
-            string s = args.command.params;
-            const auto f1 = consume_field_name (s);
-            const auto f2 = consume_field_name (s);
-            copy_field (is (), os (), f1, f2);
-        }
-        else if (args.command.name == "gaussian-noise")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            gaussian_noise (is (), os (), args.random_seed, v, v, v);
-        }
-        else if (args.command.name == "gaussian-noise-x")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            gaussian_noise (is (), os (), args.random_seed, v, 0.0, 0.0);
-        }
-        else if (args.command.name == "gaussian-noise-y")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            gaussian_noise (is (), os (), args.random_seed, 0.0, v, 0.0);
-        }
-        else if (args.command.name == "gaussian-noise-z")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            gaussian_noise (is (), os (), args.random_seed, 0.0, 0.0, v);
-        }
-        else if (args.command.name == "quantize-xyz")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            quantize (is (), os (), v);
-        }
-        else if (args.command.name == "replace")
-        {
-            string s = args.command.params;
-            const auto l = consume_field_name (s);
-            const auto v1 = consume_int (s);
-            const auto v2 = consume_int (s);
-            replace (is (), os (), l, v1, v2);
-        }
-        else if (args.command.name == "rotate-x")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            rotate_x (is (), os (), v);
-        }
-        else if (args.command.name == "rotate-y")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            rotate_y (is (), os (), v);
-        }
-        else if (args.command.name == "rotate-z")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            rotate_z (is (), os (), v);
-        }
-        else if (args.command.name == "scale-x")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            scale_x (is (), os (), v);
-        }
-        else if (args.command.name == "scale-y")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            scale_y (is (), os (), v);
-        }
-        else if (args.command.name == "scale-z")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            scale_z (is (), os (), v);
-        }
-        else if (args.command.name == "set")
-        {
-            string s = args.command.params;
-            const auto l = consume_field_name (s);
-            const auto v = consume_double (s);
-            spoc::transform_app::set (is (), os (), l, v);
-        }
-        else if (args.command.name == "uniform-noise")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            uniform_noise (is (), os (), args.random_seed, v, v, v);
-        }
-        else if (args.command.name == "uniform-noise-x")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            uniform_noise (is (), os (), args.random_seed, v, 0.0, 0.0);
-        }
-        else if (args.command.name == "uniform-noise-y")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            uniform_noise (is (), os (), args.random_seed, 0.0, v, 0.0);
-        }
-        else if (args.command.name == "uniform-noise-z")
-        {
-            string s = args.command.params;
-            const auto v = consume_double (s);
-            uniform_noise (is (), os (), args.random_seed, 0.0, 0.0, v);
-        }
-        else
-            throw runtime_error ("An unknown command was encountered");
+        // Apply each command in order they appeared on command line
+        apply (is (), os (), args.commands, args.random_seed);
 
         return 0;
     }
