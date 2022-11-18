@@ -59,7 +59,9 @@ OP get_add_z_op (double v)
     return op;
 }
 
-OP get_copy_field_op (const std::string field_name1, const std::string field_name2, const size_t extra_fields)
+OP get_copy_field_op (const std::string &field_name1,
+    const std::string &field_name2,
+    const size_t extra_fields)
 {
     using namespace spoc::app_utils;
 
@@ -178,7 +180,7 @@ OP get_quantize_op (const double precision)
 }
 
 // Replace values in one field with values in another
-OP get_replace_op (const std::string field_name,
+OP get_replace_op (const std::string &field_name,
     const double v1,
     const double v2,
     const size_t extra_fields)
@@ -302,7 +304,7 @@ OP get_scale_z_op (double v)
     return op;
 }
 
-OP get_set_op (const std::string field_name, const double v, const size_t extra_fields)
+OP get_set_op (const std::string &field_name, const double v, const size_t extra_fields)
 {
     using namespace spoc::app_utils;
 
