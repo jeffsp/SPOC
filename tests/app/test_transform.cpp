@@ -429,7 +429,9 @@ void test_transform_scale ()
 
 void test_transform_set ()
 {
-    /*
+    const size_t random_seed = 0;
+    vector<command> commands (1);
+
     for (auto rgb : {true, false})
     {
         // Generate spoc file
@@ -441,7 +443,8 @@ void test_transform_set ()
         {
             stringstream is, os;
             write_spoc_file_uncompressed (is, f);
-            set (is, os, c, 123);
+            commands[0] = command ("set", std::string (c) + ",123");
+            apply (is, os, commands, random_seed);
             const auto g = read_spoc_file_uncompressed (os);
         }
         for (auto c : { "q", "w", "e9"})
@@ -450,7 +453,8 @@ void test_transform_set ()
             try {
                 stringstream is, os;
                 write_spoc_file_uncompressed (is, f);
-                set (is, os, c, 123);
+                commands[0] = command ("set", std::string (c) + ",123");
+                apply (is, os, commands, random_seed);
                 const auto g = read_spoc_file_uncompressed (os);
             }
             catch (...) { failed = true; }
@@ -460,7 +464,6 @@ void test_transform_set ()
             (void) failed; // Turn off 'set but not used' error
         }
     }
-    */
 }
 
 void test_transform_uniform_noise ()
@@ -501,6 +504,50 @@ void test_transform_uniform_noise ()
     VERIFY (min_z > -3 && max_z < 3);
 }
 
+void test_transform_multiple_ops ()
+{
+    // Generate spoc file
+    const size_t total_points = 100;
+    const size_t extra_fields = 8;
+    auto f1 = generate_random_spoc_file (total_points, extra_fields);
+    const auto p1 = f1.get_point_records ();
+
+    const size_t random_seed = 0;
+    vector<command> forward_commands;
+    forward_commands.push_back (command ("add-x", "10.0"));
+    forward_commands.push_back (command ("rotate-x", "17.5"));
+    forward_commands.push_back (command ("scale-x", "100.0"));
+    vector<command> reverse_commands;
+    reverse_commands.push_back (command ("scale-x", "0.01"));
+    reverse_commands.push_back (command ("rotate-x", "-17.5"));
+    reverse_commands.push_back (command ("add-x", "-10.0"));
+
+    // Streams for I/O
+    stringstream s1, s2, s3;
+
+    // Perform the transform
+    write_spoc_file_uncompressed (s1, f1);
+    apply (s1, s2, forward_commands, random_seed);
+
+    // The points should have changed
+    const auto f2 = read_spoc_file_uncompressed (s2);
+    const auto p2 = f2.get_point_records ();
+    VERIFY (!about_equal (p1.back ().x, p2.back ().x));
+    VERIFY (!about_equal (p1.back ().y, p2.back ().y));
+    VERIFY (!about_equal (p1.back ().z, p2.back ().z));
+
+    // Undo the transform
+    write_spoc_file_uncompressed (s2, f2);
+    apply (s2, s3, reverse_commands, random_seed);
+
+    // The points should match the original
+    const auto f3 = read_spoc_file_uncompressed (s3);
+    const auto p3 = f3.get_point_records ();
+    VERIFY (about_equal (p1.back ().x, p3.back ().x));
+    VERIFY (about_equal (p1.back ().y, p3.back ().y));
+    VERIFY (about_equal (p1.back ().z, p3.back ().z));
+}
+
 int main (int argc, char **argv)
 {
     try
@@ -515,6 +562,7 @@ int main (int argc, char **argv)
         test_transform_scale ();
         test_transform_set ();
         test_transform_uniform_noise ();
+        test_transform_multiple_ops ();
         return 0;
     }
     catch (const exception &e)
