@@ -256,61 +256,8 @@ void test_transform_quantize ()
         VERIFY (i == 0);
 }
 
-void test_transform_rotate ()
-{
-    /*
-    // Generate random reference
-    const auto p = generate_random_point_records (100);
-
-    default_random_engine g;
-    uniform_real_distribution<double> d (-M_PI, M_PI);
-
-    for (auto i : { 0, 1, 2, 3, 4})
-    {
-        (void)i; // disable not used warning
-        const double degrees = d (g);
-
-        // Copy it
-        auto qx (p);
-        auto qy (p);
-        auto qz (p);
-
-        // Test streaming functions
-        stringstream is, os;
-        const string wkt ("Test WKT");
-        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
-
-        rotate_x (is, os, degrees);
-        auto r = read_spoc_file_uncompressed (os);
-        qx = r.get_point_records ();
-
-        rotate_y (is, os, degrees);
-        r = read_spoc_file_uncompressed (os);
-        qy = r.get_point_records ();
-
-        rotate_z (is, os, degrees);
-        r = read_spoc_file_uncompressed (os);
-        qz = r.get_point_records ();
-
-        // VERIFY that the correct axis was used
-        VERIFY (p[3].x == qx[3].x);
-        VERIFY (p[3].y != qx[3].y);
-        VERIFY (p[3].z != qx[3].z);
-        VERIFY (p[3].x != qy[3].x);
-        VERIFY (p[3].y == qy[3].y);
-        VERIFY (p[3].z != qy[3].z);
-        VERIFY (p[3].x != qz[3].x);
-        VERIFY (p[3].y != qz[3].y);
-        VERIFY (p[3].z == qz[3].z);
-    }
-    */
-}
-
 void test_transform_replace ()
 {
-    /*
     for (auto rgb : {true, false})
     {
         // Generate spoc file
@@ -334,7 +281,13 @@ void test_transform_replace ()
                 {
                     stringstream is, os;
                     write_spoc_file_uncompressed (is, f);
-                    replace (is, os, fn, v1, v2);
+                    const size_t random_seed = 0;
+                    vector<command> commands;
+                    commands.push_back (command ("replace",
+                        std::string (fn) + "," +
+                        std::to_string (v1) + "," +
+                        std::to_string (v2)));
+                    apply (is, os, commands, random_seed);
                     const auto g = read_spoc_file_uncompressed (os);
                 }
                 for (auto fn : { "x", "y", "z", "q", "w", "e8"})
@@ -343,7 +296,13 @@ void test_transform_replace ()
                     try {
                         stringstream is, os;
                         write_spoc_file_uncompressed (is, f);
-                        replace (is, os, fn, v1, v2);
+                        const size_t random_seed = 0;
+                        vector<command> commands;
+                        commands.push_back (command ("replace",
+                            std::string (fn) + "," +
+                            std::to_string (v1) + "," +
+                            std::to_string (v2)));
+                        apply (is, os, commands, random_seed);
                         const auto g = read_spoc_file_uncompressed (os);
                     }
                     catch (...) { failed = true; }
@@ -355,17 +314,73 @@ void test_transform_replace ()
             }
         }
     }
-    */
+}
+
+
+void test_transform_rotate ()
+{
+    // Generate random reference
+    const auto p = generate_random_point_records (100);
+
+    default_random_engine g;
+    uniform_real_distribution<double> d (-M_PI, M_PI);
+    const size_t random_seed = 0;
+    vector<command> commands (1);
+
+    for (auto i : { 0, 1, 2, 3, 4})
+    {
+        (void)i; // disable not used warning
+        const double degrees = d (g);
+
+        // Copy it
+        auto qx (p);
+        auto qy (p);
+        auto qz (p);
+
+        // Test streaming functions
+        stringstream is, os;
+        const string wkt ("Test WKT");
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+
+        commands[0] = command ("rotate-x", std::to_string (degrees));
+        apply (is, os, commands, random_seed);
+        auto r = read_spoc_file_uncompressed (os);
+        qx = r.get_point_records ();
+
+        commands[0] = command ("rotate-y", std::to_string (degrees));
+        apply (is, os, commands, random_seed);
+        r = read_spoc_file_uncompressed (os);
+        qy = r.get_point_records ();
+
+        commands[0] = command ("rotate-z", std::to_string (degrees));
+        apply (is, os, commands, random_seed);
+        r = read_spoc_file_uncompressed (os);
+        qz = r.get_point_records ();
+
+        // VERIFY that the correct axis was used
+        VERIFY (p[3].x == qx[3].x);
+        VERIFY (p[3].y != qx[3].y);
+        VERIFY (p[3].z != qx[3].z);
+        VERIFY (p[3].x != qy[3].x);
+        VERIFY (p[3].y == qy[3].y);
+        VERIFY (p[3].z != qy[3].z);
+        VERIFY (p[3].x != qz[3].x);
+        VERIFY (p[3].y != qz[3].y);
+        VERIFY (p[3].z == qz[3].z);
+    }
 }
 
 void test_transform_scale ()
 {
-    /*
     // Generate random reference
     const auto p = generate_random_point_records (100);
 
     default_random_engine g;
     uniform_real_distribution<double> d (-100, 100);
+    const size_t random_seed = 0;
+    vector<command> commands (1);
 
     for (auto i : { 0, 1, 2, 3, 4})
     {
@@ -384,15 +399,18 @@ void test_transform_scale ()
         write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
         write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
 
-        scale_x (is, os, s);
+        commands[0] = command ("scale-x", std::to_string (s));
+        apply (is, os, commands, random_seed);
         auto r = read_spoc_file_uncompressed (os);
         qx = r.get_point_records ();
 
-        scale_y (is, os, s);
+        commands[0] = command ("scale-y", std::to_string (s));
+        apply (is, os, commands, random_seed);
         r = read_spoc_file_uncompressed (os);
         qy = r.get_point_records ();
 
-        scale_z (is, os, s);
+        commands[0] = command ("scale-z", std::to_string (s));
+        apply (is, os, commands, random_seed);
         r = read_spoc_file_uncompressed (os);
         qz = r.get_point_records ();
 
@@ -407,7 +425,6 @@ void test_transform_scale ()
         VERIFY (p[3].y == qz[3].y);
         VERIFY (about_equal (p[3].z * s, qz[3].z));
     }
-    */
 }
 
 void test_transform_set ()
@@ -448,7 +465,6 @@ void test_transform_set ()
 
 void test_transform_uniform_noise ()
 {
-    /*
     // Generate spoc file
     auto f = generate_random_spoc_file (100, 3, false);
     // Copy point records
@@ -462,7 +478,13 @@ void test_transform_uniform_noise ()
     stringstream is, os;
     write_spoc_file_uncompressed (is, f);
     // Add the noise
-    uniform_noise (is, os, 123, 1.0, 2.0, 3.0);
+    vector<command> commands (1);
+    commands[0] = command ("uniform-noise",
+                        std::string ("1.0") + "," +
+                        std::string ("2.0") + "," +
+                        std::string ("3.0"));
+    const size_t random_seed = 123;
+    apply (is, os, commands, random_seed);
     // Get the result
     auto g = read_spoc_file_uncompressed (os);
     const auto x = get_x (g.get_point_records ());
@@ -477,7 +499,6 @@ void test_transform_uniform_noise ()
     VERIFY (min_x > -1 && max_x < 1);
     VERIFY (min_y > -2 && max_y < 2);
     VERIFY (min_z > -3 && max_z < 3);
-    */
 }
 
 int main (int argc, char **argv)
