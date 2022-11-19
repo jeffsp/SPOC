@@ -4,7 +4,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
-#include <variant>
+#include <vector>
 
 namespace spoc
 {
@@ -23,7 +23,7 @@ struct args
     bool help = false;
     bool verbose = false;
     bool version = false;
-    spoc::transform_cmd::command command;
+    std::vector<spoc::transform_cmd::command> commands;
     size_t random_seed = 0;
     std::string input_fn;
     std::string output_fn;
@@ -54,17 +54,13 @@ enum command_values
     UNIFORM_NOISE_Z,
 };
 
-args set_command (const args &args, const std::string &name, const char *s)
+command get_command (const std::string &name, const char *s)
 {
-    std::string params;
+    // std::string() expects a null-terminated string
     if (s != nullptr)
-        params = std::string (s);
-    if (!args.command.name.empty ())
-        throw std::runtime_error ("You can only specify one command at a time");
-    spoc::transform_cmd::args new_args (args);
-    new_args.command.name = name;
-    new_args.command.params = params;
-    return new_args;
+        return command {name, std::string (s)};
+    else
+        return command {name, std::string ()};
 }
 
 inline args get_args (int argc, char **argv, const std::string &usage)
@@ -122,27 +118,27 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 'e': { args.version = true; break; }
             case ADD_X:
             {
-                args = set_command (args, "add-x", optarg);
+                args.commands.push_back (get_command ("add-x", optarg));
                 break;
             }
             case ADD_Y:
             {
-                args = set_command (args, "add-y", optarg);
+                args.commands.push_back (get_command ("add-y", optarg));
                 break;
             }
             case ADD_Z:
             {
-                args = set_command (args, "add-z", optarg);
+                args.commands.push_back (get_command ("add-z", optarg));
                 break;
             }
             case COPY_FIELD:
             {
-                args = set_command (args, "copy-field", optarg);
+                args.commands.push_back (get_command ("copy-field", optarg));
                 break;
             }
             case QUANTIZE_XYZ:
             {
-                args = set_command (args, "quantize-xyz", optarg);
+                args.commands.push_back (get_command ("quantize-xyz", optarg));
                 break;
             }
             case 'a':
@@ -152,42 +148,42 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             }
             case REPLACE:
             {
-                args = set_command (args, "replace", optarg);
+                args.commands.push_back (get_command ("replace", optarg));
                 break;
             }
             case ROTATE_X:
             {
-                args = set_command (args, "rotate-x", optarg);
+                args.commands.push_back (get_command ("rotate-x", optarg));
                 break;
             }
             case ROTATE_Y:
             {
-                args = set_command (args, "rotate-y", optarg);
+                args.commands.push_back (get_command ("rotate-y", optarg));
                 break;
             }
             case ROTATE_Z:
             {
-                args = set_command (args, "rotate-z", optarg);
+                args.commands.push_back (get_command ("rotate-z", optarg));
                 break;
             }
             case SCALE_X:
             {
-                args = set_command (args, "scale-x", optarg);
+                args.commands.push_back (get_command ("scale-x", optarg));
                 break;
             }
             case SCALE_Y:
             {
-                args = set_command (args, "scale-y", optarg);
+                args.commands.push_back (get_command ("scale-y", optarg));
                 break;
             }
             case SCALE_Z:
             {
-                args = set_command (args, "scale-z", optarg);
+                args.commands.push_back (get_command ("scale-z", optarg));
                 break;
             }
             case SET:
             {
-                args = set_command (args, "set", optarg);
+                args.commands.push_back (get_command ("set", optarg));
                 break;
             }
         }

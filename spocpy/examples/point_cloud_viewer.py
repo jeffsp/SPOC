@@ -230,4 +230,6 @@ def update_figure(
     return fig
 
 
+# If you want to host across your network, uncomment the next line
+# app.run_server(debug=True, host='0.0.0.0')
 app.run_server(debug=True)

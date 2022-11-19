@@ -15,35 +15,6 @@ namespace spoc
 namespace transform_app
 {
 
-// Add to X, Y, or Z
-template<typename OP>
-void add (std::istream &is,
-    std::ostream &os,
-    const spoc::header::header &h,
-    OP op)
-{
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (h.is_valid ());
-
-    // Write the header
-    write_header (os, h);
-
-    // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
-    {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-
-        // Scale the point
-        op (p);
-
-        // Write it back out
-        write_point_record (os, p);
-    }
-}
-
 namespace detail
 {
 
@@ -67,77 +38,60 @@ const spoc::header::header read_header_uncompressed (std::istream &is)
 
 }
 
-void add_x (std::istream &is, std::ostream &os, const double v)
+using PR = spoc::point_record::point_record;
+using OP = std::function<PR(PR)>;
+
+OP get_add_x_op (double v)
 {
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-    auto op = [&v] (auto &p) { p.x += v; };
-    add (is, os, h, op);
+    OP op = [=] (PR p) { p.x += v; return p; };
+    return op;
 }
 
-void add_y (std::istream &is, std::ostream &os, const double v)
+OP get_add_y_op (double v)
 {
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-    auto op = [&v] (auto &p) { p.y += v; };
-    add (is, os, h, op);
+    OP op = [=] (PR p) { p.y += v; return p; };
+    return op;
 }
 
-void add_z (std::istream &is, std::ostream &os, const double v)
+OP get_add_z_op (double v)
 {
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-    auto op = [&v] (auto &p) { p.z += v; };
-    add (is, os, h, op);
+    OP op = [=] (PR p) { p.z += v; return p; };
+    return op;
 }
 
-void copy_field (std::istream &is,
-    std::ostream &os,
-    const std::string &field_name1,
-    const std::string &field_name2)
+OP get_copy_field_op (const std::string &field_name1,
+    const std::string &field_name2,
+    const size_t extra_fields)
 {
     using namespace spoc::app_utils;
-
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (check_field_name (field_name1));
-    REQUIRE (check_field_name (field_name2));
 
     // Check to make sure x, y, z, is not being used
     switch (field_name1[0])
     {
-        case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'x':
+        case 'y':
+        case 'z':
+            throw std::runtime_error ("Cannot run the copy command on floating point fields (X, Y, Z)");
     }
     switch (field_name2[0])
     {
-        case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'x':
+        case 'y':
+        case 'z':
+            throw std::runtime_error ("Cannot run the copy command on floating point fields (X, Y, Z)");
     }
-
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
 
     // Get the extra indexes
     const size_t j1 = is_extra_field (field_name1)
         ? get_extra_index (field_name1)
-        : h.extra_fields + 1;
+        : extra_fields + 1;
     const size_t j2 = is_extra_field (field_name2)
         ? get_extra_index (field_name2)
-        : h.extra_fields + 1;
+        : extra_fields + 1;
 
-    // Write the header
-    write_header (os, h);
-
-    // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
+    // Get the operation
+    OP op = [=] (PR p)
     {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-
         // Get the value of the source field
         size_t src = 0;
         switch (field_name1[0])
@@ -177,14 +131,16 @@ void copy_field (std::istream &is,
             break;
         }
 
-        // Write it back out
-        write_point_record (os, p);
-    }
+        return p;
+    };
+
+    return op;
 }
 
-void gaussian_noise (std::istream &is, std::ostream &os,
-    const size_t random_seed,
-    const double std_x, const double std_y, const double std_z)
+OP get_gaussian_noise_op (const size_t random_seed,
+    const double std_x,
+    const double std_y,
+    const double std_z)
 {
     // Create rng
     std::default_random_engine rng (random_seed);
@@ -194,66 +150,44 @@ void gaussian_noise (std::istream &is, std::ostream &os,
     std::normal_distribution<double> dy (0.0, std_y);
     std::normal_distribution<double> dz (0.0, std_z);
 
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-
-    // Define the operation being performed
-    auto op = [&] (auto &p)
+    // Get the operation
+    OP op = [=] (PR p) mutable
     {
-        if (std_x != 0.0) p.x += dx (rng);
-        if (std_y != 0.0) p.y += dy (rng);
-        if (std_z != 0.0) p.z += dz (rng);
+        if (std_x != 0.0)
+            p.x += dx (rng);
+        if (std_y != 0.0)
+            p.y += dy (rng);
+        if (std_z != 0.0)
+            p.z += dz (rng);
+        return p;
     };
 
-    // Do it
-    add (is, os, h, op);
+    return op;
 }
 
 // Set X, Y, Z to nearest precision by truncating
-void quantize (std::istream &is,
-    std::ostream &os,
-    const double precision)
+OP get_quantize_op (const double precision)
 {
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (precision != 0.0);
-
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-
-    // Write the header
-    write_header (os, h);
-
-    // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
+    // Get the operation
+    OP op = [=] (PR p)
     {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-
         // Quantize the point
         p.x = static_cast<int> (p.x / precision) * precision;
         p.y = static_cast<int> (p.y / precision) * precision;
         p.z = static_cast<int> (p.z / precision) * precision;
+        return p;
+    };
 
-        // Write it back out
-        write_point_record (os, p);
-    }
+    return op;
 }
 
 // Replace values in one field with values in another
-void replace (std::istream &is,
-    std::ostream &os,
-    const std::string &field_name,
+OP get_replace_op (const std::string &field_name,
     const double v1,
-    const double v2)
+    const double v2,
+    const size_t extra_fields)
 {
     using namespace spoc::app_utils;
-
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (check_field_name (field_name));
 
     // Check to make sure x, y, z, is not being used
     switch (field_name[0])
@@ -263,23 +197,14 @@ void replace (std::istream &is,
         case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
     }
 
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-
     // Get the extra index
     const size_t j = is_extra_field (field_name)
         ? get_extra_index (field_name)
-        : h.extra_fields + 1;
+        : extra_fields + 1;
 
-    // Write the header
-    write_header (os, h);
-
-    // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
+    // Get the operation
+    OP op = [=] (PR p)
     {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-
         // Process the point
         switch (field_name[0])
         {
@@ -300,170 +225,99 @@ void replace (std::istream &is,
             break;
         }
 
-        // Write it back out
-        write_point_record (os, p);
-    }
+        return p;
+    };
+
+    return op;
 }
 
-// Rotate about the X, Y, or Z axis
-template<typename XOP,typename YOP,typename ZOP>
-void rotate (std::istream &is,
-    std::ostream &os,
-    const spoc::header::header &h,
-    XOP xop,
-    YOP yop,
-    ZOP zop)
+OP get_rotate_x_op (const double degrees)
 {
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (h.is_valid ());
+    // Convert degrees to radians
+    const double r = degrees * M_PI / 180.0;
 
-    // Write the header
-    write_header (os, h);
-
-    // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
+    // Get the operation
+    OP op = [=] (PR p)
     {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-        const double x = p.x;
-        const double y = p.y;
-        const double z = p.z;
+        // Rotate the point about X axis
+        const auto y = p.y * cos (r) - p.z * sin (r);
+        const auto z = p.y * sin (r) + p.z * cos (r);
+        p.y = y;
+        p.z = z;
+        return p;
+    };
 
-        // Rotate the point
-        p.x = xop (x, y, z);
-        p.y = yop (x, y, z);
-        p.z = zop (x, y, z);
-
-        // Write it back out
-        write_point_record (os, p);
-    }
+    return op;
 }
 
-void rotate_x (std::istream &is, std::ostream &os, const double degrees)
+OP get_rotate_y_op (const double degrees)
 {
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-
     // Convert degrees to radians
     const double r = degrees * M_PI / 180.0;
-    auto xop = [&r] (const double x, const double y, const double z) -> double { return x; };
-    auto yop = [&r] (const double x, const double y, const double z) -> double { return y * cos (r) - z * sin (r); };
-    auto zop = [&r] (const double x, const double y, const double z) -> double { return y * sin (r) + z * cos (r); };
-    rotate (is, os, h, xop, yop, zop);
-}
 
-void rotate_y (std::istream &is, std::ostream &os, const double degrees)
-{
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-
-    // Convert degrees to radians
-    const double r = degrees * M_PI / 180.0;
-    auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - z * sin (r); };
-    auto yop = [&r] (const double x, const double y, const double z) -> double { return y; };
-    auto zop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + z * cos (r); };
-    rotate (is, os, h, xop, yop, zop);
-}
-
-void rotate_z (std::istream &is, std::ostream &os, const double degrees)
-{
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-
-    // Convert degrees to radians
-    const double r = degrees * M_PI / 180.0;
-    auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - y * sin (r); };
-    auto yop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + y * cos (r); };
-    auto zop = [&r] (const double x, const double y, const double z) -> double { return z; };
-    rotate (is, os, h, xop, yop, zop);
-}
-
-// Scale X, Y, or Z
-template<typename OP>
-void scale (std::istream &is,
-    std::ostream &os,
-    const spoc::header::header &h,
-    OP op)
-{
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (h.is_valid ());
-
-    // Write the header
-    write_header (os, h);
-
-    // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
+    // Get the operation
+    OP op = [=] (PR p)
     {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
+        // Rotate the point about Y axis
+        const auto x = p.x * cos (r) - p.z * sin (r);
+        const auto z = p.x * sin (r) + p.z * cos (r);
+        p.x = x;
+        p.z = z;
+        return p;
+    };
 
-        // Scale the point
-        op (p);
-
-        // Write it back out
-        write_point_record (os, p);
-    }
+    return op;
 }
 
-void scale_x (std::istream &is, std::ostream &os, const double v)
+OP get_rotate_z_op (const double degrees)
 {
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-    auto op = [&v] (auto &p) { p.x *= v; };
-    scale (is, os, h, op);
+    // Convert degrees to radians
+    const double r = degrees * M_PI / 180.0;
+
+    // Get the operation
+    OP op = [=] (PR p)
+    {
+        // Rotate the point about Z axis
+        const auto x = p.x * cos (r) - p.y * sin (r);
+        const auto y = p.x * sin (r) + p.y * cos (r);
+        p.x = x;
+        p.y = y;
+        return p;
+    };
+
+    return op;
 }
 
-void scale_y (std::istream &is, std::ostream &os, const double v)
+OP get_scale_x_op (double v)
 {
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-    auto op = [&v] (auto &p) { p.y *= v; };
-    scale (is, os, h, op);
+    OP op = [=] (PR p) { p.x *= v; return p; };
+    return op;
 }
 
-void scale_z (std::istream &is, std::ostream &os, const double v)
+OP get_scale_y_op (double v)
 {
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-    auto op = [&v] (auto &p) { p.z *= v; };
-    scale (is, os, h, op);
+    OP op = [=] (PR p) { p.y *= v; return p; };
+    return op;
 }
 
-// Set field values
-void set (std::istream &is,
-    std::ostream &os,
-    const std::string &field_name,
-    const double v)
+OP get_scale_z_op (double v)
+{
+    OP op = [=] (PR p) { p.z *= v; return p; };
+    return op;
+}
+
+OP get_set_op (const std::string &field_name, const double v, const size_t extra_fields)
 {
     using namespace spoc::app_utils;
-
-    // Check preconditions
-    REQUIRE (is.good ());
-    REQUIRE (os.good ());
-    REQUIRE (check_field_name (field_name));
-
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
 
     // Get the extra index
     const size_t j = is_extra_field (field_name)
         ? get_extra_index (field_name)
-        : h.extra_fields + 1;
+        : extra_fields + 1;
 
-    // Write the header
-    write_header (os, h);
-
-    // Process the points
-    for (size_t i = 0; i < h.total_points; ++i)
+    // Get the operation
+    OP op = [=] (PR p)
     {
-        // Read a point
-        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
-
-        // Process the point
         switch (field_name[0])
         {
             case 'x': p.x = v; break;
@@ -485,14 +339,16 @@ void set (std::istream &is,
             break;
         }
 
-        // Write it back out
-        write_point_record (os, p);
-    }
+        return p;
+    };
+
+    return op;
 }
 
-void uniform_noise (std::istream &is, std::ostream &os,
-    const size_t random_seed,
-    const double mag_x, const double mag_y, const double mag_z)
+OP get_uniform_noise_op (const size_t random_seed,
+    const double mag_x,
+    const double mag_y,
+    const double mag_z)
 {
     // Create rng
     std::default_random_engine rng (random_seed);
@@ -502,19 +358,220 @@ void uniform_noise (std::istream &is, std::ostream &os,
     std::uniform_real_distribution<double> dy (-mag_y, mag_y);
     std::uniform_real_distribution<double> dz (-mag_z, mag_z);
 
-    // Read the header and make sure it's uncompressed
-    const auto h = detail::read_header_uncompressed (is);
-
-    // Define the operation being performed
-    auto op = [&] (auto &p)
+    // Get the operation
+    OP op = [=] (PR p) mutable
     {
-        if (mag_x != 0.0) p.x += dx (rng);
-        if (mag_y != 0.0) p.y += dy (rng);
-        if (mag_z != 0.0) p.z += dz (rng);
+        if (mag_x != 0.0)
+            p.x += dx (rng);
+        if (mag_y != 0.0)
+            p.y += dy (rng);
+        if (mag_z != 0.0)
+            p.z += dz (rng);
+        return p;
     };
 
-    // Do it
-    add (is, os, h, op);
+    return op;
+}
+
+template<typename T>
+void apply (std::istream &is,
+    std::ostream &os,
+    const T &commands,
+    const size_t random_seed)
+{
+    // Check preconditions
+    REQUIRE (is.good ());
+    REQUIRE (os.good ());
+
+    // Read the header and make sure it's uncompressed
+    const auto h = detail::read_header_uncompressed (is);
+    REQUIRE (h.is_valid ());
+
+    // Write the same header to the output stream
+    write_header (os, h);
+
+    using PR = spoc::point_record::point_record;
+    std::vector<std::function<PR(PR)>> ops;
+
+    using namespace spoc::app_utils;
+
+    // Check the commands
+    for (auto c : commands)
+    {
+        if (c.name == "add-x")
+        {
+            // Get offset
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_add_x_op (v));
+        }
+        else if (c.name == "add-y")
+        {
+            // Get offset
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_add_y_op (v));
+        }
+        else if (c.name == "add-z")
+        {
+            // Get offset
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_add_z_op (v));
+        }
+        else if (c.name == "copy-field")
+        {
+            // Get fields
+            std::string s = c.params;
+            const auto f1 = consume_field_name (s);
+            const auto f2 = consume_field_name (s);
+            ops.push_back (get_copy_field_op (f1, f2, h.extra_fields));
+        }
+        else if (c.name == "gaussian-noise")
+        {
+            // Get variance for X, Y, Z
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_gaussian_noise_op (random_seed, v, v, v));
+        }
+        else if (c.name == "gaussian-noise-x")
+        {
+            // Get variance for X
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_gaussian_noise_op (random_seed, v, 0.0, 0.0));
+        }
+        else if (c.name == "gaussian-noise-y")
+        {
+            // Get variance for Y
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_gaussian_noise_op (random_seed, 0.0, v, 0.0));
+        }
+        else if (c.name == "gaussian-noise-z")
+        {
+            // Get variance for Z
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_gaussian_noise_op (random_seed, 0.0, 0.0, v));
+        }
+        else if (c.name == "quantize-xyz")
+        {
+            // Get precision
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_quantize_op (v));
+        }
+        else if (c.name == "replace")
+        {
+            // Get fields and values
+            std::string s = c.params;
+            const auto l = consume_field_name (s);
+            const auto v1 = consume_int (s);
+            const auto v2 = consume_int (s);
+            ops.push_back (get_replace_op (l, v1, v2, h.extra_fields));
+        }
+        else if (c.name == "rotate-x")
+        {
+            // Get degrees
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_rotate_x_op (v));
+        }
+        else if (c.name == "rotate-y")
+        {
+            // Get degrees
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_rotate_y_op (v));
+        }
+        else if (c.name == "rotate-z")
+        {
+            // Get degrees
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_rotate_z_op (v));
+        }
+        else if (c.name == "scale-x")
+        {
+            // Get magnitude
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_scale_x_op (v));
+        }
+        else if (c.name == "scale-y")
+        {
+            // Get magnitude
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_scale_y_op (v));
+        }
+        else if (c.name == "scale-z")
+        {
+            // Get magnitude
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_scale_z_op (v));
+        }
+        else if (c.name == "set")
+        {
+            // Get label and value
+            std::string s = c.params;
+            const auto l = consume_field_name (s);
+            const auto v = consume_double (s);
+            ops.push_back (get_set_op (l, v, h.extra_fields));
+        }
+        else if (c.name == "uniform-noise")
+        {
+            // Get magnitude
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_uniform_noise_op (random_seed, v, v, v));
+        }
+        else if (c.name == "uniform-noise-x")
+        {
+            // Get magnitude
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_uniform_noise_op (random_seed, v, 0.0, 0.0));
+        }
+        else if (c.name == "uniform-noise-y")
+        {
+            // Get magnitude
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_uniform_noise_op (random_seed, 0.0, v, 0.0));
+        }
+        else if (c.name == "uniform-noise-z")
+        {
+            // Get magnitude
+            std::string s = c.params;
+            const auto v = consume_double (s);
+            ops.push_back (get_uniform_noise_op (random_seed, 0.0, 0.0, v));
+        }
+        else
+            throw std::runtime_error (std::string ("An unknown command was encountered: ") + c.name);
+    }
+
+    // Process the points
+    for (size_t i = 0; i < h.total_points; ++i)
+    {
+        // Read a point
+        auto p = spoc::point_record::read_point_record (is, h.extra_fields);
+
+        // Apply each operation, one by one
+        //
+        // The reference to 'op' is required because some operations
+        // hold state that is changed, like for example a random
+        // number generator. Cppcheck is an error for suggesting
+        // otherwise.
+        for (auto &op : ops) // cppcheck-suppress constVariable
+            p = op (p);
+
+        // Write it back out
+        write_point_record (os, p);
+    }
+
 }
 
 } // namespace transform_app

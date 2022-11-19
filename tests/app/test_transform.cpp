@@ -1,6 +1,7 @@
-#include "transform.h"
 #include "spoc/spoc.h"
 #include "spoc/test_utils.h"
+#include "transform.h"
+#include "transform_cmd.h"
 #include <iostream>
 #include <stdexcept>
 
@@ -11,6 +12,7 @@ using namespace spoc::point;
 using namespace spoc::point_record;
 using namespace spoc::test_utils;
 using namespace spoc::transform_app;
+using namespace spoc::transform_cmd;
 
 void test_transform_detail ()
 {
@@ -28,43 +30,49 @@ void test_transform_add ()
 
     default_random_engine g;
     uniform_real_distribution<double> d (-100, 100);
+    const size_t random_seed = 0;
 
     for (auto i : { 0, 1, 2, 3, 4})
     {
         (void)i; // disable not used warning
         const double offset = d (g);
 
-        // Copy it
-        auto qx (p);
-        auto qy (p);
-        auto qz (p);
-
-        // Test streaming functions
+        // Write it out 3 times
         stringstream is, os;
         const string wkt ("Test WKT");
         write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
         write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
         write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
 
-        add_x (is, os, offset);
+        vector<command> commands (1);
+
+        // Apply to first one on x
+        commands[0] = command ("add-x", std::to_string (offset));
+        apply (is, os, commands, random_seed);
         auto r = read_spoc_file_uncompressed (os);
-        qx = r.get_point_records ();
+        auto qx = r.get_point_records ();
 
-        add_y (is, os, offset);
+        // Apply to second one on y
+        commands[0] = command ("add-y", std::to_string (offset));
+        apply (is, os, commands, random_seed);
         r = read_spoc_file_uncompressed (os);
-        qy = r.get_point_records ();
+        auto qy = r.get_point_records ();
 
-        add_z (is, os, offset);
+        // Apply to third one on z
+        commands[0] = command ("add-z", std::to_string (offset));
+        apply (is, os, commands, random_seed);
         r = read_spoc_file_uncompressed (os);
-        qz = r.get_point_records ();
+        auto qz = r.get_point_records ();
 
         // VERIFY that the correct axis was used
         VERIFY (about_equal (p[3].x + offset, qx[3].x));
         VERIFY (p[3].y == qx[3].y);
         VERIFY (p[3].z == qx[3].z);
+
         VERIFY (p[3].x == qy[3].x);
         VERIFY (about_equal (p[3].y + offset, qy[3].y));
         VERIFY (p[3].z == qy[3].z);
+
         VERIFY (p[3].x == qz[3].x);
         VERIFY (p[3].y == qz[3].y);
         VERIFY (about_equal (p[3].z + offset, qz[3].z));
@@ -79,12 +87,15 @@ void test_transform_copy_field ()
     const bool compressed = false;
     const bool rgb = true;
     auto f = generate_random_spoc_file (total_points, extra_fields, compressed, rgb);
+    const size_t random_seed = 0;
 
     // Copy c to p
     {
         stringstream is, os;
         write_spoc_file_uncompressed (is, f);
-        copy_field (is, os, "c", "p");
+        vector<command> commands (1);
+        commands[0] = command ("copy-field", "c,p");
+        apply (is, os, commands, random_seed);
         const auto g = read_spoc_file_uncompressed (os);
         const auto c = get_c (f.get_point_records ());
         const auto p = get_p (g.get_point_records ());
@@ -95,7 +106,9 @@ void test_transform_copy_field ()
     {
         stringstream is, os;
         write_spoc_file_uncompressed (is, f);
-        copy_field (is, os, "e7", "e0");
+        vector<command> commands (1);
+        commands[0] = command ("copy-field", "e7,e0");
+        apply (is, os, commands, random_seed);
         const auto g = read_spoc_file_uncompressed (os);
         const auto e7 = get_extra (7, f.get_point_records ());
         const auto e0 = get_extra (0, g.get_point_records ());
@@ -106,7 +119,9 @@ void test_transform_copy_field ()
     {
         stringstream is, os;
         write_spoc_file_uncompressed (is, f);
-        copy_field (is, os, "i", "e2");
+        vector<command> commands (1);
+        commands[0] = command ("copy-field", "i,e2");
+        apply (is, os, commands, random_seed);
         const auto g = read_spoc_file_uncompressed (os);
         const auto i = get_i (f.get_point_records ());
         const auto e2 = get_extra (2, g.get_point_records ());
@@ -123,7 +138,9 @@ void test_transform_copy_field ()
         {
             stringstream is, os;
             write_spoc_file_uncompressed (is, f);
-            copy_field (is, os, fn1, fn2);
+            vector<command> commands (1);
+            commands[0] = command ("copy-field", string(fn1) + "," + fn2);
+            apply (is, os, commands, random_seed);
             const auto g = read_spoc_file_uncompressed (os);
         }
         for (auto fn2 : { "x", "y", "z", "q", "w", "e8"})
@@ -133,7 +150,9 @@ void test_transform_copy_field ()
             try {
                 stringstream is, os;
                 write_spoc_file_uncompressed (is, f);
-                copy_field (is, os, fn1, fn2);
+                vector<command> commands (1);
+                commands[0] = command ("copy-field", string(fn1) + "," + fn2);
+                apply (is, os, commands, random_seed);
                 const auto g = read_spoc_file_uncompressed (os);
             }
             catch (...) { failed = true; }
@@ -149,7 +168,9 @@ void test_transform_copy_field ()
             try {
                 stringstream is, os;
                 write_spoc_file_uncompressed (is, f);
-                copy_field (is, os, fn2, fn1);
+                vector<command> commands (1);
+                commands[0] = command ("copy-field", string(fn2) + "," + fn1);
+                apply (is, os, commands, random_seed);
                 const auto g = read_spoc_file_uncompressed (os);
             }
             catch (...) { failed = true; }
@@ -177,9 +198,14 @@ void test_transform_gaussian_noise ()
     stringstream is, os;
     write_spoc_file_uncompressed (is, f);
     // Add the noise
-    gaussian_noise (is, os, 123, 1.0, 2.0, 3.0);
+    vector<command> commands (3);
+    commands[0] = command ("gaussian-noise-x", "1.0");
+    commands[1] = command ("gaussian-noise-y", "2.0");
+    commands[2] = command ("gaussian-noise-z", "3.0");
+    const size_t random_seed = 123;
+    apply (is, os, commands, random_seed);
     // Get the result
-    auto g = read_spoc_file_uncompressed (os);
+    const auto g = read_spoc_file_uncompressed (os);
     const auto x = get_x (g.get_point_records ());
     const auto y = get_y (g.get_point_records ());
     const auto z = get_z (g.get_point_records ());
@@ -195,6 +221,12 @@ void test_transform_gaussian_noise ()
     VERIFY (min_x > -100 && max_x < 100);
     VERIFY (min_y > -200 && max_y < 200);
     VERIFY (min_z > -300 && max_z < 300);
+    commands[0] = command ("gaussian-noise", "1.0");
+    commands[1] = command ("gaussian-noise", "2.0");
+    commands[2] = command ("gaussian-noise", "3.0");
+    write_spoc_file_uncompressed (is, f);
+    // Add the noise
+    apply (is, os, commands, random_seed);
 }
 
 void test_transform_quantize ()
@@ -202,64 +234,32 @@ void test_transform_quantize ()
     // Generate spoc file
     auto f = generate_random_spoc_file (10, 3, false);
     stringstream is, os;
-    write_spoc_file_uncompressed (is, f);
-    quantize (is, os, 0.001);
+    vector<command> commands (1);
+    const size_t random_seed = 0;
 
     write_spoc_file_uncompressed (is, f);
-    quantize (is, os, 0.01);
+    commands[0] = command ("quantize-xyz", "0.001");
+    apply (is, os, commands, random_seed);
+    auto g = read_spoc_file_uncompressed (os);
+    auto x = get_x (g.get_point_records ());
+    for (auto i : x)
+        VERIFY (i != 0.0 && (static_cast<int> (i * 1000) / 1000 == 0.0));
 
     write_spoc_file_uncompressed (is, f);
-    quantize (is, os, 100);
-}
+    commands[0] = command ("quantize-xyz", "0.01");
+    apply (is, os, commands, random_seed);
+    g = read_spoc_file_uncompressed (os);
+    auto y = get_y (g.get_point_records ());
+    for (auto i : y)
+        VERIFY (i != 0.0 && (static_cast<int> (i * 100) / 100 == 0.0));
 
-void test_transform_rotate ()
-{
-    // Generate random reference
-    const auto p = generate_random_point_records (100);
-
-    default_random_engine g;
-    uniform_real_distribution<double> d (-M_PI, M_PI);
-
-    for (auto i : { 0, 1, 2, 3, 4})
-    {
-        (void)i; // disable not used warning
-        const double degrees = d (g);
-
-        // Copy it
-        auto qx (p);
-        auto qy (p);
-        auto qz (p);
-
-        // Test streaming functions
-        stringstream is, os;
-        const string wkt ("Test WKT");
-        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
-        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
-
-        rotate_x (is, os, degrees);
-        auto r = read_spoc_file_uncompressed (os);
-        qx = r.get_point_records ();
-
-        rotate_y (is, os, degrees);
-        r = read_spoc_file_uncompressed (os);
-        qy = r.get_point_records ();
-
-        rotate_z (is, os, degrees);
-        r = read_spoc_file_uncompressed (os);
-        qz = r.get_point_records ();
-
-        // VERIFY that the correct axis was used
-        VERIFY (p[3].x == qx[3].x);
-        VERIFY (p[3].y != qx[3].y);
-        VERIFY (p[3].z != qx[3].z);
-        VERIFY (p[3].x != qy[3].x);
-        VERIFY (p[3].y == qy[3].y);
-        VERIFY (p[3].z != qy[3].z);
-        VERIFY (p[3].x != qz[3].x);
-        VERIFY (p[3].y != qz[3].y);
-        VERIFY (p[3].z == qz[3].z);
-    }
+    write_spoc_file_uncompressed (is, f);
+    commands[0] = command ("quantize-xyz", "100");
+    apply (is, os, commands, random_seed);
+    g = read_spoc_file_uncompressed (os);
+    auto z = get_z (g.get_point_records ());
+    for (auto i : z)
+        VERIFY (i == 0);
 }
 
 void test_transform_replace ()
@@ -287,7 +287,13 @@ void test_transform_replace ()
                 {
                     stringstream is, os;
                     write_spoc_file_uncompressed (is, f);
-                    replace (is, os, fn, v1, v2);
+                    const size_t random_seed = 0;
+                    vector<command> commands;
+                    commands.push_back (command ("replace",
+                        std::string (fn) + "," +
+                        std::to_string (v1) + "," +
+                        std::to_string (v2)));
+                    apply (is, os, commands, random_seed);
                     const auto g = read_spoc_file_uncompressed (os);
                 }
                 for (auto fn : { "x", "y", "z", "q", "w", "e8"})
@@ -296,7 +302,13 @@ void test_transform_replace ()
                     try {
                         stringstream is, os;
                         write_spoc_file_uncompressed (is, f);
-                        replace (is, os, fn, v1, v2);
+                        const size_t random_seed = 0;
+                        vector<command> commands;
+                        commands.push_back (command ("replace",
+                            std::string (fn) + "," +
+                            std::to_string (v1) + "," +
+                            std::to_string (v2)));
+                        apply (is, os, commands, random_seed);
                         const auto g = read_spoc_file_uncompressed (os);
                     }
                     catch (...) { failed = true; }
@@ -310,6 +322,62 @@ void test_transform_replace ()
     }
 }
 
+
+void test_transform_rotate ()
+{
+    // Generate random reference
+    const auto p = generate_random_point_records (100);
+
+    default_random_engine g;
+    uniform_real_distribution<double> d (-M_PI, M_PI);
+    const size_t random_seed = 0;
+    vector<command> commands (1);
+
+    for (auto i : { 0, 1, 2, 3, 4})
+    {
+        (void)i; // disable not used warning
+        const double degrees = d (g);
+
+        // Copy it
+        auto qx (p);
+        auto qy (p);
+        auto qz (p);
+
+        // Test streaming functions
+        stringstream is, os;
+        const string wkt ("Test WKT");
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+        write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
+
+        commands[0] = command ("rotate-x", std::to_string (degrees));
+        apply (is, os, commands, random_seed);
+        auto r = read_spoc_file_uncompressed (os);
+        qx = r.get_point_records ();
+
+        commands[0] = command ("rotate-y", std::to_string (degrees));
+        apply (is, os, commands, random_seed);
+        r = read_spoc_file_uncompressed (os);
+        qy = r.get_point_records ();
+
+        commands[0] = command ("rotate-z", std::to_string (degrees));
+        apply (is, os, commands, random_seed);
+        r = read_spoc_file_uncompressed (os);
+        qz = r.get_point_records ();
+
+        // VERIFY that the correct axis was used
+        VERIFY (p[3].x == qx[3].x);
+        VERIFY (p[3].y != qx[3].y);
+        VERIFY (p[3].z != qx[3].z);
+        VERIFY (p[3].x != qy[3].x);
+        VERIFY (p[3].y == qy[3].y);
+        VERIFY (p[3].z != qy[3].z);
+        VERIFY (p[3].x != qz[3].x);
+        VERIFY (p[3].y != qz[3].y);
+        VERIFY (p[3].z == qz[3].z);
+    }
+}
+
 void test_transform_scale ()
 {
     // Generate random reference
@@ -317,6 +385,8 @@ void test_transform_scale ()
 
     default_random_engine g;
     uniform_real_distribution<double> d (-100, 100);
+    const size_t random_seed = 0;
+    vector<command> commands (1);
 
     for (auto i : { 0, 1, 2, 3, 4})
     {
@@ -335,15 +405,18 @@ void test_transform_scale ()
         write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
         write_spoc_file_uncompressed (is, spoc_file (wkt, false, p));
 
-        scale_x (is, os, s);
+        commands[0] = command ("scale-x", std::to_string (s));
+        apply (is, os, commands, random_seed);
         auto r = read_spoc_file_uncompressed (os);
         qx = r.get_point_records ();
 
-        scale_y (is, os, s);
+        commands[0] = command ("scale-y", std::to_string (s));
+        apply (is, os, commands, random_seed);
         r = read_spoc_file_uncompressed (os);
         qy = r.get_point_records ();
 
-        scale_z (is, os, s);
+        commands[0] = command ("scale-z", std::to_string (s));
+        apply (is, os, commands, random_seed);
         r = read_spoc_file_uncompressed (os);
         qz = r.get_point_records ();
 
@@ -362,6 +435,9 @@ void test_transform_scale ()
 
 void test_transform_set ()
 {
+    const size_t random_seed = 0;
+    vector<command> commands (1);
+
     for (auto rgb : {true, false})
     {
         // Generate spoc file
@@ -373,7 +449,8 @@ void test_transform_set ()
         {
             stringstream is, os;
             write_spoc_file_uncompressed (is, f);
-            set (is, os, c, 123);
+            commands[0] = command ("set", std::string (c) + ",123");
+            apply (is, os, commands, random_seed);
             const auto g = read_spoc_file_uncompressed (os);
         }
         for (auto c : { "q", "w", "e9"})
@@ -382,7 +459,8 @@ void test_transform_set ()
             try {
                 stringstream is, os;
                 write_spoc_file_uncompressed (is, f);
-                set (is, os, c, 123);
+                commands[0] = command ("set", std::string (c) + ",123");
+                apply (is, os, commands, random_seed);
                 const auto g = read_spoc_file_uncompressed (os);
             }
             catch (...) { failed = true; }
@@ -409,7 +487,13 @@ void test_transform_uniform_noise ()
     stringstream is, os;
     write_spoc_file_uncompressed (is, f);
     // Add the noise
-    uniform_noise (is, os, 123, 1.0, 2.0, 3.0);
+    vector<command> commands (1);
+    commands[0] = command ("uniform-noise",
+                        std::string ("1.0") + "," +
+                        std::string ("2.0") + "," +
+                        std::string ("3.0"));
+    const size_t random_seed = 123;
+    apply (is, os, commands, random_seed);
     // Get the result
     auto g = read_spoc_file_uncompressed (os);
     const auto x = get_x (g.get_point_records ());
@@ -424,6 +508,72 @@ void test_transform_uniform_noise ()
     VERIFY (min_x > -1 && max_x < 1);
     VERIFY (min_y > -2 && max_y < 2);
     VERIFY (min_z > -3 && max_z < 3);
+    commands[0] = command ("uniform-noise-x", "1.0");
+    write_spoc_file_uncompressed (is, f);
+    apply (is, os, commands, random_seed);
+    commands[0] = command ("uniform-noise-y", "1.0");
+    write_spoc_file_uncompressed (is, f);
+    apply (is, os, commands, random_seed);
+    commands[0] = command ("uniform-noise-z", "1.0");
+    write_spoc_file_uncompressed (is, f);
+    apply (is, os, commands, random_seed);
+}
+
+void test_transform_multiple_ops ()
+{
+    // Generate spoc file
+    const size_t total_points = 100;
+    const size_t extra_fields = 8;
+    auto f1 = generate_random_spoc_file (total_points, extra_fields);
+    const auto p1 = f1.get_point_records ();
+
+    const size_t random_seed = 0;
+    vector<command> forward_commands;
+    forward_commands.push_back (command ("add-x", "10.0"));
+    forward_commands.push_back (command ("rotate-x", "17.5"));
+    forward_commands.push_back (command ("scale-x", "100.0"));
+    vector<command> reverse_commands;
+    reverse_commands.push_back (command ("scale-x", "0.01"));
+    reverse_commands.push_back (command ("rotate-x", "-17.5"));
+    reverse_commands.push_back (command ("add-x", "-10.0"));
+
+    // Streams for I/O
+    stringstream s1, s2, s3;
+
+    // Perform the transform
+    write_spoc_file_uncompressed (s1, f1);
+    apply (s1, s2, forward_commands, random_seed);
+
+    // The points should have changed
+    const auto f2 = read_spoc_file_uncompressed (s2);
+    const auto p2 = f2.get_point_records ();
+    VERIFY (!about_equal (p1.back ().x, p2.back ().x));
+    VERIFY (!about_equal (p1.back ().y, p2.back ().y));
+    VERIFY (!about_equal (p1.back ().z, p2.back ().z));
+
+    // Undo the transform
+    write_spoc_file_uncompressed (s2, f2);
+    apply (s2, s3, reverse_commands, random_seed);
+
+    // The points should match the original
+    const auto f3 = read_spoc_file_uncompressed (s3);
+    const auto p3 = f3.get_point_records ();
+    VERIFY (about_equal (p1.back ().x, p3.back ().x));
+    VERIFY (about_equal (p1.back ().y, p3.back ().y));
+    VERIFY (about_equal (p1.back ().z, p3.back ().z));
+}
+
+void test_transform_bad_command ()
+{
+    bool failed = false;
+    try {
+        stringstream is, os;
+        vector<command> commands (1);
+        commands[0] = command ("xxx", "1.0");
+        apply (is, os, commands, 123);
+    }
+    catch (...) { failed = true; }
+    VERIFY (failed);
 }
 
 int main (int argc, char **argv)
@@ -440,6 +590,8 @@ int main (int argc, char **argv)
         test_transform_scale ();
         test_transform_set ();
         test_transform_uniform_noise ();
+        test_transform_multiple_ops ();
+        test_transform_bad_command ();
         return 0;
     }
     catch (const exception &e)
