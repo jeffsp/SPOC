@@ -68,15 +68,17 @@ OP get_copy_field_op (const std::string &field_name1,
     // Check to make sure x, y, z, is not being used
     switch (field_name1[0])
     {
-        case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'x':
+        case 'y':
+        case 'z':
+            throw std::runtime_error ("Cannot run the copy command on floating point fields (X, Y, Z)");
     }
     switch (field_name2[0])
     {
-        case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
-        case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'x':
+        case 'y':
+        case 'z':
+            throw std::runtime_error ("Cannot run the copy command on floating point fields (X, Y, Z)");
     }
 
     // Get the extra indexes
