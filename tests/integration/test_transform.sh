@@ -94,3 +94,13 @@ spoc_transform --scale-z=10 \
     < test_data/lidar/juarez50.spoc \
     > ${TMPDIR}/output.spoc
 #spoc_info ${TMPDIR}/output.spoc
+
+# Multiple
+#spoc_info test_data/lidar/juarez50.spoc
+spoc_transform \
+    --add-x=100 \
+    --quantize-xyz=0.01 \
+    --rotate-z=12.3 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
