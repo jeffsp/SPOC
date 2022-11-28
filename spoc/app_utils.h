@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 namespace spoc
 {
@@ -145,14 +146,30 @@ std::string consume_field_name (std::string &s)
     return field_name;
 }
 
-int consume_int (std::string &s)
+unsigned consume_int (std::string &s)
 {
     size_t sz = 0;
-    int v = 0.0;
+    unsigned v = 0;
     try { v = std::stoi (s, &sz); }
     catch (...) { throw std::runtime_error (std::string ("Could not parse int value string: ") + s); }
     s.erase (0, sz + 1);
     return v;
+}
+
+std::vector<unsigned> consume_ints (std::string &s)
+{
+    std::vector<unsigned> vs;
+    // Get the first one
+    unsigned v = consume_int (s);
+    vs.push_back (v);
+    // Get the rest
+    while (true)
+    {
+        try { v = consume_int (s); }
+        catch (...) { break; }
+        vs.push_back (v);
+    }
+    return vs;
 }
 
 double consume_double (std::string &s)

@@ -41,6 +41,7 @@ enum command_values
     GAUSSIAN_NOISE_Z,
     QUANTIZE_XYZ,
     REPLACE,
+    REPLACE_NOT,
     ROTATE_X,
     ROTATE_Y,
     ROTATE_Z,
@@ -84,6 +85,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"quantize-xyz", required_argument, 0, QUANTIZE_XYZ},
             {"random-seed", required_argument, 0, 'a'},
             {"replace", required_argument, 0, REPLACE},
+            {"replace-not", required_argument, 0, REPLACE_NOT},
             {"rotate-x", required_argument, 0, ROTATE_X},
             {"rotate-y", required_argument, 0, ROTATE_Y},
             {"rotate-z", required_argument, 0, ROTATE_Z},
@@ -149,6 +151,11 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case REPLACE:
             {
                 args.commands.push_back (get_command ("replace", optarg));
+                break;
+            }
+            case REPLACE_NOT:
+            {
+                args.commands.push_back (get_command ("replace-not", optarg));
                 break;
             }
             case ROTATE_X:
