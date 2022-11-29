@@ -65,8 +65,13 @@ Collection of transformations to run on a SPOC file
 
 \-\-replace=*F*,*A*,*B*
 :   Replace field *F* whose values are *A* to the value *B*. *F* can be
-    one of 'x', 'y', 'z', 'c', 'p', 'i', 'r', 'g', 'b', or 'e#', where the
-    '#' after the 'e' specifies the extra field number.
+    one of 'c', 'p', 'i', 'r', 'g', 'b', or 'e#', where the '#' after
+    the 'e' specifies the extra field number.
+
+\-\-replace-not=*F*,*A1*,*A2*,...,*B*
+:   Replace field *F* whose values are any of *A1* or *A2*... to the
+    value *B*. *F* can be one of 'c', 'p', 'i', 'r', 'g', 'b', or 'e#',
+    where the '#' after the 'e' specifies the extra field number.
 
 \-\-rotate-x=*#*
 :   Rotate points about the X axis by *#* degrees.

@@ -1,4 +1,4 @@
-% SPOC_MERGE(1) SPOC User's Manual | Version 0
+% SPOC_MERGE(1) SPOC User's Manual | Version 0.1
 % spoc@spocfile.xyz
 % December 25, 2021
 

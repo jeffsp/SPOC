@@ -181,10 +181,10 @@ OP get_quantize_op (const double precision)
     return op;
 }
 
-// Replace values in one field with values in another
+// Replace values in a field
 OP get_replace_op (const std::string &field_name,
-    const double v1,
-    const double v2,
+    const unsigned v1,
+    const unsigned v2,
     const size_t extra_fields)
 {
     using namespace spoc::app_utils;
@@ -223,6 +223,97 @@ OP get_replace_op (const std::string &field_name,
                     p.extra[j] = v2;
             }
             break;
+        }
+
+        return p;
+    };
+
+    return op;
+}
+
+// Replace all values that are not equal to a value with another value
+OP get_replace_not_op (const std::string &field_name,
+    std::vector<unsigned> v,
+    const size_t extra_fields)
+{
+    using namespace spoc::app_utils;
+
+    // Check to make sure x, y, z, is not being used
+    switch (field_name[0])
+    {
+        case 'x': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'y': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+        case 'z': throw std::runtime_error ("Cannot run the replace command on floating point fields (X, Y, Z)");
+    }
+
+    // Get the last value from the vector for the value to replace with
+    if (v.size () < 2)
+        throw std::runtime_error ("Not enough values were specified in the replace-not command");
+
+    // Get the last value
+    const int r = v.back ();
+
+    // Remove it
+    v.pop_back ();
+
+    // Get the extra index
+    const size_t j = is_extra_field (field_name)
+        ? get_extra_index (field_name)
+        : extra_fields + 1;
+
+    // Get the operation
+    OP op = [=] (PR p)
+    {
+        // Assume that it will get replaced
+        bool replace = true;
+
+        // For each value in the list
+        for (auto i : v)
+        {
+            // If the field's value is equal to one of those in the
+            // list, it does not get replaced
+            switch (field_name[0])
+            {
+                case 'c': if (p.c == i) replace = false; break;
+                case 'p': if (p.p == i) replace = false; break;
+                case 'i': if (p.i == i) replace = false; break;
+                case 'r': if (p.r == i) replace = false; break;
+                case 'g': if (p.g == i) replace = false; break;
+                case 'b': if (p.b == i) replace = false; break;
+                case 'e': // extra
+                {
+                    assert (is_extra_field (field_name));
+                    if (j >= p.extra.size ())
+                        throw std::runtime_error ("Invalid extra field specification");
+                    if (p.extra[j] == i)
+                        replace = false;
+                }
+                break;
+            }
+
+            // Short circuit if you can
+            if (replace == false)
+                break;
+        }
+
+        // Replace if needed
+        if (replace)
+        {
+            switch (field_name[0])
+            {
+                case 'c': p.c = r; break;
+                case 'p': p.c = r; break;
+                case 'i': p.c = r; break;
+                case 'r': p.c = r; break;
+                case 'g': p.c = r; break;
+                case 'b': p.c = r; break;
+                case 'e': // extra
+                {
+                    assert (is_extra_field (field_name));
+                    p.extra[j] = r;
+                }
+                break;
+            }
         }
 
         return p;
@@ -470,6 +561,14 @@ void apply (std::istream &is,
             const auto v1 = consume_int (s);
             const auto v2 = consume_int (s);
             ops.push_back (get_replace_op (l, v1, v2, h.extra_fields));
+        }
+        else if (c.name == "replace-not")
+        {
+            // Get fields and values
+            std::string s = c.params;
+            const auto l = consume_field_name (s);
+            auto v = consume_ints (s);
+            ops.push_back (get_replace_not_op (l, v, h.extra_fields));
         }
         else if (c.name == "rotate-x")
         {

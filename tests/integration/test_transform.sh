@@ -56,8 +56,25 @@ spoc_transform --replace=c,1,2 \
     < test_data/lidar/juarez50.spoc \
     > ${TMPDIR}/output.spoc &> /dev/null
 
+# Replace NOT
+#spoc_info test_data/lidar/juarez50.spoc
+spoc_transform --replace-not=c,2,4,6,1 \
+    < test_data/lidar/juarez50.spoc \
+    > ${TMPDIR}/output.spoc
+#spoc_info ${TMPDIR}/output.spoc
+
 # This should fail
-! spoc_transform --replace=q,1,2 \
+! spoc_transform --replace-not=c,2 \
+    < test_data/lidar/juarez50.spoc \
+    > ${TMPDIR}/output.spoc &> /dev/null
+
+# This should fail
+! spoc_transform --replace-not=x,1,2 \
+    < test_data/lidar/juarez50.spoc \
+    > ${TMPDIR}/output.spoc &> /dev/null
+
+# This should fail
+! spoc_transform --replace-not=q,1,2 \
     < test_data/lidar/juarez50.spoc \
     > ${TMPDIR}/output.spoc &> /dev/null
 

@@ -278,9 +278,9 @@ void test_transform_replace ()
         // Set new points
         f.set_point_records (prs);
 
-        for (auto v1 : { 1.0, 2.0, 3.0, 4.0, 5.0 })
+        for (auto v1 : { 1, 2, 3, 4, 5 })
         {
-            for (auto v2 : { 1.0, 2.0, 3.0, 4.0, 5.0 })
+            for (auto v2 : { 1, 2, 3, 4, 5 })
             {
                 for (auto fn : { "c", "p", "i", "r", "g", "b",
                         "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7" })
@@ -322,6 +322,92 @@ void test_transform_replace ()
     }
 }
 
+void test_transform_replace_not ()
+{
+    for (auto rgb : {true, false})
+    {
+        // Generate spoc file
+        const size_t total_points = 100;
+        const size_t extra_fields = 8;
+        auto f = generate_random_spoc_file (total_points, extra_fields, false, rgb);
+        // Copy point records
+        auto prs = f.get_point_records ();
+        for (size_t i = 0; i < prs.size (); ++i)
+        {
+            // Limit the range of some of the random values
+            prs[i].c %= 10;
+            prs[i].p %= 10;
+            prs[i].i %= 10;
+            for (size_t j = 0; j < extra_fields; ++j)
+                prs[i].extra[j] = prs[i].extra[j] % 5;
+        }
+        // Set new points
+        f.set_point_records (prs);
+
+        // Do this several times
+        for (auto total_values : {0u, 1u, 2u, 3u, 4u})
+        {
+            // For each field name
+            for (auto fn : { "c", "p", "i", "r", "g", "b",
+                    "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7" })
+            {
+                // Create the list of values
+                vector<size_t> values;
+                for (size_t i = 0; i < total_values; ++i)
+                    values.push_back (rand () % 20);
+
+                string cmd_arg = string (fn);
+                for (auto v : values)
+                    cmd_arg += string (",") + to_string(v);
+                bool failed = false;
+                try {
+                    stringstream is, os;
+                    write_spoc_file_uncompressed (is, f);
+                    const size_t random_seed = 0;
+                    vector<command> commands;
+                    commands.push_back (command ("replace-not", cmd_arg));
+                    apply (is, os, commands, random_seed);
+                    const auto g = read_spoc_file_uncompressed (os);
+                }
+                catch (...) { failed = true; }
+                // It should fail when there are not enough values in the
+                // string. There must be at least two
+                if (values.size () < 2)
+                {
+                    VERIFY (failed == true);
+                }
+                else
+                {
+                    VERIFY (failed == false);
+                }
+            }
+            // For each invalid field name
+            for (auto fn : { "x", "y", "z", "q", "e100"})
+            {
+                // Create the list of values
+                vector<size_t> values;
+                for (size_t i = 0; i < total_values; ++i)
+                    values.push_back (rand () % 20);
+
+                string cmd_arg = string (fn);
+                for (auto v : values)
+                    cmd_arg += string (",") + to_string(v);
+                bool failed = false;
+                try {
+                    stringstream is, os;
+                    write_spoc_file_uncompressed (is, f);
+                    const size_t random_seed = 0;
+                    vector<command> commands;
+                    commands.push_back (command ("replace-not", cmd_arg));
+                    apply (is, os, commands, random_seed);
+                    const auto g = read_spoc_file_uncompressed (os);
+                }
+                catch (...) { failed = true; }
+                VERIFY (failed == true);
+            }
+        }
+    }
+}
 
 void test_transform_rotate ()
 {
@@ -587,6 +673,7 @@ int main (int argc, char **argv)
         test_transform_quantize ();
         test_transform_rotate ();
         test_transform_replace ();
+        test_transform_replace_not ();
         test_transform_scale ();
         test_transform_set ();
         test_transform_uniform_noise ();
