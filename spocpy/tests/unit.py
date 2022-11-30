@@ -45,7 +45,7 @@ class TestAll(unittest.TestCase):
         self.assertTrue(h.major_version == sp.getmajorversion())
         self.assertTrue(h.minor_version == sp.getminorversion())
         self.assertTrue(len(h.wkt) > 0)
-        self.assertTrue(h.extra_fields == 0)
+        self.assertTrue(h.extra_fields == 1)
         self.assertTrue(h.total_points > 1)
         self.assertFalse(h.compressed)
 
