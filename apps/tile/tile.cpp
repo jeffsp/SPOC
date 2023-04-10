@@ -154,7 +154,7 @@ int main (int argc, char **argv)
             // Get the filename extension
             const string ext = args.fn.empty ()
                 ?
-                (t.get_compressed () ? string ("zpoc") : string ("spoc"))
+                (t.get_compressed () ? string (".zpoc") : string (".spoc"))
                 :
                 filesystem::path (args.fn).extension().string ();
 
