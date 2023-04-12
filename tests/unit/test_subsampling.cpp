@@ -62,6 +62,21 @@ void test_subsample ()
     VERIFY (p[ind2.front ()].c != 0);
     VERIFY (p[ind2.back ()].c != n - 1);
     }
+
+    {
+    // Test subsample points function
+    point_records p;
+    p.push_back (point_record (0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0));
+    p.push_back (point_record (1.1, 0.0, 0.0, 1, 0, 0, 0, 0, 0));
+    p.push_back (point_record (2.1, 0.0, 0.0, 2, 0, 0, 0, 0, 0));
+    p.push_back (point_record (3.1, 0.0, 0.0, 3, 0, 0, 0, 0, 0));
+    const size_t random_seed = 0;
+    // Subsample at resolution of 2. This should give us 2 filled voxels
+    auto p_sub = subsample_points (p, 2, random_seed);
+    VERIFY (p_sub.size () == 2);
+    VERIFY (p_sub[0].c == 0);
+    VERIFY (p_sub[1].c == 2);
+    }
 }
 
 int main (int argc, char **argv)
