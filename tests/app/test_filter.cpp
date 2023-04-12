@@ -120,7 +120,7 @@ void test_subsample ()
 
     // Subsample
     const double resolution = 1.0;
-    auto l = subsample (f, resolution, 123);
+    auto l = subsample_file (f, resolution, 123);
 
     // Each octant be filled with about 100 points
     VERIFY (l.get_point_records ().size () == 8);

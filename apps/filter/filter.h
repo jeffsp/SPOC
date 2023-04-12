@@ -91,7 +91,7 @@ inline T unique_xyz (const T &f, const size_t random_seed)
 }
 
 template<typename T>
-inline T subsample (const T &f, const double res, const size_t random_seed)
+inline T subsample_file (const T &f, const double res, const size_t random_seed)
 {
     // Get an empty clone of the spoc file
     T g = f.clone_empty ();
@@ -99,12 +99,7 @@ inline T subsample (const T &f, const double res, const size_t random_seed)
     // Get a reference to the records
     const auto &prs = f.get_point_records ();
 
-    // Get the indexes into f
-    const auto indexes = spoc::subsampling::get_subsample_indexes (prs, res, random_seed);
-
-    // Add them
-    for (auto i : indexes)
-        g.push_back (prs[i]); // cppcheck-suppress useStlAlgorithm
+    g.set_point_records(spoc::subsampling::subsample_points(prs, res, random_seed));
 
     return g;
 }
