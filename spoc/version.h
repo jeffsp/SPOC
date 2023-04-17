@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 /// Top level namespace for all SPOC definitions
 namespace spoc
 {
