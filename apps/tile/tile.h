@@ -35,9 +35,7 @@ std::vector<size_t> get_tile_indexes (const T &p,
     const double tile_size_y)
 {
     // Get difference in X extent
-    //
-    // Add a small amount to handle rounding
-    const double dx = e.maxp.x - e.minp.x + std::numeric_limits<float>::epsilon ();
+    const double dx = e.maxp.x - e.minp.x;
 
     // Compute the stride of the number of tiles
     const size_t stride = tile_size_x > 0.0 ? dx / tile_size_x + 1.0 : 1.0;
