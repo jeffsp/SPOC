@@ -42,4 +42,4 @@ are equal and success if they are not equal
 
 # SEE ALSO
 
-SPOC_DIFF(1)
+SPOC_INFO(1)
