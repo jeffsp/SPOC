@@ -157,7 +157,14 @@ inline header read_header (std::istream &s)
     if (!h.check_signature ())
         throw std::runtime_error ("Invalid spoc file format");
     s.read (reinterpret_cast<char*>(&h.major_version), sizeof(uint8_t));
+    if (h.major_version != MAJOR_VERSION)
+        throw std::runtime_error ("Incompatible major version number");
     s.read (reinterpret_cast<char*>(&h.minor_version), sizeof(uint8_t));
+    // See the note in the `test_header.cpp` unit test. When the major
+    // version gets bumped above 0, this behavior should change to
+    // allow for reading headers with unequal minor versions.
+    if (h.minor_version != MINOR_VERSION)
+        throw std::runtime_error ("Incompatible minor version number");
     uint16_t len = 0;
     s.read (reinterpret_cast<char*>(&len), sizeof(uint16_t));
     h.wkt.resize (len);

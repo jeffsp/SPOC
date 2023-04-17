@@ -1,5 +1,6 @@
 #include "spoc/app_utils.h"
 #include "spoc/header.h"
+#include "spoc/version.h"
 #include "spoc/test_utils.h"
 #include <iostream>
 #include <random>
@@ -114,6 +115,37 @@ void test_read_write ()
     stringstream s;
     // Write an invalid signature
     s << "SPOX" << endl;
+    VERIFY_THROWS (read_header (s);)
+    }
+
+    // It's not OK if the minor versions don't match, but that's
+    // only because we are still in beta (MAJOR_VERSION == 0).
+    //
+    // When the major version goes to 1, this behavior will need to
+    // change. For example, we can choose to allow reading files with
+    // any minor version, as long as the major versions match, or we
+    // can choose to allow reading files with only the same or older
+    // minor versions.
+    //
+    // This next verify statement will ensure that our tests break
+    // when we bump the version up from 0. When that happens, we will
+    // have to fix this test and change the `header::read_header()`
+    // function appropriately to allow for minor version mismatches.
+    VERIFY (spoc::MAJOR_VERSION == 0);
+    {
+    stringstream s;
+    header h;
+    ++h.minor_version;
+    write_header (s, h);
+    VERIFY_THROWS (read_header (s);)
+    }
+
+    // It's not OK if the major versions don't match
+    {
+    stringstream s;
+    header h;
+    ++h.major_version;
+    write_header (s, h);
     VERIFY_THROWS (read_header (s);)
     }
 
