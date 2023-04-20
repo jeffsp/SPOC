@@ -122,6 +122,22 @@ inline std::vector<size_t> get_unique_xyz_indexes (const T &prs, const size_t ra
     return r;
 }
 
+template<typename T>
+inline T subsample_points (const T &p, const double res, const size_t random_seed)
+{
+    // Get an empty return points object
+    T p_sub;
+
+    // Get the indexes into f
+    const auto indexes = get_subsample_indexes (p, res, random_seed);
+
+    // Add them
+    for (auto i : indexes)
+        p_sub.push_back (p[i]); // cppcheck-suppress useStlAlgorithm
+
+    return p_sub;
+}
+
 } // namespace subsampling
 
 } // namespace spoc

@@ -68,7 +68,7 @@ int main (int argc, char **argv)
         if (args.unique_xyz)
             f = unique_xyz (f, args.random_seed);
         if (args.subsample > 0.0)
-            f = subsample (f, args.subsample, args.random_seed);
+            f = subsample_file (f, args.subsample, args.random_seed);
         if (!args.remove_coords.empty())
             f = remove_coords(f, args.remove_coords);
 
