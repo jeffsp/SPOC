@@ -54,6 +54,11 @@ int main (int argc, char **argv)
             clog << "Reading " << args.fn << endl;
         }
 
+        if (args.fn.empty () && args.prefix.empty ())
+        {
+            throw runtime_error("If using stdin as input you must specify an output prefix");
+        }
+
         // Get the input stream
         input_stream is (args.verbose, args.fn);
 
