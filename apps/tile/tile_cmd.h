@@ -73,15 +73,14 @@ inline args get_args (int argc, char **argv, const std::string &usage)
         }
     }
 
-    // Get input filename
-    if (optind == argc)
-        throw std::runtime_error ("No input filename was specified");
-
-    args.fn = argv[optind++];
-
-    // Check command line
+    // Get input filename if specified
     if (optind != argc)
-        throw std::runtime_error ("Too many arguments on command line");
+    {
+        args.fn = argv[optind++];
+        // Should have max of 1 input argument
+        if (optind != argc)
+            throw std::runtime_error ("Too many arguments on command line");
+    }
 
     return args;
 }
