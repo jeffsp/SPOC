@@ -165,7 +165,7 @@ inline point_record read_point_record (std::istream &s, const size_t extra_field
 using point_records = std::vector<point_record>;
 
 // Helper functions
-std::vector<double> get_x (const point_records &p)
+inline std::vector<double> get_x (const point_records &p)
 {
     std::vector<double> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -173,7 +173,7 @@ std::vector<double> get_x (const point_records &p)
     return x;
 }
 
-std::vector<double> get_y (const point_records &p)
+inline std::vector<double> get_y (const point_records &p)
 {
     std::vector<double> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -181,7 +181,7 @@ std::vector<double> get_y (const point_records &p)
     return x;
 }
 
-std::vector<double> get_z (const point_records &p)
+inline std::vector<double> get_z (const point_records &p)
 {
     std::vector<double> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -189,7 +189,7 @@ std::vector<double> get_z (const point_records &p)
     return x;
 }
 
-std::vector<uint32_t> get_c (const point_records &p)
+inline std::vector<uint32_t> get_c (const point_records &p)
 {
     std::vector<uint32_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -197,7 +197,7 @@ std::vector<uint32_t> get_c (const point_records &p)
     return x;
 }
 
-std::vector<uint32_t> get_p (const point_records &p)
+inline std::vector<uint32_t> get_p (const point_records &p)
 {
     std::vector<uint32_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -205,7 +205,7 @@ std::vector<uint32_t> get_p (const point_records &p)
     return x;
 }
 
-std::vector<uint16_t> get_i (const point_records &p)
+inline std::vector<uint16_t> get_i (const point_records &p)
 {
     std::vector<uint16_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -213,7 +213,7 @@ std::vector<uint16_t> get_i (const point_records &p)
     return x;
 }
 
-std::vector<uint16_t> get_r (const point_records &p)
+inline std::vector<uint16_t> get_r (const point_records &p)
 {
     std::vector<uint16_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -221,7 +221,7 @@ std::vector<uint16_t> get_r (const point_records &p)
     return x;
 }
 
-std::vector<uint16_t> get_g (const point_records &p)
+inline std::vector<uint16_t> get_g (const point_records &p)
 {
     std::vector<uint16_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -229,7 +229,7 @@ std::vector<uint16_t> get_g (const point_records &p)
     return x;
 }
 
-std::vector<uint16_t> get_b (const point_records &p)
+inline std::vector<uint16_t> get_b (const point_records &p)
 {
     std::vector<uint16_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)
@@ -237,14 +237,14 @@ std::vector<uint16_t> get_b (const point_records &p)
     return x;
 }
 
-size_t get_extra_fields_size (const point_records &p)
+inline size_t get_extra_fields_size (const point_records &p)
 {
     if (p.empty ())
         return 0;
     return p[0].extra.size ();
 }
 
-std::vector<uint64_t> get_extra (const size_t k, const point_records &p)
+inline std::vector<uint64_t> get_extra (const size_t k, const point_records &p)
 {
     std::vector<uint64_t> x (p.size ());
     for (size_t n = 0; n < p.size (); ++n)

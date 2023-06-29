@@ -17,7 +17,7 @@ inline void ContractFailed (const char *e, const char *file, const unsigned line
     throw std::runtime_error (s.str ());
 }
 
-void test_contract (const bool flag,
+inline void test_contract (const bool flag,
     const char *e,
     const char *file,
     const unsigned line)
