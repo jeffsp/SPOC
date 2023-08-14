@@ -61,6 +61,25 @@ inline bool all_less_equal (const spoc::point::point<double> &a, const spoc::poi
     return true;
 }
 
+extent get_total_extent(const extent &e1, const extent &e2)
+{
+    spoc::point::point<double> minp { std::numeric_limits<double>::max (),
+            std::numeric_limits<double>::max (),
+            std::numeric_limits<double>::max ()};
+    spoc::point::point<double> maxp { std::numeric_limits<double>::lowest (),
+            std::numeric_limits<double>::lowest (),
+            std::numeric_limits<double>::lowest ()};
+
+    minp.x = std::min(e1.minp.x, e2.minp.x);
+    minp.y = std::min(e1.minp.y, e2.minp.y);
+    minp.z = std::min(e1.minp.z, e2.minp.z);
+    maxp.x = std::max(e1.maxp.x, e2.maxp.x);
+    maxp.y = std::max(e1.maxp.y, e2.maxp.y);
+    maxp.z = std::max(e1.maxp.z, e2.maxp.z);
+
+    return extent {minp, maxp};
+}
+
 inline bool operator== (const extent &a, const extent &b)
 {
     return (a.minp == b.minp) && (a.maxp == b.maxp);
