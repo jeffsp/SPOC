@@ -70,15 +70,12 @@ extent get_total_extent(const extent &e1, const extent &e2)
             std::numeric_limits<double>::lowest (),
             std::numeric_limits<double>::lowest ()};
 
-    if (all_less_equal(e1.minp, e2.minp))
-        minp = e1.minp;
-    else
-        minp = e2.minp;
-
-    if (all_less_equal(e1.maxp, e2.maxp))
-        maxp = e2.maxp;
-    else 
-        maxp = e1.maxp;
+    minp.x = std::min(e1.minp.x, e2.minp.x);
+    minp.y = std::min(e1.minp.y, e2.minp.y);
+    minp.z = std::min(e1.minp.z, e2.minp.z);
+    maxp.x = std::max(e1.maxp.x, e2.maxp.x);
+    maxp.y = std::max(e1.maxp.y, e2.maxp.y);
+    maxp.z = std::max(e1.maxp.z, e2.maxp.z);
 
     return extent {minp, maxp};
 }

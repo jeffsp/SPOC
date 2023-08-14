@@ -63,15 +63,15 @@ void test_volume ()
 
 void test_total_extent ()
 {
-    spoc::extent::extent e1 = {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}};
-    spoc::extent::extent e2 = {{2.0, 3.0, 4.0}, {5.0, 6.0, 7.0}};
+    spoc::extent::extent e1 = {{-4.0, -2.0, 0.0}, {4.0, 2.0, 0.0}};
+    spoc::extent::extent e2 = {{-2.0, -4.0, 0.0}, {2.0, 4.0, 0.0}};
     spoc::extent::extent e_total = get_total_extent(e1, e2);
-    VERIFY (about_equal(e_total.minp.x, e1.minp.x));
-    VERIFY (about_equal(e_total.minp.y, e1.minp.y));
-    VERIFY (about_equal(e_total.minp.z, e1.minp.z));
-    VERIFY (about_equal(e_total.maxp.x, e2.maxp.x));
-    VERIFY (about_equal(e_total.maxp.y, e2.maxp.y));
-    VERIFY (about_equal(e_total.maxp.z, e2.maxp.z));
+    VERIFY (about_equal(e_total.minp.x, -4.0));
+    VERIFY (about_equal(e_total.minp.y, -4.0));
+    VERIFY (about_equal(e_total.minp.z, 0.0));
+    VERIFY (about_equal(e_total.maxp.x, 4.0));
+    VERIFY (about_equal(e_total.maxp.y, 4.0));
+    VERIFY (about_equal(e_total.maxp.z, 0.0));
 }
 
 int main (int argc, char **argv)
