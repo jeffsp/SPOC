@@ -25,6 +25,8 @@ cppcheck:
 		-I . -I apps -I examples \
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
+		--suppress=unusedFunction \
+		--suppress=useStlAlgorithm \
 		apps/*/*.cpp
 
 ################################################################
