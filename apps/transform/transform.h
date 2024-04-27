@@ -664,7 +664,7 @@ void apply (std::istream &is,
         // hold state that is changed, like for example a random
         // number generator. Cppcheck is an error for suggesting
         // otherwise.
-        for (auto &op : ops) // cppcheck-suppress constVariable
+        for (const auto &op : ops)
             p = op (p);
 
         // Write it back out
