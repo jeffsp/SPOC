@@ -75,6 +75,14 @@ compressed.
     generate transect slices by setting this value while leaving the
     tile size in the X direction set to its default (-1).
 
+\-\-target-tile-size=*#*, -a *#*
+:   If this option is set the application will attempt to divide the point
+    point cloud into a set of tiles that are all the same size in x and y
+    (independently), where each tile is as close are possible to the target
+    size. For instance if you have a point cloud that is 100 meters in x and 60
+    meters in y, and if the target tile size is set to 30, the point cloud will
+    be divided into 6 tiles of size 33.3333 by 30.0 meters.
+
 \-\-prefix=*string*, -p *string*
 :   The prefix to use for the output files
 

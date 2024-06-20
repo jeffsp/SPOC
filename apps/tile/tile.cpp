@@ -73,6 +73,12 @@ int main (int argc, char **argv)
             throw runtime_error ("You can't specify both 'tile-size' and 'tile-size-x'");
         if (args.tile_size > 0.0 && args.tile_size_y > 0.0)
             throw runtime_error ("You can't specify both 'tile-size' and 'tile-size-y'");
+        if (args.tile_size > 0.0 && args.target_tile_size > 0.0)
+            throw runtime_error ("You can't specify both 'tile-size' and 'target-tile-size'");
+        if (args.tile_size_x > 0.0 && args.target_tile_size > 0.0)
+            throw runtime_error ("You can't specify both 'tile-size-x' and 'target-tile-size'");
+        if (args.tile_size_y > 0.0 && args.target_tile_size > 0.0)
+            throw runtime_error ("You can't specify both 'tile-size-y' and 'target-tile-size'");
 
         // Get the extent
         const auto e = get_extent (f.get_point_records ());
@@ -92,12 +98,17 @@ int main (int argc, char **argv)
             tile_size_x = args.tile_size_x;
             tile_size_y = args.tile_size_y;
         }
+        else if (args.target_tile_size > 0.0)
+        {
+            const auto tile_sizes = get_target_tile_size (e, args.target_tile_size);
+            tile_size_x = tile_sizes.first;
+            tile_size_y = tile_sizes.second;
+        }
         else
         {
             const auto tile_size = get_tile_size (e, args.tiles);
             tile_size_x = tile_size;
             tile_size_y = tile_size;
-
         }
 
         if (args.verbose)
