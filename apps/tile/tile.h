@@ -28,6 +28,43 @@ double get_tile_size (const spoc::extent::extent &e, const size_t tiles)
     return tile_size;
 }
 
+std::pair<double, double> get_target_tile_size(const spoc::extent::extent &e,
+                                               const double target_size,
+                                               const size_t max_div = 1000)
+{
+    using namespace std;
+    // Get difference in X and Y extents
+    //
+    // Add a small amount to handle rounding
+    const double dx = e.maxp.x - e.minp.x + std::numeric_limits<float>::epsilon ();
+    const double dy = e.maxp.y - e.minp.y + std::numeric_limits<float>::epsilon ();
+
+    // Find the number of divisions in x that gets the x size as close as possible to
+    // the target size
+    double prev_size_x = dx;
+    for (size_t div = 2; div < max_div; ++div)
+    {
+        double cur_size = dx / div;
+        // If the current size results in a tile farther from the target size
+        // we have gone too far and we stop the loop
+        if (abs(target_size - cur_size) > abs(target_size - prev_size_x))
+            break;
+        // Otherwise the distance must be better and we iterate again
+        prev_size_x = cur_size;
+    }
+    // Do the same thing for y
+    double prev_size_y = dy;
+    for (size_t div = 2; div < max_div; ++div)
+    {
+        double cur_size = dy / div;
+        if (abs(target_size - cur_size) > abs(target_size - prev_size_y))
+            break;
+        prev_size_y = cur_size;
+    }
+    // Now we have the best sizes for x and y to be close to the target size, return them
+    return make_pair(prev_size_x, prev_size_y);
+}
+
 template<typename T>
 std::vector<size_t> get_tile_indexes (const T &p,
     const spoc::extent::extent &e,

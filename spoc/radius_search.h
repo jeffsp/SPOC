@@ -154,8 +154,8 @@ class random_neighbor_selector
     }
 };
 
-/// @brief Get neighbors using fast algorithm
-template<typename T,typename U,typename V,typename W,typename X>
+/// @brief Get neighbors using fast algorithm and arbitrary distance function
+template<typename T,typename U,typename V,typename W,typename X, typename Y>
 std::vector<size_t> get_neighbors (
     const size_t i,
     const T &points,
@@ -163,6 +163,7 @@ std::vector<size_t> get_neighbors (
     const V &neighbor_indexes,
     const W &point_voxel_indexes,
     const X &neighbor_vim,
+    const Y distance_function,
     const double radius,
     const size_t max_neighbors)
 {
@@ -198,7 +199,7 @@ std::vector<size_t> get_neighbors (
         assert (neighbor_indexes[j] < points.size ());
 
         // Is it close enough?
-        const double distance = spoc::point::distance(points[point_indexes[i]], points[neighbor_indexes[j]]);
+        const double distance = distance_function(points[point_indexes[i]], points[neighbor_indexes[j]]);
         if (distance <= radius)
             neighbors.push_back (j);
     }
@@ -207,6 +208,75 @@ std::vector<size_t> get_neighbors (
     neighbors.shrink_to_fit ();
 
     return neighbors;
+}
+
+/// @brief Get neighbors using fast algorithm and using 3d distance
+template<typename T,typename U,typename V,typename W,typename X>
+std::vector<size_t> get_neighbors_3d (
+    const size_t i,
+    const T &points,
+    const U &point_indexes,
+    const V &neighbor_indexes,
+    const W &point_voxel_indexes,
+    const X &neighbor_vim,
+    const double radius,
+    const size_t max_neighbors)
+{
+    using point_t = T::value_type;
+    std::function<double(const point_t &p1,
+                         const point_t &p2)> distance_function
+        = [](const point_t &p1,
+             const point_t &p2)
+        {
+            return spoc::point::distance(p1, p2);
+        };
+    return get_neighbors(
+        i,
+        points,
+        point_indexes,
+        neighbor_indexes,
+        point_voxel_indexes,
+        neighbor_vim,
+        distance_function,
+        radius,
+        max_neighbors
+    );
+}
+
+/// @brief Get neighbors using fast algorithm and using 2d distance.
+/// This version of get_neighbors could be used by zeroing all z vlaues in a point
+/// cloud before voxelizing. Then z values can be restored and this function
+/// can be used to search over all points in a cynlinder around the center point.
+template<typename T,typename U,typename V,typename W,typename X>
+std::vector<size_t> get_neighbors_2d (
+    const size_t i,
+    const T &points,
+    const U &point_indexes,
+    const V &neighbor_indexes,
+    const W &point_voxel_indexes,
+    const X &neighbor_vim,
+    const double radius,
+    const size_t max_neighbors)
+{
+    using point_t = T::value_type;
+    std::function<double(const point_t &p1,
+                         const point_t &p2)> distance_function
+        = [](const point_t &p1,
+             const point_t &p2)
+        {
+            return spoc::point::distance_2d(p1, p2);
+        };
+    return get_neighbors(
+        i,
+        points,
+        point_indexes,
+        neighbor_indexes,
+        point_voxel_indexes,
+        neighbor_vim,
+        distance_function,
+        radius,
+        max_neighbors
+    );
 }
 
 /// @brief Get neighbors within a specified radius
@@ -273,7 +343,7 @@ void radius_search (
         // The neighbor indexes
         std::vector<size_t> neighbors;
 
-        neighbors = get_neighbors (i,
+        neighbors = get_neighbors_3d (i,
                 points,
                 point_indexes,
                 neighbor_indexes,

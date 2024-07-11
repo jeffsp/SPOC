@@ -21,6 +21,7 @@ struct args
     double tile_size = -1;
     double tile_size_x = -1;
     double tile_size_y = -1;
+    double target_tile_size = -1;
     std::string prefix;
     std::string fn;
 };
@@ -41,11 +42,12 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             {"tile-size", required_argument, 0, 's'},
             {"tile-size-x", required_argument, 0, 'x'},
             {"tile-size-y", required_argument, 0, 'y'},
+            {"target-tile-size", required_argument, 0, 'a'},
             {"prefix", required_argument, 0, 'p'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hveft:d:s:x:y:p:", long_options, &option_index);
+        int c = getopt_long(argc, argv, "hveft:d:s:x:y:p:a:", long_options, &option_index);
         if (c == -1)
             break;
 
@@ -70,6 +72,7 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case 'x': args.tile_size_x = atof (optarg); break;
             case 'y': args.tile_size_y = atof (optarg); break;
             case 'p': args.prefix = std::string (optarg); break;
+            case 'a': args.target_tile_size = atof (optarg); break;
         }
     }
 

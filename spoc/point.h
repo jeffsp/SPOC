@@ -266,6 +266,21 @@ inline double distance(const T &a,
     return std::sqrt((x_dis * x_dis) + (y_dis * y_dis) + (z_dis * z_dis));
 }
 
+/// Calculate the 2d euclidean distance between two points
+///
+/// @tparam T point type
+/// @param a First point
+/// @param b Second point
+template<typename T>
+inline double distance_2d(const T &a,
+        const T &b)
+{
+    double x_dis = a.x - b.x;
+    double y_dis = a.y - b.y;
+    return std::sqrt((x_dis * x_dis) + (y_dis * y_dis));
+}
+
+
 } // namespace point
 
 } // namespace spoc
