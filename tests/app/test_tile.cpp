@@ -37,6 +37,16 @@ void test_get_tile_size ()
     }
 }
 
+void test_get_target_tile_size ()
+{
+    {
+    const spoc::extent::extent e = {{0, 0, 0}, {100, 60, 100}};
+    const auto sizes = get_target_tile_size(e, 30.0);
+    VERIFY (about_equal (sizes.first, 33.333333333));
+    VERIFY (about_equal (sizes.second, 30.0));
+    }
+}
+
 void test_get_tile_indexes ()
 {
     {
@@ -185,6 +195,7 @@ int main (int argc, char **argv)
     try
     {
         test_get_tile_size ();
+        test_get_target_tile_size ();
         test_get_tile_indexes ();
         test_get_tile_indexes_xy ();
         test_get_tile_map ();

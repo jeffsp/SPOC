@@ -23,7 +23,7 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 macro(add_unit_test name)
     add_executable(${name} ./tests/unit/${name}.cpp)
-    target_link_libraries(${name} gmp z)
+    target_link_libraries(${name} ${OPENMP_LIBRARIES} z)
 endmacro()
 
 add_unit_test(test_app_utils)
@@ -47,7 +47,7 @@ add_unit_test(test_radius_search)
 
 macro(add_benchmark name)
     add_executable(${name} ./benchmarks/${name}.cpp)
-    target_link_libraries(${name} gmp z)
+    target_link_libraries(${name} ${OPENMP_LIBRARIES} z)
 endmacro()
 
 add_benchmark(benchmark_io)
@@ -55,7 +55,7 @@ add_benchmark(benchmark_spoc_file)
 
 macro(add_app_test name)
     add_executable(test_${name} tests/app/test_${name}.cpp)
-    target_link_libraries(test_${name} gmp z)
+    target_link_libraries(test_${name} ${OPENMP_LIBRARIES} z)
     target_include_directories(test_${name} PRIVATE apps/${name})
 endmacro()
 
@@ -69,7 +69,7 @@ add_app_test(transform)
 
 macro(add_app name)
     add_executable(spoc_${name} apps/${name}/${name}.cpp)
-    target_link_libraries(spoc_${name} gmp z)
+    target_link_libraries(spoc_${name} ${OPENMP_LIBRARIES} z)
 endmacro()
 
 add_app(compress)
