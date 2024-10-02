@@ -222,7 +222,7 @@ std::vector<size_t> get_neighbors_3d (
     const double radius,
     const size_t max_neighbors)
 {
-    using point_t = T::value_type;
+    using point_t = typename T::value_type;
     std::function<double(const point_t &p1,
                          const point_t &p2)> distance_function
         = [](const point_t &p1,
@@ -258,7 +258,7 @@ std::vector<size_t> get_neighbors_2d (
     const double radius,
     const size_t max_neighbors)
 {
-    using point_t = T::value_type;
+    using point_t = typename T::value_type;
     std::function<double(const point_t &p1,
                          const point_t &p2)> distance_function
         = [](const point_t &p1,
