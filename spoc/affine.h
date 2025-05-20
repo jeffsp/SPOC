@@ -83,9 +83,9 @@ void rotate_y (T &p, const double degrees)
 {
     // Convert degrees to radians
     const double r = degrees * M_PI / 180.0;
-    auto xop = [&r] (const double x, const double y, const double z) -> double { return x * cos (r) - z * sin (r); };
-    auto yop = [&r] (const double x, const double y, const double z) -> double { return y; };
-    auto zop = [&r] (const double x, const double y, const double z) -> double { return x * sin (r) + z * cos (r); };
+    auto xop = [&r] (const double x, const double y, const double z) -> double { return  x * cos (r) + z * sin (r); };
+    auto yop = [&r] (const double x, const double y, const double z) -> double { return  y; };
+    auto zop = [&r] (const double x, const double y, const double z) -> double { return -x * sin (r) + z * cos (r); };
     rotate (p, xop, yop, zop);
 }
 
