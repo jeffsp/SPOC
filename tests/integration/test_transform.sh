@@ -34,6 +34,20 @@ spoc_transform --add-z=100 \
     > ${TMPDIR}/output.spoc
 #spoc_info ${TMPDIR}/output.spoc
 
+# Gaussian noise
+spoc_transform --gaussian-noise=0.01 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
+spoc_transform --gaussian-noise-x=0.01 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
+spoc_transform --gaussian-noise-y=0.01 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
+spoc_transform --gaussian-noise-z=0.01 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
+
 # Quantize
 spoc_transform --quantize-xyz=0.01 \
     test_data/lidar/juarez50.spoc \
@@ -111,6 +125,20 @@ spoc_transform --scale-z=10 \
     < test_data/lidar/juarez50.spoc \
     > ${TMPDIR}/output.spoc
 #spoc_info ${TMPDIR}/output.spoc
+
+# Uniform noise
+spoc_transform --uniform-noise=0.01 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
+spoc_transform --uniform-noise-x=0.01 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
+spoc_transform --uniform-noise-y=0.01 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
+spoc_transform --uniform-noise-z=0.01 \
+    test_data/lidar/juarez50.spoc \
+    ${TMPDIR}/output.spoc
 
 # Multiple
 #spoc_info test_data/lidar/juarez50.spoc

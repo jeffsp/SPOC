@@ -138,6 +138,26 @@ inline args get_args (int argc, char **argv, const std::string &usage)
                 args.commands.push_back (get_command ("copy-field", optarg));
                 break;
             }
+            case GAUSSIAN_NOISE:
+            {
+                args.commands.push_back (get_command ("gaussian-noise", optarg));
+                break;
+            }
+            case GAUSSIAN_NOISE_X:
+            {
+                args.commands.push_back (get_command ("gaussian-noise-x", optarg));
+                break;
+            }
+            case GAUSSIAN_NOISE_Y:
+            {
+                args.commands.push_back (get_command ("gaussian-noise-y", optarg));
+                break;
+            }
+            case GAUSSIAN_NOISE_Z:
+            {
+                args.commands.push_back (get_command ("gaussian-noise-z", optarg));
+                break;
+            }
             case QUANTIZE_XYZ:
             {
                 args.commands.push_back (get_command ("quantize-xyz", optarg));
@@ -191,6 +211,26 @@ inline args get_args (int argc, char **argv, const std::string &usage)
             case SET:
             {
                 args.commands.push_back (get_command ("set", optarg));
+                break;
+            }
+            case UNIFORM_NOISE:
+            {
+                args.commands.push_back (get_command ("uniform-noise", optarg));
+                break;
+            }
+            case UNIFORM_NOISE_X:
+            {
+                args.commands.push_back (get_command ("uniform-noise-x", optarg));
+                break;
+            }
+            case UNIFORM_NOISE_Y:
+            {
+                args.commands.push_back (get_command ("uniform-noise-y", optarg));
+                break;
+            }
+            case UNIFORM_NOISE_Z:
+            {
+                args.commands.push_back (get_command ("uniform-noise-z", optarg));
                 break;
             }
         }
