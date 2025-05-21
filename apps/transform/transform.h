@@ -350,8 +350,8 @@ OP get_rotate_y_op (const double degrees)
     OP op = [=] (PR p)
     {
         // Rotate the point about Y axis
-        const auto x = p.x * cos (r) - p.z * sin (r);
-        const auto z = p.x * sin (r) + p.z * cos (r);
+        const auto x =  p.x * cos (r) + p.z * sin (r);
+        const auto z = -p.x * sin (r) + p.z * cos (r);
         p.x = x;
         p.z = z;
         return p;
