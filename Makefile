@@ -20,12 +20,11 @@ full_build: cppcheck clean build test examples man_pages doxygen coverage memche
 .PHONY: cppcheck # Run cppcheck
 cppcheck:
 	@echo "Running cppcheck..."
-	@cppcheck --std=c++17 --language=c++ --enable=all \
+	@cppcheck --std=c++23 --language=c++ --enable=all \
 		-q --error-exitcode=255 \
 		-I . -I apps -I examples \
 		--inline-suppr \
 		--suppress=missingIncludeSystem \
-		--suppress=unusedFunction \
 		--suppress=useStlAlgorithm \
 		apps/*/*.cpp
 
