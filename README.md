@@ -36,329 +36,348 @@ the SPOC file format
   (KML), or OpenStreetMap data are not supported by this library
 
 * SPOC format files are very similar to ASPRS LAS format files, with the
+
   notable exceptions listed above: LAS files only support 32-bit
   floating point coordinates, do not easily support streaming I/O, and
   do not support inline variable length records
 
 
-# Support
+# Troubleshooting
+
+## Invalid spoc file format
+
+When running the integration tests, if you receive an error "invalid
+spoc file format", it means that git's Large File Storage (LFS)
+support is not properly installed.
+
+To install it:
+
+1. Install **git-lfs** with your system's package manager. For example,
+    `sudo dnf install git-lfs`
+1. Install support for your specific project by first changing
+   directories to the git project root, and then running `git lfs install`
+1. Fetching all LFS files with `git lfs fetch --all`
+1. Restoring LFS files with `git lfs checkout`
+
+
+# support
 
 [https://gitlab.com/jeffsp/spoc_viewer](https://gitlab.com/jeffsp/spoc_viewer)
 
 [https://gitlab.com/jeffsp/spoc_conversion](https://gitlab.com/jeffsp/spoc_conversion)
 
 
-# File format
+# file format
 
-A SPOC file consists of a **HEADER** followed by **POINT RECORDS**.
+a spoc file consists of a **header** followed by **point records**.
 
-The **HEADER** contains the following information:
+the **header** contains the following information:
 
-* A SPOC file identifier consisting of the four characters: 'SPOC'
-* An 8-bit unsigned integer specifying the SPOC file format major version
-* An 8-bit unsigned integer specifying the SPOC file format minor version
-* A 16-bit unsigned integer specifying the length of the OGC WKT string
-* An arbitrary length OGC WKT string which is used to store spatial
+* a spoc file identifier consisting of the four characters: 'spoc'
+* an 8-bit unsigned integer specifying the spoc file format major version
+* an 8-bit unsigned integer specifying the spoc file format minor version
+* a 16-bit unsigned integer specifying the length of the ogc wkt string
+* an arbitrary length ogc wkt string which is used to store spatial
   reference data
-* An 8-bit unsigned integer specifying the number of 64-bit extra fields
+* an 8-bit unsigned integer specifying the number of 64-bit extra fields
   associated with each point record
-* A 64-bit unsigned integer specifying the number of points records
+* a 64-bit unsigned integer specifying the number of points records
   contained in the file
-* A 8-bit unsigned integer flag indicating whether or not the contents
+* a 8-bit unsigned integer flag indicating whether or not the contents
   are compressed
 
-| Data type     | Contents          | Notes |
+| data type     | contents          | notes |
 | ---           | ---               | ---   |
-| uint8[0..3]   | 'SPOC'            | 4 byte file identifier |
-| uint8         | Major version     | File format information |
-| uint8         | Minor version     | File format information |
-| uint16        | OGC WKT length    | Number of bytes in the next field |
-| uint8[0..N-1] | OGC WKT           | Arbitrary, possibly zero-length string containing OGC WKT format spatial reference data |
-| uint8         | Extra fields      | Number of 64-bit unsigned extra fields in each record |
-| uint64        | Total points      | Total point records in the SPOC file |
-| uint8         | Compression flag  | Indicates if the file contents are compressed |
+| uint8[0..3]   | 'spoc'            | 4 byte file identifier |
+| uint8         | major version     | file format information |
+| uint8         | minor version     | file format information |
+| uint16        | ogc wkt length    | number of bytes in the next field |
+| uint8[0..n-1] | ogc wkt           | arbitrary, possibly zero-length string containing ogc wkt format spatial reference data |
+| uint8         | extra fields      | number of 64-bit unsigned extra fields in each record |
+| uint64        | total points      | total point records in the spoc file |
+| uint8         | compression flag  | indicates if the file contents are compressed |
 
-Each **POINT RECORD** in a SPOC file contains the following information:
+each **point record** in a spoc file contains the following information:
 
-* A 64-bit floating point X coordinate
-* A 64-bit floating point Y coordinate
-* A 64-bit floating point Z coordinate
-* A 32-bit unsigned integer classification
-* A 32-bit unsigned integer point ID
-* A 16-bit unsigned integer intensity/NIR value
-* A 16-bit unsigned integer red channel value
-* A 16-bit unsigned integer green channel value
-* A 16-bit unsigned integer blue channel value
-* Zero or more 64-bit unsigned integer extra fields
+* a 64-bit floating point x coordinate
+* a 64-bit floating point y coordinate
+* a 64-bit floating point z coordinate
+* a 32-bit unsigned integer classification
+* a 32-bit unsigned integer point id
+* a 16-bit unsigned integer intensity/nir value
+* a 16-bit unsigned integer red channel value
+* a 16-bit unsigned integer green channel value
+* a 16-bit unsigned integer blue channel value
+* zero or more 64-bit unsigned integer extra fields
 
-| Data type      | Contents          | Notes |
+| data type      | contents          | notes |
 | ---            | ---               | ---   |
-| double         | X coordinate      | Units are specified in the OGC WKT string |
-| double         | Y coordinate      | Units are specified in the OGC WKT string |
-| double         | Z coordinate      | Units are specified in the OGC WKT string |
-| uint32         | Classification    | Classification as defined by the ASPRS |
-| uint32         | Point indentifier | A point ID, which can indicate the collection source or any other appropriate value |
-| uint16         | Intensity/NIR     | An intensity or NIR value |
-| uint16         | Red               | The point's red channel value |
-| uint16         | Green             | The point's green channel value |
-| uint16         | Blue              | The point's blue channel value |
-| uint64[0..N-1] | Extra fields      | Zero or more extra fields, as indicated in the SPOC file header |
+| double         | x coordinate      | units are specified in the ogc wkt string |
+| double         | y coordinate      | units are specified in the ogc wkt string |
+| double         | z coordinate      | units are specified in the ogc wkt string |
+| uint32         | classification    | classification as defined by the asprs |
+| uint32         | point indentifier | a point id, which can indicate the collection source or any other appropriate value |
+| uint16         | intensity/nir     | an intensity or nir value |
+| uint16         | red               | the point's red channel value |
+| uint16         | green             | the point's green channel value |
+| uint16         | blue              | the point's blue channel value |
+| uint64[0..n-1] | extra fields      | zero or more extra fields, as indicated in the spoc file header |
 
-# Applications
+# applications
 
-Applications provided by this repository adhere to these design
+applications provided by this repository adhere to these design
 principles:
 
-* Applications are command line oriented and are designed to run on a
-  Linux, MacOS, or Windows Subsystem for Linux terminal
-* Where possible, always preserve point record ordering
-* Implicit streaming support by reading/writing records to a stream
-  where possible. This will improve performance by allowing piped commands
-  to operate in parallel. See examples below.
-* Avoid dependencies. Current dependencies are:
+* applications are command line oriented and are designed to run on a
+  linux, macos, or windows subsystem for linux terminal
+* where possible, always preserve point record ordering
+* implicit streaming support by reading/writing records to a stream
+  where possible. this will improve performance by allowing piped commands
+  to operate in parallel. see examples below.
+* avoid dependencies. current dependencies are:
   * zlib for compression
-  * OpenMP for parallelization
+  * openmp for parallelization
 
-The library API follows these principles:
+the library api follows these principles:
 
-* STL conformance where appropriate
-* Functional programming style. Use OOP sparingly and with strong
+* stl conformance where appropriate
+* functional programming style. use oop sparingly and with strong
   justification.
-* Where possible, point records are stored in a vector, and functions
+* where possible, point records are stored in a vector, and functions
   manipulate point record vector indexes, rather than manipulating the
   point records themselves
-* Most functions provide the strong exception safety guarantee by using
+* most functions provide the strong exception safety guarantee by using
   call-by-const-reference or call-by-value and returning either indexes
   into the input data or copies of the input data.
-* Linear complexity algorithms
-  * Exception: Quantiles in `spoc_info` require point record sorting
-  * Exception: Nearest neighbor algorithms are linear in the number of neighbors, not
+* linear complexity algorithms
+  * exception: quantiles in `spoc_info` require point record sorting
+  * exception: nearest neighbor algorithms are linear in the number of neighbors, not
       number of points
-* This library currently makes assumptions about the byte ordering, and
+* this library currently makes assumptions about the byte ordering, and
   it is therefore not portable to other architectures
 
-# Project Roadmap
+# project roadmap
 
-This roadmap lists the target features and functionality and their
+this roadmap lists the target features and functionality and their
 current development status.
 
-## Framework
+## framework
 
-- [ ] Create build and deploy containers
-- [X] Add I/O benchmarks
-- [X] Add point record get/set benchmarks
-- [ ] Add compression benchmarks
-- [X] Update warning for OGC WKT to be more explicit
-- [X] Add Doxygen support
-- [X] Add Design by Contract functionality
-- [X] Generate documentation
-  - [ ] Command line application manual
-  - [X] SDK
-- [X] Reorganize namespaces and headers
-  - [X] Separate application headers from API headers
-  - [X] Create separate application namespace
-- [X] Reorganize tests
-  - [X] Separate app tests from unit tests
-- [X] Create header only library with examples
-- [X] Read/write uncompressed
-- [X] Add NEXTRA field in header
-- [X] Allow arbitrary number of extra fields
-- [X] Rename 'extra\_size' -> 'extra\_fields'
-- [X] Create interface to spoc\_file, so header file size and point
-      vector size do not get out of line. Same for 'extra_size'
-- [X] Gitlab runner
-- [X] CI/CD
-- [X] Version number in header
-- [X] Memcheck with valgrind
-- [X] Test data files
-- [X] Unit test suite
-- [X] Application test suite
-  - [X] Separate from unit test suite
-  - [X] Include in coverage and memcheck
-- [X] Integration test suite
-  - [X] Shell commands that manipulate PATH variable
-- [X] Man page generation
-- [X] Coverage
-- [X] Cppcheck
-- [X] read/write spoc files
-- [X] read/write las files
-- [X] Add --version option to all apps
+- [ ] create build and deploy containers
+- [x] add i/o benchmarks
+- [x] add point record get/set benchmarks
+- [ ] add compression benchmarks
+- [x] update warning for ogc wkt to be more explicit
+- [x] add doxygen support
+- [x] add design by contract functionality
+- [x] generate documentation
+  - [ ] command line application manual
+  - [x] sdk
+- [x] reorganize namespaces and headers
+  - [x] separate application headers from api headers
+  - [x] create separate application namespace
+- [x] reorganize tests
+  - [x] separate app tests from unit tests
+- [x] create header only library with examples
+- [x] read/write uncompressed
+- [x] add nextra field in header
+- [x] allow arbitrary number of extra fields
+- [x] rename 'extra\_size' -> 'extra\_fields'
+- [x] create interface to spoc\_file, so header file size and point
+      vector size do not get out of line. same for 'extra_size'
+- [x] gitlab runner
+- [x] ci/cd
+- [x] version number in header
+- [x] memcheck with valgrind
+- [x] test data files
+- [x] unit test suite
+- [x] application test suite
+  - [x] separate from unit test suite
+  - [x] include in coverage and memcheck
+- [x] integration test suite
+  - [x] shell commands that manipulate path variable
+- [x] man page generation
+- [x] coverage
+- [x] cppcheck
+- [x] read/write spoc files
+- [x] read/write las files
+- [x] add --version option to all apps
 
-## Python Interface
+## python interface
 
-- [X] Python extension reader/writer using pybind11
-- [X] Numpy/Pandas helpers in Python extension
-- [X] Simple Python examples
-- [ ] Simple SPOC file viewer using Plotly
+- [x] python extension reader/writer using pybind11
+- [x] numpy/pandas helpers in python extension
+- [x] simple python examples
+- [ ] simple spoc file viewer using plotly
 
-## Applications
+## applications
 
-- [X] Speed up I/O by either increasing the read/write buffer sizes or
+- [x] speed up i/o by either increasing the read/write buffer sizes or
       by manually buffering reads and writes.
 
-- [X] spoc info
-  - [X] Header/summary
-  - [X] Unit/integration tests
-  - [X] By default, don't show quantiles to avoid sorting
-  - [X] Flag to turn on quantile summary, just show min/max instead
-  - [X] Read compressed files
-  - [ ] Add metrics
-    - [X] Points/m^2 (extent)
-    - [X] Points/m^2 (grid cell)
-    - [X] Points/m^3 (voxel)
-    - [ ] Point spacing estimate
+- [x] spoc info
+  - [x] header/summary
+  - [x] unit/integration tests
+  - [x] by default, don't show quantiles to avoid sorting
+  - [x] flag to turn on quantile summary, just show min/max instead
+  - [x] read compressed files
+  - [ ] add metrics
+    - [x] points/m^2 (extent)
+    - [x] points/m^2 (grid cell)
+    - [x] points/m^3 (voxel)
+    - [ ] point spacing estimate
 
-- [X] spoc spoc2text/text2spoc
-  - [X] Unit/integration tests
-  - [X] Read compressed files
+- [x] spoc spoc2text/text2spoc
+  - [x] unit/integration tests
+  - [x] read compressed files
 
-- [X] spoc compress/decompress
+- [x] spoc compress/decompress
 
-- [X] spoc spoc2las/las2spoc
-  - [X] Unit/integration tests
-  - [X] Support streaming for large files
-  - [X] Read compressed files
+- [x] spoc spoc2las/las2spoc
+  - [x] unit/integration tests
+  - [x] support streaming for large files
+  - [x] read compressed files
 
-- [X] spoc srs: Get/set SRS
-  - [X] Unit/integration tests
+- [x] spoc srs: get/set srs
+  - [x] unit/integration tests
 
-- [X] spoc diff: diff two point clouds, return error if different
-  - [X] Header only
-  - [X] Data only
-  - [X] Field F only - x, y, z, c, p, i, r, g, b, 0-7
-  - [X] Not - inverse results
-  - [X] Unit/integration tests
-  - [X] Read compressed files
+- [x] spoc diff: diff two point clouds, return error if different
+  - [x] header only
+  - [x] data only
+  - [x] field f only - x, y, z, c, p, i, r, g, b, 0-7
+  - [x] not - inverse results
+  - [x] unit/integration tests
+  - [x] read compressed files
 
-- [X] spoc tile: Tile into regular non-overlapping tiles.
-  - [X] Number of tiles on largest size
-  - [X] Size of tile on one side
-  - [X] Unit/integration tests
-  - [X] Tile along a single axis in order to get transect slices
-  - [X] Read/write compressed files
+- [x] spoc tile: tile into regular non-overlapping tiles.
+  - [x] number of tiles on largest size
+  - [x] size of tile on one side
+  - [x] unit/integration tests
+  - [x] tile along a single axis in order to get transect slices
+  - [x] read/write compressed files
 
-- [X] spoc merge: Combine several point clouds into one
-  - [X] Set point id
-  - [X] Warn if the SRS info strings differ
-  - [X] Warn if the area of the merged file is too big
-  - [X] Quiet (don't warn)
-  - [X] Unit/integration tests
-  - [X] Read/write compressed files
+- [x] spoc merge: combine several point clouds into one
+  - [x] set point id
+  - [x] warn if the srs info strings differ
+  - [x] warn if the area of the merged file is too big
+  - [x] quiet (don't warn)
+  - [x] unit/integration tests
+  - [x] read/write compressed files
 
-- [X] spoc transform: Transform each point record into a different point
-      record. These are all capable of streaming. The output has the
-      same number of points as the input. The ordering of the points
+- [x] spoc transform: transform each point record into a different point
+      record. these are all capable of streaming. the output has the
+      same number of points as the input. the ordering of the points
       does not change.
-  - [X] Only allow one command at a time, multiple commands can be
+  - [x] only allow one command at a time, multiple commands can be
         executed using pipes
-  - [X] Allow string field specifications for extra[0..N]
-  - [X] Set fields: set f #
-  - [X] Replace fields: replace f # #
-  - [X] Quantize: round X, Y, Z to nearest Nth decimal place
-  - [X] Rotate by N degrees about X/Y/Z axis: rotatex/y/z #
-  - [X] Add offset to X,Y,Z: addx/y/z #
-  - [X] Scale by X,Y,Z: scale, scalex/y/z
-  - [X] Set random seed
-  - [X] Add Gaussian noise to XYZ
-    - [X] Sigma=#
-    - [X] Sigma-xyz=#,#,#
-  - [X] Add Uniform noise to XYZ
-    - [X] Size=#
-    - [X] Size-xyz=#,#,#
-  - [X] Copy field --src=F --dest=F
-  - [ ] Add --precision-x, --precision-y, --precision-z arguments to
+  - [x] allow string field specifications for extra[0..n]
+  - [x] set fields: set f #
+  - [x] replace fields: replace f # #
+  - [x] quantize: round x, y, z to nearest nth decimal place
+  - [x] rotate by n degrees about x/y/z axis: rotatex/y/z #
+  - [x] add offset to x,y,z: addx/y/z #
+  - [x] scale by x,y,z: scale, scalex/y/z
+  - [x] set random seed
+  - [x] add gaussian noise to xyz
+    - [x] sigma=#
+    - [x] sigma-xyz=#,#,#
+  - [x] add uniform noise to xyz
+    - [x] size=#
+    - [x] size-xyz=#,#,#
+  - [x] copy field --src=f --dest=f
+  - [ ] add --precision-x, --precision-y, --precision-z arguments to
         compress in order to improve compression
 
-- [X] spoc tool: Common operations
-  - [X] Get/Set field F as text
-    - [X] Check to make sure text file has the correct number of points
+- [x] spoc tool: common operations
+  - [x] get/set field f as text
+    - [x] check to make sure text file has the correct number of points
           when setting a field
-  - [X] Recenter points about mean
-  - [X] Subtract minimum X, Y, and Z from all points: subtract-min
-  - [X] Resize extra
-  - [X] Upsample classifications
-    - [X] resolution
-  - [X] Refactor: This application does not need to stream
-  - [X] Read/write compressed files
+  - [x] recenter points about mean
+  - [x] subtract minimum x, y, and z from all points: subtract-min
+  - [x] resize extra
+  - [x] upsample classifications
+    - [x] resolution
+  - [x] refactor: this application does not need to stream
+  - [x] read/write compressed files
 
-- [X] spoc filter: Remove points with certain properties
-  - [X] Keep classes
-  - [X] Remove classes
-  - [X] Unique: Remove duplicates with same X, Y, Z values
-  - [X] Subsample: Remove duplicates with same voxel indexes
-    - [X] random-seed=*#*
-    - [X] save-voxel-indexes in e0,e1,e2
-  - [X] Unit/app tests
-  - [X] Read/write compressed files
+- [x] spoc filter: remove points with certain properties
+  - [x] keep classes
+  - [x] remove classes
+  - [x] unique: remove duplicates with same x, y, z values
+  - [x] subsample: remove duplicates with same voxel indexes
+    - [x] random-seed=*#*
+    - [x] save-voxel-indexes in e0,e1,e2
+  - [x] unit/app tests
+  - [x] read/write compressed files
 
-## Script Examples
+## script examples
 
-Examples of how to use the command line applications
+examples of how to use the command line applications
 
-- [ ] Machine learning
-  - [ ] Rotate by 5 degrees off nadir, then project to XY plane
-  - [ ] Slice a 1 meter transect, rotate by 90 degrees, project to get
+- [ ] machine learning
+  - [ ] rotate by 5 degrees off nadir, then project to xy plane
+  - [ ] slice a 1 meter transect, rotate by 90 degrees, project to get
         a transect
-  - [ ] Regularization, add noise
-  - [ ] Tile
-- [ ] Subsample/upsample
-- [ ] Transform with pipes
-- [X] Stream averaging
+  - [ ] regularization, add noise
+  - [ ] tile
+- [ ] subsample/upsample
+- [ ] transform with pipes
+- [x] stream averaging
 
-## C++ Programming Examples
+## c++ programming examples
 
-Examples of how to use the C++ API with compiled examples
+examples of how to use the c++ api with compiled examples
 
-- [X] Noop with streams
-- [X] Very large spoc file with streaming
-- [ ] Nearest neighbor processing
-- [ ] DSM creation
-  - [ ] Get voxel indexes
-  - [ ] Project to XY plane
-  - [ ] Write raw raster to disk
-  - [ ] Convert raw to png using imagemagick
-- [ ] Subsample with random indexes, assign class, undo subsampling
+- [x] noop with streams
+- [x] very large spoc file with streaming
+- [ ] nearest neighbor processing
+- [ ] dsm creation
+  - [ ] get voxel indexes
+  - [ ] project to xy plane
+  - [ ] write raw raster to disk
+  - [ ] convert raw to png using imagemagick
+- [ ] subsample with random indexes, assign class, undo subsampling
 
-# Proposed Functionality
+# proposed functionality
 
 * spoctree: break into files arranged as an octree, access/create spoc files
-  * Given a bunch of spoc files, create a spoctree file. Each entry in the spoctree file should contain:
-    * Filename
-    * Extent
-    * MD5Sum
-  * Spoctree is immutable (i.e. can't add to or delete from spoctree)
-  * Octree cells divide until they reach a minimum size, based upon point record size (e.g. 1Mb per cell)
-  * Generate a spoc file from a spoctree given an extent
-    * API call
-    * Application interface
-    * X,Y extent
-    * X,Y,Z extent
-  * Unit/integration tests
+  * given a bunch of spoc files, create a spoctree file. each entry in the spoctree file should contain:
+    * filename
+    * extent
+    * md5sum
+  * spoctree is immutable (i.e. can't add to or delete from spoctree)
+  * octree cells divide until they reach a minimum size, based upon point record size (e.g. 1mb per cell)
+  * generate a spoc file from a spoctree given an extent
+    * api call
+    * application interface
+    * x,y extent
+    * x,y,z extent
+  * unit/integration tests
 
-# A final note about library design
+# a final note about library design
 
-This library adheres to Design by Contract which is implemented using
-macros and are enabled during debug compilation. In the release version
+this library adheres to design by contract which is implemented using
+macros and are enabled during debug compilation. in the release version
 of the build, the macros have no effect (i.e., they are no-ops).
 
-Preconditions are specified typically upon function entry with the macro
-**REQUIRE()**.
+preconditions are specified typically upon function entry with the macro
+**require()**.
 
-Postconditions are specified before function return with the macro
-**ENSURE()**.
+postconditions are specified before function return with the macro
+**ensure()**.
 
-Invariants are specified throughout the code with the **assert()** macro.
+invariants are specified throughout the code with the **assert()** macro.
 
-Note that design by contract macros are used during development and aid
-in code **design**. They are not used for debugging or for error
+note that design by contract macros are used during development and aid
+in code **design**. they are not used for debugging or for error
 checking.
 
-As noted above, side effects are typically reduced by adhering to a
-function style of programming. Also, the **strong** exception safety
+as noted above, side effects are typically reduced by adhering to a
+function style of programming. also, the **strong** exception safety
 guarantee is often provided by passing parameters that are const
 reference and by using copy semantics when performance allows it.
 
-# References
+# references
 
 https://www.boost.org/community/exception\_safety.html
 
@@ -367,8 +386,8 @@ https://en.cppreference.com/w/cpp/language/copy\_elision
 https://stackoverflow.com/questions/21471836/what-can-c-offer-as-far-as-functional-programming
 
 https://stackoverflow.com/questions/21605579/how-true-is-want-speed-pass-by-value
-(Note that David Abraham's original article, "Want speed? Pass by
+(note that david abraham's original article, "want speed? pass by
 value", at the time of this writing, does not appear to have a
-persistent URL, and cpp-next.com is defunct.
+persistent url, and cpp-next.com is defunct.
 
-https://en.wikipedia.org/wiki/Lambda\_lifting
+https://en.wikipedia.org/wiki/lambda\_lifting
