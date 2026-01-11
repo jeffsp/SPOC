@@ -1,5 +1,5 @@
-#include "spoc/affine.h"
-#include "spoc/test_utils.h"
+#include "affine.h"
+#include "test_utils.h"
 #include <iostream>
 #include <stdexcept>
 

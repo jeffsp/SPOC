@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spoc/spoc.h"
+#include "spoc.h"
 #include <cassert>
 #include <iostream>
 

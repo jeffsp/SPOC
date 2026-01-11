@@ -1,7 +1,7 @@
-#include "spoc/app_utils.h"
-#include "spoc/header.h"
-#include "spoc/version.h"
-#include "spoc/test_utils.h"
+#include "app_utils.h"
+#include "header.h"
+#include "test_utils.h"
+#include "version.h"
 #include <iostream>
 #include <random>
 #include <vector>

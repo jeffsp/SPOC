@@ -1,6 +1,6 @@
-#include "spoc/radius_search.h"
-#include "spoc/test_utils.h"
-#include "spoc/voxel.h"
+#include "radius_search.h"
+#include "test_utils.h"
+#include "voxel.h"
 #include <iostream>
 #include <stdexcept>
 

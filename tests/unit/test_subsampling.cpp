@@ -1,5 +1,5 @@
-#include "spoc/spoc.h"
-#include "spoc/test_utils.h"
+#include "spoc.h"
+#include "test_utils.h"
 #include <iostream>
 #include <stdexcept>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spoc/contracts.h"
+#include "contracts.h"
 
 #include <getopt.h>
 #include <iostream>

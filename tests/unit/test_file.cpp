@@ -1,8 +1,8 @@
-#include "spoc/app_utils.h"
-#include "spoc/file.h"
-#include "spoc/header.h"
-#include "spoc/io.h"
-#include "spoc/test_utils.h"
+#include "app_utils.h"
+#include "file.h"
+#include "header.h"
+#include "io.h"
+#include "test_utils.h"
 #include <iostream>
 #include <random>
 #include <vector>

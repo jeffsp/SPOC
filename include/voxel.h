@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spoc/extent.h"
+#include "extent.h"
 #include <unordered_map>
 #include <unordered_set>
 #include <numeric>

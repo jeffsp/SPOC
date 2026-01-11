@@ -1,5 +1,5 @@
-#include "spoc/app_utils.h"
-#include "spoc/spoc.h"
+#include "app_utils.h"
+#include "spoc.h"
 #include "tile.h"
 #include "tile_cmd.h"
 #include <algorithm>

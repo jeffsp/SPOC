@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spoc/extent.h"
+#include "extent.h"
 #include <algorithm>
 #include <cassert>
 #include <iostream>

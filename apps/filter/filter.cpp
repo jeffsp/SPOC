@@ -1,7 +1,7 @@
-#include "spoc/app_utils.h"
-#include "spoc/spoc.h"
+#include "app_utils.h"
 #include "filter.h"
 #include "filter_cmd.h"
+#include "spoc.h"
 #include <cctype>
 #include <iostream>
 #include <stdexcept>

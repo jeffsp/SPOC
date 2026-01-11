@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "spoc/point_record.h"
-#include "spoc/point.h"
-#include "spoc/voxel.h"
+#include "point_record.h"
+#include "point.h"
+#include "voxel.h"
 
 namespace spoc
 {

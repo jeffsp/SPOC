@@ -1,7 +1,7 @@
 #pragma once
 
-#include "spoc/point.h"
-#include "spoc/voxel.h"
+#include "point.h"
+#include "voxel.h"
 #include <algorithm>
 #include <iostream>
 #include <unordered_set>

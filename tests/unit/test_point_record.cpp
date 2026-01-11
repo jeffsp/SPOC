@@ -1,5 +1,5 @@
-#include "spoc/point_record.h"
-#include "spoc/test_utils.h"
+#include "point_record.h"
+#include "test_utils.h"
 #include <iostream>
 #include <random>
 #include <vector>

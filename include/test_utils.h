@@ -1,7 +1,7 @@
 #pragma once
 
-#include "spoc/point.h"
-#include "spoc/spoc.h"
+#include "point.h"
+#include "spoc.h"
 #include <cassert>
 #include <chrono>
 #include <cmath>

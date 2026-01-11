@@ -4,7 +4,7 @@
 #include <limits>
 #include <utility>
 #include <vector>
-#include "spoc/point.h"
+#include "point.h"
 
 namespace spoc
 {

@@ -1,5 +1,5 @@
-#include "spoc/app_utils.h"
-#include "spoc/test_utils.h"
+#include "app_utils.h"
+#include "test_utils.h"
 #include <filesystem>
 #include <iostream>
 #include <sstream>

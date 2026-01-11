@@ -1,6 +1,6 @@
-#include "spoc/extent.h"
-#include "spoc/point.h"
-#include "spoc/test_utils.h"
+#include "extent.h"
+#include "point.h"
+#include "test_utils.h"
 #include <algorithm>
 #include <array>
 #include <cassert>

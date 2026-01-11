@@ -19,7 +19,7 @@ else()
     set(CMAKE_CXX_FLAGS "-Wall -Werror -Wno-class-memaccess ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR} ./include)
 
 macro(add_unit_test name)
     add_executable(${name} ./tests/unit/${name}.cpp)

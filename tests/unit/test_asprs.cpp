@@ -1,5 +1,5 @@
-#include "spoc/asprs.h"
-#include "spoc/test_utils.h"
+#include "asprs.h"
+#include "test_utils.h"
 
 using namespace std;
 using namespace spoc::asprs;

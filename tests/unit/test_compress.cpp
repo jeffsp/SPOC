@@ -1,5 +1,5 @@
-#include "spoc/compression.h"
-#include "spoc/test_utils.h"
+#include "compression.h"
+#include "test_utils.h"
 #include <cassert>
 #include <fstream>
 #include <iostream>

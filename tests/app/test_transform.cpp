@@ -1,5 +1,5 @@
-#include "spoc/spoc.h"
-#include "spoc/test_utils.h"
+#include "spoc.h"
+#include "test_utils.h"
 #include "transform.h"
 #include "transform_cmd.h"
 #include <iostream>

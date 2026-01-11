@@ -1,6 +1,6 @@
-#include "spoc/contracts.h"
-#include "spoc/test_utils.h"
-#include "spoc/utils.h"
+#include "contracts.h"
+#include "test_utils.h"
+#include "utils.h"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>

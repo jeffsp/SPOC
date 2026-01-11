@@ -1,6 +1,6 @@
-#include "spoc/benchmark_utils.h"
-#include "spoc/spoc.h"
-#include "spoc/test_utils.h"
+#include "benchmark_utils.h"
+#include "spoc.h"
+#include "test_utils.h"
 #include <iostream>
 #include <vector>
 #include <stdexcept>

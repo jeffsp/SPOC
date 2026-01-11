@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spoc/cmd.h"
+#include "cmd.h"
 #include <stdexcept>
 #include <string>
 #include <vector>
