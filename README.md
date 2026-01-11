@@ -24,9 +24,9 @@ In a SPOC file, each AOI is a 'sample'. Point records are not samples.
 The file format intentionally does not contain a central index or
 metadata file. This gives the shard creator to have the flexibility to
 divide the shard in any way they choose. Applications at a higher
-level can for example, arrange the shards in 3D Z-ordering or octrees.
-The SPOC repository contains applications that perform both Z-ordering
-and octree ordering of points across multiple shards.
+level can arrange the shards in, for example, 2D tiles, 2D/3D
+Z-ordering, quadtrees, or octrees. The SPOC repository contains
+applications that perform shard creation with these types of ordering.
 
 SPOC shards typically are limited in size to 1GB.
 
@@ -34,7 +34,8 @@ SPOC shards typically are limited in size to 1GB.
 
 ## Required point record fields
 
-A SPOC file must contain, at a minimum, the following three files.
+A SPOC file must contain, at a minimum, three files that specify
+the point record coordinates.
 
 ```
 0000.x.double
