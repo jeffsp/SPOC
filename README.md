@@ -12,6 +12,15 @@ SPOC files are GNU tar format files that conform to a certain set of
 simple file naming conventions. SPOC files, like WebDataset, are
 compatible with POSIX standards.
 
+A SPOC file is a WebDataset shard, meaning that the data contained in
+the file can be only part of a larger collection of point cloud point
+records.
+
+Point record fields are grouped together in a SPOC file so that the
+data contained in the fields can be compressed more efficiently.
+
+In a SPOC file, each AOI is a 'sample'. Point records are not samples.
+
 # Conventions
 
 ## Required point record fields
@@ -19,37 +28,28 @@ compatible with POSIX standards.
 A SPOC file must contain, at a minimum, the following three files.
 
 ```
-x-00000000.double
-y-00000000.double
-z-00000000.double
+0000.x.double
+0000.y.double
+0000.z.double
 ```
+
+The "0000" can be any string, but the point records must associated with ...
+must all be named the same.
 
 Each of these file are blocks of N elements containing 64bit, double precision floating point format.
 In particular, [IEEE 754 format](https://en.wikipedia.org/wiki/Decimal64_floating-point_format).
 
 These files must all contain the same number of elements.
 
-If the file only contains a single collection of point records, you can omit
-the -0000000 suffix from the point record names.
-
-```
-x.double
-y.double
-z.double
-```
-
-However, if the file contains more than one collection of point records,
-enumeration suffixes are required.
-
 ## Optional point record fields
 
 ```
-c-00000000.uint32_t
-p-00000000.uint32_t
-i-00000000.uint16_t
-r-00000000.uint16_t
-g-00000000.uint16_t
-b-00000000.uint16_t
+0000.c.int32_t
+0000.p.int32_t
+0000.i.int16_t
+0000.r.int16_t
+0000.g.int16_t
+0000.b.int16_t
 ```
 
 ### Extra fields
@@ -57,42 +57,23 @@ b-00000000.uint16_t
 In addition...
 
 ```
-e0-00000000.<type>
-e1-00000000.<type>
+0000.e0.<type>
+0000.e1.<type>
 ...
-eN-00000000.<type>
+0000.e99.<type>
 ```
 
 You cannot have two extra field files with the same name and different types
 
 ```
-e5-00000000.double  # First one is OK
-e5-00000000.uint8_t # Not allowed, already have an 'e5' field
+0000.e5.double  # First one is OK
+0000.e5.uint8_t # Not allowed, already have an 'e5' field
 ```
 
-If the file only contains a single collection of point records, you can omit
-the -0000000 suffix from the point record names.
+## Optional meta-data files
 
 ```
-c.uint32_t
-p.uint32_t
-i.uint16_t
-r.uint16_t
-g.uint16_t
-b.uint16_t
-e0.<type>
-e1.<type>
-...
-eN.<type>
-```
-
-However, if the file contains more than one collection of point records,
-enumeration suffixes are required on all filenames.
-
-## Optional meta-data fields
-
-```
-version.json
+spoc_version.json
 {
     'major': 2,
     'minor': 0
@@ -104,21 +85,16 @@ version.json
 format coordinate reference system string.
 
 ```
-crs.txt
+0000.crs.txt
 PROJCS["NAD83 / Texas Central (ftUS)",GEOGCS["NAD83",DATUM
 ["North American Datum 1983",SPHEROID["GRS 1980",6378137,298.257222101,
 ...
 ```
 
 ```
-extents.json
+0000.extent.json
 {
-    '00000000': {
-        'minx': 100, 'miny': 100, 'minz': 100,
-        'maxx': 100, 'maxy': 100, 'maxz': 100},
-    '00000001': {
-        'minx': 100, 'miny': 100, 'minz': 100,
-        'maxx': 100, 'maxy': 100, 'maxz': 100},
-        ...
+    'minx': 100, 'miny': 100, 'minz': 100,
+    'maxx': 100, 'maxy': 100, 'maxz': 100,
 }
 ```
