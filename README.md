@@ -16,14 +16,18 @@ compatible with POSIX standards.
 
 ## Required point record fields
 
-SPOC files must contain, at a minimum, files containing the following
-three files.
+A SPOC file must contain, at a minimum, the following three files.
 
 ```
 x-00000000.double
 y-00000000.double
 z-00000000.double
 ```
+
+Each of these file are blocks of N elements containing 64bit, double precision floating point format.
+In particular, [IEEE 754 format](https://en.wikipedia.org/wiki/Decimal64_floating-point_format).
+
+These files must all contain the same number of elements.
 
 If the file only contains a single collection of point records, you can omit
 the -0000000 suffix from the point record names.
