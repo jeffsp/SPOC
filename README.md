@@ -13,7 +13,7 @@ simple file naming conventions. SPOC files, like WebDataset, are
 compatible with POSIX standards.
 
 A SPOC file is a WebDataset shard, meaning that the data contained in
-the file can be only part of a larger collection of point cloud point
+the file can be part of a larger collection of point cloud point
 records.
 
 Point record fields are grouped together in a SPOC file so that the
@@ -29,6 +29,14 @@ Z-ordering, quadtrees, or octrees. The SPOC repository contains
 applications that perform shard creation with these types of ordering.
 
 SPOC shards typically are limited in size to 1GB.
+
+This repository also contains conversion utilities for converting spoc
+files to and from LAS format files.
+
+This repositoy also contains a simple spoc file viewer. However, the
+viewer contains many dependencies, like the QT6 SDK, and therefore the
+viewer is not built by default. You must explicitly build this tool
+from its subdirectory.
 
 # Conventions
 
