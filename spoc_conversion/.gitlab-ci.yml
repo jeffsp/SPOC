@@ -1,0 +1,18 @@
+variables:
+    GIT_SUBMODULE_STRATEGY: normal
+
+build:
+  stage: build
+  script:
+    - make cppcheck
+    - make build
+  artifacts:
+    paths:
+      - build/debug/*
+      - build/release/*
+
+test:
+  stage: test
+  script:
+    - make test
+    - make memcheck

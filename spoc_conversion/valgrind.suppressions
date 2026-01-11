@@ -1,0 +1,12 @@
+{
+   <ignore_gomp_leaks_versioned>
+   Memcheck:Leak
+   ...
+   obj:*/libgomp.so.*
+}
+{
+   <ignore_gomp_leaks_unversioned>
+   Memcheck:Leak
+   ...
+   obj:*/libgomp.so
+}
