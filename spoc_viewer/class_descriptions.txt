@@ -1,0 +1,32 @@
+0,
+1, unclassified
+2, ground
+3, low veg
+4, med veg
+5, high veg
+6, building
+7, low noise
+8, high noise
+9, water
+10, rail
+11, road
+12, bridge
+13, wire
+14, unused
+15, tower
+16, bad data
+17, bridge
+18, high noise
+19, vertical obstruction
+20, below ground, non-noise
+21, vehicles
+22, misc-manmade
+23, perimeter
+24, urban elements
+25, ducts
+26, aircraft
+27, solar panel array
+28, ???
+29, ???
+30, concrete pad
+31, fence
