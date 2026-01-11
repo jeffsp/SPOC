@@ -21,6 +21,15 @@ data contained in the fields can be compressed more efficiently.
 
 In a SPOC file, each AOI is a 'sample'. Point records are not samples.
 
+The file format intentionally does not contain a central index or
+metadata file. This gives the shard creator to have the flexibility to
+divide the shard in any way they choose. Applications at a higher
+level can for example, arrange the shards in 3D Z-ordering or octrees.
+The SPOC repository contains applications that perform both Z-ordering
+and octree ordering of points across multiple shards.
+
+SPOC shards typically are limited in size to 1GB.
+
 # Conventions
 
 ## Required point record fields
@@ -35,6 +44,31 @@ A SPOC file must contain, at a minimum, the following three files.
 
 The "0000" can be any string, but the point records must associated with ...
 must all be named the same.
+
+For example,
+```
+AOI-0.x.double
+AOI-0.y.double
+AOI-0.z.double
+AOI-1.x.double
+AOI-1.y.double
+AOI-1.z.double
+...
+building-0.x.double
+building-0.y.double
+building-0.z.double
+building-1.x.double
+building-1.y.double
+building-1.z.double
+...
+cars.x.double
+cars.y.double
+cars.z.double
+busses.x.double
+busses.y.double
+busses.z.double
+...
+```
 
 Each of these file are blocks of N elements containing 64bit, double precision floating point format.
 In particular, [IEEE 754 format](https://en.wikipedia.org/wiki/Decimal64_floating-point_format).
